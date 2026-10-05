@@ -1,0 +1,111 @@
+{
+  "checked_on": "2026-10-05",
+  "leaderboard": "https://livebench.ai/",
+  "leaderboard_revision": "caa4253c8a3aa93b5c7ec234e681d4f120a20240",
+  "latest_release": "2026-06-25",
+  "aggregation": "Mean of subtask scores within each category, then equal mean of category scores. Different releases cannot be ranked together.",
+  "recommendations": [
+    {
+      "model_id": "deepseek-r1-32b",
+      "leaderboard_model_id": "deepseek-r1-distill-qwen-32b",
+      "release": "2025-04-25",
+      "overall": 47.52,
+      "category_scores": {
+        "Reasoning": 44.361,
+        "Coding": 47.03,
+        "Mathematics": 60.13166666666667,
+        "Data Analysis": 46.94,
+        "Language": 30.915000000000003,
+        "IF": 55.7125
+      },
+      "source_table": "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv",
+      "source_sha256": "251eb7461da69232733b80d1e63f00a9db5b921d90c966d139ce0e2851c762d9",
+      "meaning": "Published source-model reference; not a local, quantized, or cross-release-comparable score."
+    },
+    {
+      "model_id": "deepseek-r1-70b",
+      "leaderboard_model_id": "deepseek-r1-distill-llama-70b",
+      "release": "2025-04-25",
+      "overall": 55.51,
+      "category_scores": {
+        "Reasoning": 59.80566666666667,
+        "Coding": 46.6475,
+        "Mathematics": 58.802,
+        "Data Analysis": 60.8095,
+        "Language": 37.050333333333334,
+        "IF": 69.9375
+      },
+      "source_table": "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv",
+      "source_sha256": "251eb7461da69232733b80d1e63f00a9db5b921d90c966d139ce0e2851c762d9",
+      "meaning": "Published source-model reference; not a local, quantized, or cross-release-comparable score."
+    },
+    {
+      "model_id": "glm45-air",
+      "leaderboard_model_id": "glm-4.5-air",
+      "release": "2025-05-30",
+      "overall": 60.53,
+      "category_scores": {
+        "Reasoning": 78.30566666666667,
+        "Coding": 60.2725,
+        "Agentic Coding": 16.666666666666668,
+        "Mathematics": 79.37233333333333,
+        "Data Analysis": 65.962,
+        "Language": 44.28966666666667,
+        "IF": 78.83775
+      },
+      "source_table": "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_05_30.csv",
+      "source_sha256": "c1215f3df5b2e0a5fe69907c101d29922bf783b011df9ba82638c0145cb4c64c",
+      "meaning": "Published source-model reference; not a local, quantized, or cross-release-comparable score."
+    },
+    {
+      "model_id": "mistral-small31",
+      "leaderboard_model_id": "mistral-small-2503",
+      "release": "2025-04-25",
+      "overall": 45.92,
+      "category_scores": {
+        "Reasoning": 37.083333333333336,
+        "Coding": 49.647999999999996,
+        "Mathematics": 38.39233333333333,
+        "Data Analysis": 52.1395,
+        "Language": 34.586,
+        "IF": 63.66275
+      },
+      "source_table": "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv",
+      "source_sha256": "251eb7461da69232733b80d1e63f00a9db5b921d90c966d139ce0e2851c762d9",
+      "meaning": "Published source-model reference; not a local, quantized, or cross-release-comparable score."
+    },
+    {
+      "model_id": "phi4-reasoning-plus",
+      "leaderboard_model_id": "phi-4-reasoning-plus",
+      "release": "2025-04-25",
+      "overall": 56.64,
+      "category_scores": {
+        "Reasoning": 57.833333333333336,
+        "Coding": 60.593999999999994,
+        "Mathematics": 62.83266666666666,
+        "Data Analysis": 54.7435,
+        "Language": 30.692333333333334,
+        "IF": 73.1665
+      },
+      "source_table": "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv",
+      "source_sha256": "251eb7461da69232733b80d1e63f00a9db5b921d90c966d139ce0e2851c762d9",
+      "meaning": "Published source-model reference; not a local, quantized, or cross-release-comparable score."
+    }
+  ],
+  "excluded_latest_examples": [
+    {
+      "model": "zai-org/GLM-5.3-Flash",
+      "release": "2026-06-25",
+      "score": 71.59,
+      "reason": "320B nominal; raw Q4 floor is about 149GiB, beyond this laptop RAM and VRAM. Flash is not a size guarantee.",
+      "source": "https://huggingface.co/zai-org/GLM-5.3-Flash"
+    },
+    {
+      "model": "deepseek-ai/DeepSeek-V4.1-Flash",
+      "release": "2026-06-25",
+      "score": 81.11,
+      "reason": "Published checkpoint is far larger than this laptop memory budget; no compact validated offload artifact verified.",
+      "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash"
+    }
+  ]
+}

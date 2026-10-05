@@ -1,6 +1,6 @@
 # Platform setup and compatibility
 
-These are operator-run setup recipes, not installer scripts. Install one pinned engine at a time in a separate checkout/environment. Keep a working driver before experimenting with model packages. Upstream OS support does not establish support for Ubuntu 26.04, Blackwell sm_120, every listed model, or every quantization kernel.
+Use the [interactive/CLI installers and run scripts](WORKFLOWS.md) for the pinned recipes. This page explains compatibility and manual tuning. Install one pinned engine at a time in a separate checkout/environment. Keep a working driver before experimenting with model packages. Upstream OS support does not establish support for Ubuntu 26.04, Blackwell sm_120, every listed model, or every quantization kernel.
 
 ## OS matrix
 
@@ -70,7 +70,7 @@ Use a pinned official release or source build appropriate to your OS/GPU. Select
 
 Use the upstream **model-specific** Linux/WSL recipe and serving mode; recent source separates `kt-kernel` capabilities and integrations. Select an AVX2-capable path for the 285HX. AMX or AVX-512 server results do not predict this laptop's behavior. Check whether the exact architecture and CPU quantization are supported before selecting a checkpoint.
 
-Expose the recipe's OpenAI-compatible endpoint, enter its full URL in the example, and record the kernel/serving integration versions separately in `placement_notes`. There is intentionally no universal launch command claiming that every catalog model works. Native Windows is excluded under the documented upstream status, rather than silently substituted with WSL.
+Expose the recipe's OpenAI-compatible endpoint, enter its full URL in the example, and record the kernel/serving integration versions separately in `placement_notes`. The managed launcher uses the SGLang KT integration and requires a model-specific method and CPU weight path; it does not claim every catalog model works. Native Windows is excluded under the documented upstream status, rather than silently substituted with WSL.
 
 ## vLLM
 

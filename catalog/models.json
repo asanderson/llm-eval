@@ -924,6 +924,293 @@
           "total": 179999981459
         }
       }
+    },
+    {
+      "id": "deepseek-r1-32b",
+      "provider": "DeepSeek",
+      "rank": null,
+      "recommendation_group": "livebench-expansion",
+      "upstream_repo": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+      "parameters_b": 32.8,
+      "active_parameters_b": 32.8,
+      "target_precision": "GGUF Q8_0",
+      "planning_bits": 8.5,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "MIT",
+      "license_class": "permissive",
+      "rationale": "Dense reasoning offload anchor; Q8 exceeds VRAM. Historical score is not a score for this quantization.",
+      "sources": [
+        "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+        "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv"
+      ],
+      "source_revision": "711ad2ea6aa40cfca18895e8aca02ab92df1a746",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "planning_weight_gib": 32.46,
+      "upstream_metadata": {
+        "id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+        "sha": "711ad2ea6aa40cfca18895e8aca02ab92df1a746",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 32763876352
+          },
+          "total": 32763876352
+        }
+      },
+      "livebench_reference": {
+        "model_id": "deepseek-r1-32b",
+        "leaderboard_model_id": "deepseek-r1-distill-qwen-32b",
+        "release": "2025-04-25",
+        "overall": 47.52,
+        "category_scores": {
+          "Reasoning": 44.361,
+          "Coding": 47.03,
+          "Mathematics": 60.13166666666667,
+          "Data Analysis": 46.94,
+          "Language": 30.915000000000003,
+          "IF": 55.7125
+        },
+        "source_table": "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv",
+        "source_sha256": "251eb7461da69232733b80d1e63f00a9db5b921d90c966d139ce0e2851c762d9",
+        "meaning": "Published source-model reference; not a local, quantized, or cross-release-comparable score."
+      }
+    },
+    {
+      "id": "deepseek-r1-70b",
+      "provider": "DeepSeek",
+      "rank": null,
+      "recommendation_group": "livebench-expansion",
+      "upstream_repo": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+      "parameters_b": 70.6,
+      "active_parameters_b": 70.6,
+      "target_precision": "GGUF Q4_K_M",
+      "planning_bits": 4.8,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "MIT; upstream Llama 3.3 terms also apply",
+      "license_class": "model_specific",
+      "rationale": "Larger dense reasoning comparison; CPU decoding may dominate. Retains upstream Llama terms.",
+      "sources": [
+        "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+        "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv"
+      ],
+      "source_revision": "b1c0b44b4369b597ad119a196caf79a9c40e141e",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "planning_weight_gib": 39.45,
+      "upstream_metadata": {
+        "id": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+        "sha": "b1c0b44b4369b597ad119a196caf79a9c40e141e",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 70553706496
+          },
+          "total": 70553706496
+        }
+      },
+      "livebench_reference": {
+        "model_id": "deepseek-r1-70b",
+        "leaderboard_model_id": "deepseek-r1-distill-llama-70b",
+        "release": "2025-04-25",
+        "overall": 55.51,
+        "category_scores": {
+          "Reasoning": 59.80566666666667,
+          "Coding": 46.6475,
+          "Mathematics": 58.802,
+          "Data Analysis": 60.8095,
+          "Language": 37.050333333333334,
+          "IF": 69.9375
+        },
+        "source_table": "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv",
+        "source_sha256": "251eb7461da69232733b80d1e63f00a9db5b921d90c966d139ce0e2851c762d9",
+        "meaning": "Published source-model reference; not a local, quantized, or cross-release-comparable score."
+      }
+    },
+    {
+      "id": "glm45-air",
+      "provider": "Z.AI",
+      "rank": null,
+      "recommendation_group": "livebench-expansion",
+      "upstream_repo": "zai-org/GLM-4.5-Air",
+      "parameters_b": 110.5,
+      "active_parameters_b": 12,
+      "target_precision": "GGUF Q4_K_M",
+      "planning_bits": 4.8,
+      "status": "conditional",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "MIT",
+      "license_class": "permissive",
+      "rationale": "Sparse upper-memory candidate; nominal 106B, metadata includes about 110.5B tensors. Require measured CPU/GPU split, short context and no duplicate full checkpoints.",
+      "sources": [
+        "https://huggingface.co/zai-org/GLM-4.5-Air",
+        "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_05_30.csv"
+      ],
+      "source_revision": "a24ceef6ce4f3536971efe9b778bdaa1bab18daa",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 4096,
+      "planning_weight_gib": 61.75,
+      "upstream_metadata": {
+        "id": "zai-org/GLM-4.5-Air",
+        "sha": "a24ceef6ce4f3536971efe9b778bdaa1bab18daa",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 110468818944,
+            "F32": 5888
+          },
+          "total": 110468824832
+        }
+      },
+      "livebench_reference": {
+        "model_id": "glm45-air",
+        "leaderboard_model_id": "glm-4.5-air",
+        "release": "2025-05-30",
+        "overall": 60.53,
+        "category_scores": {
+          "Reasoning": 78.30566666666667,
+          "Coding": 60.2725,
+          "Agentic Coding": 16.666666666666668,
+          "Mathematics": 79.37233333333333,
+          "Data Analysis": 65.962,
+          "Language": 44.28966666666667,
+          "IF": 78.83775
+        },
+        "source_table": "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_05_30.csv",
+        "source_sha256": "c1215f3df5b2e0a5fe69907c101d29922bf783b011df9ba82638c0145cb4c64c",
+        "meaning": "Published source-model reference; not a local, quantized, or cross-release-comparable score."
+      }
+    },
+    {
+      "id": "mistral-small31",
+      "provider": "Mistral AI",
+      "rank": null,
+      "recommendation_group": "livebench-expansion",
+      "upstream_repo": "mistralai/Mistral-Small-3.1-24B-Instruct-2503",
+      "parameters_b": 24.0,
+      "active_parameters_b": 24.0,
+      "target_precision": "BF16",
+      "planning_bits": 16,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "Apache-2.0",
+      "license_class": "permissive",
+      "rationale": "BF16 capacity/precision experiment. Typical low-bit quants fit in VRAM and belong in the control lane. Text-only evaluation.",
+      "sources": [
+        "https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503",
+        "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv"
+      ],
+      "source_revision": "68faf511d618ef198fef186659617cfd2eb8e33a",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "planning_weight_gib": 44.7,
+      "upstream_metadata": {
+        "id": "mistralai/Mistral-Small-3.1-24B-Instruct-2503",
+        "sha": "68faf511d618ef198fef186659617cfd2eb8e33a",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 24011361280
+          },
+          "total": 24011361280
+        }
+      },
+      "livebench_reference": {
+        "model_id": "mistral-small31",
+        "leaderboard_model_id": "mistral-small-2503",
+        "release": "2025-04-25",
+        "overall": 45.92,
+        "category_scores": {
+          "Reasoning": 37.083333333333336,
+          "Coding": 49.647999999999996,
+          "Mathematics": 38.39233333333333,
+          "Data Analysis": 52.1395,
+          "Language": 34.586,
+          "IF": 63.66275
+        },
+        "source_table": "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv",
+        "source_sha256": "251eb7461da69232733b80d1e63f00a9db5b921d90c966d139ce0e2851c762d9",
+        "meaning": "Published source-model reference; not a local, quantized, or cross-release-comparable score."
+      }
+    },
+    {
+      "id": "phi4-reasoning-plus",
+      "provider": "Microsoft",
+      "rank": null,
+      "recommendation_group": "livebench-expansion",
+      "upstream_repo": "microsoft/Phi-4-reasoning-plus",
+      "parameters_b": 14.7,
+      "active_parameters_b": 14.7,
+      "target_precision": "BF16",
+      "planning_bits": 16,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "MIT",
+      "license_class": "permissive",
+      "rationale": "BF16 weights exceed 24GiB; quantized variants are in-VRAM controls. Reasoning token budget materially changes quality.",
+      "sources": [
+        "https://huggingface.co/microsoft/Phi-4-reasoning-plus",
+        "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv"
+      ],
+      "source_revision": "69baf8528e1bcf05f475034d9e5dd32875ed125f",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "planning_weight_gib": 27.38,
+      "upstream_metadata": {
+        "id": "microsoft/Phi-4-reasoning-plus",
+        "sha": "69baf8528e1bcf05f475034d9e5dd32875ed125f",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 14659507200
+          },
+          "total": 14659507200
+        }
+      },
+      "livebench_reference": {
+        "model_id": "phi4-reasoning-plus",
+        "leaderboard_model_id": "phi-4-reasoning-plus",
+        "release": "2025-04-25",
+        "overall": 56.64,
+        "category_scores": {
+          "Reasoning": 57.833333333333336,
+          "Coding": 60.593999999999994,
+          "Mathematics": 62.83266666666666,
+          "Data Analysis": 54.7435,
+          "Language": 30.692333333333334,
+          "IF": 73.1665
+        },
+        "source_table": "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv",
+        "source_sha256": "251eb7461da69232733b80d1e63f00a9db5b921d90c966d139ce0e2851c762d9",
+        "meaning": "Published source-model reference; not a local, quantized, or cross-release-comparable score."
+      }
     }
   ]
 }

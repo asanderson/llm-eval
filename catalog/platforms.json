@@ -47,10 +47,11 @@
         "windows-11-native": "unsupported",
         "windows-11-wsl2-ubuntu-26.04": "conditional"
       },
-      "notes": "Upstream native Windows temporarily deprecated; Linux/WSL model recipes and AVX2 kernels need validation. No AMX assumption.",
+      "notes": "Current kt-kernel AVX2 path with SGLang-kt; explicit CPUINFER_CPU_INSTRUCT=AVX2, AMX disabled. Native Windows excluded; individual model and kernel support still conditional.",
       "sources": [
         "https://github.com/kvcache-ai/ktransformers",
-        "https://github.com/kvcache-ai/ktransformers/blob/main/doc/en/install.md"
+        "https://github.com/kvcache-ai/ktransformers/blob/main/doc/en/install.md",
+        "https://github.com/kvcache-ai/ktransformers/blob/a5d7ad90479c9e8bdee491c16bfd563fa9d70262/doc/en/kt-kernel/AVX2-Tutorial.md"
       ],
       "tested_version": null,
       "model_compatibility": "unverified_per_combination"
@@ -182,7 +183,12 @@
         "kimi-vl-16b",
         "qwen38-27b",
         "qwen35-35b-moe",
-        "qwen35-122b-moe"
+        "qwen35-122b-moe",
+        "deepseek-r1-32b",
+        "deepseek-r1-70b",
+        "glm45-air",
+        "mistral-small31",
+        "phi4-reasoning-plus"
       ]
     }
   ]

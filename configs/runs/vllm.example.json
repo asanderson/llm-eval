@@ -35,5 +35,9 @@
   "served_model": "REPLACE_WITH_LOADED_MODEL_NAME",
   "request_usage": true,
   "request_options": {},
-  "hardware_profile": "msi-raider-18-hx-ai"
+  "hardware_profile": "msi-raider-18-hx-ai",
+  "launch": {
+    "model_dir": ".",
+    "cpu_offload_gb": 32
+  }
 }

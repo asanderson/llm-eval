@@ -54,6 +54,9 @@ def validate_config(c, root, synthetic=False):
         raise ValueError("Invalid evaluation lane")
     finite_number(c.get("telemetry_interval_s", 1.0), "telemetry_interval_s", .25, 30)
     finite_number(c.get("load_timeout_s", 600), "load_timeout_s", 1, 3600)
+    threads=c.get('launch',{}).get('threads',16)
+    if not isinstance(threads,int) or not 1<=threads<=24:
+        raise ValueError('launch.threads must be an integer from 1 to 24')
     if c.get("allow_disk_offload", False) and c.get("lane") != "disk":
         raise ValueError("Disk-offload experiments require the disk lane")
     if not synthetic:
@@ -101,6 +104,18 @@ def load_suite(path):
     return suite
 
 
+def validate_host(c, root, host=None):
+    host = host if host is not None else host_snapshot()
+    hardware = read_json(Path(root) / ('configs/hardware/' + c.get('hardware_profile', 'msi-raider-18-hx-ai') + '.json'))
+    if not host['psutil_available']:
+        raise ValueError('Install the telemetry extra for real hardware runs')
+    if not any(hardware['gpu']['name'] in g['name'] for g in host['gpus']):
+        raise ValueError('Expected hardware-profile NVIDIA GPU was not detected')
+    if host.get('ac_connected') is False:
+        raise ValueError('Connect AC power before a performance run')
+    return host
+
+
 def run(config_path, root, output, synthetic=False):
     config_path, root = Path(config_path).resolve(), Path(root).resolve()
     c = read_json(config_path)
@@ -127,6 +142,8 @@ def run(config_path, root, output, synthetic=False):
         return out
     suite = load_suite(c["suite"])
     metadata["suite_sha256"] = digest(suite)
+    metadata["benchmark"] = suite.get("benchmark", "local-smoke")
+    metadata["category"] = suite.get("category", "smoke")
     if suite.get("family", "general") != "safety" and model["task_family"] == "safety":
         raise ValueError("Safeguard models require the safety-policy suite")
     if not synthetic:
@@ -139,14 +156,7 @@ def run(config_path, root, output, synthetic=False):
         metadata["artifact_sha256"] = digest(lock)
         if model["status"] == "control" and c.get("lane") != "control":
             raise ValueError("This catalog model belongs in the control lane")
-        host = metadata["host"]
-        if not host["psutil_available"]:
-            raise ValueError("Install the telemetry extra for real hardware runs")
-        expected_gpu = metadata["hardware_profile"]["gpu"]["name"]
-        if not any(expected_gpu in g["name"] for g in host["gpus"]):
-            raise ValueError("Expected hardware-profile NVIDIA GPU was not detected")
-        if host.get("ac_connected") is False:
-            raise ValueError("Connect AC power before a performance run")
+        validate_host(c, root, metadata['host'])
     write_json(out / "metadata.json", metadata)
     adapter = None
     rows = []
@@ -169,6 +179,8 @@ def run(config_path, root, output, synthetic=False):
                 for task in suite["tasks"]:
                     for repetition in range(c["warmups"] + c["repeats"]):
                         row = {"task_id": task["id"], "prompt_sha256": digest(task["messages"]),
+                               "category": task.get("category", metadata["category"]),
+                               "benchmark": metadata["benchmark"],
                                "warmup": repetition < c["warmups"], "repetition": repetition,
                                "synthetic": synthetic, "status": "ok",
                                "quality_check_applicable": task.get("check", {}).get("type", "none") != "none"}

@@ -11,6 +11,9 @@ import time
 class LocalAdapter:
     def __init__(self, config, config_path):
         env = os.environ.copy()
+        threads=str(config.get('launch',{}).get('threads',16))
+        env.update(OMP_NUM_THREADS=threads,MKL_NUM_THREADS=threads,
+                   CUDA_VISIBLE_DEVICES=str(config.get('launch',{}).get('gpu',0)))
         env.update(HF_HUB_OFFLINE="1", TRANSFORMERS_OFFLINE="1", HF_DATASETS_OFFLINE="1",
                    HF_HUB_DISABLE_TELEMETRY="1", TOKENIZERS_PARALLELISM="false")
         for name in list(env):

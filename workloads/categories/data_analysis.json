@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "category-smoke-data_analysis",
+  "family": "general",
+  "benchmark": "category-smoke",
+  "category": "data_analysis",
+  "source": "Original llm-eval fixtures inspired by LiveBench category names; not an official LiveBench evaluation.",
+  "scoring_scope": "deterministic smoke checks",
+  "tasks": [
+    {
+      "id": "data_analysis-join",
+      "category": "data_analysis",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Join orders [{\"user\":1,\"amount\":7},{\"user\":2,\"amount\":9}] to users [{\"id\":1,\"name\":\"Ada\"},{\"id\":2,\"name\":\"Bo\"}]. Return an object mapping names to amounts."
+        }
+      ],
+      "check": {
+        "type": "json_equal",
+        "expected": {
+          "Ada": 7,
+          "Bo": 9
+        }
+      }
+    },
+    {
+      "id": "data_analysis-aggregate",
+      "category": "data_analysis",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Records: A=4, B=7, A=6. Sum by key. Return only a JSON object."
+        }
+      ],
+      "check": {
+        "type": "json_equal",
+        "expected": {
+          "A": 10,
+          "B": 7
+        }
+      }
+    },
+    {
+      "id": "data_analysis-sort",
+      "category": "data_analysis",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Sort these date strings earliest first and return a JSON array: 2026-05-12, 2025-12-31, 2026-01-01."
+        }
+      ],
+      "check": {
+        "type": "json_equal",
+        "expected": [
+          "2025-12-31",
+          "2026-01-01",
+          "2026-05-12"
+        ]
+      }
+    }
+  ]
+}

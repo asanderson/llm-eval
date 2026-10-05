@@ -13,3 +13,5 @@ offload/
 *.token
 dist/
 build/
+.platforms/
+configs/local/

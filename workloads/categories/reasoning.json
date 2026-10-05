@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "category-smoke-reasoning",
+  "family": "general",
+  "benchmark": "category-smoke",
+  "category": "reasoning",
+  "source": "Original llm-eval fixtures inspired by LiveBench category names; not an official LiveBench evaluation.",
+  "scoring_scope": "deterministic smoke checks",
+  "tasks": [
+    {
+      "id": "reasoning-order",
+      "category": "reasoning",
+      "messages": [
+        {
+          "role": "user",
+          "content": "A is before B. C is after B. Who is first? Reply with one letter."
+        }
+      ],
+      "check": {
+        "type": "exact",
+        "expected": "A"
+      }
+    },
+    {
+      "id": "reasoning-logic",
+      "category": "reasoning",
+      "messages": [
+        {
+          "role": "user",
+          "content": "All glims are blue. No blue object is warm. Can a glim be warm? Answer yes or no."
+        }
+      ],
+      "check": {
+        "type": "exact",
+        "expected": "no"
+      }
+    },
+    {
+      "id": "reasoning-navigation",
+      "category": "reasoning",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Start at (0,0), move 3 east, 2 north, 1 west. Return the final coordinates as a JSON array."
+        }
+      ],
+      "check": {
+        "type": "json_equal",
+        "expected": [
+          2,
+          2
+        ]
+      }
+    }
+  ]
+}
