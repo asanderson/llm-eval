@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-10-05",
+  "qualification": "Recipe pins, not verified laptop installations. Transitive Python dependencies are captured with pip freeze after installation; not a fully hashed dependency lock.",
+  "harness_packages": [
+    "psutil==7.2.2"
+  ],
+  "archive_packages": [
+    "zstandard==0.25.0"
+  ],
+  "livebench": {
+    "repository": "https://github.com/LiveBench/LiveBench.git",
+    "revision": "8f8e5c381a16e3f24257776edd53471fe86f8091",
+    "release": "2026-06-25"
+  },
+  "platforms": {
+    "llama.cpp": {
+      "kind": "cmake",
+      "repository": "https://github.com/ggml-org/llama.cpp.git",
+      "revision": "7049ff0cbeb1f5ead231de4522af6b75d8d773c0"
+    },
+    "ik_llama.cpp": {
+      "kind": "cmake",
+      "repository": "https://github.com/ikawrakow/ik_llama.cpp.git",
+      "revision": "3d27f5bb6348c4d79edded63b03e9a93efb2f80e"
+    },
+    "ktransformers": {
+      "kind": "pip",
+      "packages": [
+        "kt-kernel==0.7.0.post4",
+        "sglang-kt==0.7.0.post4"
+      ],
+      "cpu_backend": "AVX2",
+      "source": "https://github.com/kvcache-ai/ktransformers/blob/a5d7ad90479c9e8bdee491c16bfd563fa9d70262/doc/en/kt-kernel/AVX2-Tutorial.md"
+    },
+    "ollama": {
+      "kind": "archive",
+      "version": "0.35.1",
+      "assets": {
+        "linux": {
+          "url": "https://github.com/ollama/ollama/releases/download/v0.35.1/ollama-linux-amd64.tar.zst",
+          "sha256": "9fcd79ac4575b2bd31b992eee18b1000c8ad126b451627c8f8cd091714cfbb10",
+          "bytes": 1439658961,
+          "filename": "ollama-linux-amd64.tar.zst"
+        },
+        "windows": {
+          "url": "https://github.com/ollama/ollama/releases/download/v0.35.1/ollama-windows-amd64.zip",
+          "sha256": "dc50b9ca7f9023c86525012632cd1615b093d0407987444a7f62ecab617e8e93",
+          "bytes": 1471094402,
+          "filename": "ollama-windows-amd64.zip"
+        }
+      }
+    },
+    "koboldcpp": {
+      "kind": "executable",
+      "version": "1.122.1",
+      "assets": {
+        "linux": {
+          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.122.1/koboldcpp-linux-x64",
+          "sha256": "724b81ad4d0557e6cf6b1e634c1b973e9a56c0a99b5164a9cf1ecbb8c9ad53d8",
+          "bytes": 641836648,
+          "filename": "koboldcpp-linux-x64"
+        },
+        "windows": {
+          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.122.1/koboldcpp.exe",
+          "sha256": "c0955f60aac10d139cfdb3ffbd73ad5c7045bfff32656b4a971363d08ff31289",
+          "bytes": 636192312,
+          "filename": "koboldcpp.exe"
+        }
+      }
+    },
+    "accelerate": {
+      "kind": "pip",
+      "torch": "2.9.1",
+      "torch_index": "https://download.pytorch.org/whl/cu128",
+      "packages": [
+        "transformers==5.18.0",
+        "accelerate==1.15.0",
+        "sentencepiece==0.2.1"
+      ]
+    },
+    "airllm": {
+      "kind": "pip",
+      "torch": "2.9.1",
+      "torch_index": "https://download.pytorch.org/whl/cu128",
+      "packages": [
+        "airllm==4.0.0",
+        "transformers==5.18.0",
+        "accelerate==1.15.0",
+        "sentencepiece==0.2.1"
+      ]
+    },
+    "vllm": {
+      "kind": "pip",
+      "packages": [
+        "vllm==0.31.0"
+      ]
+    },
+    "strata": {
+      "kind": "strata",
+      "repository": "https://github.com/Niko1221/Strata.git",
+      "revision": "6f32ec070f23ced9f50e704d854d775da52591ab"
+    }
+  },
+  "model_download_package": "huggingface-hub==2.1.1"
+}

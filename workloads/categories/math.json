@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "category-smoke-math",
+  "family": "general",
+  "benchmark": "category-smoke",
+  "category": "math",
+  "source": "Original llm-eval fixtures inspired by LiveBench category names; not an official LiveBench evaluation.",
+  "scoring_scope": "deterministic smoke checks",
+  "tasks": [
+    {
+      "id": "math-arithmetic",
+      "category": "math",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Compute 37 * 19. Return only the integer."
+        }
+      ],
+      "check": {
+        "type": "exact",
+        "expected": "703"
+      }
+    },
+    {
+      "id": "math-algebra",
+      "category": "math",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Solve 3x + 7 = 31. Return only x."
+        }
+      ],
+      "check": {
+        "type": "exact",
+        "expected": "8"
+      }
+    },
+    {
+      "id": "math-probability",
+      "category": "math",
+      "messages": [
+        {
+          "role": "user",
+          "content": "A fair six-sided die is rolled. How many outcomes are strictly greater than 4? Reply only with the integer."
+        }
+      ],
+      "check": {
+        "type": "exact",
+        "expected": "2"
+      }
+    }
+  ]
+}

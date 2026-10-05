@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "category-smoke-coding",
+  "family": "general",
+  "benchmark": "category-smoke",
+  "category": "coding",
+  "source": "Original llm-eval fixtures inspired by LiveBench category names; not an official LiveBench evaluation.",
+  "scoring_scope": "deterministic smoke checks",
+  "tasks": [
+    {
+      "id": "coding-trace",
+      "category": "coding",
+      "messages": [
+        {
+          "role": "user",
+          "content": "For Python: x = [2, 4, 6]; print(sum(x[1:])). What is printed? Reply only with the integer."
+        }
+      ],
+      "check": {
+        "type": "exact",
+        "expected": "10"
+      }
+    },
+    {
+      "id": "coding-boundary",
+      "category": "coding",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Which Python expression returns the last element of nonempty list xs: A) xs[len(xs)] B) xs[-1] C) xs[0]? Reply with the letter."
+        }
+      ],
+      "check": {
+        "type": "exact",
+        "expected": "B"
+      }
+    },
+    {
+      "id": "coding-json-read",
+      "category": "coding",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Given JavaScript const x = {a: 2}; x.a += 3; what is JSON.stringify(x)? Output the JSON object only."
+        }
+      ],
+      "check": {
+        "type": "json_equal",
+        "expected": {
+          "a": 5
+        }
+      }
+    }
+  ]
+}

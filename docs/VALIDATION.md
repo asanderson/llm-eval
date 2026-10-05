@@ -5,8 +5,9 @@
 - Public repository cloned from initial commit `71a0dbc5ed06cc4d37f5ea54af3cdd285b43ad7b`; existing MIT license preserved.
 - Candidate metadata and immutable original-model revisions retrieved from official publisher Hugging Face repositories; exact quantized artifacts still require selection.
 - Core package installs as an editable Python package with no inference dependencies.
-- Final local validation: **16 tests passed** under Python 3.12.14; telemetry path exercised with psutil 7.2.2. CLI config preparation, inventory, matrix generation (648 cells), empty reporting, bytecode compilation, and whitespace checks passed. The development container is Ubuntu 24.04 without an NVIDIA GPU; it is not the target laptop.
+- Final local validation: **35 tests passed** under Python 3.12.14; telemetry path exercised with psutil 7.2.2. CLI config preparation, inventory, matrix generation (783 cells), empty reporting, bytecode compilation, and whitespace checks passed. The development container is Ubuntu 24.04 without an NVIDIA GPU; it is not the target laptop.
 - Unit/integration tests use a loopback HTTP server and synthetic files. They exercise SSE and NDJSON parsing, reasoning versus visible timing, missing usage, truncated streams, redirects, deadlines, artifact hashing/tampering, traversal rejection, matrix exclusions, warmups, synthetic-result exclusion, and report grouping.
+- Added workflow tests cover all 54 wrappers and 25 eligible OS/platform dry-run pairs (two native Windows pairs explicitly rejected), interactive/CLI selection, immutable pins, download checksum failure, archive traversal/symlinks, explicit model download manifests, loopback launch controls, authenticated readiness, secret-free plans, host preflight, category aggregation, LiveBench dataset/test-case hashing, agent/worker gates, no host incremental grading, and managed-server shutdown before isolated grading.
 - CI is configured for Python 3.11/3.12/3.13 on Linux and Windows. Configuration is not a claim that GitHub CI has already run.
 
 ## Not measured or certified
@@ -15,8 +16,9 @@
 - No real model inference, OOM/VRAM/RAM qualification, thermal run, or model-quality ranking.
 - No native Windows/WSL execution in the development container; CI only exercises the portable harness, not GPU engines.
 - No comprehensive security audit of the other eight engines is implied by their inclusion.
-- Accelerate/AirLLM workers are optional implementations that require their dependencies and per-model smoke tests. Multimodal inputs and generated-code execution are not implemented.
-- No automatic model download, license acceptance, engine build/install, driver change, OS tuning, backend lifecycle management for servers, cold-cache reset, or concurrency sweep.
+- Accelerate/AirLLM workers are optional implementations that require their dependencies and per-model smoke tests. Multimodal inputs are not implemented; generated-code execution is confined to the explicit upstream LiveBench lane.
+- Engine setup, explicit manifest downloads and managed server lifecycle are implemented but were not executed against real engines/GPU models in this development container. No target OS installation, driver change, OS tuning, cold-cache reset or concurrency sweep has been performed.
+- Optional upstream LiveBench dependencies, Docker image, public question coverage and agentic task execution have not been validated end-to-end here. Upstream API/argument checks use the pinned source; orchestration tests use mocks. Installer pins are not a certification of current wheels or all model architectures.
 - No empirical claim that any 120B candidate meets the 64 GiB RAM budget; these remain conditional.
 
 ## Acceptance gate on the laptop

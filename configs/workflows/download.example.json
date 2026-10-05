@@ -1,0 +1,20 @@
+{
+  "models": [
+    {
+      "model_id": "phi4-reasoning-plus",
+      "source_repo": "microsoft/Phi-4-reasoning-plus",
+      "source_revision": "69baf8528e1bcf05f475034d9e5dd32875ed125f",
+      "precision": "BF16",
+      "include": [
+        "*.safetensors",
+        "*.json",
+        "*.jinja",
+        "*.txt",
+        "*.model"
+      ],
+      "artifact_root": "models/phi4-bf16",
+      "artifact_lock": "artifacts/phi4-bf16.lock.json",
+      "accept_license": false
+    }
+  ]
+}

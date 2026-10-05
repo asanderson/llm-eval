@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "category-smoke-agentic_coding",
+  "family": "general",
+  "benchmark": "category-smoke",
+  "category": "agentic_coding",
+  "source": "Original llm-eval fixtures inspired by LiveBench category names; not an official LiveBench evaluation.",
+  "scoring_scope": "static planning proxy; no agent or code execution",
+  "tasks": [
+    {
+      "id": "agentic_coding-plan",
+      "category": "agentic_coding",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Repository: app/parser.py implements parse(); tests/test_parser.py tests it; docs/theme.css styles docs. A parse() regression needs a fix and a test. Return the two file paths as a JSON array, implementation first."
+        }
+      ],
+      "check": {
+        "type": "json_equal",
+        "expected": [
+          "app/parser.py",
+          "tests/test_parser.py"
+        ]
+      }
+    },
+    {
+      "id": "agentic_coding-next-step",
+      "category": "agentic_coding",
+      "messages": [
+        {
+          "role": "user",
+          "content": "A unit test fails after a one-line bug fix. Choose the next step: A) delete the failing test B) inspect the failure and verify the requirement C) publish immediately. Reply with the letter."
+        }
+      ],
+      "check": {
+        "type": "exact",
+        "expected": "B"
+      }
+    },
+    {
+      "id": "agentic_coding-scope",
+      "category": "agentic_coding",
+      "messages": [
+        {
+          "role": "user",
+          "content": "A task asks only to fix division by zero in calc.py. Which unrelated action should be excluded: A) add a zero-divisor test B) update calc.py C) upload environment credentials? Reply with the letter."
+        }
+      ],
+      "check": {
+        "type": "exact",
+        "expected": "C"
+      }
+    }
+  ]
+}

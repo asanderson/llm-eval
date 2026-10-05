@@ -4,7 +4,7 @@ A reproducible lab for evaluating **local LLMs larger than GPU VRAM** across inf
 
 **Status: benchmark harness and researched experiment plan, not measured laptop results.** The test suite uses small local fixtures. No large model has been downloaded or benchmarked by this project yet. Source evidence was checked on **2026-10-05**. Recommendations are hypotheses to test, not a measured quality/performance ranking.
 
-[Downloads](#downloads-and-setup-references) · [How it works](#how-the-evaluation-works) · [Quick start](#start-here) · [Report card](#evaluation-report-card) · [Model links](#model-links)
+[Downloads](#downloads-and-setup-references) · [How it works](#how-the-evaluation-works) · [Quick start](#start-here) · [Setup/run scripts](docs/WORKFLOWS.md) · [LiveBench categories](docs/LIVEBENCH.md) · [Report card](#evaluation-report-card) · [Model links](#model-links)
 
 ## Scope
 
@@ -12,7 +12,7 @@ Nine platforms: **[llama.cpp][llama-cpp], [ik_llama.cpp][ik-llama], [KTransforme
 
 Three environments: **[native Ubuntu 26.04][ubuntu-download]**, **[native Windows 11 Pro][windows-download]**, and **[Windows 11 Pro][windows-download] + [WSL2][wsl-install] + [Ubuntu 26.04][ubuntu-download]**. Native Windows means no WSL, Linux container, or compatibility layer. WSL measurements remain a separate environment even though their user space is Ubuntu.
 
-The [model catalog](catalog/models.json) has **24 entries**: 21 prioritized selections across seven providers (including an OpenAI in-VRAM control), two xAI exclusions, and an additional Strata reference model. It deliberately does not invent three qualifying releases for every provider. Downloadable weights do not automatically have an OSI-style software license; model-specific terms are recorded in the [model recommendations](docs/MODELS.md). Browse the [complete model link directory](#model-links) below.
+The [model catalog](catalog/models.json) has **29 entries**: the original 24 selections/reference exclusions plus five [LiveBench-informed additions](docs/LIVEBENCH.md#additional-providers-and-models) from DeepSeek, Z.AI, Mistral AI, and Microsoft. It deliberately does not invent three qualifying releases for every provider. Downloadable weights do not automatically have an OSI-style software license; model-specific terms are recorded in the [model recommendations](docs/MODELS.md). Browse the [complete model link directory](#model-links) below.
 
 ## Downloads and setup references
 
@@ -26,6 +26,8 @@ The [model catalog](catalog/models.json) has **24 entries**: 21 prioritized sele
 | MSI firmware and platform drivers | [Raider 18 HX AI support][msi-support] | Match the A2XWJG-069US hardware before choosing a package. |
 | Python and environment | [Python downloads][python]; [venv documentation][venv]; [pip installation][pip] | Select Python 3.11–3.13 and isolate the harness from inference dependencies. |
 | Command-line tools | [Git downloads][git]; [PowerShell installation][powershell] | Git is used in the clone example; PowerShell is one Windows shell option. |
+| Build tools | [CMake](https://cmake.org/download/); [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022) | Source recipes need a compiler/toolkit compatible with Blackwell. |
+| LiveBench and grading | [Leaderboard][livebench]; [upstream code][livebench-code]; [published datasets][livebench-data]; [Docker Engine][docker]; [Docker Desktop][docker-desktop] | Optional upstream scoring uses a pinned scorer, supplied data snapshot and isolated regular grading. |
 | Telemetry | [psutil documentation][psutil]; [NVIDIA System Management Interface][nvidia-smi] | The harness uses these to sample host and GPU observations. |
 | Model files | [Hugging Face download guide][hf-download]; [model links](#model-links) | Download only the chosen variant at an immutable revision, then hash it with `llm_eval lock`. |
 
@@ -33,7 +35,7 @@ For platform-specific releases, build instructions, and dependencies, use the ni
 
 ## How the evaluation works
 
-The harness validates a selected experiment, runs its workload, and records measurements. Unsupported catalog combinations are skipped; invalid configurations or artifacts fail preflight. Server backends are started by the operator, while the optional library adapters launch a Python worker.
+The harness validates a selected experiment, runs its workload, and records measurements. Unsupported catalog combinations are skipped; invalid configurations or artifacts fail preflight. The new [run scripts](docs/WORKFLOWS.md) can manage local servers or use an existing server; library adapters launch an isolated Python worker.
 
 ```mermaid
 flowchart TD
@@ -41,7 +43,7 @@ flowchart TD
     Inputs["Locked weights and workload"] --> Check
     Check -->|Excluded| Skip["Record skipped combination"]
     Check -->|Eligible| Run["Warmups and measured requests"]
-    Run -->|Loopback HTTP| Server["User-started model server"]
+    Run -->|Loopback HTTP| Server["Managed or existing local server"]
     Run -->|Worker protocol| Worker["Harness-started Python worker"]
     Server --> Metrics["Timing, token counts, quality checks"]
     Worker --> Metrics
@@ -72,7 +74,7 @@ Use the [memory budgets and disk-offload rules](docs/METHODOLOGY.md) to separate
 
 ## Start here
 
-Use [Python 3.11–3.13][python] in an isolated [virtual environment][venv]. The core harness has no runtime dependencies; [psutil][psutil] is required for real hardware runs. Install backend packages in separate environments, using versions validated for Blackwell and your OS. Installing the harness does not install any engine, download weights, or change GPU drivers.
+Use [Python 3.11–3.13][python] in an isolated [virtual environment][venv]. The core harness has no runtime dependencies; [psutil][psutil] is required for real hardware runs. Install backend packages in separate environments, using versions validated for Blackwell and your OS. Installing the harness alone does not install an engine. Use the setup scripts below for an explicitly selected platform; optional model downloads require a manifest. GPU drivers remain operator-managed.
 
 ```bash
 git clone https://github.com/asanderson/llm-eval.git
@@ -114,6 +116,47 @@ Commands assume the repository is the current directory. Otherwise set `--projec
 
 An unsupported platform/OS/model combination is recorded as skipped. Example files intentionally fail real-run preflight until provenance and setup details are filled. `--synthetic` is only for harness fixtures; its outputs are excluded from normal reports.
 
+## Setup and run scripts
+
+After the harness installation above, use the terminal wizard:
+
+```bash
+python scripts/setup.py --interactive
+python scripts/run.py --interactive
+```
+
+Or preview an automated setup and then run a completed per-model configuration:
+
+```bash
+python scripts/setup.py --non-interactive --dry-run \
+  --platform llama.cpp --os ubuntu-26.04-native \
+  --models deepseek-r1-32b --categories reasoning,coding,math
+
+python scripts/run.py --non-interactive --config configs/local/deepseek-32b.json \
+  --benchmark category-smoke --categories reasoning,coding,math \
+  --context 8192 --max-tokens 512 --threads 16 --gpu-layers 20
+```
+
+Remove `--dry-run` from setup to install. The run example requires prepared and hashed weights plus a completed config. [WORKFLOWS.md](docs/WORKFLOWS.md) links all **54 setup/run wrappers**, documents the three OS paths, optional downloads, platform-specific fields, multi-model runs and CLI flags. Native Windows KTransformers/vLLM wrappers report unsupported; model-specific conversions and compatibility checks remain explicit.
+
+## LiveBench categories
+
+The [current LiveBench leaderboard][livebench] defines these seven categories for release **2026-06-25**. Use their IDs with `--categories`, or select `all`.
+
+| Category | CLI ID | Local evaluation scope |
+|---|---|---|
+| Reasoning | `reasoning` | Original deterministic reasoning smoke checks |
+| Coding | `coding` | Code reading and fix selection; no code execution |
+| Agentic Coding | `agentic_coding` | Static planning proxy in smoke mode; upstream agent execution requires opt-in |
+| Mathematics | `math` | Arithmetic, algebra and probability smoke checks |
+| Data Analysis | `data_analysis` | Join, aggregation and ordering smoke checks |
+| Language | `language` | Meaning, spelling and event-order smoke checks |
+| Instruction Following | `instruction_following` | Exact output and structured formatting smoke checks |
+
+`--benchmark category-smoke` works through all eligible platform adapters and records timings plus category summaries. These 21 original checks **do not produce LiveBench scores**. `--benchmark livebench` runs the [pinned upstream scorer][livebench-code] against a supplied dataset snapshot through compatible local servers, with isolated regular grading. See [LiveBench workflow, task mapping, diagrams and score limitations](docs/LIVEBENCH.md). Upstream answer files contain full text and use their own result format.
+
+The leaderboard review adds **[DeepSeek R1 Distill 32B][model-deepseek-r1-32b] (Q8), [DeepSeek R1 Distill 70B][model-deepseek-r1-70b] (Q4), [Mistral Small 3.1][model-mistral-small31] (BF16), [Phi-4 Reasoning Plus][model-phi4-reasoning-plus] (BF16), and conditional [GLM-4.5-Air][model-glm45-air] (Q4)**. Their historical leaderboard releases are recorded individually; they are not presented as one current ranking. BF16 selections probe capacity/precision; lower-bit controls may be faster and fit VRAM.
+
 ## What is implemented
 
 | Capability | Implementation |
@@ -123,11 +166,12 @@ An unsupported platform/OS/model combination is recorded as skipped. Example fil
 | Throughput | Backend-reported token counts; whole-request output tokens/s; backend prefill/decode rates only when explicitly reported |
 | Memory and device telemetry | Optional [psutil][psutil] system RAM/swap/process-tree RSS; [NVIDIA CLI][nvidia-smi] memory, utilization, power, temperature, clocks; missing data remain unknown |
 | Reproducibility | Model file hashes, source revision, engine version, template/tokenizer identity, OS/driver observations, run config, suite hashes |
-| Quality | Original deterministic arithmetic, structured-output, code-reading, and retrieval checks; unscored coding/reasoning prompts; separate safety-policy suite |
-| Reporting | JSONL requests, JSON metadata/telemetry, grouped JSON and CSV summaries; warmups excluded; incompatible cohorts kept separate |
-| Security defaults | Literal loopback endpoints, no redirects, bounded responses/deadlines, credentials only via environment references, no generated-code execution, no model download/install hooks |
+| Quality | Seven original category smoke suites, existing smoke/context/safety suites; optional upstream LiveBench with isolated regular grading and separate agentic opt-in |
+| Reporting | JSONL requests, JSON metadata/telemetry, task/category JSON and CSV summaries; warmups excluded; incompatible cohorts kept separate |
+| Setup and lifecycle | Pinned per-platform environments/builds or verified release assets; optional explicit model downloads; managed loopback server or external mode |
+| Security defaults | Literal loopback endpoints, bounded responses/deadlines, credentials via environment references, verified artifacts, no generated-code execution in smoke mode; explicit upstream/container execution lane |
 
-**Limits:** engine installation is manual; model/engine support is not inferred from an OpenAI-compatible API. GPU tests are pending. Direct-library workers use nonstreaming `generate`, so TTFT and isolated decode rate are unavailable there. The initial harness is single-request, text-only, and does not execute generated code, score full [SWE-bench][swe-bench]/[EvalPlus][evalplus], or measure automated cold boots. See [validation status](docs/VALIDATION.md).
+**Limits:** setup recipes and launch plans are implemented but GPU installations and inference remain untested on the target laptop. Model/engine support is not inferred from API compatibility. Direct-library workers expose neither streaming TTFT nor isolated decode rate. Initial performance runs are single-request and text-only. Standalone [SWE-bench][swe-bench]/[EvalPlus][evalplus] integrations and automated cold boots are not implemented. Strata conversion and KT representation selection remain model-specific preparation steps. See [validation status](docs/VALIDATION.md).
 
 ## Initial experiment priorities
 
@@ -139,7 +183,7 @@ The 120B class is conditional. No catalog entry promises that the sum of RAM and
 
 ## Evaluation report card
 
-**No laptop evaluation results have been recorded yet.** The matrix below tracks execution status, not performance. Each measured result must identify one exact model artifact, precision, platform version, OS build, and context size; one successful model does not qualify every model on that platform. See the [648-combination eligibility matrix](docs/evaluation-matrix.csv) for individual model gates.
+**No laptop evaluation results have been recorded yet.** The matrix below tracks execution status, not performance. Each measured result must identify one exact model artifact, precision, platform version, OS build, and context size; one successful model does not qualify every model on that platform. See the [783-combination eligibility matrix](docs/evaluation-matrix.csv) for individual model gates.
 
 | Platform | Ubuntu 26.04 native | Windows 11 Pro native | Windows 11 Pro + WSL2 |
 |---|---|---|---|
@@ -154,6 +198,22 @@ The 120B class is conditional. No catalog entry promises that the sum of RAM and
 | [Strata][strata] | Not run | Not run | Not run |
 
 **Status key:** Not run = no target-laptop measurements; Unsupported = blocked by the current native-OS catalog entry. Conditional and unverified combinations still require compatibility checks. Future entries should link to an individual run report and distinguish Passed, Failed, and Skipped; none implies a quality ranking by itself.
+
+### Category results placeholder
+
+Copy this table per exact model/artifact/platform/OS/context. **No scores or laptop timings have been measured.** Keep local smoke rates and upstream LiveBench results in separate columns; never use either to fill the other.
+
+| Category | Smoke checks passed / measured requests | LiveBench score / release / question coverage | Median first output / output tokens/s | Status |
+|---|---|---|---|---|
+| Reasoning | — | — | — | Not run |
+| Coding | — | — | — | Not run |
+| Agentic Coding | — (planning proxy) | — (actual agent tasks) | — | Not run |
+| Mathematics | — | — | — | Not run |
+| Data Analysis | — | — | — | Not run |
+| Language | — | — | — | Not run |
+| Instruction Following | — | — | — | Not run |
+
+Link the raw session, artifact lock, category report or upstream judgment files, scorer revision and settings before replacing placeholders. Upstream scores do not provide the core harness timing metrics automatically.
 
 ### Result template for each evaluated configuration
 
@@ -191,6 +251,10 @@ Official publisher repositories for all catalog entries are listed below. These 
 | Meta | [Llama-3.3-70B-Instruct][model-llama33-70b]; [Llama-3.1-70B-Instruct][model-llama31-70b]; [Meta-Llama-3-70B-Instruct][model-llama3-70b] |
 | Laguna (Poolside) | [Laguna-XS-2.1][model-laguna-xs21]; [Laguna-XS.2][model-laguna-xs2]; [Laguna-S-2.1][model-laguna-s21] (conditional) |
 | Kimi (Moonshot) | [Kimi-Linear-48B-A3B-Instruct][model-kimi-linear-48b]; [Kimi-Dev-72B][model-kimi-dev-72b]; [Kimi-VL-A3B-Thinking-2506][model-kimi-vl-16b] (conditional) |
+| DeepSeek | [R1-Distill-Qwen-32B][model-deepseek-r1-32b]; [R1-Distill-Llama-70B][model-deepseek-r1-70b] |
+| Z.AI | [GLM-4.5-Air][model-glm45-air] (conditional) |
+| Mistral AI | [Mistral-Small-3.1-24B-Instruct-2503][model-mistral-small31] (BF16 capacity test) |
+| Microsoft | [Phi-4-reasoning-plus][model-phi4-reasoning-plus] (BF16 capacity test) |
 | Qwen | [Qwen3.8-27B][model-qwen38-27b]; [Qwen3.5-35B-A3B][model-qwen35-35b-moe]; [Qwen3.5-122B-A10B][model-qwen35-122b-moe] (conditional) |
 
 Additional Strata reference: [Qwen3.8-Flash-Next][model-qwen38-flash-next-strata] with the [reviewed Strata model/conversion guide][strata-models]. Its IQ2_XS conversion is a separate artifact from the publisher's original checkpoint.
@@ -200,7 +264,9 @@ Additional Strata reference: [Qwen3.8-Flash-Next][model-qwen38-flash-next-strata
 - [catalog/](catalog/): evidence, licenses, upstream revisions, candidate status, platform/OS support.
 - [configs/hardware/](configs/hardware/), [configs/os/](configs/os/), [configs/runs/](configs/runs/): physical machine, OS budgets, editable experiments.
 - [src/llm_eval/](src/llm_eval/): adapters, provenance, runner, telemetry, reporting, CLI.
-- [workloads/](workloads/): original public smoke and context fixtures.
+- [workloads/](workloads/): original public smoke, seven category suites and context fixtures.
+- [scripts/](scripts/): interactive/CLI setup and run entry points; platform/OS wrappers.
+- [containers/livebench/](containers/livebench/): regular upstream grading image recipe.
 - [docs/](docs/): model selection, setup, methodology, security, validation.
 - [tests/](tests/): loopback protocol, timeout, tampering, matrix, and reporting tests.
 
@@ -262,3 +328,14 @@ The project's existing [MIT license](LICENSE) is preserved. Backend and model li
 [model-qwen35-35b-moe]: https://huggingface.co/Qwen/Qwen3.5-35B-A3B
 [model-qwen35-122b-moe]: https://huggingface.co/Qwen/Qwen3.5-122B-A10B
 [model-qwen38-flash-next-strata]: https://huggingface.co/Qwen/Qwen3.8-Flash-Next
+
+[livebench]: https://livebench.ai/
+[livebench-code]: https://github.com/LiveBench/LiveBench/tree/8f8e5c381a16e3f24257776edd53471fe86f8091
+[livebench-data]: https://huggingface.co/livebench
+[docker]: https://docs.docker.com/engine/install/
+[docker-desktop]: https://docs.docker.com/desktop/setup/install/windows-install/
+[model-deepseek-r1-32b]: https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+[model-deepseek-r1-70b]: https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-70B
+[model-glm45-air]: https://huggingface.co/zai-org/GLM-4.5-Air
+[model-mistral-small31]: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503
+[model-phi4-reasoning-plus]: https://huggingface.co/microsoft/Phi-4-reasoning-plus

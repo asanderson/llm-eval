@@ -1,0 +1,4 @@
+{
+  "model_dir": ".",
+  "cpu_offload_gb": 32
+}

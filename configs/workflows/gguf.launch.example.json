@@ -1,0 +1,5 @@
+{
+  "model_file": "REPLACE_WITH_MODEL.gguf",
+  "threads": 16,
+  "gpu_layers": 20
+}

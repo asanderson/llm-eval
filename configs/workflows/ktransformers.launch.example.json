@@ -1,0 +1,8 @@
+{
+  "model_dir": "model",
+  "kt_weight_path": "cpu-weights",
+  "kt_method": "FP8",
+  "gpu_experts": 2,
+  "threads": 16,
+  "attention_backend": "triton"
+}

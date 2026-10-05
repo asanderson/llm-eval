@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "category-smoke-instruction_following",
+  "family": "general",
+  "benchmark": "category-smoke",
+  "category": "instruction_following",
+  "source": "Original llm-eval fixtures inspired by LiveBench category names; not an official LiveBench evaluation.",
+  "scoring_scope": "deterministic smoke checks",
+  "tasks": [
+    {
+      "id": "instruction_following-format",
+      "category": "instruction_following",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Return exactly a JSON object with keys color and count; set color to blue and count to 3. No Markdown."
+        }
+      ],
+      "check": {
+        "type": "json_equal",
+        "expected": {
+          "color": "blue",
+          "count": 3
+        }
+      }
+    },
+    {
+      "id": "instruction_following-exact",
+      "category": "instruction_following",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Write the word READY in lowercase and nothing else."
+        }
+      ],
+      "check": {
+        "type": "exact",
+        "expected": "ready"
+      }
+    },
+    {
+      "id": "instruction_following-extract",
+      "category": "instruction_following",
+      "messages": [
+        {
+          "role": "user",
+          "content": "From \"red green blue yellow\", return only the second and fourth words in a JSON array."
+        }
+      ],
+      "check": {
+        "type": "json_equal",
+        "expected": [
+          "green",
+          "yellow"
+        ]
+      }
+    }
+  ]
+}

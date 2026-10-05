@@ -17,7 +17,9 @@ def quantile(values, q):
     return values[low] + (values[high] - values[low]) * (position - low)
 
 
-def summarize(root, include_synthetic=False):
+def summarize(root, include_synthetic=False, group_by="task"):
+    if group_by not in {"task", "category"}:
+        raise ValueError("Group by task or category")
     groups = defaultdict(list)
     descriptions = {}
     for path in sorted(Path(root).rglob("metadata.json")):
@@ -34,7 +36,11 @@ def summarize(root, include_synthetic=False):
                 continue
             # All run controls are retained except measurement repetition/count and output location.
             cohort = {k: v for k, v in c.items() if k not in {"repeats", "warmups", "save_outputs", "backend_pid", "artifact_root", "artifact_lock", "offload_dir", "endpoint", "api_key_env"}}
-            cohort.update(artifact=meta.get("artifact_sha256"), suite=meta["suite_sha256"], task=row["task_id"], synthetic=meta["synthetic"],
+            category = row.get("category", meta.get("category", "smoke"))
+            benchmark = row.get("benchmark", meta.get("benchmark", "local-smoke"))
+            cohort.update(artifact=meta.get("artifact_sha256"), suite=meta["suite_sha256"],
+                          task=row["task_id"] if group_by == "task" else category,
+                          category=category, benchmark=benchmark, group_by=group_by, synthetic=meta["synthetic"],
                           paging=meta.get("memory_assessment", {}).get("paging_observed"),
                           hardware=meta.get("hardware_profile", {}).get("id"),
                           host_driver=[g.get("driver_version") for g in meta.get("host", {}).get("gpus", [])],
@@ -42,7 +48,9 @@ def summarize(root, include_synthetic=False):
             key = digest(cohort)
             groups[key].append(row)
             descriptions[key] = {"cohort": key[:12], "model": c["model_id"], "platform": c["platform"],
-                                 "os": c["os_id"], "lane": c.get("lane", "offload"), "task": row["task_id"],
+                                 "os": c["os_id"], "lane": c.get("lane", "offload"),
+                                 "task": row["task_id"] if group_by == "task" else "all",
+                                 "category": category, "benchmark": benchmark,
                                  "context": c["context_tokens"], "synthetic": meta["synthetic"],
                                  "paging_observed": meta.get("memory_assessment", {}).get("paging_observed")}
     summaries = []
@@ -79,4 +87,11 @@ def write_report(root, output, include_synthetic=False):
             writer = csv.DictWriter(f, fieldnames=list(rows[0]), lineterminator="\n")
             writer.writeheader()
             writer.writerows({k: safe_cell(v) for k, v in r.items()} for r in rows)
+    categories = summarize(root, include_synthetic, "category")
+    write_json(output / "category-summary.json", categories)
+    with open(output / "category-summary.csv", "w", encoding="utf-8", newline="") as f:
+        if categories:
+            writer = csv.DictWriter(f, fieldnames=list(categories[0]), lineterminator="\n")
+            writer.writeheader()
+            writer.writerows({k: safe_cell(v) for k, v in r.items()} for r in categories)
     return rows

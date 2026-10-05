@@ -125,3 +125,7 @@ Kimi-Dev's [LICENSE.md](https://huggingface.co/moonshotai/Kimi-Dev-72B/blob/main
 5. gpt-oss-120b, Laguna S, Nemotron Super 120B, and Qwen 122B: conditional high-memory lane with short initial context. Never begin with an unquantized 120B checkpoint on this machine.
 
 A model that returns tokens is not automatically a successful candidate: report correctness, supported tasks, RAM/VRAM peaks, paging, TTFT where available, and sustained performance.
+
+## LiveBench-informed additions
+
+Five additional entries from DeepSeek, Z.AI, Mistral AI and Microsoft bring the catalog to 29. See the [recommendation table and release-specific evidence](LIVEBENCH.md#additional-providers-and-models) for DeepSeek R1 Distill 32B Q8 / 70B Q4, Mistral Small 3.1 BF16, Phi-4 Reasoning Plus BF16 and conditional GLM-4.5-Air Q4. The BF16 selections are precision/capacity tests; their smaller quantizations are controls. The historical published scores guide candidate selection and are not local measurements or comparable across releases. All five remain blocked on the currently audited Strata reference lane.

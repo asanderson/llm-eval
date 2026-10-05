@@ -19,6 +19,7 @@ def main():
     with contextlib.redirect_stdout(sys.stderr):
         try:
             import torch
+            torch.set_num_threads(config.get('launch',{}).get('threads',16))
             from transformers import AutoTokenizer, set_seed
             started = time.perf_counter()
             model_dir = str(Path(config["artifact_root"]).resolve())

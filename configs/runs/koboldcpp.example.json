@@ -35,5 +35,10 @@
   "served_model": "REPLACE_WITH_LOADED_MODEL_NAME",
   "request_usage": false,
   "request_options": {},
-  "hardware_profile": "msi-raider-18-hx-ai"
+  "hardware_profile": "msi-raider-18-hx-ai",
+  "launch": {
+    "model_file": "REPLACE_WITH_MODEL.gguf",
+    "threads": 16,
+    "gpu_layers": 20
+  }
 }

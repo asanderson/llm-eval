@@ -36,5 +36,10 @@
   "request_usage": false,
   "request_options": {},
   "intrinsic_ssd_lookup": "PLE is part of this model; measure and disclose separately",
-  "hardware_profile": "msi-raider-18-hx-ai"
+  "hardware_profile": "msi-raider-18-hx-ai",
+  "launch": {
+    "strata_config": "prepared-server.json"
+  },
+  "reviewed_strata_config": false,
+  "api_key_env": "STRATA_API_KEY"
 }

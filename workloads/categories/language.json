@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "id": "category-smoke-language",
+  "family": "general",
+  "benchmark": "category-smoke",
+  "category": "language",
+  "source": "Original llm-eval fixtures inspired by LiveBench category names; not an official LiveBench evaluation.",
+  "scoring_scope": "deterministic smoke checks",
+  "tasks": [
+    {
+      "id": "language-typo",
+      "category": "language",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Correct the spelling of \"recieve\". Reply with the corrected word only."
+        }
+      ],
+      "check": {
+        "type": "exact",
+        "expected": "receive"
+      }
+    },
+    {
+      "id": "language-sequence",
+      "category": "language",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Events: C) eat toast; A) put bread in toaster; B) toast bread. Return the chronological event letters as a JSON array."
+        }
+      ],
+      "check": {
+        "type": "json_equal",
+        "expected": [
+          "A",
+          "B",
+          "C"
+        ]
+      }
+    },
+    {
+      "id": "language-meaning",
+      "category": "language",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Which word is closest in meaning to \"brief\": A) short B) loud C) distant? Reply with one letter."
+        }
+      ],
+      "check": {
+        "type": "exact",
+        "expected": "A"
+      }
+    }
+  ]
+}
