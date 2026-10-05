@@ -1,0 +1,929 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-10-05",
+  "scope": "Prioritized hypotheses, not measured performance or guaranteed compatibility",
+  "size_note": "Planning bits include rough quant overhead; raw bounds exclude KV, activations, staging, duplicated tensors and loader peaks. Exact locked artifact size decides >VRAM eligibility.",
+  "provider_gaps": {
+    "xAI": "No qualifying recommended model; two exclusions recorded; no third eligible release verified.",
+    "OpenAI": "Two over-VRAM candidates, one is safety-specific. Third is an in-VRAM control. No three general-purpose qualifying models verified."
+  },
+  "models": [
+    {
+      "id": "nemotron-nano-30b",
+      "provider": "NVIDIA",
+      "rank": 1,
+      "upstream_repo": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+      "parameters_b": 30,
+      "active_parameters_b": 3,
+      "target_precision": "GGUF Q8_0",
+      "planning_bits": 8.5,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "NVIDIA Nemotron Open Model License",
+      "license_class": "model_specific",
+      "rationale": "Small active MoE; Q8 tests RAM offload while Q4 is a separate in-VRAM control. Hybrid architecture needs engine validation.",
+      "sources": [
+        "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16"
+      ],
+      "source_revision": "bf77c3174f68ad409e1c2aa60daeb46e32d1c606",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+        "sha": "bf77c3174f68ad409e1c2aa60daeb46e32d1c606",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "F32": 5888,
+            "BF16": 31577934400
+          },
+          "total": 31577937344
+        }
+      },
+      "planning_weight_gib": 29.69
+    },
+    {
+      "id": "nemotron-super-49b",
+      "provider": "NVIDIA",
+      "rank": 2,
+      "upstream_repo": "nvidia/Llama-3_3-Nemotron-Super-49B-v1_5",
+      "parameters_b": 49,
+      "active_parameters_b": 49,
+      "target_precision": "GGUF Q5_K_M",
+      "planning_bits": 5.7,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "NVIDIA Open Model License; Llama 3.3 terms also referenced",
+      "license_class": "model_specific",
+      "rationale": "Dense/NAS comparison; CPU fallback can dominate. Model-card remote-code path needs review.",
+      "sources": [
+        "https://huggingface.co/nvidia/Llama-3_3-Nemotron-Super-49B-v1_5"
+      ],
+      "source_revision": "420ba7d28211abf116b8b103ab700d92619daf98",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "nvidia/Llama-3_3-Nemotron-Super-49B-v1_5",
+        "sha": "420ba7d28211abf116b8b103ab700d92619daf98",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 49867145216
+          },
+          "total": 49867145216
+        }
+      },
+      "planning_weight_gib": 32.51
+    },
+    {
+      "id": "nemotron-super-120b",
+      "provider": "NVIDIA",
+      "rank": 3,
+      "upstream_repo": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4",
+      "parameters_b": 120,
+      "active_parameters_b": 12,
+      "target_precision": "NVFP4 or separately tracked GGUF Q4",
+      "planning_bits": 4.5,
+      "status": "conditional",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "NVIDIA Nemotron Open Model License",
+      "license_class": "model_specific",
+      "rationale": "Upper-budget experiment. Official NVFP4 deployment targets B200/DGX Spark; laptop offload is NOT vendor-validated. GGUF and NVFP4 results are separate cohorts.",
+      "sources": [
+        "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4"
+      ],
+      "source_revision": "ff433f5493e25d631c9f12b5d55c674229923d02",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 4096,
+      "upstream_metadata": {
+        "id": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4",
+        "sha": "ff433f5493e25d631c9f12b5d55c674229923d02",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "F32": 20992,
+            "BF16": 6020553728,
+            "F8_E4M3": 4825546752,
+            "U8": 56382455808
+          },
+          "total": 67228556288
+        }
+      },
+      "planning_weight_gib": 62.86
+    },
+    {
+      "id": "gpt-oss-120b",
+      "provider": "OpenAI",
+      "rank": 1,
+      "upstream_repo": "openai/gpt-oss-120b",
+      "parameters_b": 117,
+      "active_parameters_b": 5.1,
+      "target_precision": "MXFP4 (native or GGUF preservation)",
+      "planning_bits": 4.5,
+      "status": "conditional",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "Apache-2.0",
+      "license_class": "permissive",
+      "rationale": "Requires verified native MXFP4 offload without full BF16 expansion or excessive duplicate host weights. Harmony template required.",
+      "sources": [
+        "https://huggingface.co/openai/gpt-oss-120b"
+      ],
+      "source_revision": "b5c939de8f754692c1647ca79fbf85e8c1e70f8a",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 4096,
+      "upstream_metadata": {
+        "id": "openai/gpt-oss-120b",
+        "sha": "b5c939de8f754692c1647ca79fbf85e8c1e70f8a",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 2167371072,
+            "U8": 114661785600
+          },
+          "total": 116829156672
+        }
+      },
+      "planning_weight_gib": 61.29
+    },
+    {
+      "id": "gpt-oss-safeguard-120b",
+      "provider": "OpenAI",
+      "rank": 2,
+      "upstream_repo": "openai/gpt-oss-safeguard-120b",
+      "parameters_b": 117,
+      "active_parameters_b": 5.1,
+      "target_precision": "MXFP4",
+      "planning_bits": 4.5,
+      "status": "conditional",
+      "lane": "offload",
+      "task_family": "safety",
+      "license": "Apache-2.0",
+      "license_class": "permissive",
+      "rationale": "Safety classifier only; score in safety-policy suite, never in a general coding leaderboard. Same high-memory caveats as gpt-oss-120b.",
+      "sources": [
+        "https://huggingface.co/openai/gpt-oss-safeguard-120b"
+      ],
+      "source_revision": "3c7391182603991a904031244e7822488c67796d",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 4096,
+      "upstream_metadata": {
+        "id": "openai/gpt-oss-safeguard-120b",
+        "sha": "3c7391182603991a904031244e7822488c67796d",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 2167371072,
+            "U8": 118244966400
+          },
+          "total": 120412337472
+        }
+      },
+      "planning_weight_gib": 61.29
+    },
+    {
+      "id": "gpt-oss-20b",
+      "provider": "OpenAI",
+      "rank": 3,
+      "upstream_repo": "openai/gpt-oss-20b",
+      "parameters_b": 21,
+      "active_parameters_b": 3.6,
+      "target_precision": "MXFP4",
+      "planning_bits": 4.5,
+      "status": "control",
+      "lane": "control",
+      "task_family": "general",
+      "license": "Apache-2.0",
+      "license_class": "permissive",
+      "rationale": "Efficient local baseline normally fits within VRAM. Does NOT satisfy the >24GiB weight criterion. Do not inflate precision solely to invent a third qualifying model.",
+      "sources": [
+        "https://huggingface.co/openai/gpt-oss-20b"
+      ],
+      "source_revision": "6cee5e81ee83917806bbde320786a8fb61efebee",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "openai/gpt-oss-20b",
+        "sha": "6cee5e81ee83917806bbde320786a8fb61efebee",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 1804459584,
+            "U8": 19110297600
+          },
+          "total": 20914757184
+        }
+      },
+      "planning_weight_gib": 11.0
+    },
+    {
+      "id": "grok-1",
+      "provider": "xAI",
+      "rank": 1,
+      "upstream_repo": "xai-org/grok-1",
+      "parameters_b": 314,
+      "active_parameters_b": 86,
+      "target_precision": "Q4 hypothetical",
+      "planning_bits": 4,
+      "status": "excluded",
+      "lane": "excluded",
+      "task_family": "general",
+      "license": "Apache-2.0",
+      "license_class": "permissive",
+      "rationale": "146GiB raw Q4 lower bound already exceeds combined physical memory; no practical validated configuration for this laptop.",
+      "sources": [
+        "https://huggingface.co/xai-org/grok-1"
+      ],
+      "source_revision": "5de83eb225f49624b424f1c8aa74f96983b5885c",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "xai-org/grok-1",
+        "sha": "5de83eb225f49624b424f1c8aa74f96983b5885c",
+        "gated": false,
+        "safetensors": null
+      },
+      "planning_weight_gib": 146.22
+    },
+    {
+      "id": "grok-2",
+      "provider": "xAI",
+      "rank": 2,
+      "upstream_repo": "xai-org/grok-2",
+      "parameters_b": null,
+      "active_parameters_b": null,
+      "target_precision": "Published FP8 checkpoint",
+      "planning_bits": null,
+      "status": "excluded",
+      "lane": "excluded",
+      "task_family": "general",
+      "license": "Grok 2 Community License",
+      "license_class": "model_specific",
+      "rationale": "Published artifact is about 500GB and documented deployment uses eight GPUs >40GB each. Exclusion relies on artifact/deployment evidence, not an inferred parameter count.",
+      "sources": [
+        "https://huggingface.co/xai-org/grok-2"
+      ],
+      "source_revision": "daf4395a80ad177386cfe39641b64fc12b1d70ed",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "xai-org/grok-2",
+        "sha": "daf4395a80ad177386cfe39641b64fc12b1d70ed",
+        "gated": false,
+        "safetensors": null
+      },
+      "planning_weight_gib": null
+    },
+    {
+      "id": "gemma4-31b",
+      "provider": "Google",
+      "rank": 1,
+      "upstream_repo": "google/gemma-4-31B-it",
+      "parameters_b": 30.7,
+      "active_parameters_b": 30.7,
+      "target_precision": "GGUF Q8_0",
+      "planning_bits": 8.5,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "Apache-2.0",
+      "license_class": "permissive",
+      "rationale": "Modern dense model; Q8 weight placement is a moderate offload workload. Text-only first; confirm engine architecture support.",
+      "sources": [
+        "https://huggingface.co/google/gemma-4-31B-it"
+      ],
+      "source_revision": "842da3794eaa0b77d5f08bae87a17459d91ff475",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "google/gemma-4-31B-it",
+        "sha": "842da3794eaa0b77d5f08bae87a17459d91ff475",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 31273088876
+          },
+          "total": 31273088876
+        }
+      },
+      "planning_weight_gib": 30.38
+    },
+    {
+      "id": "gemma4-26b-moe",
+      "provider": "Google",
+      "rank": 2,
+      "upstream_repo": "google/gemma-4-26B-A4B-it",
+      "parameters_b": 25.2,
+      "active_parameters_b": 3.8,
+      "target_precision": "BF16",
+      "planning_bits": 16,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "Apache-2.0",
+      "license_class": "permissive",
+      "rationale": "BF16 is intentionally a capacity/precision comparison. Low-bit variants generally fit VRAM and belong in the control lane; do not describe BF16 as fastest.",
+      "sources": [
+        "https://huggingface.co/google/gemma-4-26B-A4B-it"
+      ],
+      "source_revision": "4d7ae4984b7db7de8f8457170b3f1a419ee76d52",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "google/gemma-4-26B-A4B-it",
+        "sha": "4d7ae4984b7db7de8f8457170b3f1a419ee76d52",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 25805936206
+          },
+          "total": 25805936206
+        }
+      },
+      "planning_weight_gib": 46.94
+    },
+    {
+      "id": "gemma3-27b",
+      "provider": "Google",
+      "rank": 3,
+      "upstream_repo": "google/gemma-3-27b-it",
+      "parameters_b": 27,
+      "active_parameters_b": 27,
+      "target_precision": "GGUF Q8_0",
+      "planning_bits": 8.5,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "Gemma Terms of Use",
+      "license_class": "model_specific",
+      "rationale": "Older dense regression anchor; text-only suite and exact chat template. Model-specific license rather than Apache.",
+      "sources": [
+        "https://huggingface.co/google/gemma-3-27b-it"
+      ],
+      "source_revision": "005ad3404e59d6023443cb575daa05336842228a",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "google/gemma-3-27b-it",
+        "sha": "005ad3404e59d6023443cb575daa05336842228a",
+        "gated": "manual",
+        "safetensors": {
+          "parameters": {
+            "BF16": 27432406640
+          },
+          "total": 27432406640
+        }
+      },
+      "planning_weight_gib": 26.72
+    },
+    {
+      "id": "llama33-70b",
+      "provider": "Meta",
+      "rank": 1,
+      "upstream_repo": "meta-llama/Llama-3.3-70B-Instruct",
+      "parameters_b": 70,
+      "active_parameters_b": 70,
+      "target_precision": "GGUF Q4_K_M",
+      "planning_bits": 4.8,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "Llama 3.3 Community License",
+      "license_class": "model_specific",
+      "rationale": "Primary broadly supported dense offload anchor; compare same GGUF bytes across the four GGUF-oriented runtimes.",
+      "sources": [
+        "https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct"
+      ],
+      "source_revision": "6f6073b423013f6a7d4d9f39144961bfbfbc386b",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "meta-llama/Llama-3.3-70B-Instruct",
+        "sha": "6f6073b423013f6a7d4d9f39144961bfbfbc386b",
+        "gated": "manual",
+        "safetensors": {
+          "parameters": {
+            "BF16": 70553706496
+          },
+          "total": 70553706496
+        }
+      },
+      "planning_weight_gib": 39.12
+    },
+    {
+      "id": "llama31-70b",
+      "provider": "Meta",
+      "rank": 2,
+      "upstream_repo": "meta-llama/Llama-3.1-70B-Instruct",
+      "parameters_b": 70,
+      "active_parameters_b": 70,
+      "target_precision": "GGUF Q4_K_M",
+      "planning_bits": 4.8,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "Llama 3.1 Community License",
+      "license_class": "model_specific",
+      "rationale": "Earlier checkpoint for quality/performance regression. Dense CPU work will be bandwidth-sensitive.",
+      "sources": [
+        "https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct"
+      ],
+      "source_revision": "1605565b47bb9346c5515c34102e054115b4f98b",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "meta-llama/Llama-3.1-70B-Instruct",
+        "sha": "1605565b47bb9346c5515c34102e054115b4f98b",
+        "gated": "manual",
+        "safetensors": {
+          "parameters": {
+            "BF16": 70553706496
+          },
+          "total": 70553706496
+        }
+      },
+      "planning_weight_gib": 39.12
+    },
+    {
+      "id": "llama3-70b",
+      "provider": "Meta",
+      "rank": 3,
+      "upstream_repo": "meta-llama/Meta-Llama-3-70B-Instruct",
+      "parameters_b": 70,
+      "active_parameters_b": 70,
+      "target_precision": "GGUF Q4_K_M",
+      "planning_bits": 4.8,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "Llama 3 Community License",
+      "license_class": "model_specific",
+      "rationale": "Older control with 8K native context: cap total prompt plus output at 8192, and do not run 16K/32K sweeps.",
+      "sources": [
+        "https://huggingface.co/meta-llama/Meta-Llama-3-70B-Instruct"
+      ],
+      "source_revision": "50fd307e57011801c7833c87efa1984ddf2db42f",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 8192,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "meta-llama/Meta-Llama-3-70B-Instruct",
+        "sha": "50fd307e57011801c7833c87efa1984ddf2db42f",
+        "gated": "manual",
+        "safetensors": {
+          "parameters": {
+            "BF16": 70553706496
+          },
+          "total": 70553706496
+        }
+      },
+      "planning_weight_gib": 39.12
+    },
+    {
+      "id": "laguna-xs21",
+      "provider": "Laguna (Poolside)",
+      "rank": 1,
+      "upstream_repo": "poolside/Laguna-XS-2.1",
+      "parameters_b": 33,
+      "active_parameters_b": 3,
+      "target_precision": "GGUF Q8_0 or FP8",
+      "planning_bits": 8.5,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "OpenMDW-1.1",
+      "license_class": "model_specific",
+      "rationale": "Preferred Laguna starting point; small active set. GGUF and FP8 are different precision/backend cohorts.",
+      "sources": [
+        "https://huggingface.co/poolside/Laguna-XS-2.1"
+      ],
+      "source_revision": "c5f36269bbdbd3f27fddc9a9f9dbae0cf2cf57db",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "poolside/Laguna-XS-2.1",
+        "sha": "c5f36269bbdbd3f27fddc9a9f9dbae0cf2cf57db",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 33442617088
+          },
+          "total": 33442617088
+        }
+      },
+      "planning_weight_gib": 32.65
+    },
+    {
+      "id": "laguna-xs2",
+      "provider": "Laguna (Poolside)",
+      "rank": 2,
+      "upstream_repo": "poolside/Laguna-XS.2",
+      "parameters_b": 33,
+      "active_parameters_b": 3,
+      "target_precision": "GGUF Q8_0 or FP8",
+      "planning_bits": 8.5,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "Apache-2.0",
+      "license_class": "permissive",
+      "rationale": "Earlier distinct checkpoint gives a permissive-license comparison. Verify backend architecture support.",
+      "sources": [
+        "https://huggingface.co/poolside/Laguna-XS.2"
+      ],
+      "source_revision": "a397bde04501591d0ac3d74a5d9d0a4ec298ffb8",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "poolside/Laguna-XS.2",
+        "sha": "a397bde04501591d0ac3d74a5d9d0a4ec298ffb8",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 33442617088
+          },
+          "total": 33442617088
+        }
+      },
+      "planning_weight_gib": 32.65
+    },
+    {
+      "id": "laguna-s21",
+      "provider": "Laguna (Poolside)",
+      "rank": 3,
+      "upstream_repo": "poolside/Laguna-S-2.1",
+      "parameters_b": 118,
+      "active_parameters_b": 8,
+      "target_precision": "GGUF Q4_K_M",
+      "planning_bits": 4.8,
+      "status": "conditional",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "OpenMDW-1.1",
+      "license_class": "model_specific",
+      "rationale": "High-capacity sparse candidate; require measured working set and native quantized CPU path. M.1 is deliberately omitted as too large.",
+      "sources": [
+        "https://huggingface.co/poolside/Laguna-S-2.1"
+      ],
+      "source_revision": "0f573140834b11cfac0c2af97a101a7a69a13e22",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 4096,
+      "upstream_metadata": {
+        "id": "poolside/Laguna-S-2.1",
+        "sha": "0f573140834b11cfac0c2af97a101a7a69a13e22",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 117561977600
+          },
+          "total": 117561977600
+        }
+      },
+      "planning_weight_gib": 65.94
+    },
+    {
+      "id": "kimi-linear-48b",
+      "provider": "Kimi (Moonshot)",
+      "rank": 1,
+      "upstream_repo": "moonshotai/Kimi-Linear-48B-A3B-Instruct",
+      "parameters_b": 48,
+      "active_parameters_b": 3,
+      "target_precision": "GGUF Q6_K",
+      "planning_bits": 6.6,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "MIT",
+      "license_class": "permissive",
+      "rationale": "Small active set and linear-attention design; Q6 exceeds VRAM more clearly than borderline Q4. Model architecture support is a gate.",
+      "sources": [
+        "https://huggingface.co/moonshotai/Kimi-Linear-48B-A3B-Instruct"
+      ],
+      "source_revision": "e1df551a447157d4658b573f9a695d57658590e9",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "moonshotai/Kimi-Linear-48B-A3B-Instruct",
+        "sha": "e1df551a447157d4658b573f9a695d57658590e9",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 49122599168,
+            "F32": 82560
+          },
+          "total": 49122681728
+        }
+      },
+      "planning_weight_gib": 36.88
+    },
+    {
+      "id": "kimi-dev-72b",
+      "provider": "Kimi (Moonshot)",
+      "rank": 2,
+      "upstream_repo": "moonshotai/Kimi-Dev-72B",
+      "parameters_b": 72,
+      "active_parameters_b": 72,
+      "target_precision": "GGUF Q4_K_M",
+      "planning_bits": 4.8,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "coding",
+      "license": "MIT subject to upstream Qwen license agreement",
+      "license_class": "model_specific",
+      "rationale": "Coding-focused dense checkpoint; evaluate task quality separately from throughput. Model LICENSE.md preserves Qwen conditions.",
+      "sources": [
+        "https://huggingface.co/moonshotai/Kimi-Dev-72B",
+        "https://huggingface.co/moonshotai/Kimi-Dev-72B/blob/main/LICENSE.md"
+      ],
+      "source_revision": "8791d7981945752a51f692d66f2bbfb3573c9722",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "moonshotai/Kimi-Dev-72B",
+        "sha": "8791d7981945752a51f692d66f2bbfb3573c9722",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 72706203648
+          },
+          "total": 72706203648
+        }
+      },
+      "planning_weight_gib": 40.23
+    },
+    {
+      "id": "kimi-vl-16b",
+      "provider": "Kimi (Moonshot)",
+      "rank": 3,
+      "upstream_repo": "moonshotai/Kimi-VL-A3B-Thinking-2506",
+      "parameters_b": 16,
+      "active_parameters_b": 3,
+      "target_precision": "BF16",
+      "planning_bits": 16,
+      "status": "conditional",
+      "lane": "offload",
+      "task_family": "multimodal",
+      "license": "MIT",
+      "license_class": "permissive",
+      "rationale": "Capacity/precision and multimodal specialist, not a general coding replacement. Text-only first; multimodal loader/custom code may require review.",
+      "sources": [
+        "https://huggingface.co/moonshotai/Kimi-VL-A3B-Thinking-2506"
+      ],
+      "source_revision": "aa1730989e7558695b44ee493623e03bd325a994",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 4096,
+      "upstream_metadata": {
+        "id": "moonshotai/Kimi-VL-A3B-Thinking-2506",
+        "sha": "aa1730989e7558695b44ee493623e03bd325a994",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "F32": 1664,
+            "BF16": 16407656112
+          },
+          "total": 16407657776
+        }
+      },
+      "planning_weight_gib": 29.8
+    },
+    {
+      "id": "qwen38-27b",
+      "provider": "Qwen",
+      "rank": 1,
+      "upstream_repo": "Qwen/Qwen3.8-27B",
+      "parameters_b": 27.8,
+      "active_parameters_b": 27.8,
+      "target_precision": "GGUF Q8_0",
+      "planning_bits": 8.5,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "Apache-2.0",
+      "license_class": "permissive",
+      "rationale": "Modern moderate dense offload candidate; use its own chat template and reasoning settings.",
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3.8-27B"
+      ],
+      "source_revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "Qwen/Qwen3.8-27B",
+        "sha": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 27781427952
+          },
+          "total": 27781427952
+        }
+      },
+      "planning_weight_gib": 27.51
+    },
+    {
+      "id": "qwen35-35b-moe",
+      "provider": "Qwen",
+      "rank": 2,
+      "upstream_repo": "Qwen/Qwen3.5-35B-A3B",
+      "parameters_b": 35,
+      "active_parameters_b": 3,
+      "target_precision": "GGUF Q8_0",
+      "planning_bits": 8.5,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "Apache-2.0",
+      "license_class": "permissive",
+      "rationale": "Strong architectural fit hypothesis for sparse CPU/GPU split; low-bit variants are useful in-VRAM controls, not qualifying offload runs.",
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3.5-35B-A3B"
+      ],
+      "source_revision": "59d61f3ce65a6d9863b86d2e96597125219dc754",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "Qwen/Qwen3.5-35B-A3B",
+        "sha": "59d61f3ce65a6d9863b86d2e96597125219dc754",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 35951817904,
+            "F32": 4800
+          },
+          "total": 35951822704
+        }
+      },
+      "planning_weight_gib": 34.63
+    },
+    {
+      "id": "qwen35-122b-moe",
+      "provider": "Qwen",
+      "rank": 3,
+      "upstream_repo": "Qwen/Qwen3.5-122B-A10B",
+      "parameters_b": 122,
+      "active_parameters_b": 10,
+      "target_precision": "GGUF Q4_K_M",
+      "planning_bits": 4.8,
+      "status": "conditional",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "Apache-2.0",
+      "license_class": "permissive",
+      "rationale": "High-memory tier. Require host memory <=52GiB in native profiles and avoid duplicate weights or dequantization. Start at 4K context.",
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+        "https://huggingface.co/Qwen/Qwen3.5-122B-A10B/blob/main/LICENSE"
+      ],
+      "source_revision": "dc4d348443bc740c68e2d77492492c11606384d5",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 4096,
+      "upstream_metadata": {
+        "id": "Qwen/Qwen3.5-122B-A10B",
+        "sha": "dc4d348443bc740c68e2d77492492c11606384d5",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 125086490096,
+            "F32": 6912
+          },
+          "total": 125086497008
+        }
+      },
+      "planning_weight_gib": 68.17
+    },
+    {
+      "id": "qwen38-flash-next-strata",
+      "provider": "Qwen",
+      "rank": null,
+      "upstream_repo": "Qwen/Qwen3.8-Flash-Next",
+      "parameters_b": 180,
+      "active_parameters_b": null,
+      "target_precision": "Strata IQ2_XS; exact GSQ/RCO conversion recorded separately",
+      "planning_bits": null,
+      "status": "conditional",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "Apache-2.0 (verify quantization artifact terms)",
+      "license_class": "permissive",
+      "rationale": "Additional Strata reference, not an invented fourth top-three slot. Reviewed Strata documents ~35.5GB expert RAM for IQ2_XS, GPU dense/cache allocations and SSD lookup table. Full original checkpoint is much larger; count all files and conversion steps. PLE SSD lookup is intrinsic and must be recorded.",
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
+        "https://github.com/Niko1221/Strata/blob/6f32ec070f23ced9f50e704d854d775da52591ab/docs/MODELS.md"
+      ],
+      "source_revision": "de4b8e4d43b917e7706784d8bb445c9af86a3540",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-10-05",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "planning_weight_gib": null,
+      "upstream_metadata": {
+        "id": "Qwen/Qwen3.8-Flash-Next",
+        "sha": "de4b8e4d43b917e7706784d8bb445c9af86a3540",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 179999981424,
+            "I64": 35
+          },
+          "total": 179999981459
+        }
+      }
+    }
+  ]
+}

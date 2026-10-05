@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "id": "original-text-smoke-v1",
+  "family": "general",
+  "license": "MIT (original project fixtures)",
+  "quality_scope": "Deterministic smoke checks only; not a general coding or reasoning benchmark. Never executes model output.",
+  "tasks": [
+    {
+      "id": "arithmetic",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Return only the decimal integer: 137 * 29."
+        }
+      ],
+      "check": {
+        "type": "exact",
+        "expected": "3973"
+      }
+    },
+    {
+      "id": "structured-json",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Return only a JSON object with keys project, gpu_gib, ram_gib. Values are respectively llm-eval, 24, 64. No markdown."
+        }
+      ],
+      "check": {
+        "type": "json_equal",
+        "expected": {
+          "project": "llm-eval",
+          "gpu_gib": 24,
+          "ram_gib": 64
+        }
+      }
+    },
+    {
+      "id": "code-reading",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Python code: values = [3, 1, 3, 2]; print(sorted(set(values))). Return only the exact printed output, no explanation."
+        }
+      ],
+      "check": {
+        "type": "exact",
+        "expected": "[1, 2, 3]"
+      }
+    },
+    {
+      "id": "code-review",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Review this Python function for correctness and concurrency issues, and propose a fix. def add(item, items=[]): items.append(item); return items"
+        }
+      ],
+      "check": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "sql-reasoning",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Explain how to delete expired records from a table where ingest_date is a UTC timestamp and retention_days is a table-level integer property. Discuss nulls, time zones, retries, and separate metadata reads. Do not assume a particular database dialect."
+        }
+      ],
+      "check": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "long-generation",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Write a detailed technical comparison of CPU execution of quantized MoE experts and transferring expert weights to a GPU. Discuss bandwidth, scheduling, prompt processing, decode, and measurement pitfalls."
+        }
+      ],
+      "check": {
+        "type": "none"
+      }
+    }
+  ]
+}

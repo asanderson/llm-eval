@@ -1,0 +1,19 @@
+{
+  "id": "windows-11-wsl2-ubuntu-26.04",
+  "host_os": "Windows 11 Pro",
+  "guest_os": "Ubuntu 26.04 LTS",
+  "ram_budget_gib": 46,
+  "vram_budget_gib": 22,
+  "context_sweep": [
+    4096,
+    8192,
+    16384,
+    32768
+  ],
+  "concurrency": 1,
+  "swap_policy": "Record existing swap; reject paging-dependent runs from resident-memory rankings",
+  "model_filesystem": "WSL ext4 VHDX stored on SN7100; not /mnt/c",
+  "driver_policy": "Windows NVIDIA driver only; do not install Linux display/kernel driver in WSL",
+  "wsl_memory_gib": 52,
+  "comparison_note": "Default WSL cap can be lower than installed RAM. Also record Windows host usage. Keep native 46GiB matched-memory lane separate from native 52GiB best-achievable lane."
+}
