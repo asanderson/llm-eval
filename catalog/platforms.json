@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-10-05",
+  "meaning": "supported = upstream OS path exists, NOT a verified Ubuntu 26.04 + Blackwell + model combination",
+  "platforms": [
+    {
+      "id": "llama.cpp",
+      "repository": "https://github.com/ggml-org/llama.cpp",
+      "license": "MIT",
+      "protocol": "openai",
+      "os_support": {
+        "ubuntu-26.04-native": "supported",
+        "windows-11-native": "supported",
+        "windows-11-wsl2-ubuntu-26.04": "conditional"
+      },
+      "notes": "GGUF; CUDA build; exact model support must pass smoke test.",
+      "sources": [
+        "https://github.com/ggml-org/llama.cpp"
+      ],
+      "tested_version": null,
+      "model_compatibility": "unverified_per_combination"
+    },
+    {
+      "id": "ik_llama.cpp",
+      "repository": "https://github.com/ikawrakow/ik_llama.cpp",
+      "license": "MIT",
+      "protocol": "openai",
+      "os_support": {
+        "ubuntu-26.04-native": "supported",
+        "windows-11-native": "supported",
+        "windows-11-wsl2-ubuntu-26.04": "conditional"
+      },
+      "notes": "CPU AVX2/CUDA; do not assume all upstream GGUF or flags are compatible.",
+      "sources": [
+        "https://github.com/ikawrakow/ik_llama.cpp"
+      ],
+      "tested_version": null,
+      "model_compatibility": "unverified_per_combination"
+    },
+    {
+      "id": "ktransformers",
+      "repository": "https://github.com/kvcache-ai/ktransformers",
+      "license": "Apache-2.0",
+      "protocol": "openai",
+      "os_support": {
+        "ubuntu-26.04-native": "conditional",
+        "windows-11-native": "unsupported",
+        "windows-11-wsl2-ubuntu-26.04": "conditional"
+      },
+      "notes": "Upstream native Windows temporarily deprecated; Linux/WSL model recipes and AVX2 kernels need validation. No AMX assumption.",
+      "sources": [
+        "https://github.com/kvcache-ai/ktransformers",
+        "https://github.com/kvcache-ai/ktransformers/blob/main/doc/en/install.md"
+      ],
+      "tested_version": null,
+      "model_compatibility": "unverified_per_combination"
+    },
+    {
+      "id": "ollama",
+      "repository": "https://github.com/ollama/ollama",
+      "license": "MIT",
+      "protocol": "ollama",
+      "os_support": {
+        "ubuntu-26.04-native": "supported",
+        "windows-11-native": "supported",
+        "windows-11-wsl2-ubuntu-26.04": "conditional"
+      },
+      "notes": "Native /api/chat protocol exposes eval_duration. Disable cloud. Import identical GGUF for controlled comparisons.",
+      "sources": [
+        "https://github.com/ollama/ollama"
+      ],
+      "tested_version": null,
+      "model_compatibility": "unverified_per_combination"
+    },
+    {
+      "id": "koboldcpp",
+      "repository": "https://github.com/LostRuins/koboldcpp",
+      "license": "AGPL-3.0",
+      "protocol": "openai",
+      "os_support": {
+        "ubuntu-26.04-native": "supported",
+        "windows-11-native": "supported",
+        "windows-11-wsl2-ubuntu-26.04": "conditional"
+      },
+      "notes": "Use OpenAI-compatible streaming endpoint; usage availability is version-dependent.",
+      "sources": [
+        "https://github.com/LostRuins/koboldcpp"
+      ],
+      "tested_version": null,
+      "model_compatibility": "unverified_per_combination"
+    },
+    {
+      "id": "accelerate",
+      "repository": "https://github.com/huggingface/accelerate",
+      "license": "Apache-2.0",
+      "protocol": "worker",
+      "os_support": {
+        "ubuntu-26.04-native": "conditional",
+        "windows-11-native": "conditional",
+        "windows-11-wsl2-ubuntu-26.04": "conditional"
+      },
+      "notes": "Transformers/PyTorch architecture and quantized CPU support determine feasibility; local model only.",
+      "sources": [
+        "https://github.com/huggingface/accelerate"
+      ],
+      "tested_version": null,
+      "model_compatibility": "unverified_per_combination"
+    },
+    {
+      "id": "airllm",
+      "repository": "https://github.com/lyogavin/airllm",
+      "license": "Apache-2.0",
+      "protocol": "worker",
+      "os_support": {
+        "ubuntu-26.04-native": "conditional",
+        "windows-11-native": "unverified",
+        "windows-11-wsl2-ubuntu-26.04": "conditional"
+      },
+      "notes": "Capacity-first layer streaming. No TTFT from nonstreaming generate. Source review required because library loaders can enable custom code.",
+      "sources": [
+        "https://github.com/lyogavin/airllm"
+      ],
+      "tested_version": null,
+      "model_compatibility": "unverified_per_combination"
+    },
+    {
+      "id": "vllm",
+      "repository": "https://github.com/vllm-project/vllm",
+      "license": "Apache-2.0",
+      "protocol": "openai",
+      "os_support": {
+        "ubuntu-26.04-native": "conditional",
+        "windows-11-native": "unsupported",
+        "windows-11-wsl2-ubuntu-26.04": "conditional"
+      },
+      "notes": "Upstream has no native Windows CUDA support. Weight CPU offload and quantization kernel support must be validated on sm_120.",
+      "sources": [
+        "https://github.com/vllm-project/vllm",
+        "https://docs.vllm.ai/en/latest/getting_started/installation/gpu/",
+        "https://docs.vllm.ai/en/latest/configuration/engine_args/"
+      ],
+      "tested_version": null,
+      "model_compatibility": "unverified_per_combination"
+    },
+    {
+      "id": "strata",
+      "repository": "https://github.com/Niko1221/Strata",
+      "license": "MIT",
+      "protocol": "openai",
+      "os_support": {
+        "ubuntu-26.04-native": "conditional",
+        "windows-11-native": "supported",
+        "windows-11-wsl2-ubuntu-26.04": "conditional"
+      },
+      "notes": "Narrow Qwen3.8-Flash-Next family; automatic toolkit setup in audited commit handles Ubuntu 22.04/24.04 only. WSL KV streaming disabled. Model identity and converted artifacts differ from general GGUF.",
+      "sources": [
+        "https://github.com/Niko1221/Strata"
+      ],
+      "tested_version": null,
+      "reviewed_commit": "6f32ec070f23ced9f50e704d854d775da52591ab",
+      "model_compatibility": "Only declared family included; no GPU measurement",
+      "blocked_models": [
+        "nemotron-nano-30b",
+        "nemotron-super-49b",
+        "nemotron-super-120b",
+        "gpt-oss-120b",
+        "gpt-oss-safeguard-120b",
+        "gpt-oss-20b",
+        "grok-1",
+        "grok-2",
+        "gemma4-31b",
+        "gemma4-26b-moe",
+        "gemma3-27b",
+        "llama33-70b",
+        "llama31-70b",
+        "llama3-70b",
+        "laguna-xs21",
+        "laguna-xs2",
+        "laguna-s21",
+        "kimi-linear-48b",
+        "kimi-dev-72b",
+        "kimi-vl-16b",
+        "qwen38-27b",
+        "qwen35-35b-moe",
+        "qwen35-122b-moe"
+      ]
+    }
+  ]
+}

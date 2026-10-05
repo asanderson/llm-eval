@@ -1,0 +1,66 @@
+{
+  "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+  "manufacturer": "MSI",
+  "model": "Raider 18 HX AI A2XWJG-069US",
+  "cpu": {
+    "name": "Intel Core Ultra 9 285HX",
+    "architecture": "Arrow Lake-HX",
+    "p_cores": 8,
+    "e_cores": 16,
+    "threads": 24,
+    "instruction_baseline": "AVX2",
+    "amx": false,
+    "avx512": false,
+    "thread_sweep": [
+      7,
+      8,
+      15,
+      23
+    ],
+    "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+  },
+  "ram": {
+    "installed_gib": 64,
+    "type": "DDR5-6400",
+    "channels": 2
+  },
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+    "architecture": "Blackwell",
+    "compute_capability": "12.0",
+    "vram_gib": 24,
+    "initial_reserve_gib": 2,
+    "desktop_gpu": false
+  },
+  "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+  "storage": [
+    {
+      "name": "Factory NVMe",
+      "capacity_tb": 2,
+      "model": "not inventoried"
+    },
+    {
+      "name": "WD_BLACK SN7100",
+      "capacity_tb": 4,
+      "interface": "PCIe Gen4 x4",
+      "role": "Model files, artifacts, results; separate swap/offload experiments"
+    }
+  ],
+  "evidence": {
+    "configuration": "user-provided",
+    "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+  },
+  "required_recordings": [
+    "BIOS version",
+    "NVIDIA driver",
+    "GPU power limit/TGP",
+    "AC state",
+    "MSI power/fan profile",
+    "hybrid/MUX setting",
+    "RAM configured speed",
+    "SSD mount and filesystem",
+    "SSD free space and temperature",
+    "OS build/kernel",
+    "WSL version and memory cap if applicable"
+  ]
+}

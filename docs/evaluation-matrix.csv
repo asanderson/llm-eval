@@ -1,0 +1,649 @@
+model,platform,os,status,os_support,reason,model_validation,target_precision
+nemotron-nano-30b,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+nemotron-nano-30b,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+nemotron-nano-30b,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+nemotron-nano-30b,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+nemotron-nano-30b,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+nemotron-nano-30b,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+nemotron-nano-30b,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+nemotron-nano-30b,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q8_0
+nemotron-nano-30b,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+nemotron-nano-30b,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+nemotron-nano-30b,ollama,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+nemotron-nano-30b,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+nemotron-nano-30b,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+nemotron-nano-30b,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+nemotron-nano-30b,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+nemotron-nano-30b,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+nemotron-nano-30b,accelerate,windows-11-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+nemotron-nano-30b,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+nemotron-nano-30b,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+nemotron-nano-30b,airllm,windows-11-native,requires_validation,unverified,,not_measured,GGUF Q8_0
+nemotron-nano-30b,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+nemotron-nano-30b,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+nemotron-nano-30b,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q8_0
+nemotron-nano-30b,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+nemotron-nano-30b,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,GGUF Q8_0
+nemotron-nano-30b,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,GGUF Q8_0
+nemotron-nano-30b,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,GGUF Q8_0
+nemotron-super-49b,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q5_K_M
+nemotron-super-49b,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,ollama,windows-11-native,requires_validation,supported,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,accelerate,windows-11-native,requires_validation,conditional,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,airllm,windows-11-native,requires_validation,unverified,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q5_K_M
+nemotron-super-49b,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q5_K_M
+nemotron-super-49b,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,GGUF Q5_K_M
+nemotron-super-49b,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,GGUF Q5_K_M
+nemotron-super-49b,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,GGUF Q5_K_M
+nemotron-super-120b,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,ollama,windows-11-native,requires_validation,supported,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,accelerate,windows-11-native,requires_validation,conditional,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,airllm,windows-11-native,requires_validation,unverified,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,NVFP4 or separately tracked GGUF Q4
+nemotron-super-120b,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,NVFP4 or separately tracked GGUF Q4
+gpt-oss-120b,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,ollama,windows-11-native,requires_validation,supported,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,accelerate,windows-11-native,requires_validation,conditional,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,airllm,windows-11-native,requires_validation,unverified,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-120b,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,MXFP4 (native or GGUF preservation)
+gpt-oss-safeguard-120b,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,MXFP4
+gpt-oss-safeguard-120b,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,MXFP4
+gpt-oss-safeguard-120b,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4
+gpt-oss-safeguard-120b,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,MXFP4
+gpt-oss-safeguard-120b,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,MXFP4
+gpt-oss-safeguard-120b,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4
+gpt-oss-safeguard-120b,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,MXFP4
+gpt-oss-safeguard-120b,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,MXFP4
+gpt-oss-safeguard-120b,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4
+gpt-oss-safeguard-120b,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,MXFP4
+gpt-oss-safeguard-120b,ollama,windows-11-native,requires_validation,supported,,not_measured,MXFP4
+gpt-oss-safeguard-120b,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4
+gpt-oss-safeguard-120b,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,MXFP4
+gpt-oss-safeguard-120b,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,MXFP4
+gpt-oss-safeguard-120b,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4
+gpt-oss-safeguard-120b,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,MXFP4
+gpt-oss-safeguard-120b,accelerate,windows-11-native,requires_validation,conditional,,not_measured,MXFP4
+gpt-oss-safeguard-120b,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4
+gpt-oss-safeguard-120b,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,MXFP4
+gpt-oss-safeguard-120b,airllm,windows-11-native,requires_validation,unverified,,not_measured,MXFP4
+gpt-oss-safeguard-120b,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4
+gpt-oss-safeguard-120b,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,MXFP4
+gpt-oss-safeguard-120b,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,MXFP4
+gpt-oss-safeguard-120b,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,MXFP4
+gpt-oss-safeguard-120b,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,MXFP4
+gpt-oss-safeguard-120b,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,MXFP4
+gpt-oss-safeguard-120b,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,MXFP4
+gpt-oss-20b,llama.cpp,ubuntu-26.04-native,control_only,supported,,not_measured,MXFP4
+gpt-oss-20b,llama.cpp,windows-11-native,control_only,supported,,not_measured,MXFP4
+gpt-oss-20b,llama.cpp,windows-11-wsl2-ubuntu-26.04,control_only,conditional,,not_measured,MXFP4
+gpt-oss-20b,ik_llama.cpp,ubuntu-26.04-native,control_only,supported,,not_measured,MXFP4
+gpt-oss-20b,ik_llama.cpp,windows-11-native,control_only,supported,,not_measured,MXFP4
+gpt-oss-20b,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,control_only,conditional,,not_measured,MXFP4
+gpt-oss-20b,ktransformers,ubuntu-26.04-native,control_only,conditional,,not_measured,MXFP4
+gpt-oss-20b,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,MXFP4
+gpt-oss-20b,ktransformers,windows-11-wsl2-ubuntu-26.04,control_only,conditional,,not_measured,MXFP4
+gpt-oss-20b,ollama,ubuntu-26.04-native,control_only,supported,,not_measured,MXFP4
+gpt-oss-20b,ollama,windows-11-native,control_only,supported,,not_measured,MXFP4
+gpt-oss-20b,ollama,windows-11-wsl2-ubuntu-26.04,control_only,conditional,,not_measured,MXFP4
+gpt-oss-20b,koboldcpp,ubuntu-26.04-native,control_only,supported,,not_measured,MXFP4
+gpt-oss-20b,koboldcpp,windows-11-native,control_only,supported,,not_measured,MXFP4
+gpt-oss-20b,koboldcpp,windows-11-wsl2-ubuntu-26.04,control_only,conditional,,not_measured,MXFP4
+gpt-oss-20b,accelerate,ubuntu-26.04-native,control_only,conditional,,not_measured,MXFP4
+gpt-oss-20b,accelerate,windows-11-native,control_only,conditional,,not_measured,MXFP4
+gpt-oss-20b,accelerate,windows-11-wsl2-ubuntu-26.04,control_only,conditional,,not_measured,MXFP4
+gpt-oss-20b,airllm,ubuntu-26.04-native,control_only,conditional,,not_measured,MXFP4
+gpt-oss-20b,airllm,windows-11-native,control_only,unverified,,not_measured,MXFP4
+gpt-oss-20b,airllm,windows-11-wsl2-ubuntu-26.04,control_only,conditional,,not_measured,MXFP4
+gpt-oss-20b,vllm,ubuntu-26.04-native,control_only,conditional,,not_measured,MXFP4
+gpt-oss-20b,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,MXFP4
+gpt-oss-20b,vllm,windows-11-wsl2-ubuntu-26.04,control_only,conditional,,not_measured,MXFP4
+gpt-oss-20b,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,MXFP4
+gpt-oss-20b,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,MXFP4
+gpt-oss-20b,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,MXFP4
+grok-1,llama.cpp,ubuntu-26.04-native,blocked,supported,model_excluded,not_measured,Q4 hypothetical
+grok-1,llama.cpp,windows-11-native,blocked,supported,model_excluded,not_measured,Q4 hypothetical
+grok-1,llama.cpp,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Q4 hypothetical
+grok-1,ik_llama.cpp,ubuntu-26.04-native,blocked,supported,model_excluded,not_measured,Q4 hypothetical
+grok-1,ik_llama.cpp,windows-11-native,blocked,supported,model_excluded,not_measured,Q4 hypothetical
+grok-1,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Q4 hypothetical
+grok-1,ktransformers,ubuntu-26.04-native,blocked,conditional,model_excluded,not_measured,Q4 hypothetical
+grok-1,ktransformers,windows-11-native,blocked,unsupported,model_excluded;os_unsupported,not_measured,Q4 hypothetical
+grok-1,ktransformers,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Q4 hypothetical
+grok-1,ollama,ubuntu-26.04-native,blocked,supported,model_excluded,not_measured,Q4 hypothetical
+grok-1,ollama,windows-11-native,blocked,supported,model_excluded,not_measured,Q4 hypothetical
+grok-1,ollama,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Q4 hypothetical
+grok-1,koboldcpp,ubuntu-26.04-native,blocked,supported,model_excluded,not_measured,Q4 hypothetical
+grok-1,koboldcpp,windows-11-native,blocked,supported,model_excluded,not_measured,Q4 hypothetical
+grok-1,koboldcpp,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Q4 hypothetical
+grok-1,accelerate,ubuntu-26.04-native,blocked,conditional,model_excluded,not_measured,Q4 hypothetical
+grok-1,accelerate,windows-11-native,blocked,conditional,model_excluded,not_measured,Q4 hypothetical
+grok-1,accelerate,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Q4 hypothetical
+grok-1,airllm,ubuntu-26.04-native,blocked,conditional,model_excluded,not_measured,Q4 hypothetical
+grok-1,airllm,windows-11-native,blocked,unverified,model_excluded,not_measured,Q4 hypothetical
+grok-1,airllm,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Q4 hypothetical
+grok-1,vllm,ubuntu-26.04-native,blocked,conditional,model_excluded,not_measured,Q4 hypothetical
+grok-1,vllm,windows-11-native,blocked,unsupported,model_excluded;os_unsupported,not_measured,Q4 hypothetical
+grok-1,vllm,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Q4 hypothetical
+grok-1,strata,ubuntu-26.04-native,blocked,conditional,model_excluded;architecture_unsupported,not_measured,Q4 hypothetical
+grok-1,strata,windows-11-native,blocked,supported,model_excluded;architecture_unsupported,not_measured,Q4 hypothetical
+grok-1,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded;architecture_unsupported,not_measured,Q4 hypothetical
+grok-2,llama.cpp,ubuntu-26.04-native,blocked,supported,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,llama.cpp,windows-11-native,blocked,supported,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,llama.cpp,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,ik_llama.cpp,ubuntu-26.04-native,blocked,supported,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,ik_llama.cpp,windows-11-native,blocked,supported,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,ktransformers,ubuntu-26.04-native,blocked,conditional,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,ktransformers,windows-11-native,blocked,unsupported,model_excluded;os_unsupported,not_measured,Published FP8 checkpoint
+grok-2,ktransformers,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,ollama,ubuntu-26.04-native,blocked,supported,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,ollama,windows-11-native,blocked,supported,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,ollama,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,koboldcpp,ubuntu-26.04-native,blocked,supported,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,koboldcpp,windows-11-native,blocked,supported,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,koboldcpp,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,accelerate,ubuntu-26.04-native,blocked,conditional,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,accelerate,windows-11-native,blocked,conditional,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,accelerate,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,airllm,ubuntu-26.04-native,blocked,conditional,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,airllm,windows-11-native,blocked,unverified,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,airllm,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,vllm,ubuntu-26.04-native,blocked,conditional,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,vllm,windows-11-native,blocked,unsupported,model_excluded;os_unsupported,not_measured,Published FP8 checkpoint
+grok-2,vllm,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded,not_measured,Published FP8 checkpoint
+grok-2,strata,ubuntu-26.04-native,blocked,conditional,model_excluded;architecture_unsupported,not_measured,Published FP8 checkpoint
+grok-2,strata,windows-11-native,blocked,supported,model_excluded;architecture_unsupported,not_measured,Published FP8 checkpoint
+grok-2,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,model_excluded;architecture_unsupported,not_measured,Published FP8 checkpoint
+gemma4-31b,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma4-31b,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma4-31b,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma4-31b,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma4-31b,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma4-31b,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma4-31b,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma4-31b,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q8_0
+gemma4-31b,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma4-31b,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma4-31b,ollama,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma4-31b,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma4-31b,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma4-31b,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma4-31b,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma4-31b,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma4-31b,accelerate,windows-11-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma4-31b,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma4-31b,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma4-31b,airllm,windows-11-native,requires_validation,unverified,,not_measured,GGUF Q8_0
+gemma4-31b,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma4-31b,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma4-31b,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q8_0
+gemma4-31b,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma4-31b,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,GGUF Q8_0
+gemma4-31b,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,GGUF Q8_0
+gemma4-31b,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,GGUF Q8_0
+gemma4-26b-moe,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,BF16
+gemma4-26b-moe,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,BF16
+gemma4-26b-moe,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+gemma4-26b-moe,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,BF16
+gemma4-26b-moe,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,BF16
+gemma4-26b-moe,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+gemma4-26b-moe,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,BF16
+gemma4-26b-moe,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,BF16
+gemma4-26b-moe,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+gemma4-26b-moe,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,BF16
+gemma4-26b-moe,ollama,windows-11-native,requires_validation,supported,,not_measured,BF16
+gemma4-26b-moe,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+gemma4-26b-moe,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,BF16
+gemma4-26b-moe,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,BF16
+gemma4-26b-moe,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+gemma4-26b-moe,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,BF16
+gemma4-26b-moe,accelerate,windows-11-native,requires_validation,conditional,,not_measured,BF16
+gemma4-26b-moe,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+gemma4-26b-moe,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,BF16
+gemma4-26b-moe,airllm,windows-11-native,requires_validation,unverified,,not_measured,BF16
+gemma4-26b-moe,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+gemma4-26b-moe,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,BF16
+gemma4-26b-moe,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,BF16
+gemma4-26b-moe,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+gemma4-26b-moe,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,BF16
+gemma4-26b-moe,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,BF16
+gemma4-26b-moe,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,BF16
+gemma3-27b,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma3-27b,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma3-27b,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma3-27b,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma3-27b,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma3-27b,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma3-27b,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma3-27b,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q8_0
+gemma3-27b,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma3-27b,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma3-27b,ollama,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma3-27b,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma3-27b,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma3-27b,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+gemma3-27b,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma3-27b,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma3-27b,accelerate,windows-11-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma3-27b,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma3-27b,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma3-27b,airllm,windows-11-native,requires_validation,unverified,,not_measured,GGUF Q8_0
+gemma3-27b,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma3-27b,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma3-27b,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q8_0
+gemma3-27b,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+gemma3-27b,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,GGUF Q8_0
+gemma3-27b,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,GGUF Q8_0
+gemma3-27b,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,GGUF Q8_0
+llama33-70b,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama33-70b,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama33-70b,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama33-70b,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama33-70b,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama33-70b,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama33-70b,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama33-70b,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q4_K_M
+llama33-70b,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama33-70b,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama33-70b,ollama,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama33-70b,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama33-70b,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama33-70b,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama33-70b,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama33-70b,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama33-70b,accelerate,windows-11-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama33-70b,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama33-70b,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama33-70b,airllm,windows-11-native,requires_validation,unverified,,not_measured,GGUF Q4_K_M
+llama33-70b,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama33-70b,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama33-70b,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q4_K_M
+llama33-70b,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama33-70b,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,GGUF Q4_K_M
+llama33-70b,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,GGUF Q4_K_M
+llama33-70b,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,GGUF Q4_K_M
+llama31-70b,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama31-70b,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama31-70b,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama31-70b,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama31-70b,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama31-70b,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama31-70b,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama31-70b,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q4_K_M
+llama31-70b,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama31-70b,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama31-70b,ollama,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama31-70b,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama31-70b,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama31-70b,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama31-70b,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama31-70b,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama31-70b,accelerate,windows-11-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama31-70b,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama31-70b,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama31-70b,airllm,windows-11-native,requires_validation,unverified,,not_measured,GGUF Q4_K_M
+llama31-70b,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama31-70b,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama31-70b,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q4_K_M
+llama31-70b,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama31-70b,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,GGUF Q4_K_M
+llama31-70b,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,GGUF Q4_K_M
+llama31-70b,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,GGUF Q4_K_M
+llama3-70b,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama3-70b,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama3-70b,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama3-70b,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama3-70b,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama3-70b,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama3-70b,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama3-70b,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q4_K_M
+llama3-70b,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama3-70b,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama3-70b,ollama,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama3-70b,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama3-70b,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama3-70b,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+llama3-70b,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama3-70b,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama3-70b,accelerate,windows-11-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama3-70b,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama3-70b,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama3-70b,airllm,windows-11-native,requires_validation,unverified,,not_measured,GGUF Q4_K_M
+llama3-70b,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama3-70b,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama3-70b,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q4_K_M
+llama3-70b,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+llama3-70b,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,GGUF Q4_K_M
+llama3-70b,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,GGUF Q4_K_M
+llama3-70b,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,GGUF Q4_K_M
+laguna-xs21,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,ollama,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,accelerate,windows-11-native,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,airllm,windows-11-native,requires_validation,unverified,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,GGUF Q8_0 or FP8
+laguna-xs21,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,ollama,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,accelerate,windows-11-native,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,airllm,windows-11-native,requires_validation,unverified,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,GGUF Q8_0 or FP8
+laguna-xs2,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,GGUF Q8_0 or FP8
+laguna-s21,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+laguna-s21,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+laguna-s21,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+laguna-s21,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+laguna-s21,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+laguna-s21,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+laguna-s21,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+laguna-s21,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q4_K_M
+laguna-s21,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+laguna-s21,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+laguna-s21,ollama,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+laguna-s21,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+laguna-s21,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+laguna-s21,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+laguna-s21,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+laguna-s21,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+laguna-s21,accelerate,windows-11-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+laguna-s21,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+laguna-s21,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+laguna-s21,airllm,windows-11-native,requires_validation,unverified,,not_measured,GGUF Q4_K_M
+laguna-s21,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+laguna-s21,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+laguna-s21,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q4_K_M
+laguna-s21,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+laguna-s21,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,GGUF Q4_K_M
+laguna-s21,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,GGUF Q4_K_M
+laguna-s21,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,GGUF Q4_K_M
+kimi-linear-48b,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q6_K
+kimi-linear-48b,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q6_K
+kimi-linear-48b,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q6_K
+kimi-linear-48b,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q6_K
+kimi-linear-48b,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q6_K
+kimi-linear-48b,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q6_K
+kimi-linear-48b,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q6_K
+kimi-linear-48b,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q6_K
+kimi-linear-48b,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q6_K
+kimi-linear-48b,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q6_K
+kimi-linear-48b,ollama,windows-11-native,requires_validation,supported,,not_measured,GGUF Q6_K
+kimi-linear-48b,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q6_K
+kimi-linear-48b,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q6_K
+kimi-linear-48b,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q6_K
+kimi-linear-48b,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q6_K
+kimi-linear-48b,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q6_K
+kimi-linear-48b,accelerate,windows-11-native,requires_validation,conditional,,not_measured,GGUF Q6_K
+kimi-linear-48b,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q6_K
+kimi-linear-48b,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q6_K
+kimi-linear-48b,airllm,windows-11-native,requires_validation,unverified,,not_measured,GGUF Q6_K
+kimi-linear-48b,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q6_K
+kimi-linear-48b,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q6_K
+kimi-linear-48b,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q6_K
+kimi-linear-48b,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q6_K
+kimi-linear-48b,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,GGUF Q6_K
+kimi-linear-48b,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,GGUF Q6_K
+kimi-linear-48b,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,GGUF Q6_K
+kimi-dev-72b,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q4_K_M
+kimi-dev-72b,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,ollama,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,accelerate,windows-11-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,airllm,windows-11-native,requires_validation,unverified,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q4_K_M
+kimi-dev-72b,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+kimi-dev-72b,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,GGUF Q4_K_M
+kimi-dev-72b,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,GGUF Q4_K_M
+kimi-dev-72b,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,GGUF Q4_K_M
+kimi-vl-16b,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,BF16
+kimi-vl-16b,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,BF16
+kimi-vl-16b,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+kimi-vl-16b,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,BF16
+kimi-vl-16b,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,BF16
+kimi-vl-16b,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+kimi-vl-16b,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,BF16
+kimi-vl-16b,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,BF16
+kimi-vl-16b,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+kimi-vl-16b,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,BF16
+kimi-vl-16b,ollama,windows-11-native,requires_validation,supported,,not_measured,BF16
+kimi-vl-16b,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+kimi-vl-16b,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,BF16
+kimi-vl-16b,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,BF16
+kimi-vl-16b,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+kimi-vl-16b,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,BF16
+kimi-vl-16b,accelerate,windows-11-native,requires_validation,conditional,,not_measured,BF16
+kimi-vl-16b,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+kimi-vl-16b,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,BF16
+kimi-vl-16b,airllm,windows-11-native,requires_validation,unverified,,not_measured,BF16
+kimi-vl-16b,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+kimi-vl-16b,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,BF16
+kimi-vl-16b,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,BF16
+kimi-vl-16b,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,BF16
+kimi-vl-16b,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,BF16
+kimi-vl-16b,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,BF16
+kimi-vl-16b,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,BF16
+qwen38-27b,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen38-27b,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen38-27b,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen38-27b,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen38-27b,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen38-27b,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen38-27b,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen38-27b,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q8_0
+qwen38-27b,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen38-27b,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen38-27b,ollama,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen38-27b,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen38-27b,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen38-27b,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen38-27b,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen38-27b,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen38-27b,accelerate,windows-11-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen38-27b,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen38-27b,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen38-27b,airllm,windows-11-native,requires_validation,unverified,,not_measured,GGUF Q8_0
+qwen38-27b,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen38-27b,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen38-27b,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q8_0
+qwen38-27b,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen38-27b,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,GGUF Q8_0
+qwen38-27b,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,GGUF Q8_0
+qwen38-27b,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,GGUF Q8_0
+qwen35-35b-moe,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen35-35b-moe,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen35-35b-moe,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen35-35b-moe,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen35-35b-moe,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen35-35b-moe,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen35-35b-moe,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen35-35b-moe,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q8_0
+qwen35-35b-moe,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen35-35b-moe,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen35-35b-moe,ollama,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen35-35b-moe,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen35-35b-moe,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen35-35b-moe,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q8_0
+qwen35-35b-moe,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen35-35b-moe,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen35-35b-moe,accelerate,windows-11-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen35-35b-moe,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen35-35b-moe,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen35-35b-moe,airllm,windows-11-native,requires_validation,unverified,,not_measured,GGUF Q8_0
+qwen35-35b-moe,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen35-35b-moe,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen35-35b-moe,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q8_0
+qwen35-35b-moe,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q8_0
+qwen35-35b-moe,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,GGUF Q8_0
+qwen35-35b-moe,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,GGUF Q8_0
+qwen35-35b-moe,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,GGUF Q8_0
+qwen35-122b-moe,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,ollama,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,accelerate,windows-11-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,airllm,windows-11-native,requires_validation,unverified,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,strata,ubuntu-26.04-native,blocked,conditional,architecture_unsupported,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,strata,windows-11-native,blocked,supported,architecture_unsupported,not_measured,GGUF Q4_K_M
+qwen35-122b-moe,strata,windows-11-wsl2-ubuntu-26.04,blocked,conditional,architecture_unsupported,not_measured,GGUF Q4_K_M
+qwen38-flash-next-strata,llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,llama.cpp,windows-11-native,requires_validation,supported,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,ik_llama.cpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,ik_llama.cpp,windows-11-native,requires_validation,supported,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,ik_llama.cpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,ktransformers,ubuntu-26.04-native,requires_validation,conditional,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,ktransformers,windows-11-native,blocked,unsupported,os_unsupported,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,ktransformers,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,ollama,ubuntu-26.04-native,requires_validation,supported,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,ollama,windows-11-native,requires_validation,supported,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,ollama,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,koboldcpp,ubuntu-26.04-native,requires_validation,supported,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,koboldcpp,windows-11-native,requires_validation,supported,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,koboldcpp,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,accelerate,ubuntu-26.04-native,requires_validation,conditional,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,accelerate,windows-11-native,requires_validation,conditional,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,accelerate,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,airllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,airllm,windows-11-native,requires_validation,unverified,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,airllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,vllm,ubuntu-26.04-native,requires_validation,conditional,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,vllm,windows-11-native,blocked,unsupported,os_unsupported,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,vllm,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,strata,ubuntu-26.04-native,requires_validation,conditional,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,strata,windows-11-native,requires_validation,supported,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately
+qwen38-flash-next-strata,strata,windows-11-wsl2-ubuntu-26.04,requires_validation,conditional,,not_measured,Strata IQ2_XS; exact GSQ/RCO conversion recorded separately

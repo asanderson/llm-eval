@@ -1,0 +1,19 @@
+{
+  "id": "ubuntu-26.04-native",
+  "host_os": "Ubuntu 26.04 LTS",
+  "guest_os": null,
+  "ram_budget_gib": 52,
+  "vram_budget_gib": 22,
+  "context_sweep": [
+    4096,
+    8192,
+    16384,
+    32768
+  ],
+  "concurrency": 1,
+  "swap_policy": "Record existing swap; reject paging-dependent runs from resident-memory rankings",
+  "model_filesystem": "ext4 or XFS on SN7100",
+  "driver_policy": "NVIDIA official open kernel modules via coherent signed package stack",
+  "wsl_memory_gib": null,
+  "comparison_note": "Run a matched 46GiB host-weight-budget lane when comparing against WSL; also retain the 52GiB native capacity lane."
+}
