@@ -3,6 +3,9 @@ import hashlib
 import io
 import json
 import os
+import shutil
+import subprocess
+import sys
 from pathlib import Path
 import stat
 import tempfile
@@ -13,17 +16,67 @@ import zipfile
 
 from llm_eval.common import read_json, write_json
 from llm_eval.launch import launch_spec, wait_port
-from llm_eval.livebench import question_manifest, run_livebench, upstream_commands
+from llm_eval.livebench import api_base, question_manifest, result_coverage, result_label, run_livebench, upstream_commands
 from llm_eval.model_download import validate_download_spec
 from llm_eval.provision import OS_IDS, extract_archive, https_download, install_plan
 from llm_eval.report import summarize, write_report
 from llm_eval.runner import grade, load_suite, validate_host
-from llm_eval.workflow import Prompts, main
+from llm_eval.workflow import Prompts, build_config, main, parser_for
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_interactive_defaults_preserve_each_models_config(self):
+        engines={p['id']:p for p in read_json(ROOT/'catalog/platforms.json')['platforms']}
+        models={m['id']:m for m in read_json(ROOT/'catalog/models.json')['models']}
+        args=parser_for('run').parse_args(['--os',OS_IDS[0],'--server-mode','managed'])
+        with tempfile.TemporaryDirectory() as tmp:
+            for model,context,threads in [('deepseek-r1-32b',4096,8),('deepseek-r1-70b',8192,15)]:
+                c=read_json(ROOT/'configs/runs/llama.cpp.example.json')
+                c.update(model_id=model,context_tokens=context,max_output_tokens=1024,repeats=7,warmups=0,save_outputs=True)
+                c['launch'].update(threads=threads,gpu_layers=12)
+                path=Path(tmp)/(model+'.json');write_json(path,c)
+                with patch('builtins.input',return_value=''),contextlib.redirect_stdout(io.StringIO()):
+                    result=build_config(args,Prompts(True),ROOT,engines['llama.cpp'],models[model],{},path)
+                for key in ['context_tokens','max_output_tokens','repeats','warmups','save_outputs','launch']:
+                    self.assertEqual(result[key],c[key])
+                args.context=2048
+                with patch('builtins.input',return_value=''),contextlib.redirect_stdout(io.StringIO()):
+                    result=build_config(args,Prompts(True),ROOT,engines['llama.cpp'],models[model],{},path)
+                self.assertEqual(result['context_tokens'],2048)
+                args.context=None
+
+    def test_os_wrappers_execute_real_dry_runs(self):
+        shell=shutil.which('pwsh' if os.name=='nt' else 'bash')
+        if not shell:self.skipTest('OS wrapper interpreter unavailable')
+        os_ids=[OS_IDS[1]] if os.name=='nt' else [OS_IDS[0],OS_IDS[2]]
+        env=os.environ.copy();env['LLM_EVAL_PYTHON']=sys.executable
+        with tempfile.TemporaryDirectory(prefix='llm eval ') as tmp:
+            for platform in read_json(ROOT/'catalog/platforms.json')['platforms']:
+                for os_id in os_ids:
+                    c=read_json(ROOT/f'configs/runs/{platform["id"]}.example.json')
+                    c.update(os_id=os_id,ram_budget_gib=46)
+                    config=Path(tmp)/'config.json';write_json(config,c)
+                    for action in ['setup','run']:
+                        with self.subTest(platform=platform['id'],os=os_id,action=action):
+                            extension='ps1' if os.name=='nt' else 'sh'
+                            wrapper=ROOT/'scripts/platforms'/os_id/platform['id']/(action+'.'+extension)
+                            argv=[shell,*(['-NoLogo','-NoProfile','-File'] if os.name=='nt' else []),str(wrapper),
+                                  '--non-interactive','--dry-run','--prefix',str(Path(tmp)/'missing')]
+                            if action=='run':argv+=['--config',str(config)]
+                            result=subprocess.run(argv,cwd=tmp,env=env,text=True,encoding='utf-8',capture_output=True,timeout=30)
+                            expected=2 if platform['os_support'][os_id]=='unsupported' else 0
+                            self.assertEqual(result.returncode,expected,result.stderr)
+                            if expected==2:
+                                self.assertIn('no supported native setup',result.stderr)
+                            else:
+                                plan=json.loads(result.stdout)
+                                selected=plan if action=='setup' else plan['runs'][0]['config']
+                                self.assertEqual(selected['os_id'],os_id)
+                                self.assertEqual(selected['platform'],platform['id'])
+            self.assertFalse(Path(tmp,'missing').exists())
+
     def test_multiple_models_and_categories_run_sequentially(self):
         with tempfile.TemporaryDirectory() as tmp:
             folder=Path(tmp);configs=[];events=[]
@@ -246,6 +299,39 @@ class LaunchTests(unittest.TestCase):
 
 
 class LiveBenchTests(unittest.TestCase):
+    def test_api_base_preserves_address_ipv6_and_route_prefix(self):
+        for endpoint,expected in [
+                ('http://127.0.0.2:8100/v1/chat/completions','http://127.0.0.2:8100/v1'),
+                ('http://[::1]:8101/proxy/v1/chat/completions','http://[::1]:8101/proxy/v1'),
+                ('http://127.0.0.1:11434/api/chat','http://127.0.0.1:11434/v1')]:
+            self.assertEqual(api_base({'endpoint':endpoint}),expected)
+        with self.assertRaisesRegex(ValueError,'nonstandard'):
+            api_base({'endpoint':'http://127.0.0.1:8100/custom-chat'})
+        with self.assertRaises(ValueError):
+            api_base({'livebench_api_base':'http://192.0.2.1/v1'})
+
+    def test_coverage_requires_all_eligible_finite_judgments(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            data,folder=self.data(tmp)
+            original=json.loads((folder/'question.jsonl').read_text())
+            future={**original,'question_id':2,'livebench_release_date':'2027-01-01'}
+            (folder/'question.jsonl').write_text(json.dumps(original)+'\n'+json.dumps(future)+'\n')
+            manifest=question_manifest(data,['coding'],'2026-06-25')
+            self.assertEqual(manifest['files'][0]['eligible_question_ids'],['1'])
+            source=Path(tmp)/'copy'
+            result=source/'livebench/data/live_bench/coding/task/model_judgment/ground_truth_judgment.jsonl'
+            result.parent.mkdir(parents=True)
+            good={'question_id':1,'model':'local-fixture','score':0.0}
+            cases=[([],False),([good],True),([good,good],False),([{**good,'model':'another-model'}],False),
+                   ([{**good,'score':-1}],False),([{**good,'score':float('nan')}],False),
+                   ([{**good,'eval_status':'eval_error'}],False)]
+            for rows,complete in cases:
+                with self.subTest(rows=rows):
+                    result.write_text('\n'.join(map(json.dumps,rows)))
+                    coverage=result_coverage(source,manifest,'local-fixture')['coding']
+                    self.assertEqual(coverage['expected'],1)
+                    self.assertEqual(coverage['complete'],complete)
+
     def data(self, tmp, category='coding'):
         folder = Path(tmp) / 'data/live_bench' / category / 'task'
         folder.mkdir(parents=True)
@@ -308,6 +394,7 @@ class LiveBenchTests(unittest.TestCase):
     def test_managed_model_stops_before_grading_and_snapshot_is_copied(self):
         with tempfile.TemporaryDirectory() as tmp:
             data, _ = self.data(tmp)
+            self.data(tmp,'math')
             state = self.state(tmp)
             out = Path(tmp) / 'run'
             events = []
@@ -323,17 +410,43 @@ class LiveBenchTests(unittest.TestCase):
             def execute(argv, **kwargs):
                 if argv[:2] == ['docker', 'run']:
                     events.append('grade')
+                    bench=argv[argv.index('--bench-name')+1]
+                    label=argv[argv.index('--model-display-name')+1]
+                    result=out/'source/livebench/data'/bench/'task/model_judgment/ground_truth_judgment.jsonl'
+                    result.write_text(json.dumps({'question_id':1,'model':label,'score':0})+'\n')
                 elif any(str(x).endswith('gen_api_answer.py') for x in argv):
                     events.append('generate')
+                    label=argv[argv.index('--model')+1]
+                    local=read_json(out/'source/livebench/model/model_configs'/('llm_eval_'+label+'.yaml'))
+                    self.assertEqual(local['api_name'],{'openai':'Case-Sensitive/Local-Model'})
+                elif any(str(x).endswith('show_livebench_result.py') for x in argv):
+                    bench=argv[argv.index('--bench-name')+1]
+                    (out/'source/livebench/df_raw.csv').write_text(bench)
                 self.assertFalse(kwargs['shell'])
                 return SimpleNamespace(returncode=0)
             config = {'protocol': 'openai', 'endpoint': 'http://127.0.0.1:8100/v1/chat/completions',
-                      'served_model': 'local', 'max_output_tokens': 512}
+                      'served_model': 'Case-Sensitive/Local-Model', 'max_output_tokens': 512}
             with patch('llm_eval.livebench.invoke', side_effect=invocation), patch('llm_eval.livebench.subprocess.run', side_effect=execute):
-                run_livebench(config, state, ['coding'], data, '2026-06-25', out, image='grader', backend=backend())
-            self.assertEqual(events, ['start', 'generate', 'stop', 'grade'])
+                run_livebench(config, state, ['coding','math'], data, '2026-06-25', out, image='grader', backend=backend())
+            self.assertEqual(events, ['start', 'generate', 'generate','stop', 'grade','grade'])
             self.assertTrue((out / 'source/livebench/data/live_bench/coding/task/test_cases_1.jsonl').exists())
             self.assertEqual(read_json(out / 'livebench-run.json')['status'], 'completed')
+            self.assertEqual((out/'reports/coding/df_raw.csv').read_text(),'live_bench/coding')
+            self.assertEqual((out/'reports/math/df_raw.csv').read_text(),'live_bench/math')
+
+    def test_zero_exit_codes_without_judgments_are_failed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            data,_=self.data(tmp);state=self.state(tmp);out=Path(tmp)/'run'
+            config={'protocol':'openai','endpoint':'http://127.0.0.1:8100/v1/chat/completions',
+                    'served_model':'local','max_output_tokens':512}
+            responses=[SimpleNamespace(stdout='a'*40),SimpleNamespace(stdout=''),SimpleNamespace(stdout='sha256:'+'b'*64)]
+            with patch('llm_eval.livebench.invoke',side_effect=responses),patch('llm_eval.livebench.subprocess.run') as run:
+                with self.assertRaisesRegex(RuntimeError,'incomplete'):
+                    run_livebench(config,state,['coding'],data,'2026-06-25',out,image='grader')
+            metadata=read_json(out/'livebench-run.json')
+            self.assertEqual(metadata['status'],'failed')
+            self.assertEqual(metadata['coverage']['coding']['missing'],1)
+            self.assertFalse(any(str(arg).endswith('show_livebench_result.py') for call in run.call_args_list for arg in call.args[0]))
 
     def test_category_reports_weight_raw_requests_and_keep_benchmark_lanes_separate(self):
         with tempfile.TemporaryDirectory() as tmp:

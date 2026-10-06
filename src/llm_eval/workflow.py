@@ -165,6 +165,13 @@ def build_config(args, prompts, root, engine, model, state, config_file=None):
     if args.launch_options:c['launch'].update(read_json(args.launch_options))
     for arg in ['threads','gpu_layers','model_file']:
         if getattr(args,arg,None) is not None:c['launch'][arg]=getattr(args,arg)
+    if prompts.interactive:
+        c['save_outputs']=prompts.yes(model['id']+': --save-outputs',args.save_outputs,c.get('save_outputs',False))
+        for arg,key in [('context','context_tokens'),('max_tokens','max_output_tokens'),('repeats','repeats'),('warmups','warmups')]:
+            c[key]=int(prompts.value(model['id']+': --'+arg.replace('_','-'),getattr(args,arg),c[key]))
+        for arg,default in [('threads',16),('gpu_layers',20)]:
+            if arg=='gpu_layers' and engine['id'] not in {'llama.cpp','ik_llama.cpp','koboldcpp','ollama'}:continue
+            c['launch'][arg]=int(prompts.value(model['id']+': --'+arg.replace('_','-'),getattr(args,arg),c['launch'].get(arg,default)))
     if c['protocol']!='worker':
         port=args.port or (11434 if engine['id']=='ollama' else 8100)
         if not 1024<=port<=65535:raise ValueError('Select a port from 1024 to 65535')
@@ -228,11 +235,6 @@ def run_action(args,prompts,root,engines,models,categories):
     args.benchmark=prompts.value('--benchmark',args.benchmark,'category-smoke',['category-smoke','livebench'])
     chosen=csv_selection(prompts.value('--categories',args.categories,','.join(prefs.get('categories',[])) or 'all'),categories)
     args.server_mode=prompts.value('--server-mode',args.server_mode,'managed',['managed','external'])
-    if prompts.interactive:
-        args.save_outputs=prompts.yes('--save-outputs',args.save_outputs)
-    # Offer the most common tuning controls; remaining flags can also be put in --config.
-    for name,default in [('context',8192),('max_tokens',512),('repeats',3),('warmups',1),('threads',16),('gpu_layers',20)]:
-        if prompts.interactive:setattr(args,name,int(prompts.value('--'+name.replace('_','-'),getattr(args,name),default)))
     if args.benchmark=='livebench':
         args.livebench_data=Path(prompts.value('--livebench-data',args.livebench_data,required=True)).expanduser().resolve()
         args.livebench_image=prompts.value('--livebench-image',args.livebench_image,required=True)
