@@ -25,20 +25,7 @@ Two explicit run modes prevent accidental score conflation:
 
 Accelerate and AirLLM use category-smoke in this integration; their worker protocol is not an OpenAI server. Running upstream LiveBench against them requires a separately implemented server adapter. Local category pass rates are never added to upstream scores. Upstream runs do not currently generate the core harness's per-request latency/telemetry report; pair them with category-smoke performance runs at the same settings. Upstream generation persists full questions/answers regardless of the core `save_outputs` setting.
 
-```mermaid
-flowchart TD
-    Select["Choose category and benchmark mode"] --> Smoke["Original category prompts"]
-    Select --> Snapshot["Hash supplied LiveBench snapshot"]
-    Smoke --> Metrics["Timing, telemetry, exact checks"]
-    Snapshot --> Generate["Pinned upstream generation against local server"]
-    Generate --> Regular["Stop managed server; isolated regular grading"]
-    Generate --> Agentic["Opt-in upstream Docker agent tasks"]
-    Regular --> Scores["Upstream judgments and coverage record"]
-    Agentic --> Scores
-    Metrics --> Local["Category smoke report"]
-```
-
-[View the LiveBench workflow as a PNG](diagrams/livebench-workflow.png).
+[View the LiveBench workflow as a PNG](../diagrams/livebench-workflow.png).
 
 ## Running upstream LiveBench
 
