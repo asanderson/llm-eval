@@ -38,6 +38,8 @@ flowchart TD
     Metrics --> Local["Category smoke report"]
 ```
 
+[View the LiveBench workflow as a PNG](diagrams/livebench-workflow.png).
+
 ## Running upstream LiveBench
 
 First complete the [platform setup and artifact preparation](WORKFLOWS.md). Setup can install a separate LiveBench environment and build its grading image:

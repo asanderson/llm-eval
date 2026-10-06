@@ -52,6 +52,8 @@ flowchart TD
     Files --> Report["Reports grouped by comparable configuration"]
 ```
 
+[View the evaluation workflow as a PNG](docs/diagrams/evaluation-workflow.png).
+
 HTTP adapters cover [llama.cpp][llama-cpp], [ik_llama.cpp][ik-llama], [KTransformers][ktransformers], [Ollama][ollama], [KoboldCpp][koboldcpp], [vLLM][vllm], and [Strata][strata]. Python workers cover [Accelerate][accelerate] and [AirLLM][airllm]. Reports exclude warmups and, by default, synthetic runs. Streaming timing and token accounting depend on what the backend actually exposes; see the [methodology](docs/METHODOLOGY.md).
 
 ### How models can exceed GPU VRAM
@@ -67,6 +69,8 @@ flowchart TD
     CPU --> Results["Runtime combines computation results"]
     GPU --> Results
 ```
+
+[View the memory offload diagram as a PNG](docs/diagrams/memory-offload.png).
 
 With **CPU/GPU splitting**, some weights stay in system RAM and CPU kernels compute their layers or experts. With **layer or expert streaming**, a runtime transfers needed weights to the GPU; some configurations also fetch data from SSD during generation. The factory 2 TB drive remains available for the OS and other files; record the actual model/offload paths. SSD storage does not add RAM or VRAM, and these memory pools cannot simply be summed into one allocation. KV cache placement, temporary buffers, host copies, and disk traffic vary by backend. The Intel iGPU is part of the display configuration and is not an additional inference device in the current evaluation profiles.
 
