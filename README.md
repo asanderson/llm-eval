@@ -37,7 +37,7 @@ For platform-specific releases, build instructions, and dependencies, use the ni
 
 The harness validates a selected experiment, runs its workload, and records measurements. Unsupported catalog combinations are skipped; invalid configurations or artifacts fail preflight. The new [run scripts](docs/WORKFLOWS.md) can manage local servers or use an existing server; library adapters launch an isolated Python worker.
 
-[View the evaluation workflow as a PNG](diagrams/evaluation-workflow.png).
+![Evaluation workflow: validate an experiment, run requests, collect metrics and telemetry, and generate reports.](diagrams/evaluation-workflow.png)
 
 HTTP adapters cover [llama.cpp][llama-cpp], [ik_llama.cpp][ik-llama], [KTransformers][ktransformers], [Ollama][ollama], [KoboldCpp][koboldcpp], [vLLM][vllm], and [Strata][strata]. Python workers cover [Accelerate][accelerate] and [AirLLM][airllm]. Reports exclude warmups and, by default, synthetic runs. Streaming timing and token accounting depend on what the backend actually exposes; see the [methodology](docs/METHODOLOGY.md).
 
@@ -45,7 +45,7 @@ HTTP adapters cover [llama.cpp][llama-cpp], [ik_llama.cpp][ik-llama], [KTransfor
 
 The inference runtime chooses weight placement and offload strategy; the evaluation harness observes it. This diagram shows possible data paths on the laptop, not a claim that every platform uses all paths.
 
-[View the memory offload diagram as a PNG](diagrams/memory-offload.png).
+![Memory offload: model data flows from NVMe through system RAM to CPU kernels or GPU VRAM and CUDA kernels.](diagrams/memory-offload.png)
 
 With **CPU/GPU splitting**, some weights stay in system RAM and CPU kernels compute their layers or experts. With **layer or expert streaming**, a runtime transfers needed weights to the GPU; some configurations also fetch data from SSD during generation. The factory 2 TB drive remains available for the OS and other files; record the actual model/offload paths. SSD storage does not add RAM or VRAM, and these memory pools cannot simply be summed into one allocation. KV cache placement, temporary buffers, host copies, and disk traffic vary by backend. The Intel iGPU is part of the display configuration and is not an additional inference device in the current evaluation profiles.
 
