@@ -1,0 +1,26 @@
+{
+  "schema_version": 2,
+  "id": "routing-smoke",
+  "inventory": "../configs/targets/local.example.json",
+  "phases": [
+    {
+      "id": "routing",
+      "experiments": [
+        {
+          "id": "llm-routing",
+          "version": 1,
+          "mode": "decision",
+          "cases": [
+            "category-smoke"
+          ],
+          "hardware_configs": [
+            "raider-ubuntu"
+          ]
+        }
+      ]
+    }
+  ],
+  "reporting": {
+    "on_experiment_end": true
+  }
+}

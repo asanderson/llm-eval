@@ -9,7 +9,7 @@ from llm_eval.common import read_json, sha256_file
 from llm_eval.core.contracts import fields, identifier, integer, no_credentials, config_hash
 from llm_eval.experiments import get_experiment
 
-PATH_KEYS = {'suite', 'artifact_root', 'artifact_lock', 'offload_dir', 'installation_state', 'replay', 'data'}
+PATH_KEYS = {'suite', 'artifact_root', 'artifact_lock', 'offload_dir', 'installation_state', 'replay', 'data', 'benchmark_registry'}
 
 
 def resolve_paths(value, directory):
@@ -113,7 +113,7 @@ def compile_campaign(path, root, max_parallel_jobs=None):
                         bound['config'].update(overrides, hardware_profile=hardware['hardware_profile'], os_id=hardware['os_id'])
                         if hardware.get('attestation'):
                             bound['config']['hardware_attestation'] = hardware['attestation']
-                    reason = experiment.validate(bound, root)
+                    reason = experiment.validate(bound, root, mode)
                     signature = [case_id, hardware_id]
                     if tuple(signature) in seen:
                         raise ValueError('Duplicate case/hardware selection')
@@ -131,6 +131,14 @@ def compile_campaign(path, root, max_parallel_jobs=None):
                     job['config_sha256'] = config_hash(job)
                     jobs.append(job); phase_jobs.append(jid); exp['job_ids'].append(jid)
             phases[phase_id] = phase_jobs
+    def hash_inputs(value):
+        if isinstance(value, dict):
+            for key, item in value.items():
+                if key in PATH_KEYS and isinstance(item, str) and Path(item).is_file(): inputs[item] = sha256_file(item)
+                else: hash_inputs(item)
+        elif isinstance(value, list):
+            for item in value: hash_inputs(item)
+    for job in jobs: hash_inputs(job['parameters'])
     reporting = c.get('reporting', {'on_experiment_end': True})
     fields(reporting, {'on_experiment_end', 'raw_format', 'summary_formats', 'publish', 'include_outputs', 'max_artifact_bytes'})
     plan = {'schema_version': 2, 'campaign_id': c['id'], 'source': str(path), 'root': str(root),

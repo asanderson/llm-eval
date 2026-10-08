@@ -6,5 +6,9 @@
     "replay",
     "live"
   ],
-  "cases": {}
+  "cases": {
+    "category-smoke": "cases/category-smoke.json",
+    "ollama-nimble": "cases/ollama-nimble.json",
+    "ollama-tev1": "cases/ollama-tev1.json"
+  }
 }

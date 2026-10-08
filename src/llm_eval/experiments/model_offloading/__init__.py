@@ -11,7 +11,7 @@ MANIFEST = {'id': 'model-offloading', 'version': 1,
             'description': 'Model quality, performance and memory placement across serving platforms'}
 
 
-def validate(case, root):
+def validate(case, root, mode=None):
     fields(case, {'config', 'server_mode', 'installation_state', 'categories', 'livebench', 'synthetic'}, ['config'])
     if case.get('server_mode', 'external') not in {'external', 'managed'}:
         raise ValueError('server_mode must be managed or external')

@@ -27,9 +27,23 @@ def endpoint_parts(url):
     return parts
 
 
-def request_events(url, payload, protocol, timeout_s, api_key_env=None):
-    parts = endpoint_parts(url)
-    conn = http.client.HTTPConnection(parts.hostname, parts.port or 80, timeout=min(timeout_s, 30))
+def configured_endpoint(url, network=None):
+    if not network or network.get('kind', 'local') == 'local':
+        return endpoint_parts(url)
+    parts = urlsplit(url)
+    if network.get('kind') not in {'hosted', 'remote'} or parts.scheme != 'https':
+        raise ValueError('Explicit remote deployments require HTTPS')
+    if parts.username or parts.password or parts.query or parts.fragment:
+        raise ValueError('Credentials, query and fragment are forbidden in endpoints')
+    if not parts.hostname or parts.hostname not in network.get('allowed_hosts', []):
+        raise ValueError('Endpoint hostname is not explicitly allowlisted')
+    return parts
+
+
+def request_events(url, payload, protocol, timeout_s, api_key_env=None, network=None):
+    parts = configured_endpoint(url, network)
+    connection = http.client.HTTPSConnection if parts.scheme == 'https' else http.client.HTTPConnection
+    conn = connection(parts.hostname, parts.port or (443 if parts.scheme == 'https' else 80), timeout=min(timeout_s, 30))
     headers = {"Content-Type": "application/json", "Accept": "text/event-stream"}
     if api_key_env:
         key = os.environ.get(api_key_env)
@@ -61,6 +75,14 @@ def request_events(url, payload, protocol, timeout_s, api_key_env=None):
         if response.status != 200:
             # Never save response bodies: they can echo tokens, prompts, or filesystem paths.
             raise RuntimeError(f"Backend HTTP status {response.status}; redirects are not followed")
+        if protocol == 'json':
+            body = response.read(MAX_RESPONSE_BYTES + 1)
+            if expired.is_set() or time.monotonic() > deadline:
+                raise TimeoutError('Decision exceeded request deadline')
+            if len(body) > MAX_RESPONSE_BYTES:
+                raise ValueError('Decision response exceeded size limit')
+            yield json.loads(body)
+            return
         total = 0
         data_lines = []
         while True:
@@ -109,7 +131,7 @@ class HTTPAdapter:
     def __init__(self, config):
         self.config = config
         self.protocol = config["protocol"]
-        endpoint_parts(config["endpoint"])
+        configured_endpoint(config["endpoint"], config.get("network"))
 
     def generate(self, messages, max_tokens, seed, temperature):
         c = self.config
@@ -132,7 +154,7 @@ class HTTPAdapter:
         backend_decode_tps = backend_prefill_tps = backend_load_s = None
         done = False
         finish_reason = None
-        for event in request_events(c["endpoint"], payload, self.protocol, c["timeout_s"], c.get("api_key_env")):
+        for event in request_events(c["endpoint"], payload, self.protocol, c["timeout_s"], c.get("api_key_env"), c.get("network")):
             if event.get("error"):
                 raise RuntimeError("Backend reported an error (body omitted)")
             now = time.perf_counter()
