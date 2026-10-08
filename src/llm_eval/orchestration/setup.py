@@ -3,14 +3,14 @@ from pathlib import Path
 import uuid
 
 from .resources import reserve, release, lock_root
-from .transport import rpc
+from .transport import rpc, map_paths
 
 
 def setup_campaign(plan):
     seen=set();failed=False
     for job in plan['jobs']:
         if job['status']=='skipped':continue
-        target=job['target'];params=job['parameters']
+        target=job['target'];params=map_paths(job['parameters'],target,plan['root'])
         platforms=[params['config']['platform']] if 'config' in params else [params.get('router',{}).get('platform','ollama')]
         for platform in platforms:
             if platform not in {'ollama','llama.cpp','ik_llama.cpp','ktransformers','koboldcpp','vllm','strata','accelerate','airllm'}:continue

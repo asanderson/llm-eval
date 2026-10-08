@@ -73,5 +73,10 @@ def validate(case, root, mode='decision'):
 
 def execute(job, output, root):
     validate(job['parameters'],root,job['mode'])
+    if not job['parameters'].get('synthetic',False):
+        deployments=[job['parameters']['router'],*job['parameters'].get('candidates',{}).values()]
+        for d in deployments:
+            if d.get('model') and any(s in d.get('model_revision','') for s in ('REPLACE','TODO')):
+                raise ValueError('Record the exact loaded model revision before evaluating')
     from .evaluation import execute as evaluate
     return evaluate(job,output,root)

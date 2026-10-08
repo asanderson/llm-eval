@@ -307,11 +307,11 @@ def main(action=None,argv=None):
     incoming = list(sys.argv[1:] if argv is None else argv)
     if '--campaign' in incoming:
         from .orchestration.cli import main as campaign_main
-        incoming = [x for x in incoming if x != '--non-interactive']
+        incoming = [x for x in incoming if x not in {'--non-interactive','--interactive'}]
         return campaign_main([action, *incoming])
-    if '--campaign-wizard' in incoming:
+    if '--campaign-wizard' in incoming or (('--interactive' in incoming or (not incoming and sys.stdin.isatty())) and not any(x in incoming for x in ('--config','--platform','--os','--models'))):
         from .orchestration.cli import interactive
-        return interactive(Path(__file__).resolve().parents[2])
+        return interactive(Path(__file__).resolve().parents[2], action)
     parser=parser_for(action);args=parser.parse_args(argv)
     prompts=Prompts(args.interactive or (not args.non_interactive and sys.stdin.isatty()))
     try:

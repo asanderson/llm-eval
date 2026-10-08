@@ -1,5 +1,15 @@
 # Validation status
 
+## Experiment campaign implementation
+
+The v0.3 campaign refactor adds experiment contracts, dependency scheduling, local/SSH workers, persistent host ownership, decision/replay/live routing, report generation, and results PR publication. Local validation under Python 3.12 passes **63 tests**, including a real local worker with automatic reporting, supervision dependency preflight, parallel independent hosts versus serial shared hosts, lost-run and lost-reservation recovery, unavailable-target admission, chunked artifact integrity, routing protocol/budget/fallback checks, deterministic sanitized reporting, and real temporary Git worktree/push recovery with a simulated GitHub API.
+
+A real local worker process completes the synthetic routing campaign and produces JSON/CSV/raw gzip/Markdown/PNG outputs. The combined offload/routing example resolves into three jobs. Report and architecture PNGs were inspected. These checks do not contact paid providers or generate model-quality rankings.
+
+The Linux/Windows Python 3.11/3.12/3.13 CI matrix includes the telemetry and reporting extras. Real NVIDIA hardware, native Windows/WSL GPU execution, two physical SSH hosts, actual SystemOne model inference, and paid-provider billing/rate-limit behavior remain operator acceptance gates. Live routing currently uses deterministic checks; full upstream LiveBench grading remains in the original offload lane, while routing replay accepts fingerprint-bound externally graded outcomes.
+
+Before claiming a multi-host study, verify no overlap for shared physical IDs; concurrent work on independent machines; disconnect/reconnect collection without duplicate requests; cancellation and owned-process cleanup; Windows/WSL shared locks; and a complete result PR against the intended repository using operator credentials. The publisher's network/auth failure path is covered by a local Git integration test, not a real credentials-bearing result publication.
+
 ## Completed locally
 
 - Public repository cloned from initial commit `71a0dbc5ed06cc4d37f5ea54af3cdd285b43ad7b`; existing MIT license preserved.

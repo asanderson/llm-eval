@@ -17,6 +17,8 @@ from .telemetry import Sampler, host_snapshot
 
 
 def validate_config(c, root, synthetic=False):
+    if c.get("network", {}).get("kind", "local") != "local":
+        raise ValueError("Hosted endpoints belong in the routing experiment")
     if any(k.lower() in {"api_key", "token", "password", "secret"} for k in c):
         raise ValueError("Do not put credentials in run files; use api_key_env")
     engines = {p["id"]: p for p in read_json(root / "catalog/platforms.json")["platforms"]}
@@ -108,9 +110,9 @@ def validate_host(c, root, host=None):
     hardware = read_json(Path(root) / ('configs/hardware/' + c.get('hardware_profile', 'msi-raider-18-hx-ai') + '.json'))
     if not host['psutil_available']:
         raise ValueError('Install the telemetry extra for real hardware runs')
-    if not any(hardware['gpu']['name'] in g['name'] for g in host['gpus']):
+    if hardware.get('gpu') and not any(hardware['gpu']['name'] in g['name'] for g in host['gpus']):
         raise ValueError('Expected hardware-profile NVIDIA GPU was not detected')
-    if host.get('ac_connected') is False:
+    if hardware.get('require_ac', True) and host.get('ac_connected') is False:
         raise ValueError('Connect AC power before a performance run')
     return host
 
