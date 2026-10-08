@@ -122,15 +122,18 @@ def checkout(repository, revision, destination):
     invoke(['git', '-C', destination, '-c', 'protocol.file.allow=never', 'submodule', 'update', '--init', '--recursive'])
 
 
-def install_plan(root, platform, os_id, prefix, python=sys.executable, jobs=8, cuda_arch='120',
-                 revision=None, packages=None, with_livebench=False):
+def install_plan(root, platform, os_id, prefix, python=sys.executable, jobs=8, cuda_arch=None,
+                 revision=None, packages=None, with_livebench=False, hardware_profile='msi-raider-18-hx-ai'):
     platforms = {p['id']: p for p in read_json(root / 'catalog/platforms.json')['platforms']}
     if platform not in platforms or os_id not in OS_IDS:
         raise ValueError('Unknown platform or OS')
     if platforms[platform]['os_support'][os_id] == 'unsupported':
         raise ValueError(f'{platform} is unsupported on {os_id}; use its Linux/WSL script')
-    if not 1 <= jobs <= 24 or not re.fullmatch(r'[0-9]{2,3}', cuda_arch):
-        raise ValueError('Use 1–24 build jobs and a numeric CUDA architecture (120 for this laptop)')
+    from .core.hardware import limits
+    bounds = limits({'hardware_profile': hardware_profile, 'os_id': os_id}, root)
+    cuda_arch = cuda_arch or bounds['cuda_arch']
+    if not 1 <= jobs <= bounds['threads'] or not re.fullmatch(r'[0-9]{2,3}', cuda_arch):
+        raise ValueError('Build jobs and CUDA architecture must match the hardware profile')
     catalog = read_json(root / 'catalog/installers.json')
     recipe = dict(catalog['platforms'][platform])
     if revision:
@@ -147,7 +150,7 @@ def install_plan(root, platform, os_id, prefix, python=sys.executable, jobs=8, c
             'python':str(python), 'jobs':jobs, 'cuda_arch':cuda_arch, 'recipe':recipe,
             'with_livebench':with_livebench, 'livebench':catalog['livebench'] if with_livebench else None,
             'prerequisites':['Python 3.11–3.13', 'working NVIDIA host driver',
-                             *(['Git', 'CMake', 'CUDA toolkit with sm_120 support', 'C++ compiler'] if recipe['kind'] in {'cmake','strata'} else [])],
+                             *(['Git', 'CMake', 'CUDA toolkit with sm_' + cuda_arch + ' support', 'C++ compiler'] if recipe['kind'] in {'cmake','strata'} else [])],
             'qualification':'Installer recipe only; GPU/model compatibility must be measured.'}
 
 

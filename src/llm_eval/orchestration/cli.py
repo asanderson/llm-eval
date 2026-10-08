@@ -23,6 +23,7 @@ def main(argv, root=None):
         p.add_argument('--dry-run', action='store_true')
     for name in ('status', 'resume', 'cancel'):
         p = sub.add_parser(name); p.add_argument('--campaign-dir', type=Path, required=True)
+        if name == 'resume': p.add_argument('--retry-failed', action='store_true')
     args = parser.parse_args(argv)
     try:
         if args.command == 'experiments':
@@ -32,7 +33,7 @@ def main(argv, root=None):
                 print(json.dumps(read_json(args.campaign_dir / 'campaign.json'), indent=2)); return 0
             if args.command == 'cancel':
                 atomic_json(args.campaign_dir / 'cancel.json', {'cancel': True}); return 0
-            return run_campaign(args.campaign_dir)
+            return run_campaign(args.campaign_dir, args.retry_failed)
         plan = compile_campaign(args.campaign, args.project_root, args.max_parallel_jobs)
         if args.command == 'plan' or args.dry_run:
             print(json.dumps(plan, indent=2)); return 0

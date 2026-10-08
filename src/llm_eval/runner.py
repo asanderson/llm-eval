@@ -28,8 +28,9 @@ def validate_config(c, root, synthetic=False):
     if not re.fullmatch(r"[a-z0-9-]+", profile_id):
         raise ValueError("Invalid hardware profile identifier")
     hardware = read_json(root / ("configs/hardware/" + profile_id + ".json"))
-    max_gpu = hardware["gpu"]["vram_gib"] - hardware["gpu"]["initial_reserve_gib"]
-    max_ram = hardware["ram"]["installed_gib"] - hardware.get("host_reserve_gib", 12)
+    from .core.hardware import limits
+    bounds = limits(c, root)
+    max_gpu, max_ram = bounds["gpu_budget_gib"], bounds["ram_budget_gib"]
     if c.get("os_id") not in engine["os_support"]:
         raise ValueError("Unknown OS profile")
     if c.get("protocol") != engine["protocol"]:
@@ -46,17 +47,15 @@ def validate_config(c, root, synthetic=False):
         raise ValueError("Context exceeds this catalog's initial validation limit")
     if c["max_output_tokens"] >= c["context_tokens"]:
         raise ValueError("Output budget leaves no room for the prompt")
-    if "wsl2" in c["os_id"] and c["ram_budget_gib"] > 46:
-        raise ValueError("WSL profile reserves guest and Windows host headroom; CPU weight budget <=46GiB")
     if c.get("concurrency", 1) != 1:
         raise ValueError("Initial harness measures one active request; concurrency requires a separate experiment")
     if c.get("lane", "offload") not in {"offload", "control", "disk"}:
         raise ValueError("Invalid evaluation lane")
     finite_number(c.get("telemetry_interval_s", 1.0), "telemetry_interval_s", .25, 30)
     finite_number(c.get("load_timeout_s", 600), "load_timeout_s", 1, 3600)
-    threads=c.get('launch',{}).get('threads',16)
-    if not isinstance(threads,int) or not 1<=threads<=24:
-        raise ValueError('launch.threads must be an integer from 1 to 24')
+    threads=c.get('launch',{}).get('threads', min(16, bounds['threads']))
+    if not isinstance(threads,int) or not 1<=threads<=bounds['threads']:
+        raise ValueError('launch.threads exceeds hardware profile capacity')
     if c.get("allow_disk_offload", False) and c.get("lane") != "disk":
         raise ValueError("Disk-offload experiments require the disk lane")
     if not synthetic:
