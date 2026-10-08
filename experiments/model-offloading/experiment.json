@@ -1,0 +1,9 @@
+{
+  "id": "model-offloading",
+  "version": 1,
+  "modes": [
+    "category-smoke",
+    "livebench"
+  ],
+  "cases": {}
+}

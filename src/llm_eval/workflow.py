@@ -303,6 +303,14 @@ def main(action=None,argv=None):
     if action is None:
         if len(sys.argv)<2 or sys.argv[1] not in {'setup','run'}:raise SystemExit('Usage: python -m llm_eval.workflow setup|run [options]')
         action=sys.argv[1];argv=sys.argv[2:]
+    incoming = list(sys.argv[1:] if argv is None else argv)
+    if '--campaign' in incoming:
+        from .orchestration.cli import main as campaign_main
+        incoming = [x for x in incoming if x != '--non-interactive']
+        return campaign_main([action, *incoming])
+    if '--campaign-wizard' in incoming:
+        from .orchestration.cli import interactive
+        return interactive(Path(__file__).resolve().parents[2])
     parser=parser_for(action);args=parser.parse_args(argv)
     prompts=Prompts(args.interactive or (not args.non_interactive and sys.stdin.isatty()))
     try:
