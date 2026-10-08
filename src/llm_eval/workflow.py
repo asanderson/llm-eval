@@ -66,7 +66,8 @@ def parser_for(action):
     if action=='setup':
         p.add_argument('--python',help='Backend Python 3.11–3.13 interpreter')
         p.add_argument('--jobs',type=int)
-        p.add_argument('--cuda-arch',default='120')
+        p.add_argument('--cuda-arch')
+        p.add_argument('--hardware-profile',default='msi-raider-18-hx-ai')
         p.add_argument('--revision',help='Override a source recipe with a full commit SHA')
         p.add_argument('--package',action='append',help='Override Python recipe with exact name==version; repeat for each package')
         p.add_argument('--with-livebench',action=argparse.BooleanOptionalAction,default=None)
@@ -197,7 +198,7 @@ def setup_action(args,prompts,root,engines,models,categories):
         if with_lb:args.build_livebench_image=prompts.value('--build-livebench-image (optional Docker image tag)',args.build_livebench_image)
         download=prompts.value('--download-spec (optional model download manifest)',args.download_spec)
         args.download_spec=Path(download).expanduser() if download else None
-    plan=install_plan(root,args.platform,args.os,args.prefix,py,jobs,args.cuda_arch,args.revision,args.package,with_lb)
+    plan=install_plan(root,args.platform,args.os,args.prefix,py,jobs,args.cuda_arch,args.revision,args.package,with_lb,hardware_profile=args.hardware_profile)
     if args.build_livebench_image and not with_lb:raise ValueError('--build-livebench-image requires --with-livebench')
     plan['selected_models']=selected;plan['selected_categories']=selected_categories
     plan['download_spec']=str(args.download_spec.resolve()) if args.download_spec else None

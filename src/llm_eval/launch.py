@@ -16,6 +16,8 @@ from .common import read_json, safe_relative
 
 
 def launch_spec(config, state, workdir):
+    from .core.hardware import limits
+    bounds = limits(config)
     platform=config['platform']
     if state['plan']['platform']!=platform or state['plan']['os_id']!=config['os_id']:
         raise ValueError('Installation state does not match the run platform/OS')
@@ -34,9 +36,9 @@ def launch_spec(config, state, workdir):
         if not p.is_relative_to(root) or not p.exists():
             raise ValueError(f'launch.{name} must exist inside the locked artifact root')
         return str(p)
-    ctx=str(config['context_tokens']); threads=str(launch.get('threads',16)); layers=str(launch.get('gpu_layers',20))
-    if not threads.isdigit() or not 1<=int(threads)<=24:
-        raise ValueError('launch.threads must be from 1 to 24')
+    ctx=str(config['context_tokens']); threads=str(launch.get('threads',min(16,bounds['threads']))); layers=str(launch.get('gpu_layers',20))
+    if not threads.isdigit() or not 1<=int(threads)<=bounds['threads']:
+        raise ValueError('launch.threads exceeds hardware profile capacity')
     if not layers.lstrip('-').isdigit() or not -1<=int(layers)<=999:
         raise ValueError('launch.gpu_layers must be -1 (engine-specific, often all layers) or 0–999')
     env={ 'CUDA_VISIBLE_DEVICES':str(launch.get('gpu',0)), 'OMP_NUM_THREADS':threads,'MKL_NUM_THREADS':threads,
@@ -64,7 +66,7 @@ def launch_spec(config, state, workdir):
     elif platform=='vllm':
         argv=[py,'-m','vllm.entrypoints.openai.api_server','--model',local('model_dir','.'),
               '--served-model-name',config['served_model'],'--host',host,'--port',str(port),
-              '--max-model-len',ctx,'--max-num-seqs','1','--gpu-memory-utilization',str(config['gpu_budget_gib']/24),
+              '--max-model-len',ctx,'--max-num-seqs','1','--gpu-memory-utilization',str(config['gpu_budget_gib']/bounds['gpu_total_gib']),
               '--cpu-offload-gb',str(launch.get('cpu_offload_gb',32))]
         if config.get('reviewed_model_code'):argv.append('--trust-remote-code')
     elif platform=='ktransformers':
@@ -75,7 +77,7 @@ def launch_spec(config, state, workdir):
               '--kt-weight-path',local('kt_weight_path','.'),'--kt-method',method,'--kt-cpuinfer',threads,
               '--kt-threadpool-count','1','--kt-num-gpu-experts',str(launch.get('gpu_experts',2)),
               '--host',host,'--port',str(port),'--served-model-name',config['served_model'],
-              '--context-length',ctx,'--max-running-requests','1','--mem-fraction-static',str(config['gpu_budget_gib']/24),
+              '--context-length',ctx,'--max-running-requests','1','--mem-fraction-static',str(config['gpu_budget_gib']/bounds['gpu_total_gib']),
               '--attention-backend',launch.get('attention_backend','triton'),'--disable-shared-experts-fusion']
         if config.get('reviewed_model_code'):argv.append('--trust-remote-code')
     elif platform=='strata':

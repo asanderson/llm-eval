@@ -29,7 +29,8 @@ def execute(job, output, root):
     case = job['parameters']
     config = dict(case['config'])
     output = Path(output)
-    state = read_json(case['installation_state']) if case.get('installation_state') else {}
+    state_path = case.get('installation_state') or Path(root)/'.platforms'/config['os_id']/config['platform']/'state.json'
+    state = read_json(state_path) if Path(state_path).exists() else {}
     synthetic = case.get('synthetic', False)
     if not synthetic:
         runner.validate_config(config, root)

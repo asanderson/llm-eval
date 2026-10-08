@@ -62,5 +62,11 @@
     "SSD free space and temperature",
     "OS build/kernel",
     "WSL version and memory cap if applicable"
-  ]
+  ],
+  "host_reserve_gib": 12,
+  "os_limits": {
+    "windows-11-wsl2-ubuntu-26.04": {
+      "ram_budget_gib": 46
+    }
+  }
 }
