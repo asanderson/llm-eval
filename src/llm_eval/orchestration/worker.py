@@ -59,7 +59,9 @@ def handle(p):
         target=p['target'];owner=p['owner']
         root=lock_root(target)
         if action=='reserve':reserve(root,target['physical_host_id'],owner)
-        else:release(root,target['physical_host_id'],owner)
+        else:
+            try:release(root,target['physical_host_id'],owner)
+            except ValueError:return {'ok':False,'reason':'different_owner'}
         return {'ok':True}
     out=Path(p['output']).expanduser().resolve()
     if action=='setup':
@@ -76,28 +78,48 @@ def handle(p):
             result=subprocess.run(args,stdout=log,stderr=subprocess.STDOUT,timeout=7000)
         return {'status':'succeeded' if result.returncode==0 else 'failed'}
     if action=='status':
-        return {'active':(out/'active').exists(),'result':read_json(out/'result.json') if (out/'result.json').exists() else None,
+        active=(out/'active').exists()
+        if active and (out/'result.json').exists() and (out/'heartbeat.json').exists():
+            import psutil
+            heartbeat=read_json(out/'heartbeat.json')
+            try:
+                proc=psutil.Process(heartbeat['pid'])
+                active=proc.is_running() and proc.status()!=psutil.STATUS_ZOMBIE and abs(proc.create_time()-heartbeat['process_started'])<.01
+            except psutil.NoSuchProcess:active=False
+        return {'active':active,'result':read_json(out/'result.json') if (out/'result.json').exists() else None,
                 'heartbeat':read_json(out/'heartbeat.json') if (out/'heartbeat.json').exists() else None}
     if action=='cancel':
         atomic_json(out/'cancel.json',{'cancel':True});return {'ok':True}
+    if action=='file-chunk':
+        path=(out/p['path']).resolve()
+        if not path.is_relative_to(out) or path.is_symlink():raise ValueError('Unsafe artifact path')
+        if type(p['offset']) is not int or p['offset']<0:raise ValueError('Invalid artifact offset')
+        with path.open('rb') as f:
+            f.seek(p['offset']);data=f.read(4*1024*1024)
+        return {'data':base64.b64encode(data).decode()}
     if action=='collect':
-        from .transport import MAX_TRANSFER
-        files=[];total=0
+        from llm_eval.common import sha256_file
+        files=[]
         for path in sorted(out.rglob('*')):
             if path.is_symlink():raise ValueError('Symlink in result bundle')
             if not path.is_file() or path.name in {'worker.log','execution.json'}:continue
-            size=path.stat().st_size;total+=size
-            if total>MAX_TRANSFER:raise ValueError('Collection size limit exceeded; keep remote artifacts')
-            data=path.read_bytes()
-            files.append({'path':path.relative_to(out).as_posix(),'sha256':hashlib.sha256(data).hexdigest(),'data':base64.b64encode(data).decode()})
+            files.append({'path':path.relative_to(out).as_posix(),'sha256':sha256_file(path),'bytes':path.stat().st_size})
+            if len(files)>100000:raise ValueError('Artifact inventory exceeds limit')
         return {'files':files}
     if action!='run':raise ValueError('Unknown worker action')
+    # Check supervision dependencies before reserving or creating a child.
+    import psutil
     root=Path(p['root']).resolve();job=p['job'];target=job['target']
     synthetic=job['parameters'].get('synthetic',False)
+    from llm_eval.common import sha256_file
+    for file in job.get('input_files',[]):
+        if sha256_file(file['path'])!=file['sha256']:raise ValueError('Worker input hash mismatch')
     if revision(root)!=p['code_revision']:raise ValueError('Worker code revision mismatch')
     if not synthetic:
         if subprocess.run(['git','-C',str(root),'diff','--quiet','HEAD']).returncode:
             raise ValueError('Worker checkout contains uncommitted code changes')
+        from llm_eval.runner import validate_host
+        validate_host({'hardware_profile':job['hardware']['hardware_profile']},root)
         if environment_kind()!=job['hardware']['os_id']:raise ValueError('Worker OS does not match selected hardware configuration')
         if 'wsl2' in environment_kind() and not target.get('lock_root'):
             raise ValueError('WSL requires a lock_root shared with the Windows host worker')
@@ -108,13 +130,17 @@ def handle(p):
     (out/'active').mkdir()
     atomic_json(out/'job.json',job);atomic_json(out/'execution.json',p)
     env=os.environ.copy();env['PYTHONPATH']=str(root/'src')
+    for name in ('GH_TOKEN','GITHUB_TOKEN','LLM_EVAL_PUBLISH_TOKEN'):
+        env.pop(name,None)
     with (out/'worker.log').open('w',encoding='utf-8') as log:
         child=subprocess.Popen([sys.executable,'-m','llm_eval.orchestration.worker','--execute',str(out/'execution.json')],
                                env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=os.name!='nt',
                                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name=='nt' else 0)
         try:
+            try:process_started=psutil.Process(child.pid).create_time()
+            except psutil.NoSuchProcess:process_started=None
             while child.poll() is None:
-                atomic_json(out/'heartbeat.json',{'pid':child.pid,'unix':time.time(),'owner':p['owner']})
+                atomic_json(out/'heartbeat.json',{'pid':child.pid,'process_started':process_started,'unix':time.time(),'owner':p['owner']})
                 if (out/'cancel.json').exists():stop_child(child)
                 time.sleep(.2)
             if not (out/'result.json').exists():

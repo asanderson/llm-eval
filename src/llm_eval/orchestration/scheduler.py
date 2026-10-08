@@ -30,7 +30,8 @@ def initialize(plan, output):
 
 
 def _targets(job, plan):
-    by_host={j['target']['physical_host_id']:j['target'] for j in plan['jobs']}
+    by_host={t['physical_host_id']:t for t in plan.get('targets',{}).values()}
+    by_host.update({j['target']['physical_host_id']:j['target'] for j in plan['jobs']})
     by_host[job['target']['physical_host_id']]=job['target']
     if set(job['resources'])-set(by_host):
         raise ValueError('Every reserved resource host must have a target in this campaign')
@@ -38,22 +39,14 @@ def _targets(job, plan):
 
 
 def _reserve(job, attempt, plan):
-    from .resources import reserve, release, lock_root
+    from .resources import reserve, lock_root
     from .transport import rpc
-    owner=attempt['attempt_id']; held=[]
-    try:
-        for target in _targets(job,plan):
-            reserve(lock_root()/ 'coordinator',target['physical_host_id'],owner)
-            try:
-                rpc(target,{'action':'reserve','target':target,'owner':owner},plan['root'])
-            except BaseException:
-                release(lock_root()/ 'coordinator',target['physical_host_id'],owner);raise
-            held.append(target)
-    except BaseException:
-        for target in reversed(held):
-            rpc(target,{'action':'release','target':target,'owner':owner},plan['root'])
-            release(lock_root()/ 'coordinator',target['physical_host_id'],owner)
-        raise
+    owner=attempt['attempt_id']
+    # The caller journals this intent first. A lost reply may have acquired the
+    # worker reservation, so retain its owner until cleanup is confirmed.
+    for target in _targets(job,plan):
+        reserve(lock_root()/ 'coordinator',target['physical_host_id'],owner)
+        rpc(target,{'action':'reserve','target':target,'owner':owner},plan['root'])
 
 
 def _release(job, attempt, plan):
@@ -61,7 +54,8 @@ def _release(job, attempt, plan):
     from .transport import rpc
     for target in reversed(_targets(job,plan)):
         rpc(target,{'action':'release','target':target,'owner':attempt['attempt_id']},plan['root'])
-        release(lock_root()/ 'coordinator',target['physical_host_id'],attempt['attempt_id'])
+        try:release(lock_root()/ 'coordinator',target['physical_host_id'],attempt['attempt_id'])
+        except ValueError:pass  # A completed reservation may already have been released and reassigned.
 
 
 def _execute(job, attempt, plan, directory):
@@ -83,6 +77,10 @@ def _execute(job, attempt, plan, directory):
 def _reconcile(job, attempt, plan, directory):
     from .transport import rpc, collect
     try:
+        if attempt.get('stage')=='reserving':
+            # No run RPC can precede the durable submitted stage.
+            _release(job,attempt,plan)
+            return {'status':'blocked','reason':'reservation_recovered','stage':'released'}
         reply=rpc(job['target'],{'action':'status','output':attempt['worker_output']},plan['root'])
         if reply['result'] and not reply.get('active'):
             if job['target']['transport']=='ssh':
@@ -93,7 +91,7 @@ def _reconcile(job, attempt, plan, directory):
     return {'status':'lost','reason':'worker_completion_not_confirmed'}
 
 
-def run_campaign(directory, retry_failed=False):
+def run_campaign(directory, retry_failed=False, enable_targets=()):
     import concurrent.futures
     import time
     from .resources import reserve, release, lock_root
@@ -102,6 +100,7 @@ def run_campaign(directory, retry_failed=False):
     from llm_eval.common import sha256_file
     directory=Path(directory).resolve()
     plan=read_json(directory/'plan.json');state=read_json(directory/'campaign.json')
+    if set(enable_targets)-set(plan.get('targets',{})):raise ValueError('Unknown target to enable')
     if revision(plan['root'])!=plan['code_revision']:
         raise ValueError('Resume requires the measured harness revision')
     for path,sha in plan['inputs'].items():
@@ -114,6 +113,7 @@ def run_campaign(directory, retry_failed=False):
     jobs={j['job_id']:j for j in plan['jobs']}
     def save(): atomic_json(directory/'campaign.json',state)
     try:
+        state['enabled_targets']=sorted(set(state.get('enabled_targets',[]))|set(enable_targets))
         for jid,record in state['jobs'].items():
             if record['status'] in {'running','lost'} and record['attempts']:
                 result=_reconcile(jobs[jid],record['attempts'][-1],plan,directory)
@@ -138,7 +138,8 @@ def run_campaign(directory, retry_failed=False):
                 if not stop:
                     for job in plan['jobs']:
                         record=state['jobs'][job['job_id']]
-                        if record['status'] not in {'planned','blocked'} or job['target'].get('available') is False:continue
+                        if record['status'] not in {'planned','blocked'}:continue
+                        if job['target'].get('available') is False and job.get('target_id') not in state['enabled_targets']:continue
                         if len(active)>=plan['execution']['max_parallel_jobs']:break
                         if any(state['jobs'][d]['status'] not in {'succeeded','skipped'} for d in job['depends_on']):
                             record.update(status='blocked',reason='dependency_not_succeeded');continue
@@ -148,13 +149,18 @@ def run_campaign(directory, retry_failed=False):
                         remote=str(directory/rel)
                         if job['target']['transport']=='ssh':
                             remote=job['target']['work_root'].rstrip('/\\')+'/'+directory.name+'/'+rel.as_posix()
-                        attempt={'attempt_id':aid,'status':'running','started_utc':utc_now(),'output':str(rel),'worker_output':remote}
+                        attempt={'attempt_id':aid,'status':'running','stage':'reserving','started_utc':utc_now(),'output':str(rel),'worker_output':remote}
+                        record['attempts'].append(attempt);record.update(status='running',reason=None)
+                        save()
                         try:_reserve(job,attempt,plan)
                         except (OSError,RuntimeError,ValueError) as exc:
-                            record.update(status='blocked',reason=type(exc).__name__);continue
+                            result=_reconcile(job,attempt,plan,directory)
+                            attempt.update(result,error_type=type(exc).__name__)
+                            record.update(status=result['status'],reason=type(exc).__name__)
+                            save();continue
                         (directory/rel).mkdir(parents=True,exist_ok=True)
                         atomic_json(directory/rel/'job.json',job)
-                        record['attempts'].append(attempt);record.update(status='running',reason=None)
+                        attempt['stage']='submitted'
                         held.update(job['resources']);save()
                         active[pool.submit(_execute,job,attempt,plan,directory)]=(job,attempt)
                 if not active:break
@@ -171,6 +177,11 @@ def run_campaign(directory, retry_failed=False):
                     if result['status']=='failed' and plan['execution']['on_failure']=='fail-fast':stop=True
                     if result['status']=='blocked':stop=True
                     save()
+                if not any(j['target']['transport']=='local' for j,a in active.values()):
+                    from llm_eval.reporting.experiment import finalize_campaign
+                    if plan['reporting'].get('on_experiment_end',True):
+                        finalize_campaign(directory,coordinator_locked=True)
+                        state['reports']=read_json(directory/'campaign.json')['reports']
                 save()
         statuses={r['status'] for r in state['jobs'].values()}
         state['status']='succeeded' if statuses<={'succeeded','skipped'} else 'cancelled' if 'cancelled' in statuses else 'incomplete'
@@ -181,8 +192,10 @@ def run_campaign(directory, retry_failed=False):
         except ImportError:
             finalize_campaign=None
         if finalize_campaign and plan['reporting'].get('on_experiment_end',True):
-            finalize_campaign(directory)
-        return 0 if state['status']=='succeeded' else 130 if state['status']=='cancelled' else 1
+            finalize_campaign(directory,coordinator_locked=True)
+            state['reports']=read_json(directory/'campaign.json')['reports']
+        reporting_failed=any(r['status']=='failed' for r in state['reports'].values())
+        return 0 if state['status']=='succeeded' and not reporting_failed else 130 if state['status']=='cancelled' else 1
     except KeyboardInterrupt:
         atomic_json(directory/'cancel.json',{'cancel':True})
         for job,attempt in active.values():

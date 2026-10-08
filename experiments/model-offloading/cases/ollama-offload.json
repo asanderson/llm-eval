@@ -1,0 +1,12 @@
+{
+  "id": "ollama-offload",
+  "parameters": {
+    "config": "../../../configs/runs/ollama.example.json",
+    "server_mode": "managed",
+    "categories": [
+      "reasoning",
+      "coding",
+      "math"
+    ]
+  }
+}

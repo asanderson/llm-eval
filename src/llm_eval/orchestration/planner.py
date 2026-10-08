@@ -38,7 +38,7 @@ def compile_campaign(path, root, max_parallel_jobs=None):
     inv = read_json(inv_path)
     fields(inv, {'targets', 'hardware_configs'}, ['targets', 'hardware_configs']); no_credentials(inv)
     execution = {'max_parallel_jobs': 1, 'measurement_isolation': 'physical-host', 'on_failure': 'continue-independent', **c.get('execution', {})}
-    fields(execution, {'max_parallel_jobs', 'measurement_isolation', 'on_failure'})
+    fields(execution, {'max_parallel_jobs', 'measurement_isolation', 'on_failure', 'api_budget_usd'})
     if max_parallel_jobs is not None:
         execution['max_parallel_jobs'] = max_parallel_jobs
     integer(execution['max_parallel_jobs'], 'max_parallel_jobs', high=256)
@@ -98,7 +98,7 @@ def compile_campaign(path, root, max_parallel_jobs=None):
                     if target_id not in inv['targets']:
                         raise ValueError('Unknown execution target')
                     target = copy.deepcopy(inv['targets'][target_id])
-                    fields(target, {'transport', 'physical_host_id', 'host', 'python', 'repo_root', 'work_root', 'path_mappings', 'lock_root', 'available', 'resource_hosts'}, ['transport', 'physical_host_id'])
+                    fields(target, {'transport', 'physical_host_id', 'host', 'python', 'repo_root', 'work_root', 'path_mappings', 'lock_root', 'available', 'resource_hosts', 'max_collection_bytes'}, ['transport', 'physical_host_id'])
                     identifier(target['physical_host_id'])
                     if target['transport'] not in {'local', 'ssh'}:
                         raise ValueError('Transport must be local or ssh')
@@ -138,11 +138,41 @@ def compile_campaign(path, root, max_parallel_jobs=None):
                 else: hash_inputs(item)
         elif isinstance(value, list):
             for item in value: hash_inputs(item)
-    for job in jobs: hash_inputs(job['parameters'])
+    for job in jobs:
+        before=set(inputs)
+        hash_inputs(job['parameters'])
+        job['input_files']=[{'path':p,'sha256':sha} for p,sha in inputs.items() if p in set(inputs)-before]
+        # Include shared workload files even when another job already recorded them.
+        def job_files(value):
+            if isinstance(value,dict):
+                for key,item in value.items():
+                    if key in PATH_KEYS and isinstance(item,str) and Path(item).is_file():
+                        if not any(f['path']==item for f in job['input_files']):job['input_files'].append({'path':item,'sha256':sha256_file(item)})
+                    else:job_files(item)
+            elif isinstance(value,list):
+                for item in value:job_files(item)
+        job_files(job['parameters'])
+        for candidate in job['parameters'].get('candidates',{}).values():
+            if candidate.get('target_id'):
+                role_target=inv['targets'][candidate['target_id']]
+                job['resources'].append(identifier(role_target['physical_host_id']))
+        job['resources']=sorted(set(job['resources']))
+    total_api_reservation = sum(j['parameters'].get('budget_usd', 0) for j in jobs if j['status'] != 'skipped')
+    if 'api_budget_usd' in execution:
+        from llm_eval.common import finite_number
+        finite_number(execution['api_budget_usd'], 'api_budget_usd', 0)
+        if total_api_reservation > execution['api_budget_usd']:raise ValueError('Sum of job API budgets exceeds the campaign cap')
     reporting = c.get('reporting', {'on_experiment_end': True})
     fields(reporting, {'on_experiment_end', 'raw_format', 'summary_formats', 'publish', 'include_outputs', 'max_artifact_bytes'})
+    if reporting.get('raw_format', 'jsonl.gz') != 'jsonl.gz':raise ValueError('raw_format must be jsonl.gz')
+    if set(reporting.get('summary_formats', ['markdown','json','csv'])) != {'markdown','json','csv'}:raise ValueError('Reports require markdown, json and csv summaries')
+    publication=reporting.get('publish',{})
+    fields(publication, {'mode','repository','base_branch','docs_root'})
+    if publication.get('mode','none') not in {'none','pull-request'}:raise ValueError('Invalid publication mode')
+    if publication.get('docs_root','docs/results') != 'docs/results':raise ValueError('Results destination must be docs/results')
+    integer(reporting.get('max_artifact_bytes', 40*1024*1024), 'max_artifact_bytes', high=500*1024*1024)
     plan = {'schema_version': 2, 'campaign_id': c['id'], 'source': str(path), 'root': str(root),
-            'code_revision': revision(root), 'inputs': inputs, 'execution': execution, 'reporting': reporting,
-            'experiments': experiments, 'jobs': jobs}
+            'code_revision': revision(root), 'total_api_reservation_usd': total_api_reservation, 'inputs': inputs, 'execution': execution, 'reporting': reporting,
+            'experiments': experiments, 'jobs': jobs, 'targets': inv['targets']}
     plan['plan_sha256'] = config_hash(plan)
     return plan

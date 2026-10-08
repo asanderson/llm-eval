@@ -13,8 +13,18 @@ from .telemetry import host_snapshot
 
 
 def main():
+    arguments=sys.argv[1:]
+    leading=list(arguments)
+    while leading:
+        if leading[0]=='--project-root':leading=leading[2:]
+        elif leading[0].startswith('--project-root='):leading=leading[1:]
+        else:break
+    command=leading[0] if leading else None
+    if command in {'report','publish-results'}:
+        from .reporting.cli import main as reporting_main
+        raise SystemExit(reporting_main(sys.argv[1:]))
     campaign_commands = {'experiments', 'plan', 'setup', 'status', 'resume', 'cancel', 'publish-results'}
-    if any(a in campaign_commands for a in sys.argv[1:]) or '--campaign' in sys.argv:
+    if command in campaign_commands or '--campaign' in sys.argv:
         from .orchestration.cli import main as campaign_main
         raise SystemExit(campaign_main(sys.argv[1:]))
     parser = argparse.ArgumentParser(description="Local LLM offload evaluation lab")

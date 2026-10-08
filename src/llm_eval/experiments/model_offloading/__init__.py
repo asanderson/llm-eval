@@ -39,8 +39,8 @@ def execute(job, output, root):
         lock = read_json(config['artifact_lock'])
         verify_artifact(config['artifact_root'], lock, config.get('lane') != 'control',
                         read_json(Path(root) / 'configs/hardware' / (config['hardware_profile'] + '.json'))['gpu']['vram_gib'])
-    if synthetic:
-        raise ValueError('Synthetic offload requires a fixture HTTP endpoint; use legacy test fixtures directly')
+    if synthetic and case.get('server_mode') == 'managed':
+        raise ValueError('Synthetic offload uses an explicit external fixture endpoint')
     backend = managed_backend(config, state, output / 'backend') if case.get('server_mode') == 'managed' else contextlib.nullcontext()
     if job['mode'] == 'livebench':
         lb = case.get('livebench', {})
@@ -48,11 +48,16 @@ def execute(job, output, root):
             result = run_livebench(config, state, case.get('categories', []), lb['data'], lb['release'],
                                    output / 'livebench', image=lb['image'], allow_agentic=lb.get('allow_agentic', False), backend=backend)
         return {'status': 'succeeded', 'result_path': str(result.relative_to(output)), 'benchmark': 'livebench-upstream'}
-    atomic_json(output / 'resolved-run.json', config)
+    categories = case.get('categories', [])
+    catalog = {c['id']: c for c in read_json(Path(root)/'catalog/benchmarks.json')['categories']}
+    suites = [str(Path(root)/catalog[c]['local_suite']) for c in categories] if categories else [config['suite']]
+    statuses = []
     with backend:
-        # managed_backend may add backend_pid or worker_python.
-        atomic_json(output / 'resolved-run.json', config)
-        result = runner.run(output / 'resolved-run.json', root, output / 'measurements')
-    meta = read_json(result / 'metadata.json')
-    status = {'completed': 'succeeded', 'skipped': 'skipped'}.get(meta['status'], 'failed')
-    return {'status': status, 'result_path': str(result.relative_to(output)), 'benchmark': meta.get('benchmark')}
+        for index, suite in enumerate(suites):
+            config['suite'] = suite
+            config_path = output / ('resolved-run-' + str(index) + '.json')
+            atomic_json(config_path, config)
+            result = runner.run(config_path, root, output / 'measurements', synthetic=synthetic)
+            statuses.append(read_json(result / 'metadata.json')['status'])
+    status = 'succeeded' if all(s == 'completed' for s in statuses) else 'skipped' if all(s == 'skipped' for s in statuses) else 'failed'
+    return {'status': status, 'result_path': 'measurements', 'benchmark': 'category-smoke'}

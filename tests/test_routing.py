@@ -4,7 +4,7 @@ import tempfile
 import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 from llm_eval.adapters import configured_endpoint
 from llm_eval.common import digest, read_json, write_json
 from llm_eval.experiments.llm_routing.decision import decide
@@ -61,5 +61,23 @@ class RoutingTests(unittest.TestCase):
         with self.assertRaises(ValueError):configured_endpoint('https://api.example.com/v1')
         with self.assertRaises(ValueError):configured_endpoint('http://api.example.com/v1',{'kind':'hosted','allowed_hosts':['api.example.com']})
         self.assertEqual(configured_endpoint('https://api.example.com/v1',{'kind':'hosted','allowed_hosts':['api.example.com']}).hostname,'api.example.com')
+
+    def test_live_fallback_retains_uncertain_cost_and_attempts(self):
+        with tempfile.TemporaryDirectory() as temp:
+            p=Path(temp);write_json(p/'suite.json',{'tasks':[{'id':'a','messages':[{'role':'user','content':'q'}],
+                                                          'check':{'type':'exact','expected':'yes'}}]})
+            candidates={name:{'model':name,'network':{'kind':'hosted'},'context_tokens':1000,
+                              'pricing':{'input_per_million':1000,'output_per_million':1000}} for name in ['small','large']}
+            job={'mode':'live','parameters':{'suite':str(p/'suite.json'),'router':{'kind':'fixed','choice':'small'},
+                                            'policy':{'fallback':'large'},'candidates':candidates,'budget_usd':3}}
+            response={'text':'yes','elapsed_s':1,'prompt_tokens':10,'completion_tokens':5}
+            adapters=[Mock(generate=Mock(side_effect=TimeoutError('fixture'))),Mock(generate=Mock(return_value=response))]
+            with patch('llm_eval.experiments.llm_routing.evaluation.HTTPAdapter',side_effect=adapters):
+                execute(job,p/'out',p)
+            row=json.loads((p/'out/requests.jsonl').read_text())
+            self.assertEqual(row['status'],'ok');self.assertTrue(row['fallback_used'])
+            self.assertTrue(row['quality_pass'])
+            self.assertEqual(row['selected_model'],'large');self.assertEqual(len(row['generation_attempts']),2)
+            self.assertAlmostEqual(read_json(p/'out/routing-metadata.json')['cost_charged_or_reserved_usd'],1.271)
 
 if __name__=='__main__':unittest.main()

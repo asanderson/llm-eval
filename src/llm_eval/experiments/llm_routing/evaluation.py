@@ -71,6 +71,7 @@ def execute(job, output, root):
         for cid,c in candidates.items():
             if corpus['candidate_fingerprints'].get(cid)!=candidate_fingerprint(c):raise ValueError('Replay candidate fingerprint mismatch')
         baseline=baseline_scores(replay,suite['tasks'],candidates,objective)
+        atomic_json(output/'replay-outcomes.json',corpus)
     meta={'schema_version':2,'experiment_id':'llm-routing','mode':mode,'config':case,
           'suite_sha256':digest(suite),'synthetic':case.get('synthetic',False),'benchmark':suite.get('benchmark','routing'),
           'policy_sha256':digest(policy),'status':'running','baseline':baseline}
@@ -82,7 +83,9 @@ def execute(job, output, root):
                 begin=time.perf_counter()
                 row={'task_id':task['id'],'category':task.get('category','unspecified'),'benchmark':meta['benchmark'],
                      'warmup':rep<case.get('warmups',0),'repetition':rep,'synthetic':meta['synthetic'],
-                     'prompt_sha256':digest(task['messages']),'status':'ok','mode':mode}
+                     'prompt_sha256':digest(task['messages']),'status':'ok','mode':mode,
+                     'quality_check_applicable':task.get('check',{}).get('type','none')!='none',
+                     'expected_choice':task.get('expected_choice')}
                 try:
                     router_reservation=budget_reservation(router,64)
                     if router_reservation and charged+router_reservation>case.get('budget_usd',0):
@@ -117,19 +120,35 @@ def execute(job, output, root):
                                 row['utility']=selected_utility
                                 row['oracle_regret']=max(values)-selected_utility if len(values)==len(eligible) and values and all(v is not None for v in values) and selected_utility is not None else None
                         else:
-                            candidate=candidates[selected];max_tokens=case.get('max_output_tokens',256)
-                            reservation=budget_reservation(candidate,max_tokens)
-                            if charged+reservation>case.get('budget_usd',0) and reservation:
-                                row['status']='budget_exhausted';raise ValueError('API budget exhausted')
-                            charged+=reservation
-                            response=HTTPAdapter({'timeout_s':60,**candidate,'served_model':candidate['model']}).generate(task['messages'],max_tokens,case.get('seed',1),case.get('temperature',0))
-                            cost=actual_cost(candidate,response)
-                            if cost is not None:charged+=cost-reservation
-                            row.update(generation_s=response['elapsed_s'],cost_usd=cost,cost_reserved_usd=reservation if cost is None else 0,
-                                       prompt_tokens=response['prompt_tokens'],completion_tokens=response['completion_tokens'],
-                                       first_output_s=response.get('first_output_s'),first_visible_s=response.get('first_visible_s'),
-                                       output_sha256=digest(response['text'].encode()),quality_pass=grade(response['text'],task))
-                            if case.get('save_outputs'):row['output']=response['text']
+                            choices=[selected]
+                            fallback=policy.get('fallback')
+                            if fallback and fallback!=selected and fallback in eligible:choices.append(fallback)
+                            attempts=[]
+                            for candidate_id in choices:
+                                candidate=candidates[candidate_id];max_tokens=case.get('max_output_tokens',256)
+                                reservation=budget_reservation(candidate,max_tokens)
+                                if charged+reservation>case.get('budget_usd',0) and reservation:
+                                    row['status']='budget_exhausted';raise ValueError('API budget exhausted')
+                                charged+=reservation
+                                generation_start=time.perf_counter()
+                                try:
+                                    response=HTTPAdapter({'timeout_s':60,**candidate,'served_model':candidate['model']}).generate(task['messages'],max_tokens,case.get('seed',1),case.get('temperature',0))
+                                except Exception as exc:
+                                    attempts.append({'model':candidate_id,'status':'error','error_type':type(exc).__name__,'elapsed_s':time.perf_counter()-generation_start,'reserved_usd':reservation})
+                                    row['generation_attempts']=attempts
+                                    if candidate_id==choices[-1]:raise
+                                    continue
+                                cost=actual_cost(candidate,response)
+                                if cost is not None:charged+=cost-reservation
+                                attempts.append({'model':candidate_id,'status':'ok','elapsed_s':response['elapsed_s'],'cost_usd':cost})
+                                row.update(generation_attempts=attempts,selected_model=candidate_id,fallback_used=candidate_id!=selected,
+                                           generation_s=sum(x['elapsed_s'] for x in attempts),cost_usd=cost,cost_reserved_usd=reservation if cost is None else 0,
+                                           prompt_tokens=response['prompt_tokens'],completion_tokens=response['completion_tokens'],
+                                           first_output_s=response.get('first_output_s'),first_visible_s=response.get('first_visible_s'),
+                                           backend_load_s=response.get('backend_load_s'),backend_decode_tps=response.get('backend_decode_tps'),
+                                           output_sha256=digest(response['text'].encode()),quality_pass=grade(response['text'],task))
+                                if case.get('save_outputs'):row['output']=response['text']
+                                break
                     row['elapsed_s']=time.perf_counter()-begin
                 except Exception as exc:
                     if row['status']=='ok':row['status']='error'

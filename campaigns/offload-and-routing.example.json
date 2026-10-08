@@ -1,0 +1,62 @@
+{
+  "schema_version": 2,
+  "id": "offload-and-routing",
+  "inventory": "../configs/targets/local.example.json",
+  "execution": {
+    "max_parallel_jobs": 2,
+    "measurement_isolation": "physical-host",
+    "on_failure": "continue-independent"
+  },
+  "phases": [
+    {
+      "id": "offload",
+      "experiments": [
+        {
+          "id": "model-offloading",
+          "version": 1,
+          "cases": [
+            "ollama-offload"
+          ],
+          "hardware_configs": [
+            "raider-ubuntu"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "routing",
+      "depends_on": [
+        "offload"
+      ],
+      "experiments": [
+        {
+          "id": "llm-routing",
+          "version": 1,
+          "mode": "decision",
+          "cases": [
+            "ollama-nimble",
+            "ollama-tev1"
+          ],
+          "hardware_configs": [
+            "raider-ubuntu"
+          ]
+        }
+      ]
+    }
+  ],
+  "reporting": {
+    "on_experiment_end": true,
+    "raw_format": "jsonl.gz",
+    "summary_formats": [
+      "markdown",
+      "json",
+      "csv"
+    ],
+    "publish": {
+      "mode": "pull-request",
+      "repository": "asanderson/llm-eval",
+      "base_branch": "main",
+      "docs_root": "docs/results"
+    }
+  }
+}
