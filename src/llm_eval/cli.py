@@ -13,6 +13,10 @@ from .telemetry import host_snapshot
 
 
 def main():
+    campaign_commands = {'experiments', 'plan', 'setup', 'status', 'resume', 'cancel', 'publish-results'}
+    if any(a in campaign_commands for a in sys.argv[1:]) or '--campaign' in sys.argv:
+        from .orchestration.cli import main as campaign_main
+        raise SystemExit(campaign_main(sys.argv[1:]))
     parser = argparse.ArgumentParser(description="Local LLM offload evaluation lab")
     parser.add_argument("--project-root", type=Path, default=Path.cwd(), help="Repository root containing catalog/ and configs/")
     sub = parser.add_subparsers(dest="command", required=True)

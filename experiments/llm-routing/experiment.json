@@ -1,0 +1,10 @@
+{
+  "id": "llm-routing",
+  "version": 1,
+  "modes": [
+    "decision",
+    "replay",
+    "live"
+  ],
+  "cases": {}
+}
