@@ -1,0 +1,19 @@
+{
+  "id": "category-smoke",
+  "parameters": {
+    "suite": "../workloads/decisions.json",
+    "synthetic": true,
+    "router": {
+      "kind": "category",
+      "default_category": "general",
+      "keywords": {
+        "coding": [
+          "python"
+        ],
+        "math": [
+          "equation"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "benchmark": "original-routing-smoke",
+  "tasks": [
+    {
+      "id": "coding-1",
+      "category": "coding",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Write a Python function to reverse a string."
+        }
+      ],
+      "expected_choice": "coding"
+    },
+    {
+      "id": "math-1",
+      "category": "math",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Solve the equation 2x + 3 = 7."
+        }
+      ],
+      "expected_choice": "math"
+    }
+  ]
+}
