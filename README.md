@@ -11,6 +11,8 @@ The original target is the MSI Raider 18 HX AI with RTX 5090 Laptop 24 GiB, 64 G
 
 ## Start here
 
+For a complete native Windows example on the MSI Raider, follow the [combined-campaign walkthrough](docs/WINDOWS_RAIDER_WALKTHROUGH.md): install, prepare models, plan, setup, run, status, resume, generate reports and push results PRs, with labeled example output.
+
 ```bash
 python -m pip install -e ".[telemetry,reporting]"
 python -m llm_eval experiments list
