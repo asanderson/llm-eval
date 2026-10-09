@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "id": "raider-wsl-combined",
+  "inventory": "inventory.json",
+  "execution": {
+    "max_parallel_jobs": 1,
+    "measurement_isolation": "physical-host",
+    "on_failure": "continue-independent"
+  },
+  "phases": [
+    {
+      "id": "offload",
+      "experiments": [
+        {
+          "id": "model-offloading",
+          "version": 1,
+          "mode": "category-smoke",
+          "cases": [
+            "offload-case.json"
+          ],
+          "hardware_configs": [
+            "raider-wsl"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "routing",
+      "depends_on": [
+        "offload"
+      ],
+      "experiments": [
+        {
+          "id": "llm-routing",
+          "version": 1,
+          "mode": "decision",
+          "cases": [
+            "nimble-case.json",
+            "tev1-case.json"
+          ],
+          "hardware_configs": [
+            "raider-wsl"
+          ]
+        }
+      ]
+    }
+  ],
+  "reporting": {
+    "on_experiment_end": true,
+    "raw_format": "jsonl.gz",
+    "summary_formats": [
+      "markdown",
+      "json",
+      "csv"
+    ],
+    "publish": {
+      "mode": "none",
+      "repository": "asanderson/llm-eval",
+      "base_branch": "main",
+      "docs_root": "docs/results"
+    }
+  }
+}
