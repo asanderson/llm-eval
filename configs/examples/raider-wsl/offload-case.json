@@ -1,0 +1,12 @@
+{
+  "id": "deepseek-r1-32b-q8",
+  "parameters": {
+    "config": "ollama-run.json",
+    "server_mode": "external",
+    "categories": [
+      "reasoning",
+      "coding",
+      "math"
+    ]
+  }
+}

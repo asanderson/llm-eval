@@ -2,6 +2,8 @@
 
 This walkthrough installs the harness and a private Ollama runtime, prepares real models, then uses **plan → setup → run → status → resume → report** for both experiments on Windows 11. It targets the MSI Raider 18 HX AI, Core Ultra 9 285HX, **RTX 5090 Laptop GPU with 24 GiB VRAM and 64 GiB system RAM**.
 
+The same campaign is also documented for [WSL2 / Ubuntu 26.04](WSL_RAIDER_WALKTHROUGH.md) and [native Ubuntu 26.04](UBUNTU_RAIDER_WALKTHROUGH.md), with separate configurations and OS-specific preparation.
+
 **Output provenance:** the three-job plan below was verified with the actual planner in a Linux development environment. Windows installation, GPU inference, and successful-run transcripts are **illustrative expected output**, not measurements from this laptop. IDs, paths and output structure follow the scripts. No accuracy, latency or memory-performance numbers are invented here. Keep your own terminal output and generated artifacts as the evidence for your run.
 
 ## What this example runs
@@ -73,6 +75,8 @@ $ObservedHost.gpus | Format-Table name, total_mib, driver_version
 ```
 
 The inventory command prints a full JSON object and saves the same observations. Confirm `environment_kind` is `windows-11-native`, `psutil_available` is `true`, and the GPU name is `NVIDIA GeForce RTX 5090 Laptop GPU`. Driver, RAM, AC and GPU counters must come from your output. A missing/unknown AC sensor is not proof that the machine is on AC. The hardware profile's storage entries are intended configuration; record your actual installed SSD and filesystem below.
+
+This inventory uses `physical_host_id: raider` and the default lock directory, `.cache\llm-eval\locks` under the Windows Python user's home. The WSL walkthrough maps that same physical directory into Linux. Keep both the host ID and directory aligned if you customize either; a matching ID alone cannot coordinate Windows and WSL reservations. Stop this guide's private service before switching to WSL measurements. Reservations do not control unrelated applications or an idle external server.
 
 | Local file | Purpose |
 |---|---|

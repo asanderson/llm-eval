@@ -11,7 +11,13 @@ The original target is the MSI Raider 18 HX AI with RTX 5090 Laptop 24 GiB, 64 G
 
 ## Start here
 
-For a complete native Windows example on the MSI Raider, follow the [combined-campaign walkthrough](docs/WINDOWS_RAIDER_WALKTHROUGH.md): install, prepare models, plan, setup, run, status, resume, generate reports and push results PRs, with labeled example output.
+For a complete combined model-offloading and routing campaign on the MSI Raider, choose your OS. Each walkthrough covers installation, model preparation, plan, setup, run, status, resume, reports and results PRs, with labeled example output.
+
+| Platform | Walkthrough | Campaign files |
+|---|---|---|
+| Native Windows 11 | [PowerShell](docs/WINDOWS_RAIDER_WALKTHROUGH.md) | [raider-windows](configs/examples/raider-windows/) |
+| WSL2 / Ubuntu 26.04 | [Bash with Windows host preparation](docs/WSL_RAIDER_WALKTHROUGH.md) | [raider-wsl](configs/examples/raider-wsl/) |
+| Native Ubuntu 26.04 | [Bash](docs/UBUNTU_RAIDER_WALKTHROUGH.md) | [raider-ubuntu](configs/examples/raider-ubuntu/) |
 
 ```bash
 python -m pip install -e ".[telemetry,reporting]"

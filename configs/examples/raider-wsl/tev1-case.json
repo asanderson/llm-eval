@@ -1,0 +1,23 @@
+{
+  "id": "ollama-tev1",
+  "parameters": {
+    "suite": "../../../experiments/llm-routing/workloads/decisions.json",
+    "router": {
+      "kind": "systemone",
+      "platform": "ollama",
+      "model": "llm-eval-tev1:locked",
+      "model_revision": "REPLACE_WITH_LOADED_MODEL_DIGEST",
+      "endpoint": "http://127.0.0.1:11435/v1/systemone",
+      "instructions": "Choose the category that best describes the user request.",
+      "criteria": {
+        "coding": "Writing or debugging software",
+        "math": "Mathematical reasoning",
+        "general": "Other requests"
+      },
+      "timeout_s": 300
+    },
+    "repeats": 3,
+    "warmups": 1,
+    "save_outputs": false
+  }
+}

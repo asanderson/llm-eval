@@ -2,7 +2,7 @@
 
 A campaign binds versioned experiment cases to actual hardware configurations. A case can refer to the same model as another case while changing its placement, workload or routing policy. Existing single-run commands remain supported.
 
-For a complete PowerShell example with model preparation and script output, see [MSI Raider / native Windows: combined offload and routing campaign](WINDOWS_RAIDER_WALKTHROUGH.md).
+For complete MSI Raider examples with installation, model preparation and script output, see the combined offload/routing walkthroughs for [native Windows](WINDOWS_RAIDER_WALKTHROUGH.md), [WSL2 / Ubuntu 26.04](WSL_RAIDER_WALKTHROUGH.md), or [native Ubuntu 26.04](UBUNTU_RAIDER_WALKTHROUGH.md).
 
 ## Configuration model
 
