@@ -1,5 +1,7 @@
 # Interactive setup and evaluation workflows
 
+The [native Windows MSI Raider walkthrough](WINDOWS_RAIDER_WALKTHROUGH.md) follows a combined model-offloading and decision-routing campaign from installation through results PRs, including example terminal output and resume behavior.
+
 With no legacy platform/config selection, `--interactive` opens the experiment campaign wizard. It selects experiments, cases, hardware configurations, phase ordering, concurrency and report publication. `--campaign FILE` runs a saved campaign through either script. Explicit legacy platform/config selections retain the workflows below. See [CAMPAIGNS.md](CAMPAIGNS.md) for local/SSH workers and [RESULTS.md](RESULTS.md) for automatic report PRs.
 
 Use `python scripts/setup.py` and `python scripts/run.py` from the repository root. In a terminal they prompt for missing selections; use `--interactive` to force the wizard or `--non-interactive` for automation. **Every exposed option has a CLI argument**; run `--help` for the full list. Platform-specific setup/run wrappers supply platform and OS defaults and forward all remaining arguments. These are implementation-tested recipes, **not GPU-qualified installations**.

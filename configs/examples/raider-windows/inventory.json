@@ -1,0 +1,15 @@
+{
+  "targets": {
+    "raider": {
+      "transport": "local",
+      "physical_host_id": "raider"
+    }
+  },
+  "hardware_configs": {
+    "raider-windows": {
+      "target": "raider",
+      "hardware_profile": "msi-raider-18-hx-ai",
+      "os_id": "windows-11-native"
+    }
+  }
+}
