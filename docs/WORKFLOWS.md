@@ -1,5 +1,7 @@
 # Interactive setup and evaluation workflows
 
+Start with the [readiness checker](READINESS.md) to inspect and, after consent, install missing host tools, harness libraries and selected runtime dependencies. It accepts a campaign or one or more platforms and runs locally on native Windows, WSL2 or Ubuntu 26.04.
+
 The MSI Raider walkthroughs for [native Windows](WINDOWS_RAIDER_WALKTHROUGH.md), [WSL2 / Ubuntu 26.04](WSL_RAIDER_WALKTHROUGH.md), and [native Ubuntu 26.04](UBUNTU_RAIDER_WALKTHROUGH.md) follow a combined model-offloading and decision-routing campaign from installation through results PRs, including example terminal output and resume behavior.
 
 With no legacy platform/config selection, `--interactive` opens the experiment campaign wizard. It selects experiments, cases, hardware configurations, phase ordering, concurrency and report publication. `--campaign FILE` runs a saved campaign through either script. Explicit legacy platform/config selections retain the workflows below. See [CAMPAIGNS.md](CAMPAIGNS.md) for local/SSH workers and [RESULTS.md](RESULTS.md) for automatic report PRs.

@@ -39,6 +39,8 @@ If dual booting from Windows, finish or cancel its campaign and stop its private
 
 ## 1. Install the harness with Python 3.12
 
+The [readiness script](READINESS.md) provides a prompted installation alternative from an existing clone: `bash scripts/readiness.sh --platform ollama`. It can bootstrap Python, harness libraries and the pinned runtime. The following commands document the manual path; preserve any environment already prepared by readiness. Before measuring, audit the completed configuration with `bash scripts/readiness.sh --campaign configs/local/raider-ubuntu/campaign.json --check-only`.
+
 Use one **Bash terminal in this Ubuntu installation** for the following steps. Keep the `OS_ID` and `EXAMPLE_NAME` selections from the preparation section above. Connect AC power and close unrelated CPU/GPU inference workloads. The prebuilt Ollama recipe does not require compiling an engine, a CUDA toolkit, or Docker.
 
 The harness setup environments support Python 3.11–3.13. Select Python 3.12 explicitly instead of assuming Ubuntu's default interpreter is compatible. This bootstrap uses an isolated uv installation; it does not replace system Python. It resolves a 3.12 patch release once and records the versions. Keep that interpreter unchanged during the campaign.

@@ -11,6 +11,8 @@ The original target is the MSI Raider 18 HX AI with RTX 5090 Laptop 24 GiB, 64 G
 
 ## Start here
 
+Run the [readiness checker](docs/READINESS.md) on the test host to find missing tools/libraries and install supported prerequisites after prompting: `powershell -NoProfile -File .\scripts\readiness.ps1` on native Windows, or `bash scripts/readiness.sh` on Ubuntu/WSL. Use `--check-only` for an audit or `--campaign FILE` to derive requirements from your experiments.
+
 For a complete combined model-offloading and routing campaign on the MSI Raider, choose your OS. Each walkthrough covers installation, model preparation, plan, setup, run, status, resume, reports and results PRs, with labeled example output.
 
 | Platform | Walkthrough | Campaign files |
