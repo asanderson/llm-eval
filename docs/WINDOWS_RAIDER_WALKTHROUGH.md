@@ -21,6 +21,8 @@ There is one physical machine and one active job. The routing phase waits for of
 
 ## 1. Install the harness
 
+For automatic prerequisite detection and prompted installation, use the [native Windows readiness script](READINESS.md) from a clone: `powershell -NoProfile -File .\scripts\readiness.ps1 --platform ollama`. It can bootstrap Python and the harness, install the pinned runtime, and report unresolved driver/hardware requirements. The commands below remain the manual installation path; preserve an environment already prepared by readiness. Before measuring, audit it again with `--campaign configs/local/raider-windows/campaign.json --check-only`.
+
 Install Git for Windows, Python 3.12 with the `py` launcher, and PowerShell 7.4 or newer. Use a working NVIDIA Windows driver for the laptop GPU and connect AC power. This prebuilt Ollama example does not compile a backend or require WSL, a CUDA toolkit, Visual Studio, or Docker. Close other inference workloads, including any loaded models in the Ollama tray application.
 
 Run the following blocks in the **same native PowerShell 7 terminal**, from the repository root after cloning. PowerShell 7 is used for consistent UTF-8 handling; the helper below also writes JSON without a BOM. Installers do not change BIOS, power/MUX settings, drivers or disks.

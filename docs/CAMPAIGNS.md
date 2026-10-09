@@ -1,5 +1,7 @@
 # Experiment campaigns
 
+Before setup, use [readiness](READINESS.md) with `--campaign FILE` (and `--hardware-config ID` for a multi-configuration campaign) on the test host. It offers installation of missing prerequisites and rechecks them afterward.
+
 A campaign binds versioned experiment cases to actual hardware configurations. A case can refer to the same model as another case while changing its placement, workload or routing policy. Existing single-run commands remain supported.
 
 For complete MSI Raider examples with installation, model preparation and script output, see the combined offload/routing walkthroughs for [native Windows](WINDOWS_RAIDER_WALKTHROUGH.md), [WSL2 / Ubuntu 26.04](WSL_RAIDER_WALKTHROUGH.md), or [native Ubuntu 26.04](UBUNTU_RAIDER_WALKTHROUGH.md).
