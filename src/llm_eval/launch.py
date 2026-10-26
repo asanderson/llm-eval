@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import http.client
 import json
 import os
@@ -45,7 +46,7 @@ def launch_spec(config, state, workdir):
           'HF_HUB_OFFLINE':'1','TRANSFORMERS_OFFLINE':'1',
           'HF_HUB_DISABLE_TELEMETRY':'1','DO_NOT_TRACK':'1','VLLM_NO_USAGE_STATS':'1',
           'CPUINFER_CPU_INSTRUCT':'AVX2','CPUINFER_ENABLE_AMX':'OFF','KT_RAWINT4_BACKEND':'avx2','KT_KERNEL_CPU_VARIANT':'avx2'}
-    commands=[]; cwd=str(workdir)
+    commands=[]; cleanup=[]; cwd=str(workdir)
     if platform in {'accelerate','airllm'}:
         return {'argv':None,'env':env,'cwd':cwd,'prepare':[]}
     if platform in {'llama.cpp','ik_llama.cpp'}:
@@ -92,17 +93,37 @@ def launch_spec(config, state, workdir):
         if config.get('api_key_env'):
             key=os.environ.get(config['api_key_env'])
             if not key:raise ValueError('Strata API key environment variable is unset')
+    elif platform=='lmstudio':
+        from .lmstudio import IMPORT_MODES, gpu_offload
+        gpu=gpu_offload(launch.get('gpu_offload','0.5'))
+        mode=launch.get('import_mode','hard-link' if os.name=='nt' else 'symbolic-link')
+        if mode not in IMPORT_MODES:raise ValueError('launch.import_mode must be symbolic-link, hard-link or copy')
+        model_file=local('model_file')
+        relative=Path(model_file).relative_to(root).as_posix()
+        lock_path=Path(config.get('artifact_lock','') or '')
+        lock=read_json(lock_path) if lock_path.is_file() else {}
+        # Content-addressed import path: the locked file hash when available, else the artifact-relative path.
+        sha=next((f.get('sha256') for f in lock.get('files',[]) if f.get('path')==relative),None)
+        artifact_id=(sha or hashlib.sha256(relative.encode()).hexdigest())[:12]
+        state_file=str(Path(workdir)/'lmstudio-supervisor.json')
+        argv=[py,'-m','llm_eval.lmstudio','serve','--lms',exe,'--model-file',model_file,'--artifact-id',artifact_id,
+              '--identifier',config['served_model'],'--port',str(port),'--context-length',ctx,'--gpu',gpu,
+              '--import-mode',mode,'--state',state_file,'--load-timeout',str(config.get('load_timeout_s',900))]
+        expected=state.get('plan',{}).get('recipe',{}).get('version')
+        if expected:argv+=['--expected-version',expected]
+        cleanup=[[py,'-m','llm_eval.lmstudio','cleanup','--lms',exe,'--state',state_file]]
     else:raise ValueError('No launch recipe for platform')
     extra=launch.get('extra_args',[])
     if not isinstance(extra,list) or any(not isinstance(v,str) or '\x00' in v for v in extra):
         raise ValueError('launch.extra_args must be a JSON array of strings')
     protected={'--host','--port','--listen','--bind','--model','--model-path','--model_path','-m',
                '--served-model-name','--alias','--api-key','--api_key','--trust-remote-code','--config','--script',
-               '--mcp-config','--before-load','--open','--websearch'}
+               '--mcp-config','--before-load','--open','--websearch','--identifier','--context-length','--bind',
+               '--ttl','--lms','--state','--artifact-id','--expected-version','--import-mode'}
     if any(v.split('=',1)[0] in protected for v in extra):
         raise ValueError('Extra engine arguments cannot override controlled model, network, or execution options')
     argv.extend(extra)
-    return {'argv':argv,'cwd':cwd,'env':env,'prepare':commands,'port':port}
+    return {'argv':argv,'cwd':cwd,'env':env,'prepare':commands,'cleanup':cleanup,'port':port}
 
 
 def stop_owned(process):
@@ -174,6 +195,14 @@ def managed_backend(config, state, workdir):
                 Path(action['file']).write_text(action['content'],encoding='utf-8')
                 subprocess.run(action['argv'],env=env,check=True,stdout=log,stderr=subprocess.STDOUT,
                                timeout=config.get('load_timeout_s',900),shell=False)
+            if config['platform']=='lmstudio':
+                # The engine runs in the detached daemon the supervisor started; sample that process tree.
+                supervisor=read_json(workdir/'lmstudio-supervisor.json')
+                if supervisor.get('daemon_pid'):config['backend_pid']=supervisor['daemon_pid']
             yield
         finally:
             if process is not None:stop_owned(process)
+            for action in spec.get('cleanup',[]):
+                # Releases detached engine state (e.g. an LM Studio daemon) that terminating the owned process cannot.
+                try:subprocess.run(action,env=env,check=False,stdout=log,stderr=subprocess.STDOUT,timeout=600,shell=False)
+                except (OSError,subprocess.TimeoutExpired):pass

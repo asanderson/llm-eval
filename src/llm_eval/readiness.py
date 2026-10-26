@@ -22,7 +22,7 @@ from typing import Callable
 from .common import digest, environment_kind, read_json, write_json
 from .core.contracts import identifier
 from .core.hardware import limits, profile
-from .provision import OS_IDS, install_plan, python_in
+from .provision import OS_IDS, install_plan, lms_executable, python_in
 
 
 def probe_command(argv, timeout=30):
@@ -261,6 +261,10 @@ def runtime_probe(root, selection, name, prefix, livebench, py):
         if name == 'ollama':
             ok, detail = probe_command([exe, '--version'])
             if not ok or recipe['version'] not in detail: return False, detail
+        elif name == 'lmstudio':
+            # The CLI is a Node binary from the operator-installed app; the app version is enforced at launch.
+            ok, detail = probe_command([exe, 'version', '--json'])
+            if not ok: return False, detail
         else:
             ok, detail = probe_command([exe, '--version' if name in {'llama.cpp', 'ik_llama.cpp'} else '--help'])
             if not ok: return False, detail
@@ -376,6 +380,18 @@ def build_checks(root, selection):
             ('os', 'architecture', 'package-manager'), 'For WSL enable Docker Desktop integration for this distribution.')
         add('docker-daemon', 'Accessible Docker daemon', lambda: probe_command(['docker', 'info', '--format', '{{.ServerVersion}}']),
             remedy='Start Docker Desktop/Engine and configure access, then rerun; readiness does not change group privileges.')
+    if any(n == 'lmstudio' for n, _ in selection['runtimes']):
+        version = catalog['platforms']['lmstudio']['version']
+        def lms_probe():
+            exe = lms_executable(os_id)
+            if not exe: return False, 'lms CLI not found in ~/.lmstudio/bin or on PATH'
+            return probe_command([exe, 'version', '--json'])
+        # Only Windows has a package-manager path to the exact pinned build. The Linux AppImage has no
+        # vendor checksum and the headless install scripts are rolling, so they stay manual steps.
+        add('lmstudio-app', 'LM Studio ' + version + ' desktop app or llmster with the lms CLI', lms_probe,
+            winget_commands('ElementLabs.LMStudio', ['--version', version]) if windows else [],
+            ('os', 'architecture', 'package-manager') if windows else (),
+            'Install LM Studio ' + version + ' from https://lmstudio.ai/download (or llmster via its documented install script), run it once, then rerun. See docs/PLATFORMS.md#lm-studio.')
     for index, ((name, folder), lb) in enumerate(selection['runtimes'].items()):
         prefix = Path(folder).resolve(); kind = catalog['platforms'][name]['kind']
         support = {p['id']: p for p in read_json(root/'catalog/platforms.json')['platforms']}[name]['os_support'][os_id]
@@ -419,6 +435,7 @@ def build_checks(root, selection):
         required += ['vc-runtime'] if windows else ['system-libraries']
         if kind in {'cmake', 'strata'}: required += ['cmake', 'compiler', 'cuda']
         if name in {'vllm', 'ktransformers'} and not windows: required += ['numa-build']
+        if name == 'lmstudio': required += ['lmstudio-app']
         add('runtime-'+str(index), name + ' pinned runtime at ' + str(prefix),
             lambda n=name, p=prefix, l=lb: runtime_probe(root, selection, n, p, l, py), commands, required,
             'Matching environments can repair Python dependencies after consent. Conflicting state or missing binaries require a new prefix/checkout; see docs/READINESS.md.')

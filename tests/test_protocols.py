@@ -41,7 +41,10 @@ class Handler(BaseHTTPRequestHandler):
                       {"choices": [{"delta": {"content": "3973"}}]}]
             if self.mode != "truncated":
                 events.append({"choices": [{"delta": {}, "finish_reason": "stop"}]})
-                if self.mode != "no_usage":
+                if self.mode == "lmstudio":
+                    events[-1].update(usage={"prompt_tokens": 12, "completion_tokens": 4},
+                                      stats={"tokens_per_second": 41.5, "time_to_first_token": 0.2, "stop_reason": "eosFound"})
+                elif self.mode != "no_usage":
                     events.append({"choices": [], "usage": {"prompt_tokens": 12, "completion_tokens": 4}})
             for e in events:
                 self.wfile.write(("data: " + json.dumps(e) + "\r\n\r\n").encode())
@@ -87,6 +90,14 @@ class ProtocolTests(unittest.TestCase):
         result = self.generate()
         self.assertEqual(result["backend_decode_tps"], 2)
         self.assertEqual(result["backend_prefill_tps"], 12)
+
+    def test_lmstudio_stats_report_explicit_decode_rate(self):
+        self.handler.mode = "lmstudio"
+        result = self.generate()
+        self.assertEqual(result["completion_tokens"], 4)
+        self.assertEqual(result["backend_decode_tps"], 41.5)
+        self.assertIsNone(result["backend_prefill_tps"])
+        self.assertEqual(result["finish_reason"], "stop")
 
     def test_truncation_is_failure(self):
         self.handler.mode = "truncated"

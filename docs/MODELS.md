@@ -118,7 +118,7 @@ Kimi-Dev's [LICENSE.md](https://huggingface.co/moonshotai/Kimi-Dev-72B/blob/main
 
 ## Initial experiment order
 
-1. Llama 3.3 70B Q4_K_M: compare the same GGUF on llama.cpp, ik_llama.cpp, Ollama import, and KoboldCpp.
+1. Llama 3.3 70B Q4_K_M: compare the same GGUF on llama.cpp, ik_llama.cpp, Ollama import, KoboldCpp, and LM Studio import.
 2. Qwen3.5 35B-A3B Q8_0 and Gemma 4 31B Q8_0: sparse-versus-dense architecture experiments, each compared only against itself across engines.
 3. Laguna XS 2.1 Q8/FP8 and Kimi-Linear Q6: expand after architecture support is verified.
 4. Strata IQ2_XS reference: capture PLE IO, expert cache, CPU threads, speculation, and quality; add other engines only after equivalent architecture/artifacts work.

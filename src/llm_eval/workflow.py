@@ -142,7 +142,7 @@ def build_config(args, prompts, root, engine, model, state, config_file=None):
         if c['protocol']!='worker':
             c['served_model']=prompts.value('--served-model',args.served_model,model['id'],required=True)
         c['launch']={}
-        if engine['id'] in {'llama.cpp','ik_llama.cpp','koboldcpp','ollama'} and args.server_mode=='managed':
+        if engine['id'] in {'llama.cpp','ik_llama.cpp','koboldcpp','ollama','lmstudio'} and args.server_mode=='managed':
             c['launch']['model_file']=prompts.value('--model-file',args.model_file,required=True)
         if engine['id'] in {'ktransformers','strata'} and args.server_mode=='managed':
             opts=prompts.value('--launch-options',args.launch_options,required=True)
@@ -174,7 +174,7 @@ def build_config(args, prompts, root, engine, model, state, config_file=None):
             if arg=='gpu_layers' and engine['id'] not in {'llama.cpp','ik_llama.cpp','koboldcpp','ollama'}:continue
             c['launch'][arg]=int(prompts.value(model['id']+': --'+arg.replace('_','-'),getattr(args,arg),c['launch'].get(arg,default)))
     if c['protocol']!='worker':
-        port=args.port or (11434 if engine['id']=='ollama' else 8100)
+        port=args.port or {'ollama':11434,'lmstudio':1234}.get(engine['id'],8100)
         if not 1024<=port<=65535:raise ValueError('Select a port from 1024 to 65535')
         if args.server_mode=='managed':
             c['endpoint']=f'http://127.0.0.1:{port}'+('/api/chat' if engine['id']=='ollama' else '/v1/chat/completions')

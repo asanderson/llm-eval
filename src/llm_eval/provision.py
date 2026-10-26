@@ -25,6 +25,17 @@ def python_in(folder, os_id):
     return str(Path(folder) / ('Scripts/python.exe' if os_id == 'windows-11-native' else 'bin/python'))
 
 
+def lms_executable(os_id=None):
+    """LM Studio's MIT CLI: the documented user-local path first, then PATH. Never installed here."""
+    windows = (os_id or environment_kind()) == 'windows-11-native'
+    home = Path(os.environ['USERPROFILE']) if windows and os.environ.get('USERPROFILE') else Path.home()
+    candidates = [home / '.lmstudio' / 'bin' / ('lms.exe' if windows else 'lms')]
+    found = shutil.which('lms')
+    if found:
+        candidates.append(Path(found))
+    return next((c for c in candidates if c.is_file()), None)
+
+
 def invoke(argv, *, cwd=None, env=None, capture=False):
     return subprocess.run([str(a) for a in argv], cwd=cwd, env=env, check=True,
                           text=True, capture_output=capture, shell=False)
@@ -150,7 +161,8 @@ def install_plan(root, platform, os_id, prefix, python=sys.executable, jobs=8, c
             'python':str(python), 'jobs':jobs, 'cuda_arch':cuda_arch, 'recipe':recipe,
             'with_livebench':with_livebench, 'livebench':catalog['livebench'] if with_livebench else None,
             'prerequisites':['Python 3.11–3.13', 'working NVIDIA host driver',
-                             *(['Git', 'CMake', 'CUDA toolkit with sm_' + cuda_arch + ' support', 'C++ compiler'] if recipe['kind'] in {'cmake','strata'} else [])],
+                             *(['Git', 'CMake', 'CUDA toolkit with sm_' + cuda_arch + ' support', 'C++ compiler'] if recipe['kind'] in {'cmake','strata'} else []),
+                             *(['LM Studio ' + recipe['version'] + ' desktop app or llmster daemon, installed by the operator with its lms CLI'] if recipe['kind'] == 'lmstudio' else [])],
             'qualification':'Installer recipe only; GPU/model compatibility must be measured.'}
 
 
@@ -220,6 +232,14 @@ def execute_install(plan, root):
                 shutil.copyfile(archive,exe)
             if plan['os_id']!='windows-11-native':exe.chmod(exe.stat().st_mode | stat.S_IXUSR)
             state.update(executable=str(exe),backend_version=recipe['version'],asset_sha256=asset['sha256'])
+        elif kind=='lmstudio':
+            # The proprietary app is operator-installed (no vendor checksum for Linux; rolling install
+            # scripts are never run). Record the CLI; the pinned app version is enforced at launch.
+            exe=lms_executable(plan['os_id'])
+            if not exe: raise ValueError('LM Studio CLI (lms) not found in ~/.lmstudio/bin or PATH. Install LM Studio '+recipe['version']+' or llmster first; see docs/PLATFORMS.md#lm-studio')
+            commit=json.loads(invoke([exe,'version','--json'],capture=True).stdout.strip().splitlines()[-1]).get('version','unknown')
+            state.update(executable=str(exe),lms_cli_commit=commit,
+                         backend_version='LM Studio '+recipe['version']+' (app version verified at launch); lms CLI commit '+commit)
         else:
             if recipe.get('torch'):
                 invoke([py,'-m','pip','install','torch=='+recipe['torch'],'--index-url',recipe['torch_index']],env=env)

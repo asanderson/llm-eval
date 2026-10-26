@@ -20,8 +20,8 @@ Two explicit run modes prevent accidental score conflation:
 
 | Run option | Inputs and grading | Supported adapters | Outputs |
 |---|---|---|---|
-| `--benchmark category-smoke` | Original committed prompts; exact/JSON checks; no generated code execution | All nine platforms, subject to OS/model gates | Request timings, telemetry, task and category summaries |
-| `--benchmark livebench` | User-supplied LiveBench question/test-case snapshot and pinned upstream scorer | The seven OpenAI-compatible server platforms; Ollama uses its compatibility endpoint | Upstream answers/judgments/reports, dataset hashes, scorer revision, image ID, logs |
+| `--benchmark category-smoke` | Original committed prompts; exact/JSON checks; no generated code execution | All ten platforms, subject to OS/model gates | Request timings, telemetry, task and category summaries |
+| `--benchmark livebench` | User-supplied LiveBench question/test-case snapshot and pinned upstream scorer | The eight OpenAI-compatible server platforms; Ollama uses its compatibility endpoint | Upstream answers/judgments/reports, dataset hashes, scorer revision, image ID, logs |
 
 Accelerate and AirLLM use category-smoke in this integration; their worker protocol is not an OpenAI server. Running upstream LiveBench against them requires a separately implemented server adapter. Local category pass rates are never added to upstream scores. Upstream runs do not currently generate the core harness's per-request latency/telemetry report; pair them with category-smoke performance runs at the same settings. Upstream generation persists full questions/answers regardless of the core `save_outputs` setting.
 

@@ -191,6 +191,11 @@ class HTTPAdapter:
                     backend_decode_tps = timings["predicted_n"] * 1000 / timings["predicted_ms"]
                 if timings.get("prompt_ms", 0) > 0:
                     backend_prefill_tps = timings["prompt_n"] * 1000 / timings["prompt_ms"]
+                # LM Studio's native /api/v0 responses report an explicit decode rate.
+                stats = event.get("stats") or {}
+                rate = stats.get("tokens_per_second") if isinstance(stats, dict) else None
+                if isinstance(rate, (int, float)) and not isinstance(rate, bool) and rate > 0:
+                    backend_decode_tps = float(rate)
             if not isinstance(visible, str) or not isinstance(hidden, str):
                 raise ValueError("Only text deltas are supported in the text benchmark")
             if (visible or hidden) and first is None:

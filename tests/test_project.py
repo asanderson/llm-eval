@@ -52,7 +52,7 @@ class ProjectTests(unittest.TestCase):
     def test_catalog_and_matrix(self):
         models = validate_catalog(read_json(ROOT / "catalog/models.json"))["models"]
         rows = matrix(ROOT)
-        self.assertEqual(len(rows), len(models) * 9 * 3)
+        self.assertEqual(len(rows), len(models) * 10 * 3)
         self.assertTrue(all(r["status"] == "blocked" for r in rows if r["platform"] == "strata" and r["model"] != "qwen38-flash-next-strata"))
         self.assertTrue(all(r["status"] == "blocked" for r in rows if r["platform"] == "vllm" and r["os"] == "windows-11-native"))
         self.assertEqual(len([m for m in models if m["provider"] == "xAI" and m["status"] != "excluded"]), 0)

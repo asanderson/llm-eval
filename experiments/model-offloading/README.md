@@ -8,7 +8,7 @@ A reproducible lab for evaluating **local LLMs larger than GPU VRAM** across inf
 
 ## Scope
 
-Nine platforms: **[llama.cpp][llama-cpp], [ik_llama.cpp][ik-llama], [KTransformers][ktransformers], [Ollama][ollama], [KoboldCpp][koboldcpp], [Hugging Face Accelerate][accelerate], [AirLLM][airllm], [vLLM][vllm], and [Strata][strata]**.
+Ten platforms: **[llama.cpp][llama-cpp], [ik_llama.cpp][ik-llama], [KTransformers][ktransformers], [Ollama][ollama], [KoboldCpp][koboldcpp], [Hugging Face Accelerate][accelerate], [AirLLM][airllm], [vLLM][vllm], [Strata][strata], and [LM Studio][lmstudio]** (free closed-source app driven through its MIT `lms` CLI).
 
 Three environments: **[native Ubuntu 26.04][ubuntu-download]**, **[native Windows 11 Pro][windows-download]**, and **[Windows 11 Pro][windows-download] + [WSL2][wsl-install] + [Ubuntu 26.04][ubuntu-download]**. Native Windows means no WSL, Linux container, or compatibility layer. WSL measurements remain a separate environment even though their user space is Ubuntu.
 
@@ -31,7 +31,7 @@ The [model catalog](../../catalog/models.json) has **29 entries**: the original 
 | Telemetry | [psutil documentation][psutil]; [NVIDIA System Management Interface][nvidia-smi] | The harness uses these to sample host and GPU observations. |
 | Model files | [Hugging Face download guide][hf-download]; [model links](#model-links) | Download only the chosen variant at an immutable revision, then hash it with `llm_eval lock`. |
 
-For platform-specific releases, build instructions, and dependencies, use the nine upstream project links in [Scope](#scope) and the project's [platform setup guide](../../docs/PLATFORMS.md). These links are starting points; record the actual versions used for each experiment.
+For platform-specific releases, build instructions, and dependencies, use the ten upstream project links in [Scope](#scope) and the project's [platform setup guide](../../docs/PLATFORMS.md). These links are starting points; record the actual versions used for each experiment.
 
 ## How the evaluation works
 
@@ -39,7 +39,7 @@ The harness validates a selected experiment, runs its workload, and records meas
 
 ![Evaluation workflow: validate an experiment, run requests, collect metrics and telemetry, and generate reports.](../../diagrams/evaluation-workflow.png)
 
-HTTP adapters cover [llama.cpp][llama-cpp], [ik_llama.cpp][ik-llama], [KTransformers][ktransformers], [Ollama][ollama], [KoboldCpp][koboldcpp], [vLLM][vllm], and [Strata][strata]. Python workers cover [Accelerate][accelerate] and [AirLLM][airllm]. Reports exclude warmups and, by default, synthetic runs. Streaming timing and token accounting depend on what the backend actually exposes; see the [methodology](../../docs/METHODOLOGY.md).
+HTTP adapters cover [llama.cpp][llama-cpp], [ik_llama.cpp][ik-llama], [KTransformers][ktransformers], [Ollama][ollama], [KoboldCpp][koboldcpp], [vLLM][vllm], [Strata][strata], and [LM Studio][lmstudio]. Python workers cover [Accelerate][accelerate] and [AirLLM][airllm]. Reports exclude warmups and, by default, synthetic runs. Streaming timing and token accounting depend on what the backend actually exposes; see the [methodology](../../docs/METHODOLOGY.md).
 
 ### How models can exceed GPU VRAM
 
@@ -116,7 +116,7 @@ python scripts/run.py --non-interactive --config configs/local/deepseek-32b.json
   --context 8192 --max-tokens 512 --threads 16 --gpu-layers 20
 ```
 
-Remove `--dry-run` from setup to install. The run example requires prepared and hashed weights plus a completed config. [WORKFLOWS.md](../../docs/WORKFLOWS.md) links all **54 setup/run wrappers**, documents the three OS paths, optional downloads, platform-specific fields, multi-model runs and CLI flags. Native Windows KTransformers/vLLM wrappers report unsupported; model-specific conversions and compatibility checks remain explicit.
+Remove `--dry-run` from setup to install. The run example requires prepared and hashed weights plus a completed config. [WORKFLOWS.md](../../docs/WORKFLOWS.md) links all **60 setup/run wrappers**, documents the three OS paths, optional downloads, platform-specific fields, multi-model runs and CLI flags. Native Windows KTransformers/vLLM wrappers report unsupported; model-specific conversions and compatibility checks remain explicit.
 
 ## LiveBench categories
 
@@ -140,14 +140,14 @@ The leaderboard review adds **[DeepSeek R1 Distill 32B][model-deepseek-r1-32b] (
 
 | Capability | Implementation |
 |---|---|
-| Platform adapters | OpenAI-compatible SSE for [llama.cpp][llama-cpp], [ik_llama.cpp][ik-llama], [KTransformers][ktransformers], [KoboldCpp][koboldcpp], [vLLM][vllm], [Strata][strata]; native [Ollama][ollama] NDJSON; isolated Python workers for [Accelerate][accelerate] and [AirLLM][airllm] |
+| Platform adapters | OpenAI-compatible SSE for [llama.cpp][llama-cpp], [ik_llama.cpp][ik-llama], [KTransformers][ktransformers], [KoboldCpp][koboldcpp], [vLLM][vllm], [Strata][strata], [LM Studio][lmstudio]; native [Ollama][ollama] NDJSON; isolated Python workers for [Accelerate][accelerate] and [AirLLM][airllm] |
 | Latency | Full request time; first streamed output and first visible text separately; worker generation time and client wall time separately |
 | Throughput | Backend-reported token counts; whole-request output tokens/s; backend prefill/decode rates only when explicitly reported |
 | Memory and device telemetry | Optional [psutil][psutil] system RAM/swap/process-tree RSS; [NVIDIA CLI][nvidia-smi] memory, utilization, power, temperature, clocks; missing data remain unknown |
 | Reproducibility | Model file hashes, source revision, engine version, template/tokenizer identity, OS/driver observations, run config, suite hashes |
 | Quality | Seven original category smoke suites, existing smoke/context/safety suites; optional upstream LiveBench with isolated regular grading and separate agentic opt-in |
 | Reporting | JSONL requests, JSON metadata/telemetry, task/category JSON and CSV summaries; warmups excluded; incompatible cohorts kept separate |
-| Setup and lifecycle | Pinned per-platform environments/builds or verified release assets; optional explicit model downloads; managed loopback server or external mode |
+| Setup and lifecycle | Pinned per-platform environments/builds or verified release assets (LM Studio: operator-installed pinned app, version verified at launch); optional explicit model downloads; managed loopback server or external mode |
 | Security defaults | Literal loopback endpoints, bounded responses/deadlines, credentials via environment references, verified artifacts, no generated-code execution in smoke mode; explicit upstream/container execution lane |
 
 **Limits:** setup recipes and launch plans are implemented but GPU installations and inference remain untested on the target laptop. Model/engine support is not inferred from API compatibility. Direct-library workers expose neither streaming TTFT nor isolated decode rate. Initial performance runs are single-request and text-only. Standalone [SWE-bench][swe-bench]/[EvalPlus][evalplus] integrations and automated cold boots are not implemented. Strata conversion and KT representation selection remain model-specific preparation steps. See [validation status](../../docs/VALIDATION.md).
@@ -162,7 +162,7 @@ The 120B class is conditional. No catalog entry promises that the sum of RAM and
 
 ## Evaluation report card
 
-**No laptop evaluation results have been recorded yet.** The matrix below tracks execution status, not performance. Each measured result must identify one exact model artifact, precision, platform version, OS build, and context size; one successful model does not qualify every model on that platform. See the [783-combination eligibility matrix](../../docs/evaluation-matrix.csv) for individual model gates.
+**No laptop evaluation results have been recorded yet.** The matrix below tracks execution status, not performance. Each measured result must identify one exact model artifact, precision, platform version, OS build, and context size; one successful model does not qualify every model on that platform. See the [870-combination eligibility matrix](../../docs/evaluation-matrix.csv) for individual model gates.
 
 | Platform | Ubuntu 26.04 native | Windows 11 Pro native | Windows 11 Pro + WSL2 |
 |---|---|---|---|
@@ -175,6 +175,7 @@ The 120B class is conditional. No catalog entry promises that the sum of RAM and
 | [AirLLM][airllm] | Not run | Not run | Not run |
 | [vLLM][vllm] | Not run | Unsupported | Not run |
 | [Strata][strata] | Not run | Not run | Not run |
+| [LM Studio][lmstudio] | Not run | Not run | Not run |
 
 **Status key:** Not run = no target-laptop measurements; Unsupported = blocked by the current native-OS catalog entry. Conditional and unverified combinations still require compatibility checks. Future entries should link to an individual run report and distinguish Passed, Failed, and Skipped; none implies a quality ranking by itself.
 
@@ -283,6 +284,7 @@ The project's existing [MIT license](../../LICENSE) is preserved. Backend and mo
 [airllm]: https://github.com/lyogavin/airllm
 [vllm]: https://github.com/vllm-project/vllm
 [strata]: https://github.com/Niko1221/Strata
+[lmstudio]: https://lmstudio.ai/
 [model-nemotron-nano-30b]: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16
 [model-nemotron-super-49b]: https://huggingface.co/nvidia/Llama-3_3-Nemotron-Super-49B-v1_5
 [model-nemotron-super-120b]: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4

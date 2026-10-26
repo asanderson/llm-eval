@@ -190,6 +190,30 @@
         "mistral-small31",
         "phi4-reasoning-plus"
       ]
+    },
+    {
+      "id": "lmstudio",
+      "repository": "https://github.com/lmstudio-ai/lms",
+      "homepage": "https://lmstudio.ai/",
+      "license": "Proprietary freeware (LM Studio Desktop App Terms; free for personal and work use since 2025-07-08); lms CLI and SDKs MIT",
+      "protocol": "openai",
+      "os_support": {
+        "ubuntu-26.04-native": "supported",
+        "windows-11-native": "supported",
+        "windows-11-wsl2-ubuntu-26.04": "conditional"
+      },
+      "notes": "Closed-source desktop app or llmster headless daemon driven through the MIT lms CLI; bundled llama.cpp (CUDA/Vulkan/CPU) runtime. Operator installs the pinned app version; setup only verifies the CLI. GPU placement is a ratio (lms load --gpu 0-1/off/max), not a layer count. OpenAI-compatible /v1 streaming; native /api/v0 adds tokens_per_second and time_to_first_token stats. WSL runs llmster without a GUI on the Windows driver.",
+      "sources": [
+        "https://github.com/lmstudio-ai/lms",
+        "https://github.com/lmstudio-ai/docs/blob/main/3_cli/0_local-models/load.md",
+        "https://github.com/lmstudio-ai/docs/blob/main/3_cli/1_serve/server-start.mdx",
+        "https://github.com/lmstudio-ai/docs/blob/main/1_developer/0_core/headless.md",
+        "https://github.com/lmstudio-ai/docs/blob/main/1_developer/2_rest/endpoints.mdx",
+        "https://lmstudio.ai/terms",
+        "https://lmstudio.ai/blog/free-for-work"
+      ],
+      "tested_version": null,
+      "model_compatibility": "unverified_per_combination"
     }
   ]
 }
