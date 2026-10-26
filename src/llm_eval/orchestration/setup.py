@@ -13,7 +13,7 @@ def setup_campaign(plan):
         target=job['target'];params=map_paths(job['parameters'],target,plan['root'])
         platforms=[params['config']['platform']] if 'config' in params else [params.get('router',{}).get('platform','ollama')]
         for platform in platforms:
-            if platform not in {'ollama','llama.cpp','ik_llama.cpp','ktransformers','koboldcpp','vllm','strata','accelerate','airllm'}:continue
+            if platform not in {'ollama','llama.cpp','ik_llama.cpp','ktransformers','koboldcpp','vllm','strata','accelerate','airllm','lmstudio'}:continue
             root=target.get('repo_root',plan['root'])
             state=params.get('installation_state')
             prefix=str(Path(state).parent) if state else root.rstrip('/\\')+'/.platforms/'+job['hardware']['os_id']+'/'+platform

@@ -100,6 +100,36 @@
       "kind": "strata",
       "repository": "https://github.com/Niko1221/Strata.git",
       "revision": "6f32ec070f23ced9f50e704d854d775da52591ab"
+    },
+    "lmstudio": {
+      "kind": "lmstudio",
+      "version": "0.4.26+4",
+      "release_date": "2026-10-08",
+      "installation": "operator-installed; setup verifies the lms CLI and launch verifies the running app/daemon version",
+      "cli_paths": {
+        "linux": "~/.lmstudio/bin/lms",
+        "windows": "%USERPROFILE%\\.lmstudio\\bin\\lms.exe"
+      },
+      "winget_id": "ElementLabs.LMStudio",
+      "assets": {
+        "windows": {
+          "url": "https://installers.lmstudio.ai/win32/x64/0.4.26-4/LM-Studio-0.4.26-4-x64.exe",
+          "sha256": "6d307bc8c4c9fc92d4cb18508b4919beb1a76d2174165a95bef9e13b11317be9",
+          "filename": "LM-Studio-0.4.26-4-x64.exe",
+          "sha256_source": "https://github.com/microsoft/winget-pkgs/blob/master/manifests/e/ElementLabs/LMStudio/0.4.26%2B4/ElementLabs.LMStudio.installer.yaml"
+        },
+        "linux": {
+          "url": "https://installers.lmstudio.ai/linux/x64/0.4.26-4/LM-Studio-0.4.26-4-x64.AppImage",
+          "sha256": null,
+          "filename": "LM-Studio-0.4.26-4-x64.AppImage",
+          "sha256_source": "vendor publishes no checksum; record the observed hash in placement_notes"
+        }
+      },
+      "headless_installers": {
+        "linux": "https://lmstudio.ai/install.sh",
+        "windows": "https://lmstudio.ai/install.ps1",
+        "policy": "rolling unpinned vendor scripts; never executed by this harness"
+      }
     }
   },
   "model_download_package": "huggingface-hub==2.1.1"

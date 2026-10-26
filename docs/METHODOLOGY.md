@@ -54,7 +54,7 @@ Repeated identical prompts may hit prefix caches. Set and record a cache policy;
 | `first_output_s` | First nonempty streamed content or reasoning delta; role-only frames do not count |
 | `first_visible_s` | First visible content delta; separate from initial reasoning output |
 | `output_tokens_per_wall_second` | Backend/count-confirmed generated tokens divided by `elapsed_s`; includes prefill, not a pure decode rate |
-| `backend_decode_tps` | Only populated from an explicit backend decode count/duration |
+| `backend_decode_tps` | Only populated from an explicit backend decode count/duration (llama.cpp `timings`, Ollama `eval_duration`, LM Studio `stats.tokens_per_second`) |
 | `backend_prefill_tps` | Only populated from an explicit backend prompt count/duration; prefix caching changes interpretation |
 | `backend_load_s` | Ollama-reported load time when provided |
 | `worker_load_s` | Direct-library model initialization time; separate from per-request measurements |
