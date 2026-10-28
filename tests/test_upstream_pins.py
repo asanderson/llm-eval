@@ -1,11 +1,18 @@
-"""Offline tests for scripts/upstream_pins.py: policy, parsers and a full bump on a fixture tree."""
+"""Offline tests for scripts/upstream_pins.py: policy, parsers and a full bump on a fixture tree.
+
+The scripted upstream is derived from whatever the catalog currently pins, so the
+tests hold on a bump PR (and in the nightly workflow right after --apply), not
+only on the catalog state they were written against.
+"""
 import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import re
 import shutil
 import tempfile
 import unittest
+import urllib.error
 
 ROOT = Path(__file__).resolve().parents[1]
 _spec = importlib.util.spec_from_file_location('upstream_pins', ROOT / 'scripts' / 'upstream_pins.py')
@@ -13,75 +20,95 @@ up = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(up)
 
 CATALOG = json.loads((ROOT / 'catalog' / 'installers.json').read_text(encoding='utf-8'))
-PINNED_LMSTUDIO = CATALOG['platforms']['lmstudio']['version']
-WINGET_YAML = """PackageIdentifier: ElementLabs.LMStudio
-PackageVersion: 0.4.27+2
+PLATFORMS = CATALOG['platforms']
+PINNED_LMSTUDIO = PLATFORMS['lmstudio']['version']
+
+
+def pin_of(entry):
+    return entry.split('==', 1)[1]
+
+
+def bump(version):
+    """The next version in the same style: last numeric run + 1 (0.7.0.post4 -> 0.7.0.post5, 0.4.26+4 -> 0.4.26+5)."""
+    head, number = re.match(r'^(.*?)(\d+)$', version).groups()
+    return f'{head}{int(number) + 1}'
+
+
+NEXT_LMSTUDIO = bump(PINNED_LMSTUDIO)
+NEXT_LMSTUDIO_PATH = NEXT_LMSTUDIO.replace('+', '-')
+WINGET_YAML = f"""PackageIdentifier: ElementLabs.LMStudio
+PackageVersion: {NEXT_LMSTUDIO}
 ReleaseDate: 2026-10-20
 Installers:
 - Architecture: x86
-  InstallerUrl: https://installers.lmstudio.ai/win32/ia32/0.4.27-2/LM-Studio-0.4.27-2-ia32.exe
+  InstallerUrl: https://installers.lmstudio.ai/win32/ia32/{NEXT_LMSTUDIO_PATH}/LM-Studio-{NEXT_LMSTUDIO_PATH}-ia32.exe
   InstallerSha256: 1111111111111111111111111111111111111111111111111111111111111111
 - Architecture: x64
-  InstallerUrl: https://installers.lmstudio.ai/win32/x64/0.4.27-2/LM-Studio-0.4.27-2-x64.exe
+  InstallerUrl: https://installers.lmstudio.ai/win32/x64/{NEXT_LMSTUDIO_PATH}/LM-Studio-{NEXT_LMSTUDIO_PATH}-x64.exe
   InstallerSha256: ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789
 ManifestType: installer
 """
+# Pins the scripted upstream leaves at their current version.
+STAYS_CURRENT = {'psutil', 'zstandard', 'accelerate', 'airllm'}
+# Newer upstream, but its requires-python drops the harness floor: a manual decision.
+PYTHON_FLOOR_BREAKER = 'transformers'
+
+
+def every_pip_pin():
+    groups = [CATALOG['harness_packages'], CATALOG['archive_packages'], [CATALOG['model_download_package']]]
+    groups += [r['packages'] for r in PLATFORMS.values() if r.get('kind') == 'pip']
+    return {entry.split('==')[0]: pin_of(entry) for group in groups for entry in group}
 
 
 class FakeNet:
-    """Scripted upstream: PyPI, GitHub releases, winget manifests, release assets."""
+    """Scripted upstream derived from the catalog: PyPI, GitHub releases, winget manifests, release assets."""
 
     def __init__(self, current=False):
-        p = CATALOG['platforms']
-        pin = lambda s: s.split('==', 1)[1]  # noqa: E731
-        if current:
-            self.pypi_versions = {}
-            for group in (CATALOG['harness_packages'], CATALOG['archive_packages'], [CATALOG['model_download_package']],
-                          *[r['packages'] for r in p.values() if r.get('kind') == 'pip']):
-                for entry in group:
-                    self.pypi_versions[entry.split('==')[0]] = (pin(entry), '>=3.9')
-            self.pypi_versions['torch'] = (p['accelerate']['torch'], '>=3.10')
-            self.releases = {
-                'ollama/ollama': {'tag_name': 'v' + p['ollama']['version'], 'assets': []},
-                'LostRuins/koboldcpp': {'tag_name': 'v' + p['koboldcpp']['version'], 'assets': []},
-                'ggml-org/llama.cpp': {'tag_name': 'b7000'}, 'ikawrakow/ik_llama.cpp': {'tag_name': 'v1'}}
-            self.tags = {('ggml-org/llama.cpp', 'b7000'): p['llama.cpp']['revision'],
-                         ('ikawrakow/ik_llama.cpp', 'v1'): p['ik_llama.cpp']['revision']}
-            self.heads = {'Niko1221/Strata': p['strata']['revision'], 'LiveBench/LiveBench': CATALOG['livebench']['revision']}
-            self.winget = [PINNED_LMSTUDIO, '0.3.9']
-            return
-        self.pypi_versions = {
-            'psutil': ('7.2.2', '>=3.6'), 'zstandard': ('0.25.0', '>=3.9'),
-            'kt-kernel': ('0.7.2', '>=3.10'), 'sglang-kt': ('0.7.2', '>=3.10'),
-            'transformers': ('5.21.0', '>=3.12'),          # drops the 3.11 floor: manual
-            'accelerate': ('1.15.0', '>=3.10.0'), 'sentencepiece': ('0.2.2', '>=3.9'),
-            'airllm': ('4.0.0', None), 'vllm': ('0.32.0', '<3.15,>=3.11'),
-            'huggingface-hub': ('2.3.0', '>=3.10.0'), 'torch': ('2.10.0', '>=3.10'),
-        }
+        self.hashed = []
+        self.pypi_versions = {}
+        for name, pinned in every_pip_pin().items():
+            if current or name in STAYS_CURRENT:
+                self.pypi_versions[name] = (pinned, '>=3.9')
+            elif name == PYTHON_FLOOR_BREAKER:
+                self.pypi_versions[name] = (bump(pinned), '>=3.12')
+            else:
+                self.pypi_versions[name] = (bump(pinned), '<3.15,>=3.11')
+        torch = PLATFORMS['accelerate']['torch']
+        self.torch_next = torch if current else bump(torch)
+        self.pypi_versions['torch'] = (self.torch_next, '>=3.10')
+        self.ollama_next = PLATFORMS['ollama']['version'] if current else bump(PLATFORMS['ollama']['version'])
+        self.kobold_next = PLATFORMS['koboldcpp']['version'] if current else bump(PLATFORMS['koboldcpp']['version'])
         self.sizes = {'ollama-linux-amd64.tar.zst': 10, 'ollama-windows-amd64.zip': 11, 'koboldcpp-linux-x64': 5, 'koboldcpp.exe': 6}
-        asset = lambda repo, tag, name: {'name': name, 'size': self.sizes.get(name, 1),  # noqa: E731
-                                         'browser_download_url': f'https://github.com/{repo}/releases/download/{tag}/{name}'}
+
+        def asset(repo, tag, name):
+            return {'name': name, 'size': self.sizes.get(name, 1),
+                    'browser_download_url': f'https://github.com/{repo}/releases/download/{tag}/{name}'}
+        ollama_tag, kobold_tag = 'v' + self.ollama_next, 'v' + self.kobold_next
         self.releases = {
-            'ollama/ollama': {'tag_name': 'v0.36.0', 'assets': [asset('ollama/ollama', 'v0.36.0', n) for n in
+            'ollama/ollama': {'tag_name': ollama_tag, 'assets': [asset('ollama/ollama', ollama_tag, n) for n in
                               ('ollama-linux-amd64.tar.zst', 'ollama-windows-amd64.zip', 'sha256sum.txt')]},
-            'LostRuins/koboldcpp': {'tag_name': 'v1.123', 'assets': [asset('LostRuins/koboldcpp', 'v1.123', n) for n in
+            'LostRuins/koboldcpp': {'tag_name': kobold_tag, 'assets': [asset('LostRuins/koboldcpp', kobold_tag, n) for n in
                                     ('koboldcpp-linux-x64', 'koboldcpp.exe')]},
             'ggml-org/llama.cpp': {'tag_name': 'b7100'},
-            'ikawrakow/ik_llama.cpp': {'tag_name': 'v1'},
+            # ik_llama.cpp publishes no releases: /releases/latest is a 404
         }
-        self.tags = {('ggml-org/llama.cpp', 'b7100'): 'a' * 40, ('ikawrakow/ik_llama.cpp', 'v1'): p['ik_llama.cpp']['revision']}
-        self.heads = {'Niko1221/Strata': 'c' * 40, 'LiveBench/LiveBench': CATALOG['livebench']['revision']}
-        self.winget = ['0.3.9', PINNED_LMSTUDIO, '0.4.27+2', 'not-a-version']
-        self.hashed = []
+        self.llama_next = PLATFORMS['llama.cpp']['revision'] if current else 'a' * 40
+        self.tags = {('ggml-org/llama.cpp', 'b7100'): self.llama_next}
+        self.heads = {'Niko1221/Strata': PLATFORMS['strata']['revision'] if current else 'c' * 40,
+                      'LiveBench/LiveBench': CATALOG['livebench']['revision'],
+                      'ikawrakow/ik_llama.cpp': PLATFORMS['ik_llama.cpp']['revision'] if current else 'd' * 40}
+        self.winget = [PINNED_LMSTUDIO, '0.3.9'] if current else ['0.3.9', PINNED_LMSTUDIO, NEXT_LMSTUDIO, 'not-a-version']
 
     def pypi(self, name):
         return self.pypi_versions[name]
 
     def torch_index_has(self, index_url, version):
         assert index_url.startswith('https://download.pytorch.org/whl/')
-        return version == '2.10.0'
+        return version == self.torch_next
 
     def release(self, repo):
+        if repo not in self.releases:
+            raise urllib.error.HTTPError(f'https://api.github.com/repos/{repo}/releases/latest', 404, 'Not Found', {}, None)
         return self.releases[repo]
 
     def tag_commit(self, repo, tag):
@@ -94,11 +121,11 @@ class FakeNet:
         return self.winget
 
     def winget_installer_yaml(self, version):
-        assert version == '0.4.27+2'
+        assert version == NEXT_LMSTUDIO
         return WINGET_YAML
 
     def text(self, url):
-        assert url.endswith('/v0.36.0/sha256sum.txt')
+        assert url.endswith(f'/v{self.ollama_next}/sha256sum.txt')
         return '%s  ./ollama-linux-amd64.tar.zst\n%s *ollama-windows-amd64.zip\n' % ('1' * 64, '2' * 64)
 
     def sha256_of(self, url):
@@ -119,6 +146,7 @@ def fixture_root():
 class PolicyTest(unittest.TestCase):
     def test_version_order_covers_every_pin_style(self):
         self.assertTrue(up.newer('0.7.2', '0.7.0.post4'))
+        self.assertTrue(up.newer('0.7.0.post5', '0.7.0.post4'))
         self.assertTrue(up.newer('0.4.27+1', '0.4.26+4'))
         self.assertTrue(up.newer('0.4.26+5', '0.4.26+4'))
         self.assertTrue(up.newer('1.123', '1.122.1'))
@@ -126,6 +154,8 @@ class PolicyTest(unittest.TestCase):
         self.assertTrue(up.newer('2.10.0', '2.9.1'))
         self.assertFalse(up.newer('0.35.1', '0.35.1'))
         self.assertFalse(up.newer('0.35.0', '0.35.1'))
+        for pinned in every_pip_pin().values():
+            self.assertTrue(up.newer(bump(pinned), pinned), pinned)
 
     def test_python_floor_guard(self):
         self.assertTrue(up.admits_python(None))
@@ -145,7 +175,7 @@ class PolicyTest(unittest.TestCase):
 
 class RealCatalogTest(unittest.TestCase):
     def test_every_pin_is_in_the_shape_the_resolver_expects(self):
-        p = CATALOG['platforms']
+        p = PLATFORMS
         for entry in (*CATALOG['harness_packages'], *CATALOG['archive_packages'], CATALOG['model_download_package'],
                       *[x for r in p.values() if r.get('kind') == 'pip' for x in r['packages']]):
             self.assertRegex(entry, up.PIN)
@@ -153,6 +183,7 @@ class RealCatalogTest(unittest.TestCase):
             for asset in p[name]['assets'].values():
                 self.assertTrue(asset['url'].endswith('/' + asset['filename']), asset['url'])
                 self.assertIn(f"/v{p[name]['version']}/", asset['url'])
+                self.assertRegex(asset['sha256'], r'^[0-9a-f]{64}$')
         for name in ('llama.cpp', 'ik_llama.cpp', 'strata'):
             self.assertRegex(p[name]['repository'], up.GITHUB_REPO)
             self.assertRegex(p[name]['revision'], r'^[0-9a-f]{40}$')
@@ -174,43 +205,47 @@ class BumpTest(unittest.TestCase):
         self.assertEqual(json.dumps(cat, indent=2) + '\n', text)
         p = cat['platforms']
         self.assertEqual(cat['checked_on'], '2026-10-28')
-        self.assertEqual(cat['harness_packages'], ['psutil==7.2.2'])
-        self.assertEqual(p['ktransformers']['packages'], ['kt-kernel==0.7.2', 'sglang-kt==0.7.2'])
-        self.assertEqual(p['vllm']['packages'], ['vllm==0.32.0'])
-        self.assertEqual(cat['model_download_package'], 'huggingface-hub==2.3.0')
-        self.assertIn('transformers==5.18.0', p['accelerate']['packages'])   # python floor: untouched
-        self.assertIn('sentencepiece==0.2.2', p['airllm']['packages'])
-        self.assertEqual((p['accelerate']['torch'], p['airllm']['torch']), ('2.10.0', '2.10.0'))
-        self.assertEqual(p['ollama']['version'], '0.36.0')
+        pins = every_pip_pin()
+        self.assertEqual(cat['harness_packages'], [f"psutil=={pins['psutil']}"])
+        self.assertEqual(p['ktransformers']['packages'], [f"kt-kernel=={bump(pins['kt-kernel'])}", f"sglang-kt=={bump(pins['sglang-kt'])}"])
+        self.assertEqual(p['vllm']['packages'], [f"vllm=={bump(pins['vllm'])}"])
+        self.assertEqual(cat['model_download_package'], f"huggingface-hub=={bump(pins['huggingface-hub'])}")
+        self.assertIn(f"transformers=={pins['transformers']}", p['accelerate']['packages'])   # python floor: untouched
+        self.assertIn(f"sentencepiece=={bump(pins['sentencepiece'])}", p['airllm']['packages'])
+        self.assertEqual((p['accelerate']['torch'], p['airllm']['torch']), (net.torch_next, net.torch_next))
+        self.assertEqual(p['ollama']['version'], net.ollama_next)
         self.assertEqual(p['ollama']['assets']['linux'], {
-            'url': 'https://github.com/ollama/ollama/releases/download/v0.36.0/ollama-linux-amd64.tar.zst',
+            'url': f'https://github.com/ollama/ollama/releases/download/v{net.ollama_next}/ollama-linux-amd64.tar.zst',
             'sha256': '1' * 64, 'bytes': 10, 'filename': 'ollama-linux-amd64.tar.zst'})
         self.assertEqual(p['ollama']['assets']['windows']['sha256'], '2' * 64)
-        self.assertEqual(p['koboldcpp']['version'], '1.123')
+        self.assertEqual(p['koboldcpp']['version'], net.kobold_next)
         win = p['koboldcpp']['assets']['windows']
         self.assertEqual((win['bytes'], win['sha256']), (6, hashlib.sha256(win['url'].encode()).hexdigest()))
         self.assertEqual(sorted(u.rsplit('/', 1)[1] for u in net.hashed), ['koboldcpp-linux-x64', 'koboldcpp.exe'])
         self.assertEqual(p['llama.cpp']['revision'], 'a' * 40)
-        self.assertEqual(p['ik_llama.cpp']['revision'], CATALOG['platforms']['ik_llama.cpp']['revision'])
-        self.assertEqual(p['strata']['revision'], CATALOG['platforms']['strata']['revision'])
+        self.assertEqual(p['ik_llama.cpp']['revision'], PLATFORMS['ik_llama.cpp']['revision'])   # no releases: reported only
+        self.assertEqual(p['strata']['revision'], PLATFORMS['strata']['revision'])
         lm = p['lmstudio']
-        self.assertEqual((lm['version'], lm['release_date']), ('0.4.27+2', '2026-10-20'))
+        self.assertEqual((lm['version'], lm['release_date']), (NEXT_LMSTUDIO, '2026-10-20'))
         self.assertEqual(lm['assets']['windows']['sha256'], 'abcdef0123456789' * 4)
-        self.assertEqual(lm['assets']['windows']['url'], 'https://installers.lmstudio.ai/win32/x64/0.4.27-2/LM-Studio-0.4.27-2-x64.exe')
-        self.assertEqual(lm['assets']['linux']['filename'], 'LM-Studio-0.4.27-2-x64.AppImage')
+        self.assertEqual(lm['assets']['windows']['url'],
+                         f'https://installers.lmstudio.ai/win32/x64/{NEXT_LMSTUDIO_PATH}/LM-Studio-{NEXT_LMSTUDIO_PATH}-x64.exe')
+        self.assertEqual(lm['assets']['linux']['filename'], f'LM-Studio-{NEXT_LMSTUDIO_PATH}-x64.AppImage')
         self.assertIsNone(lm['assets']['linux']['sha256'])
-        self.assertIn('0.4.27%2B2', lm['assets']['windows']['sha256_source'])
+        self.assertIn(NEXT_LMSTUDIO.replace('+', '%2B'), lm['assets']['windows']['sha256_source'])
         for rel in up.LMSTUDIO_MENTIONS:
             doc = (root / rel).read_text(encoding='utf-8')
-            self.assertIn('0.4.27+2', doc)
+            self.assertIn(NEXT_LMSTUDIO, doc)
             self.assertNotIn(PINNED_LMSTUDIO, doc)
         self.assertEqual(result['touched'], ['catalog/installers.json', *up.LMSTUDIO_MENTIONS])
         self.assertEqual(result['stale'], ['README.md'])
-        self.assertEqual(sorted(r.name for r in result['manual']), ['accelerate transformers', 'airllm transformers', 'strata'])
+        self.assertEqual(sorted(r.name for r in result['manual']),
+                         ['accelerate transformers', 'airllm transformers', 'ik_llama.cpp', 'strata'])
         self.assertEqual(result['failures'], [])
         summary = up.markdown_summary(result)
-        self.assertIn('| ollama | `0.35.1` | `0.36.0` | bumped |', summary)
+        self.assertIn(f"| ollama | `{PLATFORMS['ollama']['version']}` | `{net.ollama_next}` | bumped |", summary)
         self.assertIn('| livebench |', summary)
+        self.assertIn('no GitHub release', summary)
         self.assertIn('Needs a manual decision', summary)
         self.assertIn('`README.md`', summary)
 
@@ -226,13 +261,14 @@ class BumpTest(unittest.TestCase):
 
     def test_report_mode_never_writes_and_failures_are_rows_not_crashes(self):
         root, net = fixture_root(), FakeNet()
-        net.releases.pop('ollama/ollama')   # resolver raises KeyError
+        net.pypi_versions.pop('vllm')   # resolver raises KeyError
         before = (root / 'catalog/installers.json').read_bytes()
         result = up.run(net, root, apply=False, today='2026-10-28')
         self.assertTrue(result['changed'])
         self.assertFalse(result['applied'])
         self.assertEqual((root / 'catalog/installers.json').read_bytes(), before)
-        self.assertEqual([r.name for r in result['failures']], ['ollama'])
+        self.assertEqual([r.name for r in result['failures']], ['vllm vllm'])
+        self.assertFalse(any(r.changed for r in result['rows']))
 
 
 if __name__ == '__main__':
