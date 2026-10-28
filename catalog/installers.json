@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_on": "2026-10-05",
+  "checked_on": "2026-10-28",
   "qualification": "Recipe pins, not verified laptop installations. Transitive Python dependencies are captured with pip freeze after installation; not a fully hashed dependency lock.",
   "harness_packages": [
     "psutil==7.2.2"
@@ -17,7 +17,7 @@
     "llama.cpp": {
       "kind": "cmake",
       "repository": "https://github.com/ggml-org/llama.cpp.git",
-      "revision": "7049ff0cbeb1f5ead231de4522af6b75d8d773c0"
+      "revision": "8642541b255bfb5dc39cd351a178be09013a55d6"
     },
     "ik_llama.cpp": {
       "kind": "cmake",
@@ -27,44 +27,44 @@
     "ktransformers": {
       "kind": "pip",
       "packages": [
-        "kt-kernel==0.7.0.post4",
-        "sglang-kt==0.7.0.post4"
+        "kt-kernel==0.7.2",
+        "sglang-kt==0.7.2"
       ],
       "cpu_backend": "AVX2",
       "source": "https://github.com/kvcache-ai/ktransformers/blob/a5d7ad90479c9e8bdee491c16bfd563fa9d70262/doc/en/kt-kernel/AVX2-Tutorial.md"
     },
     "ollama": {
       "kind": "archive",
-      "version": "0.35.1",
+      "version": "0.40.12",
       "assets": {
         "linux": {
-          "url": "https://github.com/ollama/ollama/releases/download/v0.35.1/ollama-linux-amd64.tar.zst",
-          "sha256": "9fcd79ac4575b2bd31b992eee18b1000c8ad126b451627c8f8cd091714cfbb10",
-          "bytes": 1439658961,
+          "url": "https://github.com/ollama/ollama/releases/download/v0.40.12/ollama-linux-amd64.tar.zst",
+          "sha256": "f8adcb7e08d272283a4bd3abc18cf581afe37e64b2aee04fda4f407f215485ba",
+          "bytes": 1525425005,
           "filename": "ollama-linux-amd64.tar.zst"
         },
         "windows": {
-          "url": "https://github.com/ollama/ollama/releases/download/v0.35.1/ollama-windows-amd64.zip",
-          "sha256": "dc50b9ca7f9023c86525012632cd1615b093d0407987444a7f62ecab617e8e93",
-          "bytes": 1471094402,
+          "url": "https://github.com/ollama/ollama/releases/download/v0.40.12/ollama-windows-amd64.zip",
+          "sha256": "21814944f3e50d3f07b6bb3af75baddb96f59e91353c332ac9c5063b3bfd1041",
+          "bytes": 1601458136,
           "filename": "ollama-windows-amd64.zip"
         }
       }
     },
     "koboldcpp": {
       "kind": "executable",
-      "version": "1.122.1",
+      "version": "1.123.1",
       "assets": {
         "linux": {
-          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.122.1/koboldcpp-linux-x64",
-          "sha256": "724b81ad4d0557e6cf6b1e634c1b973e9a56c0a99b5164a9cf1ecbb8c9ad53d8",
-          "bytes": 641836648,
+          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.123.1/koboldcpp-linux-x64",
+          "sha256": "f23cd1faacd96b5627ae009012e384f9b9b57f1a3e8e49b3c2fb10cd7fd6fc79",
+          "bytes": 648375216,
           "filename": "koboldcpp-linux-x64"
         },
         "windows": {
-          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.122.1/koboldcpp.exe",
-          "sha256": "c0955f60aac10d139cfdb3ffbd73ad5c7045bfff32656b4a971363d08ff31289",
-          "bytes": 636192312,
+          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.123.1/koboldcpp.exe",
+          "sha256": "5619a9de2b694a3f8ea7c28b0f9f61f73e6bded17c00c214cdde80f8ac9f0512",
+          "bytes": 642170109,
           "filename": "koboldcpp.exe"
         }
       }
@@ -74,9 +74,9 @@
       "torch": "2.9.1",
       "torch_index": "https://download.pytorch.org/whl/cu128",
       "packages": [
-        "transformers==5.18.0",
+        "transformers==5.21.0",
         "accelerate==1.15.0",
-        "sentencepiece==0.2.1"
+        "sentencepiece==0.2.2"
       ]
     },
     "airllm": {
@@ -85,15 +85,15 @@
       "torch_index": "https://download.pytorch.org/whl/cu128",
       "packages": [
         "airllm==4.0.0",
-        "transformers==5.18.0",
+        "transformers==5.21.0",
         "accelerate==1.15.0",
-        "sentencepiece==0.2.1"
+        "sentencepiece==0.2.2"
       ]
     },
     "vllm": {
       "kind": "pip",
       "packages": [
-        "vllm==0.31.0"
+        "vllm==0.32.0"
       ]
     },
     "strata": {
@@ -132,5 +132,5 @@
       }
     }
   },
-  "model_download_package": "huggingface-hub==2.1.1"
+  "model_download_package": "huggingface-hub==2.3.0"
 }
