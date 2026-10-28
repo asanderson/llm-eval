@@ -18,7 +18,9 @@ What moves automatically (policy "bump"):
     release's checksum file when it publishes one (ollama) or from hashing the
     asset (koboldcpp);
   * llama.cpp and ik_llama.cpp: the commit behind the newest GitHub release
-    tag (not branch HEAD, which moves many times a day);
+    tag (not branch HEAD, which moves many times a day); a repository that
+    publishes no releases (ik_llama.cpp today) is treated like a
+    reviewed-commit pin and only has its HEAD drift reported;
   * LM Studio: newest version in the winget-pkgs manifest tree; the Windows
     installer sha256 and release date come from that manifest, the Linux
     AppImage keeps sha256 null (the vendor publishes none).
@@ -318,7 +320,19 @@ def bump_release_revision(net: Net, platform: str, recipe: dict, rows: list) -> 
     row = Row(platform, recipe["revision"][:12], "bump")
     rows.append(row)
     try:
-        tag = net.release(repo)["tag_name"]
+        try:
+            tag = net.release(repo)["tag_name"]
+        except urllib.error.HTTPError as exc:
+            if exc.code != 404:
+                raise
+            # No GitHub release to follow: behave like a reviewed-commit pin and only report HEAD drift.
+            head = net.head_commit(repo)
+            row.policy = "report"
+            if head == recipe["revision"]:
+                row.done(head[:12], "current")
+            else:
+                row.done(head[:12], "manual", "no GitHub release to follow; reviewed-commit pin, re-review before moving it")
+            return False
         commit = net.tag_commit(repo, tag)
         if commit == recipe["revision"]:
             row.done(f"{tag} ({commit[:12]})", "current")
@@ -479,7 +493,8 @@ def main() -> int:
     result = run(Net(), ROOT, args.apply, dt.date.today().isoformat())
     for r in result["rows"]:
         verdict = "bumped" if r.changed else {"bump": "bump available"}.get(r.status, r.status)
-        print(f"{r.name:28} {r.pinned:>16} -> {str(r.latest):<16} {verdict}" + (f"  ({r.detail})" if r.detail else ""))
+        print(f"{r.name:28} {r.pinned:>16} -> {str(r.latest):<16} {verdict}" + (f"  ({r.detail})" if r.detail else ""),
+              flush=True)  # keep the table ahead of the stderr verdict in CI logs
     if args.summary:
         pathlib.Path(args.summary).write_text(markdown_summary(result), encoding="utf-8")
     if args.github_output and os.environ.get("GITHUB_OUTPUT"):
