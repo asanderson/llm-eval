@@ -13,6 +13,8 @@ from llm_eval import readiness as r
 from llm_eval.common import digest
 
 ROOT = Path(__file__).resolve().parents[1]
+# The runtime probe checks `ollama --version` against the catalog pin; the nightly upstream-pins bump moves it there.
+PINNED_OLLAMA = json.loads((ROOT / 'catalog/installers.json').read_text(encoding='utf-8'))['platforms']['ollama']['version']
 
 
 class ConsentTests(unittest.TestCase):
@@ -163,7 +165,7 @@ class RuntimeTests(unittest.TestCase):
             state = {'status': 'installed', 'plan': plan, 'plan_sha256': digest(plan), 'python': 'fixture-python', 'executable': str(executable)}
             (prefix/'state.json').write_text(json.dumps(state))
             selection = {'os_id': 'ubuntu-26.04-native', 'hardware_profile': 'msi-raider-18-hx-ai'}
-            with patch.object(r, 'probe_command', return_value=(True, 'ollama version 0.35.1')), patch.object(r, 'python_probe', return_value=(True, '')):
+            with patch.object(r, 'probe_command', return_value=(True, 'ollama version ' + PINNED_OLLAMA)), patch.object(r, 'python_probe', return_value=(True, '')):
                 self.assertTrue(r.runtime_probe(ROOT, selection, 'ollama', prefix, False, py)[0])
                 executable.unlink()
                 self.assertIn('executable missing', r.runtime_probe(ROOT, selection, 'ollama', prefix, False, py)[1])

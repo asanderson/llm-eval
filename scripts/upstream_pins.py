@@ -412,10 +412,18 @@ def rewrite_mentions(root: pathlib.Path, old: str, new: str, files=LMSTUDIO_MENT
     return changed
 
 
-def stale_mentions(root: pathlib.Path, old: str, skip=()) -> list:
-    """Tracked text files that still spell `old` after a bump (docs, README, tests)."""
+# Files whose mention of a pin is about the resolver itself, not the pinned software.
+MENTION_SKIP = ("scripts/upstream_pins.py", "tests/test_upstream_pins.py")
+
+
+def stale_mentions(root: pathlib.Path, old: str, skip=MENTION_SKIP) -> list:
+    """Tracked text files that still spell `old` after a bump (docs, README, tests, scripts, source).
+
+    A test that fakes `ollama --version` with a literal, or a doc that quotes a version,
+    is exactly what makes a bump pull request fail or lie; name it in the PR body.
+    """
     hits = []
-    for pattern in ("README.md", "docs/*.md", "tests/*.py", "scripts/**/*.sh", "scripts/**/*.ps1"):
+    for pattern in ("README.md", "docs/*.md", "tests/*.py", "src/**/*.py", "scripts/**/*.py", "scripts/**/*.sh", "scripts/**/*.ps1"):
         for path in sorted(root.glob(pattern)):
             rel = path.relative_to(root).as_posix()
             if rel in skip:
@@ -457,7 +465,9 @@ def run(net: Net, root: pathlib.Path, apply: bool, today: str):
             new_lmstudio = catalog["platforms"]["lmstudio"]["version"]
             if new_lmstudio != old_lmstudio:
                 touched += rewrite_mentions(root, old_lmstudio, new_lmstudio)
-                stale = stale_mentions(root, old_lmstudio, skip=("docs/WORKFLOWS.md",))
+            # Every replaced pin (version or revision) that a doc, test or script still spells out.
+            replaced = sorted({r.pinned for r in rows if r.changed and len(r.pinned) >= 5})
+            stale = [(rel, old) for old in replaced for rel in stale_mentions(root, old)]
     manual = [r for r in rows if r.status == "manual"]
     failures = [r for r in rows if r.status == "failed"]
     return {"rows": rows, "changed": changed, "applied": apply and changed, "touched": touched,
@@ -477,7 +487,8 @@ def markdown_summary(result: dict) -> str:
     if result["manual"]:
         lines += ["", "### Needs a manual decision", ""] + [f"- **{r.name}**: pinned `{r.pinned}`, upstream `{r.latest}`: {r.detail}" for r in result["manual"]]
     if result["stale"]:
-        lines += ["", "### Still mentions the old LM Studio version", ""] + [f"- `{f}`" for f in result["stale"]]
+        lines += ["", "### Still spells a replaced pin (refresh by hand, or a test will keep asserting the old one)", ""]
+        lines += [f"- `{rel}`: still names `{old}`" for rel, old in result["stale"]]
     if result["failures"]:
         lines += ["", "### Resolver failures", ""] + [f"- **{r.name}**: {r.detail}" for r in result["failures"]]
     return "\n".join(lines) + "\n"
