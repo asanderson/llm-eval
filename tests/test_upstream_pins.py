@@ -140,6 +140,8 @@ def fixture_root():
         (tmp / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / rel, tmp / rel)
     (tmp / 'README.md').write_text(f'Still says LM Studio {PINNED_LMSTUDIO} here.\n', encoding='utf-8')
+    (tmp / 'tests').mkdir()
+    (tmp / 'tests/test_fixture.py').write_text(f"FAKE = 'ollama version {PLATFORMS['ollama']['version']}'\n", encoding='utf-8')
     return tmp
 
 
@@ -238,7 +240,9 @@ class BumpTest(unittest.TestCase):
             self.assertIn(NEXT_LMSTUDIO, doc)
             self.assertNotIn(PINNED_LMSTUDIO, doc)
         self.assertEqual(result['touched'], ['catalog/installers.json', *up.LMSTUDIO_MENTIONS])
-        self.assertEqual(result['stale'], ['README.md'])
+        self.assertIn(('README.md', PINNED_LMSTUDIO), result['stale'])
+        self.assertIn(('tests/test_fixture.py', PLATFORMS['ollama']['version']), result['stale'])
+        self.assertTrue(all(rel != 'tests/test_upstream_pins.py' for rel, _ in result['stale']), result['stale'])
         self.assertEqual(sorted(r.name for r in result['manual']),
                          ['accelerate transformers', 'airllm transformers', 'ik_llama.cpp', 'strata'])
         self.assertEqual(result['failures'], [])
@@ -247,7 +251,7 @@ class BumpTest(unittest.TestCase):
         self.assertIn('| livebench |', summary)
         self.assertIn('no GitHub release', summary)
         self.assertIn('Needs a manual decision', summary)
-        self.assertIn('`README.md`', summary)
+        self.assertIn(f'- `README.md`: still names `{PINNED_LMSTUDIO}`', summary)
 
     def test_nothing_newer_leaves_every_file_alone(self):
         root = fixture_root()
