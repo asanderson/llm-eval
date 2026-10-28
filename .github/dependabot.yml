@@ -1,0 +1,38 @@
+# Nightly dependency checks for everything that lives in an ecosystem
+# manifest. The pins in catalog/installers.json (release assets, source
+# revisions, exact PyPI pins per platform recipe, LM Studio) are outside
+# Dependabot's reach; the upstream-pins workflow covers those on the same
+# cadence.
+# No explicit labels: Dependabot then applies (and creates) its default
+# 'dependencies' label itself; a custom labels list must already exist.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: cron
+      cronjob: "17 6 * * *"   # nightly, 06:17 UTC
+    commit-message:
+      prefix: "ci"
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  - package-ecosystem: pip   # pyproject.toml optional dependencies (psutil, matplotlib ranges)
+    directory: /
+    schedule:
+      interval: cron
+      cronjob: "17 6 * * *"
+    commit-message:
+      prefix: "deps"
+    groups:
+      pip-minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: docker   # python base image of the LiveBench grader container
+    directory: /containers/livebench
+    schedule:
+      interval: cron
+      cronjob: "17 6 * * *"
+    commit-message:
+      prefix: "containers"

@@ -1,0 +1,101 @@
+name: Upstream pin check
+
+# Nightly: compare every pin in catalog/installers.json with upstream
+# (PyPI, GitHub releases, the winget-pkgs manifests for LM Studio), apply
+# the bumps that policy allows, and open (or refresh) one pull request with
+# the result. Reviewed-commit pins (Strata, LiveBench) and anything policy
+# holds back land in the PR body, or in a tracking issue when nothing else
+# changed. Dependencies that live in ecosystem manifests (pyproject.toml,
+# the livebench Dockerfile base image, GitHub Actions) are handled by
+# Dependabot (.github/dependabot.yml) on the same nightly cadence.
+#
+# Token: the default GITHUB_TOKEN cannot open pull requests here and the
+# ones it could open would not trigger harness-tests. Add a fine-grained PAT
+# (contents + pull-requests + issues: write) as the UPSTREAM_BUMP_TOKEN
+# secret; the workflow falls back to GITHUB_TOKEN when it is absent.
+
+on:
+  schedule:
+    - cron: "17 6 * * *"   # 06:17 UTC every night
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: upstream-pins
+  cancel-in-progress: false
+
+env:
+  BRANCH: auto/upstream-pins
+  PR_TITLE: "Bump pinned platform and package versions"
+  ISSUE_TITLE: "Upstream pins needing a manual decision"
+
+jobs:
+  check:
+    name: resolve upstream pins + open PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 40   # koboldcpp assets are hashed from a download when they move
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          # Push with the PAT too (not just the gh calls): GitHub never starts
+          # workflow runs for pushes made with GITHUB_TOKEN.
+          token: ${{ secrets.UPSTREAM_BUMP_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Resolve upstream and apply the bumps
+        id: resolve
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # authenticated api.github.com rate limit
+        run: |
+          python3 scripts/upstream_pins.py --apply --summary /tmp/summary.md --github-output
+          cat /tmp/summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run the offline checks CI would
+        if: steps.resolve.outputs.changed == 'true'
+        run: python3 -m unittest discover -s tests -p 'test_upstream_pins.py' -v
+
+      - name: Open or refresh the bump pull request
+        if: steps.resolve.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.UPSTREAM_BUMP_TOKEN || secrets.GITHUB_TOKEN }}
+          BASE: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git commit -am "$PR_TITLE"
+          # Skip the push when the open PR already carries exactly this content.
+          if git fetch -q origin "$BRANCH" 2>/dev/null \
+             && [ "$(git rev-parse "origin/$BRANCH^{tree}")" = "$(git rev-parse 'HEAD^{tree}')" ]; then
+            echo "PR branch already up to date."
+          else
+            git push --force origin "$BRANCH"
+          fi
+          gh label create dependencies --description "Dependency and pin updates" --color 0366d6 --force >/dev/null
+          existing="$(gh pr list --head "$BRANCH" --base "$BASE" --state open --json number --jq '.[0].number')"
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --title "$PR_TITLE" --body-file /tmp/summary.md
+            echo "Refreshed PR #$existing"
+          else
+            gh pr create --head "$BRANCH" --base "$BASE" --title "$PR_TITLE" --body-file /tmp/summary.md --label dependencies
+          fi
+
+      - name: Track manual decisions in an issue when there is no PR to carry them
+        if: steps.resolve.outputs.changed == 'false' && steps.resolve.outputs.manual == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.UPSTREAM_BUMP_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh label create dependencies --description "Dependency and pin updates" --color 0366d6 --force >/dev/null
+          existing="$(gh issue list --search "\"$ISSUE_TITLE\" in:title" --state open --json number,title \
+                      --jq ".[] | select(.title == \"$ISSUE_TITLE\") | .number" | head -1)"
+          if [ -n "$existing" ]; then
+            gh issue edit "$existing" --body-file /tmp/summary.md
+            echo "Refreshed issue #$existing"
+          else
+            gh issue create --title "$ISSUE_TITLE" --body-file /tmp/summary.md --label dependencies
+          fi

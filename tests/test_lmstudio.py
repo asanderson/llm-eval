@@ -15,12 +15,14 @@ from llm_eval.launch import launch_spec
 from llm_eval.provision import OS_IDS, install_plan, lms_executable
 
 ROOT = Path(__file__).resolve().parents[1]
+# The pinned app version lives in the catalog; the nightly upstream-pins bump moves it there.
+PINNED = read_json(ROOT / 'catalog/installers.json')['platforms']['lmstudio']['version']
 
 
 class FakeLms:
     """Scripted lms CLI: records argument arrays and answers status/version queries."""
 
-    def __init__(self, version='0.4.26+4', daemon_running=False, server_running=False, import_exit=0, load_exit=0):
+    def __init__(self, version=PINNED, daemon_running=False, server_running=False, import_exit=0, load_exit=0):
         self.calls = []
         self.version, self.daemon_running, self.server_running = version, daemon_running, server_running
         self.import_exit, self.load_exit = import_exit, load_exit
@@ -52,7 +54,7 @@ class SupervisorTests(unittest.TestCase):
     def args(self, tmp, **extra):
         argv = ['serve', '--lms', 'lms', '--model-file', str(Path(tmp) / 'model.gguf'), '--artifact-id', 'abc123',
                 '--identifier', 'eval-model', '--port', '1234', '--context-length', '8192', '--gpu', '0.5',
-                '--state', str(Path(tmp) / 'state.json'), '--expected-version', '0.4.26+4']
+                '--state', str(Path(tmp) / 'state.json'), '--expected-version', PINNED]
         for key, value in extra.items():
             argv += ['--' + key.replace('_', '-'), value]
         return argv
@@ -133,7 +135,7 @@ class LaunchAndSetupTests(unittest.TestCase):
             write_json(lock, {'files': [{'path': 'model.gguf', 'sha256': 'f' * 64}]})
             c.update(artifact_root=tmp, artifact_lock=str(lock), served_model='eval-model')
             c['launch'] = {'model_file': 'model.gguf', 'threads': 16, 'gpu_offload': 'max'}
-            state = {'plan': {'platform': 'lmstudio', 'os_id': c['os_id'], 'prefix': tmp, 'recipe': {'version': '0.4.26+4'}},
+            state = {'plan': {'platform': 'lmstudio', 'os_id': c['os_id'], 'prefix': tmp, 'recipe': {'version': PINNED}},
                      'python': 'python', 'executable': '/opt/lms'}
             spec = launch_spec(c, state, tmp)
             self.assertEqual(spec['argv'][:4], ['python', '-m', 'llm_eval.lmstudio', 'serve'])
@@ -141,7 +143,7 @@ class LaunchAndSetupTests(unittest.TestCase):
             self.assertEqual(argv[argv.index('--artifact-id') + 1], 'f' * 12)
             self.assertEqual(argv[argv.index('--port') + 1], '1234')
             self.assertEqual(argv[argv.index('--gpu') + 1], 'max')
-            self.assertEqual(argv[argv.index('--expected-version') + 1], '0.4.26+4')
+            self.assertEqual(argv[argv.index('--expected-version') + 1], PINNED)
             self.assertEqual(spec['cleanup'][0][:4], ['python', '-m', 'llm_eval.lmstudio', 'cleanup'])
             self.assertEqual(spec['port'], 1234)
             c['launch']['extra_args'] = ['--ttl', '60']
@@ -155,7 +157,7 @@ class LaunchAndSetupTests(unittest.TestCase):
         for os_id in OS_IDS:
             plan = install_plan(ROOT, 'lmstudio', os_id, ROOT / '.not-created')
             self.assertEqual(plan['recipe']['kind'], 'lmstudio')
-            self.assertTrue(any('LM Studio 0.4.26+4' in p for p in plan['prerequisites']))
+            self.assertTrue(any('LM Studio ' + PINNED in p for p in plan['prerequisites']))
             self.assertFalse(any('CMake' in p for p in plan['prerequisites']))
         self.assertFalse((ROOT / '.not-created').exists())
 
@@ -178,7 +180,7 @@ class LaunchAndSetupTests(unittest.TestCase):
                 self.assertEqual(bool(app.commands), expect_install)
                 if expect_install:
                     self.assertEqual(app.commands[0][:4], ['winget', 'install', '--id', 'ElementLabs.LMStudio'])
-                    self.assertEqual(app.commands[0][-2:], ['--version', '0.4.26+4'])
+                    self.assertEqual(app.commands[0][-2:], ['--version', PINNED])
                 self.assertIn('lmstudio-app', checks['runtime-0'].requires)
                 with patch.object(r, 'lms_executable', return_value=None):
                     self.assertEqual(app.inspect()['status'], 'missing')

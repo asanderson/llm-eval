@@ -102,6 +102,15 @@ One invocation selects one platform and OS. Each config must match those selecti
 
 Exact source revisions, package pins and release-asset SHA256 values live in [catalog/installers.json](../catalog/installers.json). They were selected on 2026-10-05 and must pass the target-laptop gate.
 
+### Dependency updates
+
+Two nightly jobs keep the pins current without touching `main` directly:
+
+* **Upstream pin check** (`.github/workflows/upstream-pins.yml`, 06:17 UTC) runs `scripts/upstream_pins.py --apply`, which compares every entry in `catalog/installers.json` with upstream and opens or refreshes one `auto/upstream-pins` pull request. It moves exact PyPI pins (only to releases whose requires-python still admits 3.11), torch (only to releases the pinned CUDA wheel index serves), ollama and koboldcpp release assets (new URLs, byte counts and SHA256), the commit behind the newest llama.cpp and ik_llama.cpp release tags, and the LM Studio version with its winget-published installer hash; `checked_on` moves with them and the docs that spell the LM Studio version are rewritten. Strata and LiveBench are reviewed-commit pins: HEAD drift is only reported, in the PR body or in a tracking issue when nothing else changed. The bump PR runs `harness-tests` like any other; the target-laptop gate above still decides whether a bump is usable.
+* **Dependabot** (`.github/dependabot.yml`, same cadence) covers what lives in ecosystem manifests: `pyproject.toml` optional dependencies, the `containers/livebench` base image and the SHA-pinned GitHub Actions.
+
+Run `python3 scripts/upstream_pins.py` locally for a report without writing anything. Pull requests opened with the default `GITHUB_TOKEN` do not trigger CI, so the workflow expects a fine-grained PAT (contents, pull requests, issues: write) in the `UPSTREAM_BUMP_TOKEN` secret.
+
 | Platform | Setup implementation | Managed run |
 |---|---|---|
 | llama.cpp / ik_llama.cpp | Clean immutable Git checkout, submodules, CMake CUDA build | `llama-server` with a locked GGUF, explicit context/layers/threads and loopback |
