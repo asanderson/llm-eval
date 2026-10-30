@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_on": "2026-10-29",
+  "checked_on": "2026-10-30",
   "qualification": "Recipe pins, not verified laptop installations. Transitive Python dependencies are captured with pip freeze after installation; not a fully hashed dependency lock.",
   "harness_packages": [
     "psutil==7.2.2"
@@ -74,7 +74,7 @@
       "torch": "2.9.1",
       "torch_index": "https://download.pytorch.org/whl/cu128",
       "packages": [
-        "transformers==5.21.0",
+        "transformers==5.22.0",
         "accelerate==1.15.0",
         "sentencepiece==0.2.2"
       ]
@@ -85,7 +85,7 @@
       "torch_index": "https://download.pytorch.org/whl/cu128",
       "packages": [
         "airllm==4.0.0",
-        "transformers==5.21.0",
+        "transformers==5.22.0",
         "accelerate==1.15.0",
         "sentencepiece==0.2.2"
       ]
@@ -132,5 +132,5 @@
       }
     }
   },
-  "model_download_package": "huggingface-hub==2.3.0"
+  "model_download_package": "huggingface-hub==2.4.0"
 }
