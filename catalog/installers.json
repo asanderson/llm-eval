@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_on": "2026-10-30",
+  "checked_on": "2026-10-31",
   "qualification": "Recipe pins, not verified laptop installations. Transitive Python dependencies are captured with pip freeze after installation; not a fully hashed dependency lock.",
   "harness_packages": [
     "psutil==7.2.2"
@@ -53,18 +53,18 @@
     },
     "koboldcpp": {
       "kind": "executable",
-      "version": "1.123.1",
+      "version": "1.124",
       "assets": {
         "linux": {
-          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.123.1/koboldcpp-linux-x64",
-          "sha256": "f23cd1faacd96b5627ae009012e384f9b9b57f1a3e8e49b3c2fb10cd7fd6fc79",
-          "bytes": 648375216,
+          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.124/koboldcpp-linux-x64",
+          "sha256": "ae23f213243d327099d5a637c7ee18bd490162a088340318dc053553fd67569a",
+          "bytes": 679836960,
           "filename": "koboldcpp-linux-x64"
         },
         "windows": {
-          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.123.1/koboldcpp.exe",
-          "sha256": "5619a9de2b694a3f8ea7c28b0f9f61f73e6bded17c00c214cdde80f8ac9f0512",
-          "bytes": 642170109,
+          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.124/koboldcpp.exe",
+          "sha256": "7713df4f12f8ecd5d8cd006f58e2ed0027ee3f632d2ed149b88e9707b3c58c3e",
+          "bytes": 669832870,
           "filename": "koboldcpp.exe"
         }
       }
@@ -74,7 +74,7 @@
       "torch": "2.9.1",
       "torch_index": "https://download.pytorch.org/whl/cu128",
       "packages": [
-        "transformers==5.22.0",
+        "transformers==5.22.1",
         "accelerate==1.15.0",
         "sentencepiece==0.2.2"
       ]
@@ -85,7 +85,7 @@
       "torch_index": "https://download.pytorch.org/whl/cu128",
       "packages": [
         "airllm==4.0.0",
-        "transformers==5.22.0",
+        "transformers==5.22.1",
         "accelerate==1.15.0",
         "sentencepiece==0.2.2"
       ]
@@ -103,8 +103,8 @@
     },
     "lmstudio": {
       "kind": "lmstudio",
-      "version": "0.4.26+4",
-      "release_date": "2026-10-08",
+      "version": "0.4.27+2",
+      "release_date": "2026-10-29",
       "installation": "operator-installed; setup verifies the lms CLI and launch verifies the running app/daemon version",
       "cli_paths": {
         "linux": "~/.lmstudio/bin/lms",
@@ -113,15 +113,15 @@
       "winget_id": "ElementLabs.LMStudio",
       "assets": {
         "windows": {
-          "url": "https://installers.lmstudio.ai/win32/x64/0.4.26-4/LM-Studio-0.4.26-4-x64.exe",
-          "sha256": "6d307bc8c4c9fc92d4cb18508b4919beb1a76d2174165a95bef9e13b11317be9",
-          "filename": "LM-Studio-0.4.26-4-x64.exe",
-          "sha256_source": "https://github.com/microsoft/winget-pkgs/blob/master/manifests/e/ElementLabs/LMStudio/0.4.26%2B4/ElementLabs.LMStudio.installer.yaml"
+          "url": "https://installers.lmstudio.ai/win32/x64/0.4.27-2/LM-Studio-0.4.27-2-x64.exe",
+          "sha256": "6689fb083d0309692d0b3f8d741ec215098d5c2d2321019bdacc3d1628cff189",
+          "filename": "LM-Studio-0.4.27-2-x64.exe",
+          "sha256_source": "https://github.com/microsoft/winget-pkgs/blob/master/manifests/e/ElementLabs/LMStudio/0.4.27%2B2/ElementLabs.LMStudio.installer.yaml"
         },
         "linux": {
-          "url": "https://installers.lmstudio.ai/linux/x64/0.4.26-4/LM-Studio-0.4.26-4-x64.AppImage",
+          "url": "https://installers.lmstudio.ai/linux/x64/0.4.27-2/LM-Studio-0.4.27-2-x64.AppImage",
           "sha256": null,
-          "filename": "LM-Studio-0.4.26-4-x64.AppImage",
+          "filename": "LM-Studio-0.4.27-2-x64.AppImage",
           "sha256_source": "vendor publishes no checksum; record the observed hash in placement_notes"
         }
       },
