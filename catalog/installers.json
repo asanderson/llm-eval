@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_on": "2026-10-31",
+  "checked_on": "2026-11-02",
   "qualification": "Recipe pins, not verified laptop installations. Transitive Python dependencies are captured with pip freeze after installation; not a fully hashed dependency lock.",
   "harness_packages": [
     "psutil==7.2.2"
@@ -53,18 +53,18 @@
     },
     "koboldcpp": {
       "kind": "executable",
-      "version": "1.124",
+      "version": "1.124.1",
       "assets": {
         "linux": {
-          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.124/koboldcpp-linux-x64",
-          "sha256": "ae23f213243d327099d5a637c7ee18bd490162a088340318dc053553fd67569a",
-          "bytes": 679836960,
+          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.124.1/koboldcpp-linux-x64",
+          "sha256": "46740ff67194962d50c564ab3d01a41d83e2cb3f29073915f83ebac21399e8e5",
+          "bytes": 628696680,
           "filename": "koboldcpp-linux-x64"
         },
         "windows": {
-          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.124/koboldcpp.exe",
-          "sha256": "7713df4f12f8ecd5d8cd006f58e2ed0027ee3f632d2ed149b88e9707b3c58c3e",
-          "bytes": 669832870,
+          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.124.1/koboldcpp.exe",
+          "sha256": "32def5892e7880cec04382ab02baef635ac6bb298d38c616ae7c1fda48c94281",
+          "bytes": 622611661,
           "filename": "koboldcpp.exe"
         }
       }
