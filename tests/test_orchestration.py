@@ -2,7 +2,6 @@ import copy
 from pathlib import Path
 import tempfile
 import threading
-import time
 import unittest
 from unittest.mock import patch
 
@@ -30,12 +29,19 @@ class OrchestrationTests(unittest.TestCase):
     def test_parallel_hosts_and_serial_shared_host(self):
         for hosts,expected in [(['a','a'],1),(['a','b'],2)]:
             with self.subTest(hosts=hosts),tempfile.TemporaryDirectory() as temp:
-                active=0;peak=0;mutex=threading.Lock()
+                active=0;peak=0;mutex=threading.Lock();overlapped=threading.Event()
+                # Jobs on separate hosts must overlap however long the scheduler takes to
+                # submit the second one (its campaign/job writes are slow on Windows
+                # runners), so hold each run until a second run arrives. A shared host
+                # must never overlap; a short hold there gives a wrong scheduler the chance.
+                hold=30 if expected==2 else .15
                 def rpc(target,payload,root,timeout=60):
                     nonlocal active,peak
                     if payload['action']=='run':
-                        with mutex:active+=1;peak=max(peak,active)
-                        time.sleep(.15)
+                        with mutex:
+                            active+=1;peak=max(peak,active)
+                            if active>=2:overlapped.set()
+                        overlapped.wait(hold)
                         with mutex:active-=1
                         return {'status':'succeeded'}
                     return {'ok':True}
