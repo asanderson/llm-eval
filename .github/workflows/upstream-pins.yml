@@ -4,10 +4,11 @@ name: Upstream pin check
 # (PyPI, GitHub releases, the winget-pkgs manifests for LM Studio), apply
 # the bumps that policy allows, and open (or refresh) one pull request with
 # the result. Reviewed-commit pins (Strata, LiveBench) and anything policy
-# holds back land in the PR body, or in a tracking issue when nothing else
-# changed. Dependencies that live in ecosystem manifests (pyproject.toml,
-# the livebench Dockerfile base image, GitHub Actions) are handled by
-# Dependabot (.github/dependabot.yml) on the same nightly cadence.
+# holds back land in the PR body and in a tracking issue that every run
+# refreshes (and closes once nothing needs a decision). Dependencies that
+# live in ecosystem manifests (pyproject.toml, the livebench Dockerfile base
+# image, GitHub Actions) are handled by Dependabot (.github/dependabot.yml)
+# on the same nightly cadence.
 #
 # Token: the default GITHUB_TOKEN cannot open pull requests here and the
 # ones it could open would not trigger harness-tests. Add a fine-grained PAT
@@ -50,7 +51,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # authenticated api.github.com rate limit
         run: |
-          python3 scripts/upstream_pins.py --apply --summary /tmp/summary.md --github-output
+          python3 scripts/upstream_pins.py --apply --summary /tmp/summary.md --issue-summary /tmp/issue.md --github-output
           cat /tmp/summary.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Run the offline checks CI would
@@ -84,20 +85,33 @@ jobs:
             gh pr create --head "$BRANCH" --base "$BASE" --title "$PR_TITLE" --body-file /tmp/summary.md --label dependencies
           fi
 
-      - name: Track manual decisions in an issue when there is no PR to carry them
-        if: steps.resolve.outputs.changed == 'false' && steps.resolve.outputs.manual == 'true'
+      # Every run that leaves a pin waiting on a decision refreshes the issue,
+      # including runs that also opened or refreshed the bump PR, so the issue
+      # never shows an older night's upstream values.
+      - name: Refresh the tracking issue with the pins that need a manual decision
+        if: steps.resolve.outputs.manual == 'true'
         env:
           GH_TOKEN: ${{ secrets.UPSTREAM_BUMP_TOKEN || secrets.GITHUB_TOKEN }}
+          BASE: ${{ github.event.repository.default_branch }}
+          CHANGED: ${{ steps.resolve.outputs.changed }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
+          note="Refreshed by the nightly upstream pin check ([run $RUN_ID]($RUN_URL))."
+          if [ "$CHANGED" = "true" ]; then
+            pr="$(gh pr list --head "$BRANCH" --base "$BASE" --state open --json number --jq '.[0].number')"
+            if [ -n "$pr" ]; then note="$note This run's automatic bumps are in #$pr."; fi
+          fi
+          { printf '_%s_\n\n' "$note"; cat /tmp/issue.md; } > /tmp/issue-body.md
           gh label create dependencies --description "Dependency and pin updates" --color 0366d6 --force >/dev/null
           existing="$(gh issue list --search "\"$ISSUE_TITLE\" in:title" --state open --json number,title \
                       --jq ".[] | select(.title == \"$ISSUE_TITLE\") | .number" | head -1)"
           if [ -n "$existing" ]; then
-            gh issue edit "$existing" --body-file /tmp/summary.md
+            gh issue edit "$existing" --body-file /tmp/issue-body.md
             echo "Refreshed issue #$existing"
           else
-            gh issue create --title "$ISSUE_TITLE" --body-file /tmp/summary.md --label dependencies
+            gh issue create --title "$ISSUE_TITLE" --body-file /tmp/issue-body.md --label dependencies
           fi
 
       - name: Close the tracking issue once no pin needs a manual decision
