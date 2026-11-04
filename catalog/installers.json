@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_on": "2026-11-03",
+  "checked_on": "2026-11-04",
   "qualification": "Recipe pins, not verified laptop installations. Transitive Python dependencies are captured with pip freeze after installation; not a fully hashed dependency lock.",
   "harness_packages": [
     "psutil==7.2.2"
@@ -35,18 +35,18 @@
     },
     "ollama": {
       "kind": "archive",
-      "version": "0.40.13",
+      "version": "0.40.14",
       "assets": {
         "linux": {
-          "url": "https://github.com/ollama/ollama/releases/download/v0.40.13/ollama-linux-amd64.tar.zst",
-          "sha256": "c9490e0f520be21271d969e6703f012268b1d39f8b70dd58854e5bfef7a75bb6",
-          "bytes": 1525346571,
+          "url": "https://github.com/ollama/ollama/releases/download/v0.40.14/ollama-linux-amd64.tar.zst",
+          "sha256": "993e83d08c3d13d17c55009a3e2664c8a25445e644aec3a68bef5abb6abce67d",
+          "bytes": 1525335029,
           "filename": "ollama-linux-amd64.tar.zst"
         },
         "windows": {
-          "url": "https://github.com/ollama/ollama/releases/download/v0.40.13/ollama-windows-amd64.zip",
-          "sha256": "7afa38624fa62ee5d8293422d0ab084c1bb4603134c7f4dafce11a033b57cc19",
-          "bytes": 1601969847,
+          "url": "https://github.com/ollama/ollama/releases/download/v0.40.14/ollama-windows-amd64.zip",
+          "sha256": "65d68cade6cf6375f398b518224f8c8a15e062387f38cf477abfc848de7e7e29",
+          "bytes": 1601954968,
           "filename": "ollama-windows-amd64.zip"
         }
       }
