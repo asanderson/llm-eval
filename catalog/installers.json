@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_on": "2026-11-04",
+  "checked_on": "2026-11-05",
   "qualification": "Recipe pins, not verified laptop installations. Transitive Python dependencies are captured with pip freeze after installation; not a fully hashed dependency lock.",
   "harness_packages": [
     "psutil==7.2.2"
@@ -17,7 +17,7 @@
     "llama.cpp": {
       "kind": "cmake",
       "repository": "https://github.com/ggml-org/llama.cpp.git",
-      "revision": "8642541b255bfb5dc39cd351a178be09013a55d6"
+      "revision": "cd959bae99ff4bed22bef2604f45241c09bbb8c8"
     },
     "ik_llama.cpp": {
       "kind": "cmake",
@@ -76,7 +76,7 @@
       "packages": [
         "transformers==5.22.1",
         "accelerate==1.15.0",
-        "sentencepiece==0.2.2"
+        "sentencepiece==0.2.3"
       ]
     },
     "airllm": {
@@ -87,7 +87,7 @@
         "airllm==4.0.0",
         "transformers==5.22.1",
         "accelerate==1.15.0",
-        "sentencepiece==0.2.2"
+        "sentencepiece==0.2.3"
       ]
     },
     "vllm": {
@@ -103,8 +103,8 @@
     },
     "lmstudio": {
       "kind": "lmstudio",
-      "version": "0.4.27+2",
-      "release_date": "2026-10-29",
+      "version": "0.4.28+2",
+      "release_date": "2026-10-31",
       "installation": "operator-installed; setup verifies the lms CLI and launch verifies the running app/daemon version",
       "cli_paths": {
         "linux": "~/.lmstudio/bin/lms",
@@ -113,15 +113,15 @@
       "winget_id": "ElementLabs.LMStudio",
       "assets": {
         "windows": {
-          "url": "https://installers.lmstudio.ai/win32/x64/0.4.27-2/LM-Studio-0.4.27-2-x64.exe",
-          "sha256": "6689fb083d0309692d0b3f8d741ec215098d5c2d2321019bdacc3d1628cff189",
-          "filename": "LM-Studio-0.4.27-2-x64.exe",
-          "sha256_source": "https://github.com/microsoft/winget-pkgs/blob/master/manifests/e/ElementLabs/LMStudio/0.4.27%2B2/ElementLabs.LMStudio.installer.yaml"
+          "url": "https://installers.lmstudio.ai/win32/x64/0.4.28-2/LM-Studio-0.4.28-2-x64.exe",
+          "sha256": "442aa5cdb5b7d0a6693ba6d11e1663838afb2cdd8f5bfcc538cad23f00f0cf68",
+          "filename": "LM-Studio-0.4.28-2-x64.exe",
+          "sha256_source": "https://github.com/microsoft/winget-pkgs/blob/master/manifests/e/ElementLabs/LMStudio/0.4.28%2B2/ElementLabs.LMStudio.installer.yaml"
         },
         "linux": {
-          "url": "https://installers.lmstudio.ai/linux/x64/0.4.27-2/LM-Studio-0.4.27-2-x64.AppImage",
+          "url": "https://installers.lmstudio.ai/linux/x64/0.4.28-2/LM-Studio-0.4.28-2-x64.AppImage",
           "sha256": null,
-          "filename": "LM-Studio-0.4.27-2-x64.AppImage",
+          "filename": "LM-Studio-0.4.28-2-x64.AppImage",
           "sha256_source": "vendor publishes no checksum; record the observed hash in placement_notes"
         }
       },
