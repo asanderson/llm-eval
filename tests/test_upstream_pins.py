@@ -252,6 +252,14 @@ class BumpTest(unittest.TestCase):
         self.assertIn('no GitHub release', summary)
         self.assertIn('Needs a manual decision', summary)
         self.assertIn(f'- `README.md`: still names `{PINNED_LMSTUDIO}`', summary)
+        self.assertIn('### Files rewritten', summary)
+        # The tracking issue carries the same table and decisions, not the PR's diff sections.
+        issue = up.markdown_summary(result, issue=True)
+        self.assertIn(f"| ollama | `{PLATFORMS['ollama']['version']}` | `{net.ollama_next}` | bumped |", issue)
+        self.assertIn('| livebench |', issue)
+        self.assertIn('Needs a manual decision', issue)
+        self.assertNotIn('Files rewritten', issue)
+        self.assertNotIn('still names', issue)
 
     def test_nothing_newer_leaves_every_file_alone(self):
         root = fixture_root()

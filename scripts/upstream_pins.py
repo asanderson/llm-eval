@@ -3,7 +3,9 @@
 
   python3 scripts/upstream_pins.py                       report only
   python3 scripts/upstream_pins.py --apply               rewrite the catalog (and docs that spell a pin)
-  python3 scripts/upstream_pins.py --summary FILE        write a Markdown summary (the PR / issue body)
+  python3 scripts/upstream_pins.py --summary FILE        write the Markdown pull request body
+  python3 scripts/upstream_pins.py --issue-summary FILE  write the tracking-issue body (same pin table and
+                                                         decisions, without the sections about the PR's diff)
   python3 scripts/upstream_pins.py --github-output       append changed=/manual= to $GITHUB_OUTPUT
   python3 scripts/upstream_pins.py --strict              exit 1 when any resolver failed
 
@@ -474,19 +476,21 @@ def run(net: Net, root: pathlib.Path, apply: bool, today: str):
             "manual": manual, "failures": failures, "stale": stale}
 
 
-def markdown_summary(result: dict) -> str:
+def markdown_summary(result: dict, issue: bool = False) -> str:
+    """The pull request body; with issue=True the tracking-issue body, which leaves out
+    the sections that only describe the pull request's diff."""
     lines = ["## Upstream pin check", "", "| Pin | Pinned | Upstream | Result |", "|---|---|---|---|"]
     for r in result["rows"]:
         verdict = {"current": "current", "bump": "bumped" if r.changed else "bump available",
                    "manual": f"manual: {r.detail}", "failed": f"resolver failed: {r.detail}"}[r.status]
         lines.append(f"| {r.name} | `{r.pinned}` | `{r.latest or '?'}` | {verdict} |")
-    if result["touched"]:
+    if result["touched"] and not issue:
         lines += ["", "### Files rewritten", ""] + [f"- `{f}`" for f in result["touched"]]
         lines += ["", "Recipe pins only: the target-laptop gate (`docs/WORKFLOWS.md`) still decides whether a bump is usable.",
                   "koboldcpp hashes are computed from the downloaded assets; ollama hashes come from the release's `sha256sum.txt`."]
     if result["manual"]:
         lines += ["", "### Needs a manual decision", ""] + [f"- **{r.name}**: pinned `{r.pinned}`, upstream `{r.latest}`: {r.detail}" for r in result["manual"]]
-    if result["stale"]:
+    if result["stale"] and not issue:
         lines += ["", "### Still spells a replaced pin (refresh by hand, or a test will keep asserting the old one)", ""]
         lines += [f"- `{rel}`: still names `{old}`" for rel, old in result["stale"]]
     if result["failures"]:
@@ -497,7 +501,8 @@ def markdown_summary(result: dict) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--apply", action="store_true", help="rewrite catalog/installers.json and docs when upstream moved")
-    ap.add_argument("--summary", metavar="FILE", help="write a Markdown summary here")
+    ap.add_argument("--summary", metavar="FILE", help="write the Markdown pull request body here")
+    ap.add_argument("--issue-summary", metavar="FILE", help="write the Markdown tracking-issue body here")
     ap.add_argument("--github-output", action="store_true", help="append changed=/manual= to $GITHUB_OUTPUT")
     ap.add_argument("--strict", action="store_true", help="exit 1 if any resolver failed")
     args = ap.parse_args()
@@ -508,6 +513,8 @@ def main() -> int:
               flush=True)  # keep the table ahead of the stderr verdict in CI logs
     if args.summary:
         pathlib.Path(args.summary).write_text(markdown_summary(result), encoding="utf-8")
+    if args.issue_summary:
+        pathlib.Path(args.issue_summary).write_text(markdown_summary(result, issue=True), encoding="utf-8")
     if args.github_output and os.environ.get("GITHUB_OUTPUT"):
         with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
             fh.write(f"changed={'true' if result['applied'] else 'false'}\n")
