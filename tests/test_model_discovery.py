@@ -222,9 +222,17 @@ V1_RELEASES = ['2025-04-02', '2025-04-25', '2025-05-30', '2026-01-08', '2026-06-
 V2_RELEASES = ['20261014', NEWEST]
 
 
-def main_script(v1, v2, registry, v1_registry, weights_literal=True, before='', after=''):
-    """A bundle carrying the shapes the run reads: the code around the release lists and the averaging code are
-    copied from the real main.1e1ce12d.js (identifiers as minified there); registries and lists are the fixture's."""
+def suite_order_js(order):
+    """rn() of the real main.1e1ce12d.js, verbatim but for the list: it orders a 2.0 release's suites."""
+    return ('an=[' + ','.join(f'"{s}"' for s in order) + '];function rn(e){const t=e=>{const t=an.indexOf(e);return '
+            't<0?an.length:t},n={};return Object.keys(e||{}).sort((e,n)=>t(e)-t(n)).forEach(t=>{n[t]=e[t]}),n}')
+
+
+def main_script(v1, v2, registry, v1_registry, weights_literal=True, before='', after='',
+                suite_order=md.REVIEWED_SUITE_ORDER):
+    """A bundle carrying the shapes the run reads: the code around the release lists, the suite order and the
+    averaging code are copied from the real main.1e1ce12d.js (identifiers as minified there); registries and lists
+    are the fixture's."""
     v1_list = ','.join(f'"{d}"' for d in v1)
     v2_list = ','.join(f'"{d}"' for d in v2)
     weights = ('const kn="_overall_weights";function Nn(e){const{[kn]:t,...n}=e||{},a={};return Object.entries(t||{})'
@@ -233,7 +241,8 @@ def main_script(v1, v2, registry, v1_registry, weights_literal=True, before='', 
     return (
         '/*! For license information please see main.1e1ce12d.js.LICENSE.txt */(()=>{var e={766:function(e){e.exports={}}};'
         + before
-        + 'const mn=(e,t,n)=>{if(!t)return"-";const a=t.map(t=>parseFloat(e[t])).filter(e=>!isNaN(e)),r=a.length>0?'
+        + 'const tn={Qwen:"#7C3AED"},nn=e=>tn[e]||"#7A8AA8",' + (suite_order_js(suite_order) if suite_order else 'an=[]')
+        + ';const mn=(e,t,n)=>{if(!t)return"-";const a=t.map(t=>parseFloat(e[t])).filter(e=>!isNaN(e)),r=a.length>0?'
           'a.reduce((e,t)=>e+t,0)/a.length:NaN;return isNaN(r)?"-":n?r.toFixed(n):r},gn={' + ','.join(registry) + '},vn={};'
         + f'Qt={{tablejoin:"table join"}},Yt=[{v2_list}],Jt="undefined"!==typeof window&&/^\\/new(\\/(index\\.html)?)?$/'
           '.test(window.location.pathname)?[...Yt]:Yt,Xt=e=>`${e.slice(0,4)}-${e.slice(4,6)}-${e.slice(6,8)}`,'
@@ -291,6 +300,7 @@ class World:
         self.v1, self.v2 = list(V1_RELEASES), list(V2_RELEASES)
         self.registry, self.v1_registry = list(FIXTURE_REGISTRY), list(FIXTURE_V1_REGISTRY)
         self.weights_literal, self.script_before, self.script_after = True, '', ''
+        self.suite_order = md.REVIEWED_SUITE_ORDER  # the list rn() orders the suites by; None leaves it out
         self.script_bytes = None              # bytes replacing the generated main script
         self.index, self.manifest = index_html(), asset_manifest()
         self.files = {                        # livebench.ai path (no leading slash) -> bytes; anything else is 404
@@ -372,7 +382,8 @@ class World:
     # -- the site ----------------------------------------------------------------------------
     def site(self):
         script = self.script_bytes if self.script_bytes is not None else main_script(
-            self.v1, self.v2, self.registry, self.v1_registry, self.weights_literal, self.script_before, self.script_after)
+            self.v1, self.v2, self.registry, self.v1_registry, self.weights_literal, self.script_before, self.script_after,
+            self.suite_order)
         return {'': self.index, 'asset-manifest.json': self.manifest, SCRIPT: script, **self.files}
 
     def net(self):
@@ -475,6 +486,16 @@ class Base(unittest.TestCase):
 
     def root(self, world, **kw):
         return world.root(self.tmp(), **kw)
+
+    @staticmethod
+    def catalogue(root, *models):
+        """Append (id, repo, upstream_metadata or None) entries to the fixture root's catalog/models.json."""
+        path = root / 'catalog/models.json'
+        doc = json.loads(path.read_text(encoding='utf-8'))
+        doc['models'] += [{'id': cid, 'upstream_repo': repo, 'status': 'candidate', 'parameters_b': None,
+                           'upstream_metadata': meta} for cid, repo, meta in models]
+        path.write_text(json.dumps(doc, indent=2) + '\n', encoding='utf-8')
+        return root
 
     def run_world(self, world, *flags, root=None, previous=None, net=None, today=TODAY, env=None, **root_kw):
         root = root or self.root(world, **root_kw)
@@ -993,8 +1014,28 @@ REAL_REGISTRY = ('gn={"beam-1.0":{displayName:"Beam 1.0",organization:"Reflectio
                  'organization:"Z.AI",displayName:"GLM-5.3",openweight:!0,reasoner:!0,huggingface:"https://huggingface.co/'
                  'zai-org/GLM-5.3"}},ma={};')
 
+# rn() of the real bundle with what precedes it, verbatim from main.1e1ce12d.js.
+REAL_SUITE_ORDER = ('Muse:"#0D9488"},nn=e=>tn[e]||"#7A8AA8",an=["Long Agentic","Design","Coding","Browser","Data Analysis",'
+                    '"Research","Reasoning"];function rn(e){const t=e=>{const t=an.indexOf(e);return t<0?an.length:t},n={};'
+                    'return Object.keys(e||{}).sort((e,n)=>t(e)-t(n)).forEach(t=>{n[t]=e[t]}),n}const on={Design:"Dsn"}')
+
 
 class SiteTest(Base):
+    def test_the_suite_order_of_the_real_bundle(self):
+        self.assertEqual(md.parse_suite_order(REAL_SUITE_ORDER), list(md.REVIEWED_SUITE_ORDER))
+        renamed = REAL_SUITE_ORDER.replace('an', 'Q$').replace('rn(', 'k9(')
+        self.assertEqual(md.parse_suite_order(renamed), list(md.REVIEWED_SUITE_ORDER))   # minified names change
+        moved = REAL_SUITE_ORDER.replace('"Long Agentic","Design"', '"Design","Long Agentic"')
+        self.assertEqual(md.parse_suite_order(moved)[:2], ['Design', 'Long Agentic'])
+        twice = REAL_SUITE_ORDER + ';' + REAL_SUITE_ORDER.replace('an', 'bn').replace('"Design",', '')
+        for text in ('', REAL_SUITE_ORDER.replace('t<0?an.length:t', 't'), twice):
+            with self.subTest(text=text[:40]):
+                self.assertIsNone(md.parse_suite_order(text))
+        self.assertEqual(md.parse_suite_order(REAL_SUITE_ORDER + ';' + REAL_SUITE_ORDER), list(md.REVIEWED_SUITE_ORDER))
+        # unknown suites go last in their own order, as the site's stable sort leaves them
+        self.assertEqual(md.site_order(['Zeta', 'Reasoning', 'Alpha', 'Long Agentic'], md.REVIEWED_SUITE_ORDER),
+                         ['Long Agentic', 'Reasoning', 'Zeta', 'Alpha'])
+
     def test_the_release_lists_of_the_real_bundle(self):
         timeline = md.parse_release_lists(REAL_LISTS)
         self.assertEqual([r.id for r in timeline if r.generation == 'v1'][-3:], ['2025-12-23', '2026-01-08', '2026-06-25'])
@@ -1035,10 +1076,12 @@ class SiteTest(Base):
         self.assertEqual((beam.openweight, beam.link), (True, 'reflection/Beam-1.0-501B-A23B'))
         fable = reg.get('claude-fable-5.1')
         self.assertEqual((fable.openweight, fable.link), (False, None))      # no openweight key: LiveBench lists it closed
-        variant = reg.get('claude-sonnet-5-5-max-effort')
-        self.assertEqual((variant.openweight, variant.variant_of), (False, 'claude-sonnet-5-5-xhigh-effort'))
         self.assertEqual(reg.counts(), (2, 1, 1))
         self.assertIsNone(reg.get('no-such-id'))
+        self.assertIsNone(reg.get('glm-5.3'))          # only the v1 registry holds it: a 2.0 row never borrows it
+        reg.rank(['claude-sonnet-5-5-max-effort', 'glm-5.3'])
+        variant = reg.get('claude-sonnet-5-5-max-effort')
+        self.assertEqual((variant.openweight, variant.variant_of), (False, 'claude-sonnet-5-5-xhigh-effort'))
 
     def test_registry_precedence_variants_and_links(self):
         js = ('gn={"minimax-m3":{openweight:!0},"open-v":{openweight:!0,huggingface:"https://huggingface.co/Acme/Open-V",'
@@ -1046,16 +1089,38 @@ class SiteTest(Base):
               '"odd-link":{openweight:!0,huggingface:"https://huggingface.co/Acme/Odd/tree/main"}};'
               'fa={"minimax-m3":{displayName:"MiniMax M3"},"only-v1":{openweight:!0}};')
         reg = md.parse_registries(js)
-        reg.rank(['minimax-m3', 'open-v', 'odd-link'])            # the 2.0 release's ids: the 2.0 registry first
+        reg.rank(['minimax-m3', 'open-v', 'odd-link'])            # the 2.0 release's ids: the 2.0 registry is its own
         self.assertTrue(reg.get('minimax-m3').openweight)
-        self.assertTrue(reg.get('only-v1').openweight)           # an id only the other registry holds
-        reg.rank(['minimax-m3', 'only-v1', 'x', 'y'])            # a v1 release: the v1 registry (2 of 4 ids) first
-        self.assertEqual(reg.order, [1, 0])
-        self.assertFalse(reg.get('minimax-m3').openweight)       # the v1 registry lists it closed
+        self.assertIsNone(reg.get('only-v1'))                    # an id only the other registry holds: no entry
         self.assertEqual(reg.get('open-v-max').link, 'Acme/Open-V')            # a variant inherits the link
         self.assertEqual((reg.get('open-v-closed').openweight, reg.get('open-v-closed').link), (False, 'Acme/Open-V'))
         odd = reg.get('odd-link')
         self.assertEqual((odd.link, odd.link_raw), (None, 'https://huggingface.co/Acme/Odd/tree/main'))
+        reg.rank(['minimax-m3', 'only-v1', 'x', 'y'])            # a v1 release: the v1 registry (2 of 4 ids) is its own
+        self.assertEqual(reg.order, [1, 0])
+        self.assertFalse(reg.get('minimax-m3').openweight)       # the v1 registry lists it closed
+        self.assertTrue(reg.get('only-v1').openweight)
+        self.assertIsNone(reg.get('open-v-max'))                 # a 2.0 entry never answers for a v1 row
+
+    def test_a_registry_whose_first_key_the_minifier_left_unquoted(self):
+        # The real bundle writes identifier-shaped ids unquoted (gn has inkling:{...}, fa azerogpt:{...}): a new such
+        # id sorted first must not hide the registry (every openweight mark would then lie outside it).
+        inkling = 'inkling:{displayName:"Inkling",organization:"Muse",openweight:!0,huggingface:"https://huggingface.co/muse/Inkling"},'
+        for name, js in (('identifier', REAL_REGISTRY.replace('gn={', 'gn={' + inkling)),
+                         ('number', REAL_REGISTRY.replace('fa={', 'fa={7:{displayName:"Seven",openweight:!0},'))):
+            with self.subTest(name=name):
+                reg = md.parse_registries(js)
+                self.assertIsNone(reg.problem)
+                self.assertEqual(len(reg.tables), 2)
+        reg = md.parse_registries(REAL_REGISTRY.replace('gn={', 'gn={' + inkling))
+        reg.rank(['inkling', 'beam-1.0'])
+        self.assertEqual(reg.get('inkling').link, 'muse/Inkling')
+        self.assertEqual(md.parse_registries(REAL_REGISTRY.replace('fa={', 'fa={7:{openweight:!0},')).tables[1]['7'].openweight, True)
+        # Code around a registry is passed over: only the registry itself must be plain data.
+        js = 'const M={state:{open:!0},render:function(){const gn={"a":{openweight:!0}};return gn}};'
+        reg = md.parse_registries(js)
+        self.assertIsNone(reg.problem)
+        self.assertEqual([sorted(t) for t in reg.tables], [['a']])
 
     def test_a_missing_or_unparseable_registry_is_a_problem_never_an_error(self):
         cases = {
@@ -1064,6 +1129,7 @@ class SiteTest(Base):
             'a spread': ('gn={"a":{openweight:!0,...base}};', 'does not parse'),
             'outside every registry': ('gn={"a":{openweight:!0}};function f(){return{openweight:!0}}', 'outside'),
             'never closes': ('gn={"a":{openweight:!0}', 'never closes'),
+            'an identifier key, not plain data': ('gn={a:{openweight:!0,url:n.url}};', 'does not parse'),
         }
         for name, (js, needle) in cases.items():
             with self.subTest(name=name):
@@ -1130,6 +1196,30 @@ class SiteTest(Base):
                 result = self.run_world(world)
                 self.assertEqual(result.code, 2)
                 self.assertIn('- Stage: `leaderboard site`', result.failure)
+
+    def test_the_run_adds_2_0_suites_in_the_order_the_main_script_gives(self):
+        # 472.6 / 8 = 59.075 exactly: the summation order decides the last digit (ParsingTest has the arithmetic)
+        rounding = ('zz-rounding', {'Long Agentic': 25.8, 'Reasoning': 25.3, 'Coding': 73.0, 'Browser': '',
+                                    'Data Analysis': 96.6, 'Research': 43.2, 'Design': 97.6})
+        world = World([rounding] + DEFAULT_ROWS)
+        result = self.run_world(world)
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual(result.rows['zz-rounding']['overall'], 59.08)
+        self.assertEqual(result.data['sources']['suite_order'], list(md.REVIEWED_SUITE_ORDER))
+        self.assertNotIn("the site's suite order", result.issue)
+        world.suite_order = list(SUITES)           # a deploy whose rn() keeps the categories.json order
+        result = self.run_world(world)
+        self.assertEqual(result.rows['zz-rounding']['overall'], 59.07)
+        world.suite_order = None                   # not found: the reviewed script's order, and a warning
+        result = self.run_world(world)
+        self.assertEqual((result.code, result.rows['zz-rounding']['overall']), (0, 59.08))
+        self.assertIsNone(result.data['sources']['suite_order'])
+        self.assertIn("- Warning: the site's suite order (the list its rn() sorts the suites by) was not found in "
+                      "`static/js/main.1e1ce12d.js`; overalls add the suites in the order of the reviewed script (Long "
+                      "Agentic, Design, Coding, Browser, Data Analysis, Research, Reasoning), so one can differ from "
+                      "the site's in the last digit.", result.issue)
+        result = self.run_world(world, '--release', '2026-06-25')     # a v1 release adds no suites: no warning
+        self.assertNotIn("the site's suite order", result.issue)
 
     def test_html_and_missing_release_files(self):
         world = World()
@@ -1279,6 +1369,21 @@ class ParsingTest(Base):
         self.assertEqual([(r.id, r.overall, r.rank) for r in scored], [('a', 70.0, 1), ('b', 70.0, 1)])
         # JavaScript adds left to right; Python 3.12's sum() compensates: js_mean must not
         self.assertEqual(md.js_mean([0.1] * 10), 0.9999999999999999 / 10)
+
+    def test_2_0_suites_are_added_in_the_site_s_order(self):
+        # The exact weighted mean of this row is 472.6 / 8 = 59.075. Added in the site's order (rn(): Long Agentic,
+        # Design, Coding, Browser, Data Analysis, Research, Reasoning) the sum rounds to 59.08, as the site shows;
+        # added in categories.json order it is 59.074999... and rounds to 59.07.
+        cells = '25.8,25.3,73.0,,96.6,43.2,97.6'
+        self.assertEqual(self.site_overall(cells).overall, 59.08)
+        raw = md.read_csv((self.SUITE_HEADER + 'x,' + cells + '\n').encode('utf-8'), 'u')
+        self.assertEqual(md.score_table(raw, SUITES, '2.0', WEIGHTS, display=list(SUITES))[0][0].overall, 59.07)
+        # every suite x1 takes the same order (the site's plain mean runs over Object.entries of the sorted suites):
+        # 54.1 + 50.0 + 68.0 + 80.2 added A to D is 252.3 (/ 4 = 63.075 -> 63.08), added D to A 252.29999... (-> 63.07)
+        raw = md.read_csv(b'model,a,b,c,d\nx,54.1,50.0,68.0,80.2\n', 'u')
+        cats = {'D': ['d'], 'C': ['c'], 'B': ['b'], 'A': ['a']}
+        self.assertEqual([md.score_table(raw, cats, '2.0', {}, display=order)[0][0].overall
+                          for order in (['A', 'B', 'C', 'D'], ['D', 'C', 'B', 'A'])], [63.08, 63.07])
 
     def test_recorded_evidence_reproduces_offline(self):
         overalls = []
@@ -1679,6 +1784,32 @@ class CalibrationTest(Base):
         self.assertIn(f'recorded 2.0 rows of `data/{NEWEST}/table.csv` not re-checked: livebench.ai now serves other bytes',
                       result.step)
 
+    def test_a_recorded_2_0_row_that_no_longer_reproduces_is_a_warning(self):
+        # Unequal suites, so the weights matter: the site's weighted mean is 650 / 9 = 72.22, the plain mean that
+        # notes.json describes 470 / 7 = 67.14. Same bytes, a recorded overall that differs: soft, but said.
+        spec = {'Long Agentic': 90.0, 'Coding': 90.0, 'Design': 90.0, 'Reasoning': 50.0, 'Browser': 50.0,
+                'Data Analysis': 50.0, 'Research': 50.0}
+        world = World([(r[0], spec) if r[0] == 'qwen3.8-27b-thinking' else r for r in DEFAULT_ROWS])
+
+        def recorded(overall):
+            def add(ev):
+                ev['recommendations'].append({**ev['recommendations'][0], 'model_id': 'qwen38-27b',
+                                              'leaderboard_model_id': 'qwen3.8-27b-thinking', 'release': NEWEST_DATE,
+                                              'overall': overall, 'category_scores': dict(spec),
+                                              'source_table': f'https://livebench.ai/data/{NEWEST}/table.csv',
+                                              'source_sha256': hashlib.sha256(world.head_table()).hexdigest()})
+            return add
+        result = self.run_world(world, evidence=recorded(72.22))
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual(result.data['soft_calibration'][0]['status'], 'reproduced')
+        self.assertNotIn('do not reproduce', result.step)
+        result = self.run_world(world, evidence=recorded(67.14))
+        self.assertEqual((result.code, result.outputs['complete']), (0, 'true'), result.failure)
+        self.assertEqual(result.data['soft_calibration'], [{'table': f'data/{NEWEST}/table.csv', 'rows': 1, 'status': 'differs'}])
+        self.assertIn(f'- `data/{NEWEST}/table.csv` (2.0, soft): 1 recorded rows, differs.', result.step)
+        self.assertIn(f'recorded 2.0 rows of `data/{NEWEST}/table.csv` do not reproduce: `qwen3.8-27b-thinking: overall '
+                      '72.220000, recorded 67.14`', result.step)
+
     def test_hf_anchors(self):
         result = self.run_world(World())
         self.assertEqual([a['class'] for a in result.data['anchors']], ['float', 'packed', 'packed', 'float'])
@@ -1800,7 +1931,12 @@ class ReleaseDiscoveryTest(Base):
                 result = self.run_world(world, '--release', flag)
                 self.assertEqual(result.code, 0, result.failure)
                 self.assertEqual(result.data['release']['id'], rid)
-                self.assertIn('is analysed because --release named it', result.issue)
+                self.assertIn('is analysed because --release named it (a forced run never touches the tracking issue)',
+                              result.issue)
+                # Reported (issue body, step summary, artifact), but never offered to the issue steps: the issue
+                # tracks the newest release, and an older release's marker would re-announce every entry next night.
+                self.assertTrue(result.data['complete'])
+                self.assertEqual(result.outputs, {'complete': 'false', 'reportable': 'false', 'new': 'false'})
         result = self.run_world(world, '--release', '2026-06-25')
         self.assertEqual(result.data['release']['generation'], 'v1')
         self.assertIn('the two-level mean', result.issue)
@@ -1882,6 +2018,45 @@ class ListingTest(Base):
         self.assertEqual(result.code, 0)
         self.assertIn('matcher canary 3/4', result.issue)
         self.assertIn('matcher canary: `glm-4.5-air` is now ambiguous', result.issue)
+
+    def test_the_canary_resolves_a_linked_id_as_the_walk_does(self):
+        # The owner catalogued a registry-linked candidate (deepseek-v4-flash -> its -0731 checkpoint) and recorded the
+        # stanza; strict matching alone would name the sibling DeepSeek-V4-Flash. The walk follows the link, so must
+        # the canary: no exit 2 every night.
+        def world_with(link):
+            world = World([('deepseek-v4-flash', 95.0)] + DEFAULT_ROWS)
+            if link:
+                world.registry.append(entry('deepseek-v4-flash', 'DeepSeek', True, hf(link)))
+            world.listings['deepseek-ai'] += ['deepseek-ai/DeepSeek-V4-Flash', 'deepseek-ai/DeepSeek-V4-Flash-0731']
+            return world
+
+        def run(world):
+            def add(ev):
+                ev['recommendations'].append({**ev['recommendations'][0], 'model_id': 'deepseek-v4-flash-0731',
+                                              'leaderboard_model_id': 'deepseek-v4-flash', 'release': NEWEST_DATE,
+                                              'overall': 95.0, 'category_scores': {k: 95.0 for k in SUITES},
+                                              'source_table': f'https://livebench.ai/data/{NEWEST}/table.csv',
+                                              'source_sha256': hashlib.sha256(world.head_table()).hexdigest()})
+            root = self.catalogue(self.root(world, evidence=add),
+                                  ('deepseek-v4-flash-0731', 'deepseek-ai/DeepSeek-V4-Flash-0731', None))
+            return self.run_world(world, root=root)
+        result = run(world_with('deepseek-ai/DeepSeek-V4-Flash-0731'))
+        self.assertEqual(result.code, 0, result.failure)
+        flash = next(c for c in result.data['canary'] if c['id'] == 'deepseek-v4-flash')
+        self.assertEqual((flash['result'], flash['tier']), ('deepseek-ai/DeepSeek-V4-Flash-0731', 'linked'))
+        self.assertIn("- `deepseek-v4-flash` → `deepseek-ai/DeepSeek-V4-Flash-0731` (LiveBench's registry link)", result.step)
+        self.assertEqual(result.outcome('deepseek-v4-flash'), 'known:evidence')
+        self.assertNotIn('matcher canary: ', result.issue)
+        # a link that disagrees with the catalog is LiveBench's data, not the matcher: a warning, the evidence decides
+        result = run(world_with('deepseek-ai/DeepSeek-V4-Flash'))
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertIn("- Warning: matcher canary: LiveBench's registry links `deepseek-ai/DeepSeek-V4-Flash` for "
+                      "`deepseek-v4-flash`; the catalog records `deepseek-ai/DeepSeek-V4-Flash-0731`", result.issue)
+        self.assertEqual(result.outcome('deepseek-v4-flash'), 'known:evidence')
+        # without a link the strict matcher still decides, and naming the sibling still fails the run
+        result = run(world_with(None))
+        self.assertEqual(result.code, 2)
+        self.assertIn('the strict matcher names deepseek-ai/DeepSeek-V4-Flash', result.failure)
 
 
 # --- the walk ------------------------------------------------------------------------------------
@@ -1970,6 +2145,30 @@ class WalkTest(Base):
         self.assertIn('**Partial rows (1)**', result.issue)
         self.assertIn('- `hi-partial`: partial (2 of 7 categories), partial mean 95.00 (not an overall)', result.issue)
         self.assertNotIn('lo-partial', result.issue)
+
+    def test_2_0_weights_decide_the_ranking_end_to_end(self):
+        # a: strong where the 20261025 weights are (Long Agentic x2, Coding and Design x1.5); b: everywhere else.
+        heavy, light = ('Long Agentic', 'Coding', 'Design'), ('Reasoning', 'Browser', 'Data Analysis', 'Research')
+        a = ('zz-weighted-a', {**{k: 90.0 for k in heavy}, **{k: 50.0 for k in light}})
+        b = ('zz-weighted-b', {**{k: 50.0 for k in heavy}, **{k: 90.0 for k in light}})
+        world = World([a, b] + DEFAULT_ROWS)
+        world.files['data/20261014/table.csv'] = table(SUITES, [a, b] + DEFAULT_ROWS)       # 20261014: no weights
+        result = self.run_world(world)
+        self.assertEqual(result.code, 0, result.failure)
+        # (90*2 + 50 + 90*1.5 + 50 + 50 + 50 + 90*1.5) / 9 = 72.22 at rank 6; (50*2 + 90 + ...) / 9 = 67.78 at rank 10
+        self.assertEqual([(result.rows[k]['overall'], result.rows[k]['rank']) for k in ('zz-weighted-a', 'zz-weighted-b')],
+                         [(72.22, 6), (67.78, 10)])
+        self.assertIn("- Overall per the site's averaging code (reviewed 2026-11-08): weighted mean of the suites with a "
+                      "score; weights `Long Agentic` ×2, `Coding` ×1.5, `Design` ×1.5, the rest ×1; rounded to 2 "
+                      "decimals as the site shows it.", result.issue)
+        result = self.run_world(world, '--release', '20261014')
+        self.assertEqual(result.code, 0, result.failure)
+        # every suite x1: 470 / 7 = 67.14 and 510 / 7 = 72.86, the other way round
+        self.assertEqual([(result.rows[k]['overall'], result.rows[k]['rank']) for k in ('zz-weighted-b', 'zz-weighted-a')],
+                         [(72.86, 6), (67.14, 10)])
+        self.assertIn("- Overall per the site's averaging code (reviewed 2026-11-08): mean of the suites with a score "
+                      "(every suite ×1); rounded to 2 decimals as the site shows it.", result.issue)
+        self.assertNotIn('two-level mean', result.issue)
 
     def test_a_2_0_row_with_missing_suites_is_scored_from_the_suites_it_has(self):
         # 2.0 (the site's rule): missing suites are left out; only a row with no suite score at all has no overall.
@@ -2147,6 +2346,32 @@ class RegistryHintTest(Base):
         self.assertNotIn('Qwen/Qwen4-Rejected', result.net.infos_fetched())       # hf: decisions apply before model info
         self.assertIn('zai-org/GLM-5.9-Gone', result.net.infos_fetched())
 
+    def test_a_renamed_linked_repository_is_checked_under_the_name_hugging_face_answers(self):
+        # Model info for a link LiveBench spells with an old name answers with the repository's current id: the
+        # catalog, hf: decisions and the one-place-per-repository rule apply to that id, as for an alias target.
+        world = World([('qwen-fixture-27b', 97.0), ('qwenx', 96.0), ('qwen5-preview', 95.0), ('qwen5-9b', 94.0)] + DEFAULT_ROWS)
+        world.registry += [entry('qwen-fixture-27b', 'Qwen', True, hf('Qwen/Qwen3.8-27B-Preview')),
+                           entry('qwenx', 'Qwen', True, hf('Qwen/QwenX-Old')),
+                           entry('qwen5-preview', 'Qwen', True, hf('Qwen/Qwen5-9B-Preview'))]
+        world.add_model('Qwen/Qwen3.8-27B-Preview', canonical='Qwen/Qwen3.8-27B', listed=False)   # catalogued
+        world.add_model('Qwen/QwenX-Old', canonical='Qwen/QwenX-New', listed=False)
+        world.add_model('Qwen/Qwen5-9B-Preview', canonical='Qwen/Qwen5-9B', total=9_000_000_000, listed=False)
+        world.add_model('Qwen/Qwen5-9B', total=9_000_000_000)
+        rejected = {'key': 'hf:Qwen/QwenX-New', 'decision': 'rejected', 'reason': 'Reviewed by the owner',
+                    'decided_on': '2026-10-01'}
+        result = self.run_world(world, decisions=[rejected])
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual({k: result.outcome(k) for k in ('qwen-fixture-27b', 'qwenx', 'qwen5-preview', 'qwen5-9b')},
+                         {'qwen-fixture-27b': 'known:catalog', 'qwenx': 'decided:rejected', 'qwen5-preview': 'candidate',
+                          'qwen5-9b': 'variant:candidate'})
+        self.assertEqual([result.rows[k]['repo'] for k in ('qwen-fixture-27b', 'qwenx', 'qwen5-preview')],
+                         ['Qwen/Qwen3.8-27B', 'Qwen/QwenX-New', 'Qwen/Qwen5-9B'])
+        self.assertEqual(result.rows['qwen5-9b']['variant_of'], 'qwen5-preview')      # one place for one repository
+        self.assertIn('not matched by name; org `Qwen` is an allowlisted publisher org via prefix `qwen`; Hugging Face '
+                      'answers `Qwen/Qwen5-9B-Preview` as `Qwen/Qwen5-9B` (renamed); size token `9b`', result.issue)
+        self.assertIn({'key': 'hf:Qwen/Qwen5-9B', 'decision': 'rejected', 'reason': 'TODO', 'decided_on': TODAY,
+                       'release': NEWEST_DATE}, snippets(result.issue))
+
     def test_a_link_outside_the_publisher_orgs_is_never_a_candidate(self):
         world = World([('beam-1.0', 95.0), ('qwen-x-1', 94.0), ('qwen-x-2', 93.0), ('qwen-x-3', 92.0)] + DEFAULT_ROWS)
         world.registry += [entry('beam-1.0', 'Reflection AI', True, hf('reflection/Beam-1.0-501B-A23B'), effort='"max"'),
@@ -2195,6 +2420,17 @@ class RegistryHintTest(Base):
         self.assertIn('strict match stepfun-ai/Step-Closed: info:private', result.rows['step-closed']['note'])
         self.assertIn('Qwen/Qwen4-Closed', result.net.infos_fetched())    # a strict match is verified, as a decision's
 
+    def test_registries_whose_first_id_is_unquoted_are_used(self):
+        world = World()
+        world.registry.insert(0, 'inkling:{displayName:"Inkling",organization:"Muse",url:"https://example.org/",openweight:!0}')
+        world.v1_registry.insert(0, 'azerogpt:{displayName:"AzeroGPT",organization:"Fixture Lab",openweight:!0}')
+        result = self.run_world(world)
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertNotIn("model registry is not used", result.issue)
+        self.assertEqual(result.data['sources']['registry']['entries'], [5, 4])
+        self.assertEqual(result.rows['gemma-4-31b-it']['registry']['link'], 'google/gemma-4-31B-it')
+        self.assertNotIn('google', result.net.authors())          # the link is still read: no listing needed
+
     def test_a_missing_or_unparseable_registry_falls_back_to_the_name_rules(self):
         for registry, needle in (([], '`no model registry (no openweight:!0 entry) in the main script`'),
                                  (['"x":{openweight:!0,url:n.url}'], 'does not parse')):
@@ -2220,8 +2456,31 @@ class RegistryHintTest(Base):
         self.assertEqual(result.code, 0, result.failure)
         self.assertEqual(result.outcome('minimax-m3'), 'candidate')          # matched by name, as an open-weight entry
         self.assertEqual(result.data['sources']['registry']['order'], [0, 1])
-        self.assertIn('LiveBench model registry: 5 entries holding 5 of the release\'s 25 ids, 4 open weight, 2 with a '
-                      'Hugging Face link', result.issue)
+        self.assertIn('LiveBench model registry: 5 entries holding 5 of the release\'s 25 ids (the site shows only '
+                      'those 5 rows, so its ranks can differ), 4 open weight, 2 with a Hugging Face link', result.issue)
+
+    def test_a_row_never_takes_the_other_generation_s_registry_entry(self):
+        # v1 2026-06-25 lists deepseek-v4-flash; the v1 registry has no entry for it, the 2.0 one links its 0731
+        # checkpoint. The site shows that v1 row with no registry entry (in fact not at all): the 0731 link must not
+        # attribute June's scores to the 0731 repository, nor merge the row into the real 0731 row's.
+        world = World()
+        world.registry.append(entry('deepseek-v4-flash', 'DeepSeek', True, hf('deepseek-ai/DeepSeek-V4-Flash-0731')))
+        world.v1_registry += [entry('deepseek-v4-flash-0731', 'DeepSeek', True, hf('deepseek-ai/DeepSeek-V4-Flash-0731')),
+                              entry('qwen3.8-27b-thinking', 'Qwen', True)]
+        world.files['v1/table_2026_06_25.csv'] = table(CATS_2026, [('deepseek-v4-flash', 80.0), ('deepseek-v4-flash-0731', 79.0),
+                                                                   ('glm-5.3', 78.0), ('qwen3.8-27b-thinking', 77.0)] + FILLERS)
+        world.add_model('deepseek-ai/DeepSeek-V4-Flash', total=40_000_000_000)
+        world.add_model('deepseek-ai/DeepSeek-V4-Flash-0731', total=40_000_000_000)
+        world.add_model('zai-org/GLM-5.3', total=750_000_000_000)
+        result = self.run_world(world, '--release', '2026-06-25')
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual(result.data['sources']['registry']['order'], [1, 0])     # 3 of the table's ids: its own
+        flash, linked = result.rows['deepseek-v4-flash'], result.rows['deepseek-v4-flash-0731']
+        self.assertEqual((flash['outcome'], flash['repo'], flash['match']['tier']), ('candidate', 'deepseek-ai/DeepSeek-V4-Flash', 'exact'))
+        self.assertIsNone(flash.get('registry'))
+        self.assertEqual((linked['outcome'], linked['repo'], linked['match']['tier']),
+                         ('candidate', 'deepseek-ai/DeepSeek-V4-Flash-0731', 'linked'))
+        self.assertNotIn('its registry entry for `deepseek-v4-flash`)', result.issue)
 
 
 class NoticeTest(Base):
@@ -2488,6 +2747,38 @@ class RoundTripTest(Base):
         self.assertTrue(second.comment.startswith('No unreviewed model among the 10 best entries'))
         self.assertIn('Reviewed: architecture not yet supported', second.issue)
 
+    def test_a_2_0_evidence_stanza_with_a_missing_suite_parses_and_reproduces(self):
+        # A 2.0 row with an n/a and a blank suite is scored from the others and can be a candidate. Its stanza, filled
+        # in as the issue says, must be valid evidence that the next run re-checks: no null score, no crash.
+        spec = {**{name: 70.0 for name in SUITES}, 'Long Agentic': 'n/a', 'Browser': ''}
+        world = World([('qwen4-80b', spec)] + DEFAULT_ROWS)
+        world.add_model('Qwen/Qwen4-80B', total=80_400_000_000)
+        first = self.run_world(world)
+        self.assertEqual(first.code, 0, first.failure)
+        self.assertEqual(first.outcome('qwen4-80b'), 'candidate')
+        found = snippets(first.issue)
+        stanza = next(s for s in found if 'leaderboard_model_id' in s)
+        meta = next(s for s in found if set(s) == {'id', 'sha', 'gated', 'safetensors'})
+        self.assertEqual(stanza['category_scores'], {k: 70.0 for k in SUITES if k not in ('Long Agentic', 'Browser')})
+        self.assertEqual(stanza['overall'], 70.0)
+        self.assertIn('`category_scores` leaves out `Long Agentic`, `Browser`: the row has no score there, and the '
+                      'overall averages the suites it has.', first.issue)
+
+        def root_with(scores):
+            def add(ev):
+                ev['recommendations'].append({**stanza, 'model_id': 'qwen4-80b-fixture', 'category_scores': scores})
+            return self.catalogue(self.root(world, evidence=add), ('qwen4-80b-fixture', 'Qwen/Qwen4-80B', meta))
+        second = self.run_world(world, root=root_with(stanza['category_scores']))
+        self.assertEqual(second.code, 0, second.failure)
+        self.assertEqual(second.data['soft_calibration'], [{'table': f'data/{NEWEST}/table.csv', 'rows': 1, 'status': 'reproduced'}])
+        self.assertEqual(second.outcome('qwen4-80b'), 'known:evidence')
+        self.assertNotIn('do not reproduce', second.step)
+        # A recorded score for a suite the row has no score in is a soft mismatch, never a crash (exit 3).
+        third = self.run_world(world, root=root_with({**stanza['category_scores'], 'Long Agentic': 70.0}))
+        self.assertEqual(third.code, 0, third.failure)
+        self.assertEqual(third.data['soft_calibration'][0]['status'], 'differs')
+        self.assertIn('qwen4-80b: long agentic has no score in the table, recorded 70.000000', third.step)
+
 
 class FailureTest(Base):
     PREVIOUS = ('_Refreshed by the nightly model discovery ([run 1](https://github.com/o/r/actions/runs/1))._\n\n'
@@ -2546,7 +2837,8 @@ class FailureTest(Base):
         for needle in ('- page https://livebench.ai/: HTTP 200, content-type `text/html; charset=utf-8`',
                        'files["main.js"] `./static/js/main.1e1ce12d.js`',
                        '- main script `static/js/main.1e1ce12d.js` (agrees with index.html)', 'reviewed script '
-                       '`static/js/main.1e1ce12d.js` (the same); `"_overall_weights"` literal present',
+                       '`static/js/main.1e1ce12d.js` (the same); `"_overall_weights"` literal present; suite order '
+                       '`Long Agentic, Design, Coding, Browser, Data Analysis, Research, Reasoning` (as reviewed)',
                        '- v1 release list: 5 releases: `2025-04-02, 2025-04-25, 2025-05-30, 2026-01-08, 2026-06-25`',
                        '- 2.0 release list: 2 releases: `20261014, 20261025`',
                        '- model registry 1: 4 entries (+0 variants), 3 with openweight, 2 of them with a huggingface link',
@@ -2648,7 +2940,8 @@ class WorkflowTest(unittest.TestCase):
             self.assertNotIn('pull_request', cond)
             self.assertIn("github.event_name == 'schedule'", cond)
             self.assertIn("(github.event_name == 'push' && github.ref == 'refs/heads/main')", cond)
-            self.assertIn("(github.event_name == 'workflow_dispatch' && inputs.update_issue)", cond)
+            # a forced release never touches the issue (the script also writes complete=false for one)
+            self.assertIn("(github.event_name == 'workflow_dispatch' && inputs.update_issue && inputs.release == '')", cond)
             self.assertIn("steps.discover.outputs.complete == 'true'", cond)
         streak = self.block('Report repeated failures in the issue')
         self.assertIn("if: failure() && steps.discover.outcome == 'failure' && github.event_name == 'schedule'", streak)
@@ -2703,6 +2996,7 @@ class WorkflowTest(unittest.TestCase):
         self.assertIn('type: string', release)
         self.assertIn('default: ""', release)
         self.assertIn('empty = newest', release)
+        self.assertIn('A forced release never touches the tracking issue', release)
         discover = self.block('Discover')
         # the input reaches the script through an env var, never interpolated into the shell text
         self.assertIn("RELEASE: ${{ github.event_name == 'workflow_dispatch' && inputs.release || '' }}", discover)

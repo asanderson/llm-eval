@@ -11,7 +11,8 @@ name: Model discovery
 # issue (GH_TOKEN in the issue steps).
 #
 # Who may touch the "LiveBench models needing a catalog decision" issue:
-# scheduled runs, pushes to main, and workflow_dispatch with update_issue.
+# scheduled runs, pushes to main, and workflow_dispatch with update_issue
+# and no forced release (the issue tracks the newest release).
 # Pull requests that change the pipeline run it against the real upstreams
 # (the step summary and the artifact show the result) but never touch the
 # issue; only scheduled runs count towards the repeated-failure block.
@@ -43,11 +44,11 @@ on:
         type: boolean
         default: false
       update_issue:
-        description: "Refresh or close the tracking issue"
+        description: "Refresh or close the tracking issue (never when release is set)"
         type: boolean
         default: true
       release:
-        description: "Analyse this release instead of the newest (v1 YYYY-MM-DD, 2.0 YYYYMMDD); empty = newest"
+        description: "Analyse this release instead of the newest (v1 YYYY-MM-DD, 2.0 YYYYMMDD); empty = newest. A forced release never touches the tracking issue"
         type: string
         default: ""
 
@@ -133,7 +134,7 @@ jobs:
         if: >-
           steps.discover.outputs.complete == 'true' && steps.discover.outputs.reportable == 'true' &&
           (github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-           (github.event_name == 'workflow_dispatch' && inputs.update_issue))
+           (github.event_name == 'workflow_dispatch' && inputs.update_issue && inputs.release == ''))
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUMBER: ${{ steps.issue.outputs.number }}
@@ -162,7 +163,7 @@ jobs:
           steps.discover.outputs.complete == 'true' && steps.discover.outputs.reportable == 'false' &&
           steps.issue.outputs.state == 'open' &&
           (github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-           (github.event_name == 'workflow_dispatch' && inputs.update_issue))
+           (github.event_name == 'workflow_dispatch' && inputs.update_issue && inputs.release == ''))
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUMBER: ${{ steps.issue.outputs.number }}

@@ -105,6 +105,10 @@ RETRY_STATUSES = (429, 500, 502, 503, 504)
 SITE_TYPES = {"html": ("text/html",), "json": ("application/json",), "csv": ("text/csv",),
               "js": ("application/javascript", "text/javascript")}
 WEIGHTS_KEY = "_overall_weights"
+# The order the site adds a 2.0 release's suites in: rn() sorts them by their index in this list (unknown suites last),
+# and the averaging code sums in that order, which can move an overall across a .xx5 rounding boundary. Read from
+# the main script each run; this is the list of the reviewed script (main.1e1ce12d.js), used when it cannot be read.
+REVIEWED_SUITE_ORDER = ("Long Agentic", "Design", "Coding", "Browser", "Data Analysis", "Research", "Reasoning")
 GENERATIONS = ("v1", "2.0")
 
 HARDWARE_CONFIG = "configs/hardware/msi-raider-18-hx-ai.json"
@@ -149,8 +153,14 @@ V1_LIST_RE = re.compile(r'\[((?:"\d{4}-\d{2}-\d{2}",)*"\d{4}-\d{2}-\d{2}")\]\.ma
 V2_MAP_RE = re.compile(r'\.map\(\(?(' + JS_ID + r')\)?=>\(\{id:\1,label:' + JS_ID + r'\(\1\),gen:"v2"\}\)\)')
 V2_LIST_RE = re.compile(r'(?<![\w$.])' + JS_ID + r'=\[((?:"\d{8}",)*"\d{8}")\]')
 GEN_RE = re.compile(r'gen:"(v1|v2)"')
-REGISTRY_START_RE = re.compile(r'(?<![\w$.])' + JS_ID + r'=(?=\{"[^"\\]+":\{)')
+# An object literal assigned to an identifier whose first value is an object; the minifier leaves an identifier-shaped
+# (or numeric) key unquoted, so the first key may be quoted, an identifier or a number.
+REGISTRY_START_RE = re.compile(r'(?<![\w$.])' + JS_ID + r'=(?=\{(?:"[^"\\]+"|' + JS_ID + r'|\d+):\{)')
 OPENWEIGHT_MARK = "openweight:!0"
+# rn() of the reviewed script: X=["Long Agentic",...];function rn(e){const t=e=>{const t=X.indexOf(e);return t<0?
+# X.length:t}...: the list of quoted suite names whose index orders the suites, unknown ones last.
+SUITE_ORDER_RE = re.compile(r'(?<![\w$.])(' + JS_ID + r')=\[((?:"[^"\\]+",)*"[^"\\]+")\][;,][^;]{0,160}?(?<![\w$.])\1'
+                            r'\.indexOf\(' + JS_ID + r'\);return ' + JS_ID + r'<0\?\1\.length:')
 HF_LINK_RE = re.compile(r"^https://huggingface\.co/([A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9_.-]+)/?$")
 SIZE_RE = re.compile(r"^\d+(\.\d+)?b$")
 ACTIVE_RE = re.compile(r"^a\d+(\.\d+)?b$")
@@ -1013,6 +1023,21 @@ def parse_release_lists(text):
     return sorted(timeline, key=lambda r: r.date)
 
 
+def parse_suite_order(text):
+    """The site's list of suite names that orders a 2.0 release's suites (rn() in the reviewed script), or None when
+    the main script does not hold exactly one."""
+    found = {tuple(js_string(t) for t in re.findall(r'"[^"\\]+"', m.group(2))) for m in SUITE_ORDER_RE.finditer(text)}
+    return list(found.pop()) if len(found) == 1 else None
+
+
+def site_order(names, display):
+    """`names` as the site's rn() orders them: by their first index in `display`, the others last in their own order."""
+    index = {}
+    for i, name in enumerate(display):
+        index.setdefault(name, i)
+    return sorted(names, key=lambda n: index.get(n, len(display)))
+
+
 def balanced_end(text, start):
     """Index just past the bracket closing text[start] ('{' or '['), skipping quoted strings; None if unbalanced."""
     depth, i, quote, n = 0, start, None, len(text)
@@ -1187,7 +1212,9 @@ def registry_entries(doc):
 class Registry:
     """LiveBench's model registries in the main script (an object for the 2.0 ids and an older one for v1 ids).
 
-    A matching hint only: when it is missing or does not parse, matching uses the name rules alone."""
+    Only the analysed release's own registry is consulted, as the site consults only its generation's registry for
+    a row (and shows no row without an entry there). A matching hint only: when it is missing or does not parse,
+    matching uses the name rules alone."""
     tables: list            # [{id: RegistryEntry}] in script order
     sizes: list             # characters of each object literal
     problem: object = None  # why the registry is not used, or None
@@ -1195,16 +1222,17 @@ class Registry:
     coverage: list = dataclasses.field(default_factory=list)
 
     def rank(self, ids):
-        """Consult first the registry that holds the most of these ids (the release's own), then the others."""
+        """The release's own registry is the one that holds the most of its ids (first in `order`)."""
         ids = set(ids)
         self.coverage = [len(ids & set(t)) for t in self.tables]
         self.order = sorted(range(len(self.tables)), key=lambda k: (-self.coverage[k], k))
 
     def get(self, lb_id):
-        for k in self.order or range(len(self.tables)):
-            if lb_id in self.tables[k]:
-                return self.tables[k][lb_id]
-        return None
+        """The entry of the release's own registry, or None: the other generation's entry for the same id is never
+        used (a v1 id it lacks would otherwise borrow a 2.0 entry's link, and the reverse)."""
+        if not self.tables:
+            return None
+        return self.tables[(self.order or [0])[0]].get(lb_id)
 
     def counts(self):
         """(entries, open weight, linked) of the registry consulted first."""
@@ -1215,32 +1243,39 @@ class Registry:
 
 
 def parse_registries(text):
-    """Registry of every `X={"id":{...},...}` object literal in the main script that holds `openweight:!0` entries.
+    """Registry of every `X={"id":{...},...}` (or `X={id:{...},...}`) object literal in the main script that holds
+    `openweight:!0` entries and parses as plain data of entries.
 
-    Unparseable (a registry object that is not plain data, or an `openweight:!0` outside every object read) or
-    missing registries give Registry([], [], problem): a header warning, never a run failure."""
+    An object that holds such entries but does not parse (code around a registry, say) is passed over; only an
+    `openweight:!0` left outside every registry read makes the registry unusable: Registry([], [], problem), a header
+    warning, never a run failure (as is a script with no registry)."""
     marks = [m.start() for m in re.finditer(re.escape(OPENWEIGHT_MARK), text)]
     if not marks:
         return Registry([], [], f"no model registry (no `{OPENWEIGHT_MARK}` entry) in the main script")
-    tables, sizes, spans = [], [], []
+    tables, sizes, spans, failures = [], [], [], []
     for m in REGISTRY_START_RE.finditer(text):
         start = m.end()
+        if any(a <= start < b for a, b in spans):     # inside a registry already read
+            continue
         end = balanced_end(text, start)
         if end is None:
-            return Registry([], [], f"the object literal at offset {start} of the main script never closes")
+            failures.append((start, len(text), f"the object literal at offset {start} of the main script never closes"))
+            continue
         if OPENWEIGHT_MARK not in text[start:end]:
             continue
         try:
             tables.append(registry_entries(parse_js_literal(text[start:end])))
         except (ValueError, IndexError, OverflowError) as exc:
-            return Registry([], [], f"the registry object at offset {start} of the main script does not parse "
-                                    f"({excerpt(exc, 80)})")
+            failures.append((start, end, f"the registry object at offset {start} of the main script does not parse "
+                                         f"({excerpt(exc, 80)})"))
+            continue
         sizes.append(end - start)
         spans.append((start, end))
     outside = [p for p in marks if not any(a <= p < b for a, b in spans)]
     if outside:
-        return Registry([], [], f"{len(outside)} of {len(marks)} `{OPENWEIGHT_MARK}` entries lie outside the "
-                                "registry objects read")
+        why = next((msg for a, b, msg in failures if any(a <= p < b for p in outside)), None)
+        return Registry([], [], why or f"{len(outside)} of {len(marks)} `{OPENWEIGHT_MARK}` entries lie outside the "
+                                       "registry objects read")
     return Registry(tables, sizes)
 
 
@@ -1451,10 +1486,11 @@ def js_mean(values):
     return total / len(values)
 
 
-def score_row_site(lb_id, line, values, categories, weights):
+def score_row_site(lb_id, line, values, categories, weights, order=None):
     """A 2.0 row as the site's averaging code scores it: each suite is the mean of its columns that hold a number;
-    the overall is the weighted mean of the suites with a score (weight from _overall_weights, else 1), rounded to
-    2 decimals as toFixed(2). A row with no suite score has no overall."""
+    the overall is the weighted mean of the suites with a score (weight from _overall_weights, else 1), added in the
+    site's suite order (`order`, see site_order) and rounded to 2 decimals as toFixed(2). A row with no suite score
+    has no overall."""
     cats, missing, total = {}, 0, 0
     for name, cols in categories.items():
         present = [values[c] for c in cols if values[c] is not None]
@@ -1463,7 +1499,7 @@ def score_row_site(lb_id, line, values, categories, weights):
         cats[name] = js_mean(present) if present else None
     row = Row(lb_id, line, cats, missing_tasks=missing, total_tasks=total, unit="suites")
     num = den = 0.0
-    for name in categories:
+    for name in order or categories:
         w = weights.get(name, 1)
         if cats[name] is not None and w > 0:
             num += cats[name] * w
@@ -1489,10 +1525,11 @@ def score_row(lb_id, line, values, categories):
     return row
 
 
-def score_table(raw, categories, generation="v1", weights=None):
+def score_table(raw, categories, generation="v1", weights=None, display=REVIEWED_SUITE_ORDER):
     """Rows ranked by (overall desc, id asc) with standard competition ranks; partial rows after them.
 
-    v1: the two-level mean (a whole category missing gives no overall). 2.0: the site's weighted suite mean."""
+    v1: the two-level mean (a whole category missing gives no overall). 2.0: the site's weighted suite mean, the
+    suites added in the order the site's list `display` gives them."""
     columns = {}
     for i, h in enumerate(raw.header):
         name = h.strip()
@@ -1506,11 +1543,12 @@ def score_table(raw, categories, generation="v1", weights=None):
             if task not in columns:
                 raise ShapeError(f"task column {task} at {raw.url}", got="header " + raw.header_excerpt())
     tasks = [t for ts in categories.values() for t in ts]
+    order = site_order(categories, display)
     rows, values_seen = [], []
     for lb_id, record, line, number in raw.rows:
         values = {t: parse_cell(record[columns[t]], raw.url, line, t) for t in tasks}
         values_seen += [v for v in values.values() if v is not None]
-        row = (score_row_site(lb_id, line, values, categories, weights or {}) if generation == "2.0"
+        row = (score_row_site(lb_id, line, values, categories, weights or {}, order) if generation == "2.0"
                else score_row(lb_id, line, values, categories))
         row.number = number
         rows.append(row)
@@ -1956,7 +1994,7 @@ class Discovery:
         self.net, self.root, self.today = net, pathlib.Path(root), today
         self.forced = release              # a --release id, or None (the newest release)
         self.stage = "local inputs"
-        self.local = self.site = self.release = self.script = self.registry = None
+        self.local = self.site = self.release = self.script = self.registry = self.suite_order = None
         self.timeline = []
         self.complete = False
         self.header_notes, self.header_warnings, self.warnings, self.notices = [], [], [], []
@@ -2001,6 +2039,7 @@ class Discovery:
         self.timeline = parse_release_lists(text)
         if f'"{WEIGHTS_KEY}"' not in text:
             raise ShapeError(f'the averaging code\'s "{WEIGHTS_KEY}" literal in {path}', got="no such literal")
+        self.suite_order = parse_suite_order(text)
         self.registry = parse_registries(text)
         if self.registry.problem:
             self.header_warnings.append(f"LiveBench's model registry is not used: {md_code(self.registry.problem, EXCERPT_CAP)}"
@@ -2037,7 +2076,8 @@ class Discovery:
         table_bytes = self.site.get(entry.table_path, "csv", cap=MAX_TABLE_BYTES).body
         cat_bytes = self.site.get(entry.categories_path, "json", cap=MAX_TABLE_BYTES).body
         categories, weights, ignored = parse_categories(cat_bytes, cats_url, entry.generation)
-        scored, partial, extras = score_table(read_csv(table_bytes, table_url), categories, entry.generation, weights)
+        scored, partial, extras = score_table(read_csv(table_bytes, table_url), categories, entry.generation, weights,
+                                              self.suite_order or REVIEWED_SUITE_ORDER)
         return Release(entry, hashlib.sha256(table_bytes).hexdigest(), hashlib.sha256(cat_bytes).hexdigest(),
                        categories, weights, ignored, scored, partial, extras)
 
@@ -2052,11 +2092,17 @@ class Discovery:
                 raise ShapeError(f"the table and categories files of release {entry.label} (forced with --release)",
                                  got=f"HTTP {exc.code} for {urllib.parse.urlsplit(exc.url).path}") from None
             n = len(self.release.scored)
-            self.header_notes.append(f"release {entry.date} is analysed because --release named it"
+            self.header_notes.append(f"release {entry.date} is analysed because --release named it (a forced run never "
+                                     "touches the tracking issue)"
                                      + (f"; it has only {n} scored rows (in progress?)" if n < MIN_RELEASE_ROWS else ""))
         else:
             self.pick_newest()
         self.registry.rank([r.id for r in self.release.scored + self.release.partial])
+        if self.release.generation == "2.0" and self.suite_order is None:
+            self.header_warnings.append(
+                f"the site's suite order (the list its rn() sorts the suites by) was not found in `{self.script['path']}`; "
+                "overalls add the suites in the order of the reviewed script (" + ", ".join(REVIEWED_SUITE_ORDER)
+                + "), so one can differ from the site's in the last digit.")
         if self.release.ignored_weights:
             self.header_notes.append("weights the site's code ignores in `" + self.release.entry.categories_path + "`: "
                                      + ", ".join(f"{md_code(n)} = {w!r} ({why})" for n, w, why in self.release.ignored_weights))
@@ -2393,18 +2439,27 @@ class Discovery:
             pub, _ = self.local.publisher(rec.lb_id)
             if pub is None:
                 self.header_warnings.append(f"matcher canary: {md_code(rec.lb_id)} has no publisher entry")
-                self.canary_results.append({"id": rec.lb_id, "expected": model.repo, "result": "no publisher", "name_equal": name_equal})
+                self.canary_results.append({"id": rec.lb_id, "expected": model.repo, "result": "no publisher", "tier": None,
+                                            "name_equal": name_equal})
                 continue
-            status, found, _ = strict_match(rec.lb_id, pub.orgs, self.listing)
-            if status == "match" and found.repo.casefold() != model.repo.casefold():
-                raise ShapeError(f"matcher canary: {rec.lb_id} resolving to the catalog repo {model.repo}",
-                                 got=f"the strict matcher names {found.repo}")
-            result = found.repo if status == "match" else status
-            if status == "match":
+            # As the walk would resolve the id: the repository LiveBench's registry links (the release's own
+            # registry), else the strict matcher's answer.
+            hint = self.registry.get(rec.lb_id) if self.registry else None
+            status, found, _ = self.locate(rec.lb_id, pub, hint)
+            named = status in ("match", "outside")
+            if named and found.repo.casefold() != model.repo.casefold():
+                if found.tier != "linked":
+                    raise ShapeError(f"matcher canary: {rec.lb_id} resolving to the catalog repo {model.repo}",
+                                     got=f"the strict matcher names {found.repo}")
+                # LiveBench's data, not the matcher, disagrees; the evidence keeps deciding the row.
+                self.header_warnings.append(f"matcher canary: LiveBench's registry links {md_code(found.repo)} for "
+                                            f"{md_code(rec.lb_id)}; the catalog records {md_code(model.repo)}")
+            elif status == "match":
                 ok += name_equal
             elif name_equal:
                 self.header_warnings.append(f"matcher canary: {md_code(rec.lb_id)} is now {status} (expected {md_code(model.repo)})")
-            self.canary_results.append({"id": rec.lb_id, "expected": model.repo, "result": result, "name_equal": name_equal})
+            self.canary_results.append({"id": rec.lb_id, "expected": model.repo, "result": found.repo if named else status,
+                                        "tier": found.tier if named else None, "name_equal": name_equal})
         self.canary_score = (ok, total)
 
     # .. walk .....................................................................................
@@ -2472,7 +2527,7 @@ class Discovery:
             return self.stale(self.known(row, "evidence", model.repo, model), d)
         if kind == "deferred":
             if pub is not None:
-                status, found, _ = self.locate(row, pub, hint)
+                status, found, _ = self.locate(row.id, pub, hint)
                 known = self.known_repo(found.repo) if status in ("match", "outside") else None
                 if known:
                     return self.stale(self.known(row, known[0], found.repo, known[1], known[2], match=found), d)
@@ -2483,7 +2538,7 @@ class Discovery:
             if hint is not None and hint.link:
                 return self.linked_outside(row, hint.link, None, None)
             return Outcome(row, "look", "unknown_publisher", counts=True)
-        status, found, pool = self.locate(row, pub, hint)
+        status, found, pool = self.locate(row.id, pub, hint)
         if status == "outside":
             if kind == "not_open_weight":
                 known = self.known_repo(found.repo)
@@ -2510,16 +2565,16 @@ class Discovery:
             return Outcome(row, "look", "no_repo", counts=True, publisher=pub, prefix=prefix, pool_size=pool)
         return self.evaluate(row, found, pub, prefix)
 
-    def locate(self, row, pub, hint):
-        """The repository a row names: the one LiveBench's registry links (an open-weight entry with a huggingface:
-        link), else the strict matcher's answer. ('match', Match, pool) | ('ambiguous', [Match], pool) |
+    def locate(self, lb_id, pub, hint):
+        """The repository a leaderboard id names: the one LiveBench's registry links (an open-weight entry with a
+        huggingface: link), else the strict matcher's answer. ('match', Match, pool) | ('ambiguous', [Match], pool) |
         ('no_repo', None, pool) | ('outside', Match, 0) for a link outside the publisher's orgs."""
         if hint is not None and hint.openweight and hint.link:
             org = hint.link.split("/")[0]
             m = Match(hint.link, org, "linked", [], 0, [], 0)
             inside = org.casefold() in {o.casefold() for o in pub.orgs}
             return ("match" if inside else "outside"), m, 0
-        return strict_match(row.id, pub.orgs, self.listing)
+        return strict_match(lb_id, pub.orgs, self.listing)
 
     def closed(self, row, pub, prefix):
         """A row LiveBench's registry lists without openweight: like a not_open_weight decision, it takes no place in
@@ -2608,6 +2663,17 @@ class Discovery:
             return Outcome(row, "look", "not_checked", counts=True, **base)
         if isinstance(info, int):
             return Outcome(row, "look", "info_unreadable", counts=True, status=info, **base)
+        if info.id.casefold() != match.repo.casefold():
+            # Hugging Face serves the repository under another name (renamed: a registry link, say, spells the old
+            # one): the catalog and hf: decisions are checked again under that name, as for an alias target.
+            found = self.known_repo(info.id)
+            if found:
+                kind, model, example = found
+                return self.known(row, kind, info.id, model, example, match=match)
+            base["repo"] = info.id
+            decided = self.repo_decision(row, info.id, base)
+            if decided:
+                return decided
         return self.gates(row, info, base, pub.orgs)
 
     def alias(self, row, d, pub, prefix):
@@ -2703,7 +2769,11 @@ def reproduces(rows, recs):
         if row.overall is None:
             return f"{rec.lb_id}: {row.partial_label()}", names_differ
         recorded = {fold_category(k): v for k, v in rec.category_scores.items()}
-        computed = {fold_category(k): v for k, v in row.categories.items()}
+        every = {fold_category(k): v for k, v in row.categories.items()}
+        unscored = [k for k in recorded if k in every and every[k] is None]
+        if unscored:            # a 2.0 suite the row has no score in (v1 rows with one have no overall)
+            return f"{rec.lb_id}: {unscored[0]} has no score in the table, recorded {recorded[unscored[0]]:.6f}", names_differ
+        computed = {k: v for k, v in every.items() if v is not None}
         if set(recorded) == set(computed):
             for k, v in recorded.items():
                 if abs(computed[k] - v) > CATEGORY_TOL:
@@ -2839,7 +2909,8 @@ class Report:
         entries, open_, linked = reg.counts()
         held = reg.coverage[reg.order[0]] if reg.order else 0
         rows = len(r.scored) + len(r.partial)
-        return (f"LiveBench model registry: {entries} entries holding {held} of the release's {rows} ids, "
+        hidden = (f" (the site shows only those {held} rows, so its ranks can differ)" if held < rows else "")
+        return (f"LiveBench model registry: {entries} entries holding {held} of the release's {rows} ids{hidden}, "
                 f"{open_} open weight, {linked} with a Hugging Face link")
 
     def disclaimer(self):
@@ -2882,6 +2953,8 @@ class Report:
             text = f"Match: {how}"
             if o.prefix:
                 text += f"; org {md_code(m.org)} via prefix {md_code(o.prefix)}, unique among {m.pool_size} repos"
+        if o.repo and m.repo.casefold() != o.repo.casefold():
+            text += f"; Hugging Face answers {md_code(m.repo)} as {md_code(o.repo)} (renamed)"
         if o.gate:
             ok, token, ratio = o.gate
             text += f"; size token {md_code(token)} vs {o.params.value / 1e9:.2f}B ({(ratio - 1) * 100:+.1f}%)"
@@ -2927,11 +3000,18 @@ class Report:
                 f"- {self.fit_text(o)}", ""]
         reject = {"key": f"hf:{i.id}", "decision": "rejected", "reason": "TODO", "decided_on": d.today.isoformat(),
                   "release": r.date}
+        # Only the suites with a score: a 2.0 row with a blank or n/a suite is scored from the others, and the evidence
+        # parser takes numbers only.
+        scores = {k: v for k, v in o.row.categories.items() if v is not None}
+        unscored = [k for k, v in o.row.categories.items() if v is None]
         stanza = {"model_id": "TODO", "leaderboard_model_id": o.row.id, "release": r.date,
-                  "overall": round(o.row.overall, 2), "category_scores": dict(o.row.categories),
+                  "overall": round(o.row.overall, 2), "category_scores": scores,
                   "source_table": r.table_url, "source_sha256": r.table_sha256, "meaning": d.local.evidence.meaning}
         stanza_note = ("Set `model_id` to its catalog/models.json id. livebench.ai serves no versioned history: "
                        "`source_sha256` identifies the bytes read.")
+        if unscored:
+            stanza_note += (" `category_scores` leaves out " + ", ".join(md_code(k) for k in unscored)
+                            + ": the row has no score there, and the overall averages the suites it has.")
         if r.generation == "2.0":
             stanza_note += (" A 2.0 table grows as LiveBench adds rows, so every run re-checks a recorded 2.0 row "
                             "softly: other bytes are a step-summary warning, never a failure.")
@@ -3183,7 +3263,8 @@ class Report:
                 + (f"; {md_code(a['note'])}" if a["note"] else "") for a in d.anchors] + [""]
         if d.canary_results:
             out += ["### Matcher canary", ""] + [
-                f"- {md_code(c['id'])} → {md_code(c['result'])}" + (" (name-equal)" if c["name_equal"] else " (not name-equal; a miss is expected)")
+                f"- {md_code(c['id'])} → {md_code(c['result'])}" + (" (LiveBench's registry link)" if c["tier"] == "linked" else "")
+                + (" (name-equal)" if c["name_equal"] else " (not name-equal; a miss is expected)")
                 for c in d.canary_results] + [""]
         if d.warnings or d.header_warnings:
             out += ["### Warnings", ""] + [f"- {w}" for w in d.header_warnings + d.warnings] + [""]
@@ -3270,7 +3351,7 @@ def to_json(d, report, error=None):
                                              "message": str(error) if isinstance(error, DiscoveryError) else None},
         "sources": {"site": SITE_URL, "main_script": d.script,
                     "reviewed_script": dataclasses.asdict(d.local.site) if d.local else None,
-                    "timeline": [dataclasses.asdict(t) for t in d.timeline],
+                    "timeline": [dataclasses.asdict(t) for t in d.timeline], "suite_order": d.suite_order,
                     "registry": None if d.registry is None else {
                         "problem": d.registry.problem, "entries": [len(t) for t in d.registry.tables],
                         "coverage": d.registry.coverage, "order": d.registry.order}},
@@ -3349,10 +3430,13 @@ def probe(net, root, today, lines):
         state["text"] = text
         body = site.get(path, "js").body
         literal = f'"{WEIGHTS_KEY}"'
+        order = parse_suite_order(text)
         lines.append(f"- main script `{path}` (agrees with index.html): {len(body)} bytes, sha256 "
                      f"`{hashlib.sha256(body).hexdigest()}`; reviewed script `{local.site.main_script}` "
                      f"({'the same' if path == local.site.main_script else 'DIFFERENT'}); "
-                     f"`{literal}` literal {'present' if literal in text else 'ABSENT'}")
+                     f"`{literal}` literal {'present' if literal in text else 'ABSENT'}; suite order "
+                     + (md_code(", ".join(order), 400) + (" (as reviewed)" if tuple(order) == REVIEWED_SUITE_ORDER else
+                                                          " (DIFFERS from the reviewed order)") if order else "NOT FOUND"))
 
     def releases():
         timeline = parse_release_lists(state.get("text", ""))
@@ -3476,7 +3560,8 @@ def main(argv=None, net=None, root=ROOT):
     ap.add_argument("--record", metavar="DIR", help="save raw responses and an index (never request headers)")
     ap.add_argument("--today", metavar="YYYY-MM-DD", help="date override (tests)")
     ap.add_argument("--release", metavar="ID", help="analyse this release instead of the newest one: v1 YYYY-MM-DD, "
-                                                     "or 2.0 YYYYMMDD / YYYY-MM-DD (manual runs)")
+                                                     "or 2.0 YYYYMMDD / YYYY-MM-DD (manual runs; writes complete=false "
+                                                     "to $GITHUB_OUTPUT, so the tracking issue is never touched)")
     ap.add_argument("--probe", action="store_true", help="print upstream shapes; enforces nothing; never touches the issue")
     args = ap.parse_args(argv)
     if args.release is not None:
@@ -3525,7 +3610,9 @@ def main(argv=None, net=None, root=ROOT):
                 except Exception:  # noqa: BLE001 - the failure block must be written; drop the unreadable previous body
                     body = failure_body(error, d.stage, "", today)
                 write(args.failure_summary, body)
-        complete = d.complete and error is None and not args.probe
+        # A forced release is a look at another release: like the probe, it never refreshes or closes the issue (the
+        # issue tracks the newest release, and its marker would make the next nightly re-announce every entry).
+        complete = d.complete and error is None and not args.probe and not args.release
         reportable = complete and d.reportable
         new = bool(complete and report and report.new_keys)
         if args.step_summary:
