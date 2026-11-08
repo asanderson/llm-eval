@@ -92,6 +92,17 @@ jobs:
           echo "number=$number" >> "$GITHUB_OUTPUT"
           echo "state=$state" >> "$GITHUB_OUTPUT"
 
+      # Temporary, while the source moves from the LiveBench GitHub repository (404 since 2026-11-08) to
+      # livebench.ai: record what the site serves. Removed once the new source is built against those shapes.
+      - name: Probe the leaderboard site (pull requests)
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/out"
+          python3 scripts/model_discovery.py --probe --record "$RUNNER_TEMP/out/probe-raw" \
+            --step-summary "$GITHUB_STEP_SUMMARY" > "$RUNNER_TEMP/out/probe.txt"
+
       - name: Discover
         id: discover
         env:

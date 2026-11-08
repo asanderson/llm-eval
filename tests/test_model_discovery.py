@@ -222,6 +222,7 @@ class World:
         self.errors = {}
         self.page_size = None
         self.tree_patches = []      # callables (commit label, path, tree doc) -> tree doc
+        self.site = {}              # livebench.ai path -> (headers, body); anything else answers 404
 
     def add_model(self, repo, listed=True, **kw):
         self.infos[repo.casefold()] = model_info(repo, **kw)
@@ -329,6 +330,10 @@ class FakeNet:
             data = w.blobs[ref]
             content = base64.encodebytes(data).decode('ascii')
             return {}, {'sha': ref, 'size': len(data), 'encoding': 'base64', 'content': content}
+        if p.hostname in ('livebench.ai', 'www.livebench.ai'):
+            if p.path not in w.site:
+                raise md.HttpStatus(404, url)
+            return w.site[p.path]
         assert p.hostname == 'huggingface.co', url
         if p.path == '/api/models':
             q = urllib.parse.parse_qs(p.query)
@@ -577,7 +582,7 @@ class LocalInputsTest(Base):
         self.assertEqual((md.ISSUE_BODY_CAP, md.STRING_CAP, md.LIST_CAP), (60_000, 120, 30))
         self.assertEqual((md.FAILURE_STREAK, md.DEFERRAL_MAX_DAYS), (3, 365))
         self.assertEqual(md.HF_ANCHORS, ('qwen38-27b', 'nemotron-super-120b', 'gpt-oss-120b', 'llama33-70b'))
-        self.assertEqual(md.ALLOWED_HOSTS, ('api.github.com', 'huggingface.co'))   # the livebench.ai site check was dropped
+        self.assertEqual(md.ALLOWED_HOSTS, ('api.github.com', 'huggingface.co', 'livebench.ai', 'www.livebench.ai'))
         self.assertEqual(md.RUN_DEADLINE, 15 * 60)
         local = md.load_local(ROOT, REAL_TODAY)
         derived = [local.publisher(r['leaderboard_model_id'])[0].orgs[0] for r in EVIDENCE['recommendations']]
@@ -655,11 +660,11 @@ class NetTest(Base):
         net.sleep = net.sleeps.append
         return net
 
-    def test_only_https_to_the_two_allowed_hosts(self):
+    def test_only_https_to_the_allowed_hosts(self):
         net = self.net()
-        for url in ('http://api.github.com/repos/x/y', 'https://example.com/x', 'https://livebench.ai/table_2026_06_25.csv',
+        for url in ('http://api.github.com/repos/x/y', 'https://example.com/x', 'http://livebench.ai/table_2026_06_25.csv',
                     'https://raw.githubusercontent.com/LiveBench/new-livebench/main/x', 'https://user@huggingface.co/api',
-                    'https://huggingface.co:8443/api'):
+                    'https://huggingface.co:8443/api', 'https://livebench.ai.evil.net/x', 'https://cdn.livebench.ai/x'):
             with self.subTest(url=url), self.assertRaises(ValueError):
                 net.get(url)
         self.assertEqual(net.opener.requests, [])
@@ -672,6 +677,12 @@ class NetTest(Base):
         self.assertEqual(gh.get_header('Authorization'), 'Bearer gh-secret')
         self.assertEqual(hf.get_header('Authorization'), 'Bearer hf-secret')
         self.assertEqual(gh.get_header('User-agent'), 'llm-eval model_discovery')
+        site = self.net(FakeResponse(), FakeResponse(), env={'GITHUB_TOKEN': 'gh-secret', 'HF_TOKEN': 'hf-secret'})
+        site.get('https://livebench.ai/table_2026_06_25.csv')
+        site.get('https://www.livebench.ai/')
+        for req, _ in site.opener.requests:
+            self.assertIsNone(req.get_header('Authorization'))   # no token ever goes to the leaderboard site
+            self.assertEqual(req.get_header('Accept'), '*/*')
         empty = self.net(FakeResponse(), env={'GITHUB_TOKEN': '', 'HF_TOKEN': ''})
         empty.get('https://api.github.com/repos/a/b/commits/HEAD')
         self.assertIsNone(empty.opener.requests[0][0].get_header('Authorization'))
@@ -1964,6 +1975,39 @@ class FailureTest(Base):
         result = self.run_world(world, '--probe', net=net)
         self.assertEqual(result.code, 1)
         self.assertEqual(result.outputs['complete'], 'false')
+
+    def test_the_probe_reports_what_the_leaderboard_site_serves(self):
+        world = World()
+        html = (b'<!doctype html><html><head><script type="module" crossorigin src="/assets/index-abc123.js"></script>'
+                b'<link rel="stylesheet" href="/assets/index-abc123.css"></head><body></body></html>')
+        bundle = (b'const R=["2026-06-25","2025-05-30"];fetch(`/table_${d}.csv`);import("/assets/Table-def456.js");'
+                  b'const c="categories_2026_06_25.json";')
+        chunk = b'function Averaging(t){return t}'
+        world.site = {'/': ({'content-type': 'text/html'}, html),
+                      '/assets/index-abc123.js': ({'content-type': 'text/javascript'}, bundle),
+                      '/assets/Table-def456.js': ({'content-type': 'text/javascript'}, chunk),
+                      '/table_2025_04_25.csv': ({'content-type': 'text/csv'}, TABLE_2025_04),
+                      '/table_2025_05_30.csv': ({'content-type': 'text/csv'}, TABLE_2025_05 + b'changed'),
+                      '/categories_2026_06_25.json': ({'content-type': 'application/json'}, as_json(CATS_2026)),
+                      '/no-such-page': ({'content-type': 'text/html'}, html)}
+        net = world.net()
+        result = self.run_world(world, '--probe', net=net)
+        self.assertEqual(result.code, 0, result.stderr)
+        step = result.step
+        self.assertIn('scripts `/assets/index-abc123.js`', step)
+        self.assertIn('release-file names `categories_2026_06_25.json`', step)
+        self.assertIn('dates `2025-05-30, 2026-06-25, 2026_06_25`', step)
+        self.assertIn('script `/assets/Table-def456.js`', step)            # chunks a script imports are followed
+        self.assertIn('/table_2025_04_25.csv: HTTP 200', step)
+        self.assertIn('equal to the recorded source_sha256', step)
+        self.assertIn('/table_2025_05_30.csv: HTTP 200', step)
+        self.assertIn('DIFFERS from the recorded source_sha256', step)
+        self.assertIn('/public/table_2026_06_25.csv: HTTP 404', step)    # the root path missed, the public/ one is tried
+        self.assertIn('unknown /table_1999_01_01.csv: HTTP 404', step)
+        self.assertIn('unknown /no-such-page: HTTP 200', step)          # a single-page-app fallback shows up here
+        self.assertIn('page https://www.livebench.ai/: HTTP 200', step)
+        site_calls = [u for u in net.calls if 'livebench.ai' in u]
+        self.assertTrue(all(u.startswith(('https://livebench.ai/', 'https://www.livebench.ai/')) for u in site_calls))
 
     def test_no_repository_writes(self):
         world = pool_world()

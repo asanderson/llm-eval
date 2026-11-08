@@ -94,7 +94,9 @@ CANARY_ORGS = ("deepseek-ai", "zai-org", "microsoft", "mistralai")   # derived a
 
 GITHUB_API = "api.github.com"
 HF_HOST = "huggingface.co"
-ALLOWED_HOSTS = (GITHUB_API, HF_HOST)
+LIVEBENCH_SITE = "livebench.ai"
+LIVEBENCH_WWW = "www.livebench.ai"
+ALLOWED_HOSTS = (GITHUB_API, HF_HOST, LIVEBENCH_SITE, LIVEBENCH_WWW)
 USER_AGENT = "llm-eval model_discovery"
 RETRY_STATUSES = (429, 500, 502, 503, 504)
 
@@ -316,8 +318,8 @@ class Net:
         return parts
 
     def headers_for(self, host):
-        headers = {"User-Agent": USER_AGENT,
-                   "Accept": "application/vnd.github+json" if host == GITHUB_API else "application/json"}
+        accept = {GITHUB_API: "application/vnd.github+json", HF_HOST: "application/json"}.get(host, "*/*")
+        headers = {"User-Agent": USER_AGENT, "Accept": accept}
         if self.tokens.get(host):
             headers["Authorization"] = f"Bearer {self.tokens[host]}"
         return headers
@@ -2763,6 +2765,7 @@ def probe(net, root, today, lines):
         same = {k: doc.get(k) == meta[k] for k in ("sha", "gated", "safetensors")}
         lines.append(f"- anchor {model.id} revision: id {md_code(doc.get('id'))}, equal to the catalog: {md_code(compact(same))}")
 
+    site_probe(net, local, lines)
     part("commits", heads)
     part("trees", public)
     part("newest release", newest)
@@ -2771,6 +2774,138 @@ def probe(net, root, today, lines):
     part("model info", info)
     part("anchor", anchor)
     return 0
+
+
+SCRIPT_SRC_RE = re.compile(r"""<script\b[^>]*?\bsrc=["']([^"']+)["']""", re.I)
+LINK_HREF_RE = re.compile(r"""<link\b[^>]*?\bhref=["']([^"']+)["']""", re.I)
+CHUNK_RE = re.compile(r"""(?:/?(?:static/js|assets|_next/static/chunks)/[A-Za-z0-9_./-]+?\.js)""")
+SITE_FILE_RE = re.compile(r"(?:table|categories)_\d{4}_\d{2}_\d{2}(?:\.csv|\.json)?")
+SITE_DATE_RE = re.compile(r"20\d{2}[-_]\d{2}[-_]\d{2}")
+SITE_HINTS = ("table_", "categories_", ".csv", "Averag", "release")
+SITE_BUNDLES = 12
+
+
+def site_probe(net, local, lines):
+    """What livebench.ai serves: the page, its scripts, the release files the catalog records, an unknown path."""
+    ev, bench = local.evidence, local.benchmarks
+
+    def describe(reply):
+        return (f"HTTP {reply.status}, content-type {md_code(reply.headers.get('content-type'))}, "
+                f"{len(reply.body)} bytes, sha256 `{hashlib.sha256(reply.body).hexdigest()}`")
+
+    def text_of(reply):
+        return reply.body.decode("utf-8", errors="replace")
+
+    def site_part(title, fn):
+        try:
+            fn()
+        except HttpStatus as exc:
+            lines.append(f"- {title}: HTTP {exc.code}")
+        except (ShapeError, NetworkError) as exc:
+            lines.append(f"- {title}: {type(exc).__name__}: {md_code(str(exc), 300)}")
+        except Exception as exc:  # noqa: BLE001 - the probe reports, it never enforces
+            lines.append(f"- {title}: unreadable ({type(exc).__name__})")
+
+    state = {"scripts": []}
+
+    def page(host):
+        def go():
+            reply = net.get(f"https://{host}/")
+            body = text_of(reply)
+            scripts, links = SCRIPT_SRC_RE.findall(body), LINK_HREF_RE.findall(body)
+            if host == LIVEBENCH_SITE:
+                state["scripts"] = scripts
+            lines.append(f"- page https://{host}/: {describe(reply)}; scripts {md_code(', '.join(scripts), 1500)}; "
+                         f"links {md_code(', '.join(links), 1500)}; head {md_code(body[:600], 700)}")
+        return go
+
+    def small(path):
+        def go():
+            reply = net.get(f"https://{LIVEBENCH_SITE}{path}")
+            lines.append(f"- {path}: {describe(reply)}; starts {md_code(text_of(reply)[:400], 500)}")
+        return go
+
+    def scan(name, body, seen, queue):
+        files = sorted(set(SITE_FILE_RE.findall(body)))
+        dates = sorted(set(SITE_DATE_RE.findall(body)))
+        contexts = []
+        for hint in SITE_HINTS:
+            for m in list(re.finditer(re.escape(hint), body))[:3]:
+                contexts.append(body[max(0, m.start() - 160):m.end() + 160])
+        lines.append(f"- script {md_code(name, 200)}: {len(body)} chars; release-file names "
+                     f"{md_code(', '.join(files), 3000)}; dates {md_code(', '.join(dates), 3000)}")
+        for c in contexts[:12]:
+            lines.append(f"  - context {md_code(c, 400)}")
+        for chunk in sorted(set(CHUNK_RE.findall(body))):
+            if chunk not in seen:
+                seen.add(chunk)
+                queue.append(chunk)
+
+    def scripts():
+        seen, queue = set(), []
+        for src in state["scripts"]:
+            parts = urllib.parse.urlsplit(src)
+            if parts.scheme or parts.netloc:
+                if parts.hostname != LIVEBENCH_SITE:
+                    lines.append(f"- script {md_code(src, 200)}: other host, not fetched")
+                    continue
+                src = parts.path
+            if src not in seen:
+                seen.add(src)
+                queue.append(src)
+        fetched = 0
+        while queue and fetched < SITE_BUNDLES:
+            path = queue.pop(0)
+            path = path if path.startswith("/") else "/" + path
+            fetched += 1
+            try:
+                reply = net.get(f"https://{LIVEBENCH_SITE}{path}")
+            except HttpStatus as exc:
+                lines.append(f"- script {md_code(path, 200)}: HTTP {exc.code}")
+                continue
+            lines.append(f"- script {md_code(path, 200)}: {describe(reply)}")
+            scan(path, text_of(reply), seen, queue)
+        if queue:
+            lines.append(f"- {len(queue)} more script chunks not fetched: {md_code(', '.join(queue), 2000)}")
+
+    def release_files():
+        recorded = {}
+        for r in ev.recommendations:
+            recorded[r.path.rsplit("/", 1)[1]] = r.sha256
+        dates = sorted({n[len("table_"):-len(".csv")] for n in recorded}
+                       | {d.replace("-", "_") for d in (bench.reference_release, ev.latest_release) if d})
+        for date in dates:
+            for name in (f"table_{date}.csv", f"categories_{date}.json"):
+                for path in (f"/{name}", f"/public/{name}"):
+                    try:
+                        reply = net.get(f"https://{LIVEBENCH_SITE}{path}", cap=MAX_TABLE_BYTES)
+                    except HttpStatus as exc:
+                        lines.append(f"- {path}: HTTP {exc.code}")
+                        continue
+                    digest = hashlib.sha256(reply.body).hexdigest()
+                    match = ""
+                    if name in recorded:
+                        match = "; equal to the recorded source_sha256" if digest == recorded[name] else \
+                            f"; DIFFERS from the recorded source_sha256 `{recorded[name]}`"
+                    lines.append(f"- {path}: {describe(reply)}{match}; starts {md_code(text_of(reply)[:300], 400)}")
+                    break
+
+    def unknown():
+        for path in ("/table_1999_01_01.csv", "/categories_1999_01_01.json", "/no-such-page"):
+            try:
+                reply = net.get(f"https://{LIVEBENCH_SITE}{path}")
+            except HttpStatus as exc:
+                lines.append(f"- unknown {path}: HTTP {exc.code}")
+                continue
+            lines.append(f"- unknown {path}: {describe(reply)}; starts {md_code(text_of(reply)[:200], 300)}")
+
+    site_part("site page", page(LIVEBENCH_SITE))
+    site_part("site page www", page(LIVEBENCH_WWW))
+    for path in ("/asset-manifest.json", "/manifest.json", "/robots.txt", "/sitemap.xml"):
+        site_part(f"site {path}", small(path))
+    site_part("site scripts", scripts)
+    site_part("site release files", release_files)
+    site_part("site unknown paths", unknown)
 
 
 # --- CLI -----------------------------------------------------------------------------------------------
