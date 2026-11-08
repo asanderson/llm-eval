@@ -4,6 +4,12 @@ name: Model discovery
 # open-weight models the catalog has not reviewed -> one tracking issue.
 # Never edits the repository (contents: read). See docs/MODEL_DISCOVERY.md.
 #
+# Sources: livebench.ai (the page's main script lists the v1 and 2.0 releases
+# and carries LiveBench's model registry; tables are read from /v1/ and
+# /data/<id>/, no token is sent there) and the Hugging Face API (HF_TOKEN
+# optional). Nothing reads api.github.com: the GitHub token only edits the
+# issue (GH_TOKEN in the issue steps).
+#
 # Who may touch the "LiveBench models needing a catalog decision" issue:
 # scheduled runs, pushes to main, and workflow_dispatch with update_issue.
 # Pull requests that change the pipeline run it against the real upstreams
@@ -40,6 +46,10 @@ on:
         description: "Refresh or close the tracking issue"
         type: boolean
         default: true
+      release:
+        description: "Analyse this release instead of the newest (v1 YYYY-MM-DD, 2.0 YYYYMMDD); empty = newest"
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -92,24 +102,13 @@ jobs:
           echo "number=$number" >> "$GITHUB_OUTPUT"
           echo "state=$state" >> "$GITHUB_OUTPUT"
 
-      # Temporary, while the source moves from the LiveBench GitHub repository (404 since 2026-11-08) to
-      # livebench.ai: record what the site serves. Removed once the new source is built against those shapes.
-      - name: Probe the leaderboard site (pull requests)
-        if: github.event_name == 'pull_request'
-        continue-on-error: true
-        run: |
-          set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/out"
-          python3 scripts/model_discovery.py --probe --record "$RUNNER_TEMP/out/probe-raw" \
-            --step-summary "$GITHUB_STEP_SUMMARY" > "$RUNNER_TEMP/out/probe.txt"
-
       - name: Discover
         id: discover
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # authenticated api.github.com rate limit
           HF_TOKEN: ${{ secrets.HF_TOKEN }}           # optional; unauthenticated Hugging Face works
           PROBE: ${{ github.event_name == 'workflow_dispatch' && inputs.probe }}
           RECORD: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' }}
+          RELEASE: ${{ github.event_name == 'workflow_dispatch' && inputs.release || '' }}
         run: |
           set -euo pipefail
           out="$RUNNER_TEMP/out"
@@ -118,6 +117,7 @@ jobs:
                 --github-output)
           if [ "$RECORD" = "true" ]; then args+=(--record "$out/raw"); fi
           if [ "$PROBE" = "true" ]; then args+=(--probe); fi
+          if [ -n "$RELEASE" ]; then args+=(--release "$RELEASE"); fi
           python3 scripts/model_discovery.py "${args[@]}"
 
       - name: Upload the report

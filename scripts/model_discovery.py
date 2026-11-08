@@ -11,23 +11,26 @@ open-weight models the catalog has not reviewed -> one tracking issue.
   python3 scripts/model_discovery.py --json FILE             machine-readable results
   python3 scripts/model_discovery.py --github-output         append complete=/reportable=/new= to $GITHUB_OUTPUT
   python3 scripts/model_discovery.py --record DIR            save raw responses (never request headers)
+  python3 scripts/model_discovery.py --release ID            analyse this release (v1 YYYY-MM-DD, 2.0 YYYYMMDD)
   python3 scripts/model_discovery.py --probe                 print upstream shapes; enforces nothing
 
 What a run does (docs/MODEL_DISCOVERY.md):
   1. validates catalog/models.json, catalog/livebench-evidence.json, catalog/benchmarks.json,
      catalog/model-discovery.json and the laptop budgets before any network access;
-  2. reads the LiveBench leaderboard repository (derived from the evidence source_table URLs)
-     at its HEAD commit through the GitHub git API, verifying every blob's git sha1;
+  2. reads livebench.ai: the page's main script (named by asset-manifest.json and index.html) carries
+     both release lists (v1 and 2.0) and LiveBench's model registry; release files are read from
+     /v1/ and /data/<id>/ and identified by their sha256 (the site serves no versioned history);
   3. calibrates the CSV parser and the two-level mean against the rows recorded in
-     catalog/livebench-evidence.json (hash-pinned tables at the reviewed commit), and the
-     Hugging Face metadata shape against four catalog models;
-  4. scores the newest release, walks it from the top until the 10 best entries that could be
-     self-hosted open-weight models are seen (ties included), resolves each strictly to a
-     repository of an owner-approved publisher org and sizes it with the catalog arithmetic.
+     catalog/livebench-evidence.json (hash-pinned v1 tables), and the Hugging Face metadata shape
+     against four catalog models;
+  4. scores the newest release (2.0: the site's weighted suite mean), walks it from the top until the
+     10 best entries that could be self-hosted open-weight models are seen (ties included), resolves
+     each strictly to a repository of an owner-approved publisher org (or the repository LiveBench's
+     registry links, inside those orgs) and sizes it with the catalog arithmetic.
 
 It never writes inside the repository. Exit codes: 0 complete (or a probe), 1 network
 failure, 2 upstream shape changed or invalid local input, 3 unexpected internal error.
-GITHUB_TOKEN authenticates api.github.com and HF_TOKEN huggingface.co; both are optional.
+HF_TOKEN (optional) authenticates huggingface.co; no token is ever sent to livebench.ai.
 """
 import argparse
 import ast
@@ -36,6 +39,7 @@ import collections
 import csv
 import dataclasses
 import datetime as dt
+import decimal
 import email.utils
 import hashlib
 import http.client
@@ -92,13 +96,16 @@ HF_ANCHORS = ("qwen38-27b", "nemotron-super-120b", "gpt-oss-120b", "llama33-70b"
 ANCHOR_CLASSES = {"qwen38-27b": "float", "nemotron-super-120b": "packed", "gpt-oss-120b": "packed", "llama33-70b": "float"}
 CANARY_ORGS = ("deepseek-ai", "zai-org", "microsoft", "mistralai")   # derived at run time; a test pins the derivation
 
-GITHUB_API = "api.github.com"
 HF_HOST = "huggingface.co"
 LIVEBENCH_SITE = "livebench.ai"
-LIVEBENCH_WWW = "www.livebench.ai"
-ALLOWED_HOSTS = (GITHUB_API, HF_HOST, LIVEBENCH_SITE, LIVEBENCH_WWW)
+SITE_URL = f"https://{LIVEBENCH_SITE}/"
+ALLOWED_HOSTS = (HF_HOST, LIVEBENCH_SITE)
 USER_AGENT = "llm-eval model_discovery"
 RETRY_STATUSES = (429, 500, 502, 503, 504)
+SITE_TYPES = {"html": ("text/html",), "json": ("application/json",), "csv": ("text/csv",),
+              "js": ("application/javascript", "text/javascript")}
+WEIGHTS_KEY = "_overall_weights"
+GENERATIONS = ("v1", "2.0")
 
 HARDWARE_CONFIG = "configs/hardware/msi-raider-18-hx-ai.json"
 WSL_PROFILE = "windows-11-wsl2-ubuntu-26.04"
@@ -126,17 +133,35 @@ NAME_PREFIX_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-SOURCE_TABLE_RE = re.compile(r"^https://github\.com/([^/]+/[^/]+)/blob/([0-9a-f]{40})/(public/table_\d{4}_\d{2}_\d{2}\.csv)$")
-TABLE_NAME_RE = re.compile(r"^table_(\d{4})_(\d{2})_(\d{2})\.csv$")
-CATEGORIES_NAME_RE = re.compile(r"^categories_(\d{4})_(\d{2})_(\d{2})\.json$")
+# Accepted catalog/livebench-evidence.json source_table forms: the recorded GitHub blobs (that repository answers 404
+# since 2026-11-08; the same bytes are served at livebench.ai/v1/) and the two livebench.ai forms.
+GITHUB_TABLE_RE = re.compile(r"^https://github\.com/([^/]+/[^/]+)/blob/([0-9a-f]{40})/public/(table_(\d{4})_(\d{2})_(\d{2})\.csv)$")
+SITE_V1_TABLE_RE = re.compile(r"^https://livebench\.ai/v1/(table_(\d{4})_(\d{2})_(\d{2})\.csv)$")
+SITE_V2_TABLE_RE = re.compile(r"^https://livebench\.ai/data/((\d{4})(\d{2})(\d{2}))/table\.csv$")
+SCRIPT_PATH_RE = re.compile(r"^static/js/[A-Za-z0-9_.-]+\.js$")
+V1_ID_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+V2_ID_RE = re.compile(r"^\d{8}$")
+# The release lists of the main script, anchored on the gen:"v1" / gen:"v2" maps and the quoted shapes, never on the
+# minified identifiers (they change between builds). v1: an inline list mapped to gen:"v1"; 2.0: the one assigned
+# array of quoted YYYYMMDD ids (the gen:"v2" map reaches it through an identifier, so it is matched by its shape).
+JS_ID = r"[A-Za-z_$][\w$]*"
+V1_LIST_RE = re.compile(r'\[((?:"\d{4}-\d{2}-\d{2}",)*"\d{4}-\d{2}-\d{2}")\]\.map\(\(?(' + JS_ID + r')\)?=>\(\{id:\2,label:\2,gen:"v1"\}\)\)')
+V2_MAP_RE = re.compile(r'\.map\(\(?(' + JS_ID + r')\)?=>\(\{id:\1,label:' + JS_ID + r'\(\1\),gen:"v2"\}\)\)')
+V2_LIST_RE = re.compile(r'(?<![\w$.])' + JS_ID + r'=\[((?:"\d{8}",)*"\d{8}")\]')
+GEN_RE = re.compile(r'gen:"(v1|v2)"')
+REGISTRY_START_RE = re.compile(r'(?<![\w$.])' + JS_ID + r'=(?=\{"[^"\\]+":\{)')
+OPENWEIGHT_MARK = "openweight:!0"
+HF_LINK_RE = re.compile(r"^https://huggingface\.co/([A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9_.-]+)/?$")
 SIZE_RE = re.compile(r"^\d+(\.\d+)?b$")
 ACTIVE_RE = re.compile(r"^a\d+(\.\d+)?b$")
 EXPERT_RE = re.compile(r"^\d+e$")
 MULTI_RE = re.compile(r"^\d+x\d+b$")
 BUDGET_RE = re.compile(r"^\d+k$")
 NUMBER_RE = re.compile(r"^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$")
+TABLE_NAME_RE = re.compile(r"^table_(\d{4})_(\d{2})_(\d{2})\.csv$")
 LICENSE_FILE_RE = re.compile(r"^(LICENSE(\.md|\.txt)?|LICENCE[A-Za-z0-9._-]*)$", re.I)
 SAFE_FILE_RE = re.compile(r"^[A-Za-z0-9._-]+$")
+SCRIPT_SRC_RE = re.compile(r"""<script\b[^>]*?\bsrc=["']([^"']+)["']""", re.I)
 MARKER_RE = re.compile(r"<!-- model-discovery-state v1 ([A-Za-z0-9_=-]*) -->")
 FAILURE_BLOCK_RE = re.compile(r"### Problems reading sources\n.*?<!-- model-discovery-failure-end -->\n*", re.S)
 
@@ -164,7 +189,8 @@ LOOK_WORDS = {
     "moved_outside_publisher": "the repository now resolves outside the publisher's orgs",
     "not_checked": "not checked: the model-info budget of this run was spent",
     "deferral_expired": "the recorded deferral has expired",
-    "weights_may_be_public": "recorded as not open weight, but a repository of an allowlisted org now matches",
+    "weights_may_be_public": "recorded (or listed by LiveBench) as not open weight, but a repository of an allowlisted org now matches",
+    "linked_outside_publisher": "LiveBench's registry links a Hugging Face repository outside the publisher's allowlisted orgs",
     "alias_target_unavailable": "the alias target is unavailable (unreadable, private, disabled or outside the publisher's orgs)",
 }
 
@@ -183,9 +209,9 @@ class ShapeError(DiscoveryError):
     """An upstream source no longer has the shape the pipeline assumes (exit 2)."""
     exit_code = 2
 
-    def __init__(self, expected, got="", stage=None):
+    def __init__(self, expected, got="", stage=None, fix=""):
         super().__init__(f"expected {expected}; got {got}" if got else str(expected))
-        self.expected, self.got, self.stage = str(expected), str(got), stage
+        self.expected, self.got, self.stage, self.fix = str(expected), str(got), stage, str(fix)
 
 
 class NetworkError(DiscoveryError):
@@ -298,7 +324,7 @@ class Net:
 
     def __init__(self, record_dir=None, env=None):
         env = os.environ if env is None else env
-        self.tokens = {GITHUB_API: env.get("GITHUB_TOKEN") or "", HF_HOST: env.get("HF_TOKEN") or ""}
+        self.tokens = {HF_HOST: env.get("HF_TOKEN") or ""}       # never a token for livebench.ai
         self.opener = urllib.request.build_opener(SameHostRedirect)
         self.sleep = time.sleep
         self.clock = time.monotonic
@@ -318,7 +344,7 @@ class Net:
         return parts
 
     def headers_for(self, host):
-        accept = {GITHUB_API: "application/vnd.github+json", HF_HOST: "application/json"}.get(host, "*/*")
+        accept = {HF_HOST: "application/json"}.get(host, "*/*")
         headers = {"User-Agent": USER_AGENT, "Accept": accept}
         if self.tokens.get(host):
             headers["Authorization"] = f"Bearer {self.tokens[host]}"
@@ -380,10 +406,7 @@ class Net:
                 except (OSError, ValueError, http.client.HTTPException):
                     body = b""
                 self.record(url, exc.code, headers, body)
-                retry = exc.code in RETRY_STATUSES or (
-                    exc.code == 403 and host == GITHUB_API
-                    and ("retry-after" in headers or str(headers.get("x-ratelimit-remaining", "")).strip() == "0"))
-                if not retry:
+                if exc.code not in RETRY_STATUSES:
                     raise HttpStatus(exc.code, url) from None
                 last, delay = f"HTTP {exc.code}", self.retry_delay(headers, attempt)
             except (OSError, http.client.HTTPException) as exc:
@@ -437,8 +460,13 @@ class Recommendation:
     overall: float
     category_scores: dict
     source_table: str
-    path: str
+    site_path: str          # the bytes on livebench.ai: v1/table_YYYY_MM_DD.csv or data/YYYYMMDD/table.csv
     sha256: str
+    generation: str         # v1 | 2.0
+
+    @property
+    def table_name(self):
+        return self.site_path.split("/", 1)[1]
 
 
 @dataclasses.dataclass
@@ -464,6 +492,12 @@ class Budgets:
     wsl: float       # W
     native: float    # M
     native_ram: float
+
+
+@dataclasses.dataclass
+class SiteReview:
+    main_script: str      # the main script whose averaging code the owner read
+    reviewed_on: str
 
 
 @dataclasses.dataclass
@@ -520,12 +554,28 @@ def parse_models(doc):
     return models
 
 
+def parse_source_table(url):
+    """(site path, generation, GitHub repo or None, GitHub commit or None, table date) of an evidence source_table,
+    or None when the URL has none of the accepted forms."""
+    url = str(url)
+    m = GITHUB_TABLE_RE.match(url)
+    if m:
+        return f"v1/{m.group(3)}", "v1", m.group(1), m.group(2), "-".join(m.group(4, 5, 6))
+    m = SITE_V1_TABLE_RE.match(url)
+    if m:
+        return f"v1/{m.group(1)}", "v1", None, None, "-".join(m.group(2, 3, 4))
+    m = SITE_V2_TABLE_RE.match(url)
+    if m:
+        return f"data/{m.group(1)}/table.csv", "2.0", None, None, "-".join(m.group(2, 3, 4))
+    return None
+
+
 def parse_evidence(doc, models_by_id):
     rel = "catalog/livebench-evidence.json"
     if not isinstance(doc, dict) or not isinstance(doc.get("recommendations"), list) or not doc["recommendations"]:
         raise ConfigError(f"{rel}: expected a non-empty recommendations list")
     revision = doc.get("leaderboard_revision")
-    if not isinstance(revision, str) or not SHA_RE.match(revision):
+    if revision is not None and (not isinstance(revision, str) or not SHA_RE.match(revision)):
         raise ConfigError(f"{rel}: leaderboard_revision must be 40 lowercase hex")
     try:
         latest = iso_date(doc.get("latest_release")).isoformat()
@@ -536,16 +586,20 @@ def parse_evidence(doc, models_by_id):
         where = f"{rel} recommendations[{i}]"
         if not isinstance(r, dict):
             raise ConfigError(f"{where}: expected an object")
-        m = SOURCE_TABLE_RE.match(str(r.get("source_table", "")))
-        if not m:
-            raise ConfigError(f"{where}.source_table: expected https://github.com/OWNER/REPO/blob/<40 hex>/public/table_YYYY_MM_DD.csv")
-        table_name = m.group(3).rsplit("/", 1)[1]
+        source = parse_source_table(r.get("source_table", ""))
+        if source is None:
+            raise ConfigError(f"{where}.source_table: expected https://livebench.ai/v1/table_YYYY_MM_DD.csv, "
+                              "https://livebench.ai/data/YYYYMMDD/table.csv or "
+                              "https://github.com/OWNER/REPO/blob/<40 hex>/public/table_YYYY_MM_DD.csv")
+        site_path, generation, repo, commit, table_date = source
         try:
-            dt.date.fromisoformat("-".join(TABLE_NAME_RE.match(table_name).groups()))
+            dt.date.fromisoformat(table_date)
         except ValueError:
-            raise ConfigError(f"{where}.source_table: {table_name} does not name a calendar date") from None
-        repos.add(m.group(1))
-        commits.add(m.group(2))
+            name = site_path.rsplit("/", 1)[1] if generation == "v1" else site_path.split("/")[1]
+            raise ConfigError(f"{where}.source_table: {name} does not name a calendar date") from None
+        if repo is not None:
+            repos.add(repo)
+            commits.add(commit)
         if r.get("model_id") not in models_by_id:
             raise ConfigError(f"{where}.model_id: not a catalog/models.json id")
         if not isinstance(r.get("leaderboard_model_id"), str) or not r["leaderboard_model_id"]:
@@ -563,13 +617,14 @@ def parse_evidence(doc, models_by_id):
             raise ConfigError(f"{where}.release: expected an ISO date") from None
         meanings.add(r.get("meaning"))
         recs.append(Recommendation(r["model_id"], r["leaderboard_model_id"], release, float(r["overall"]),
-                                   dict(scores), r["source_table"], m.group(3), r["source_sha256"]))
-    if len(repos) != 1:
+                                   dict(scores), r["source_table"], site_path, r["source_sha256"], generation))
+    if len(repos) > 1:
         raise ConfigError(f"{rel}: source_table URLs name more than one repository ({', '.join(sorted(repos))})")
-    repo = repos.pop()
-    if not REPO_RE.match(repo):
+    repo = repos.pop() if repos else None
+    if repo is not None and not REPO_RE.match(repo):
         raise ConfigError(f"{rel}: source_table repository {repo!r} is not OWNER/REPO")
-    if commits != {revision}:
+    # leaderboard_revision pins the GitHub-form URLs only; livebench.ai URLs are identified by source_sha256 alone.
+    if commits and commits != {revision}:
         raise ConfigError(f"{rel}: source_table commits {', '.join(sorted(commits))} differ from leaderboard_revision {revision}")
     if len(meanings) != 1 or not isinstance(next(iter(meanings)), str) or not next(iter(meanings)).strip():
         raise ConfigError(f"{rel}: every recommendation must carry the same non-empty meaning string")
@@ -738,13 +793,24 @@ def parse_discovery(doc, models, evidence, today):
     rel = DISCOVERY_FILE
     if not isinstance(doc, dict):
         raise ConfigError(f"{rel}: expected an object")
-    errors = [f"{field}: unknown field" for field in doc if field not in ("schema_version", "leaderboard", "publishers", "decisions")]
+    errors = [f"{field}: unknown field" for field in doc if field not in ("schema_version", "site", "publishers", "decisions")]
     if doc.get("schema_version") != 1:
         errors.append("schema_version: expected 1")
-    leaderboard = doc.get("leaderboard")
-    revision = leaderboard.get("averaging_reviewed_revision") if isinstance(leaderboard, dict) else None
-    if not isinstance(revision, str) or not SHA_RE.match(revision):
-        errors.append("leaderboard.averaging_reviewed_revision: expected 40 lowercase hex")
+    site = doc.get("site")
+    if not isinstance(site, dict):
+        errors.append("site: expected {main_script, reviewed_on}")
+        site = {}
+    errors += [f"site.{field}: unknown field" for field in site if field not in ("main_script", "reviewed_on")]
+    script = site.get("main_script")
+    if not isinstance(script, str) or not SCRIPT_PATH_RE.match(script):
+        errors.append("site.main_script: expected the reviewed script's path, static/js/<name>.js")
+    try:
+        reviewed_on = iso_date(site.get("reviewed_on"))
+        if reviewed_on > today + dt.timedelta(days=1):
+            errors.append("site.reviewed_on: later than today + 1 day")
+    except ValueError:
+        errors.append("site.reviewed_on: expected an ISO date")
+        reviewed_on = None
     publishers, seen_prefixes = [], set()
     if not isinstance(doc.get("publishers"), list) or not doc["publishers"]:
         errors.append("publishers: expected a non-empty list")
@@ -776,7 +842,7 @@ def parse_discovery(doc, models, evidence, today):
     errors += decision_errors(doc.get("decisions", []), catalog_repos, evidence_ids, today)
     if errors:
         raise ConfigError(f"{rel}: " + "; ".join(errors))
-    return revision, publishers, Decisions(doc.get("decisions", []))
+    return SiteReview(script, reviewed_on.isoformat()), publishers, Decisions(doc.get("decisions", []))
 
 
 class Decisions:
@@ -817,7 +883,7 @@ class Local:
     benchmarks: Benchmarks
     budgets: Budgets
     releases: object
-    averaging_revision: str
+    site: SiteReview
     publishers: list
     decisions: Decisions
 
@@ -850,9 +916,9 @@ def load_local(root, today):
     for anchor in HF_ANCHORS:
         if anchor not in by_id or not by_id[anchor].metadata or not by_id[anchor].metadata.get("safetensors"):
             raise ConfigError(f"catalog/models.json: HF anchor {anchor} needs upstream_metadata with safetensors")
-    revision, publishers, decisions = parse_discovery(_read_json(root, DISCOVERY_FILE), models, evidence, today)
+    site, publishers, decisions = parse_discovery(_read_json(root, DISCOVERY_FILE), models, evidence, today)
     return Local(root, today, models, evidence, benchmarks, budgets, scorer_releases(root / SCORER_SOURCE),
-                 revision, publishers, decisions)
+                 site, publishers, decisions)
 
 
 def _safetensors(value):
@@ -867,148 +933,373 @@ def _safetensors(value):
     return value
 
 
-# --- LiveBench leaderboard repository (GitHub git API) -------------------------------------
-def git_blob_sha(data):
-    return hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()
+# --- livebench.ai: the page, its main script, the release lists and the model registry ------------
+@dataclasses.dataclass(frozen=True)
+class SiteRelease:
+    """One release on the site's timeline."""
+    id: str             # v1: YYYY-MM-DD; 2.0: YYYYMMDD
+    date: str           # ISO date (a 2.0 id formatted as the site labels it)
+    generation: str     # v1 | 2.0
+
+    @property
+    def table_path(self):
+        if self.generation == "v1":
+            return f"v1/table_{self.date.replace('-', '_')}.csv"
+        return f"data/{self.id}/table.csv"
+
+    @property
+    def categories_path(self):
+        if self.generation == "v1":
+            return f"v1/categories_{self.date.replace('-', '_')}.json"
+        return f"data/{self.id}/categories.json"
+
+    @property
+    def label(self):
+        return f"{self.date} (v1)" if self.generation == "v1" else f"{self.date} (2.0, id {self.id})"
 
 
-def verify_blob(doc, entry_sha, url):
-    """Decoded bytes of a git blobs API answer, checked against the tree entry's sha."""
-    if not isinstance(doc, dict) or doc.get("encoding") != "base64" or not isinstance(doc.get("content"), str):
-        raise ShapeError(f"a base64 git blob from {url}", got=f"encoding {doc.get('encoding') if isinstance(doc, dict) else type(doc).__name__}")
+def media_type(headers):
+    return str(headers.get("content-type") or "").split(";", 1)[0].strip().lower()
+
+
+def looks_html(body):
+    return body[:1024].lstrip().lower().startswith((b"<!doctype", b"<html"))
+
+
+def script_path(src):
+    """The site-root-relative path of a same-site script reference (static/js/<name>.js), or None."""
     try:
-        data = base64.b64decode(doc["content"])
+        parts = urllib.parse.urlsplit(urllib.parse.urljoin(SITE_URL, str(src)))
     except ValueError:
-        raise ShapeError(f"a base64 git blob from {url}", got="content that does not decode") from None
-    if doc.get("size") != len(data):
-        raise ShapeError(f"git blob of {doc.get('size')} bytes from {url}", got=f"{len(data)} decoded bytes")
-    actual = git_blob_sha(data)
-    if actual != entry_sha:
-        raise ShapeError(f"git blob {entry_sha} from {url}", got=f"bytes whose git sha1 is {actual}")
-    return data
+        return None
+    path = parts.path.lstrip("/")
+    if parts.scheme != "https" or parts.hostname != LIVEBENCH_SITE or parts.port or parts.query or parts.fragment \
+            or not SCRIPT_PATH_RE.match(path):
+        return None
+    return path
+
+
+def parse_release_lists(text):
+    """The timeline [SiteRelease] (sorted by date) of the main script's v1 and 2.0 release lists.
+
+    Each list must be found exactly once; ids must be calendar dates; dates must be unique across both lists (the
+    site itself throws "Two releases share a date on the timeline" otherwise)."""
+    gens = GEN_RE.findall(text)
+    v1 = V1_LIST_RE.findall(text)
+    if len(v1) != 1 or gens.count("v1") != 1:
+        raise ShapeError('exactly one v1 release list ["YYYY-MM-DD", ...].map(e=>({id:e,label:e,gen:"v1"})) in the '
+                         "main script", got=f'{len(v1)} such lists, {gens.count("v1")} gen:"v1" maps')
+    maps, v2 = V2_MAP_RE.findall(text), V2_LIST_RE.findall(text)
+    if len(maps) != 1 or gens.count("v2") != 1:
+        raise ShapeError('exactly one 2.0 release map .map(e=>({id:e,label:f(e),gen:"v2"})) in the main script',
+                         got=f'{len(maps)} such maps, {gens.count("v2")} gen:"v2" maps')
+    if len(v2) != 1:
+        raise ShapeError('exactly one assigned list of quoted 2.0 release ids X=["YYYYMMDD", ...] in the main script',
+                         got=f"{len(v2)} such lists" + (": " + excerpt(", ".join(v2)) if v2 else ""))
+    timeline = []
+    for generation, body in (("v1", v1[0][0]), ("2.0", v2[0])):
+        for rid in re.findall(r'"([^"]*)"', body):
+            date = rid if generation == "v1" else f"{rid[:4]}-{rid[4:6]}-{rid[6:]}"
+            try:
+                dt.date.fromisoformat(date)
+            except ValueError:
+                raise ShapeError(f"{generation} release ids that are calendar dates", got=excerpt(rid)) from None
+            timeline.append(SiteRelease(rid, date, generation))
+    dates = collections.Counter(r.date for r in timeline)
+    twice = sorted(d for d, n in dates.items() if n > 1)
+    if twice:
+        raise ShapeError("one release per date on the timeline (v1 and 2.0 lists together)",
+                         got=excerpt(", ".join(twice)) + " listed more than once")
+    return sorted(timeline, key=lambda r: r.date)
+
+
+def balanced_end(text, start):
+    """Index just past the bracket closing text[start] ('{' or '['), skipping quoted strings; None if unbalanced."""
+    depth, i, quote, n = 0, start, None, len(text)
+    while i < n:
+        c = text[i]
+        if quote:
+            if c == "\\":
+                i += 2
+                continue
+            if c == quote:
+                quote = None
+        elif c in "\"'`":
+            quote = c
+        elif c in "{[(":
+            depth += 1
+        elif c in "}])":
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        i += 1
+    return None
+
+
+JS_TOKEN_RE = re.compile(r"""\s*(?:(?P<str>"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|(?P<bang>![01])"""
+                         r"""|(?P<num>-?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)|(?P<id>[A-Za-z_$][\w$]*)|(?P<p>[{}\[\]:,]))""",
+                         re.S)
+JS_ESCAPES = {"n": "\n", "t": "\t", "r": "\r", "b": "\b", "f": "\f", "v": "\v", "0": "\0"}
+
+
+def js_string(token):
+    """The value of a quoted JavaScript string literal (\\xHH, \\uHHHH, \\u{H...} and single-character escapes)."""
+    body, out, i = token[1:-1], [], 0
+    while i < len(body):
+        c = body[i]
+        if c != "\\":
+            out.append(c)
+            i += 1
+            continue
+        nxt = body[i + 1]
+        if nxt == "x":
+            out.append(chr(int(body[i + 2:i + 4], 16)))
+            i += 4
+        elif nxt == "u" and body[i + 2:i + 3] == "{":
+            close = body.index("}", i)
+            out.append(chr(int(body[i + 3:close], 16)))
+            i = close + 1
+        elif nxt == "u":
+            out.append(chr(int(body[i + 2:i + 6], 16)))
+            i += 6
+        else:
+            out.append(JS_ESCAPES.get(nxt, nxt))
+            i += 2
+    return "".join(out)
+
+
+def parse_js_literal(text):
+    """A JavaScript object/array literal of plain data (strings, numbers, !0/!1, true/false/null, nested objects and
+    arrays) as Python values. Anything else (functions, identifiers, spreads, template literals) is a ValueError."""
+    tokens_, pos = [], 0
+    while pos < len(text):
+        m = JS_TOKEN_RE.match(text, pos)
+        if not m or m.end() == pos:
+            if not text[pos:].strip():
+                break
+            raise ValueError(f"unexpected {text[pos:pos + 20]!r}")
+        tokens_.append((m.lastgroup, m.group(m.lastgroup)))
+        pos = m.end()
+    i = 0
+
+    def take():
+        nonlocal i
+        if i >= len(tokens_):
+            raise ValueError("unexpected end")
+        i += 1
+        return tokens_[i - 1]
+
+    def value(depth):
+        nonlocal i
+        if depth > 32:
+            raise ValueError("nested too deeply")
+        kind, tok = take()
+        if kind == "str":
+            return js_string(tok)
+        if kind == "bang":
+            return tok == "!0"
+        if kind == "num":
+            return float(tok)
+        if kind == "id":
+            if tok in ("true", "false", "null"):
+                return {"true": True, "false": False, "null": None}[tok]
+            raise ValueError(f"identifier {tok}")
+        if tok == "{":
+            out = {}
+            while True:
+                kind, tok = take()
+                if tok == "}":
+                    return out
+                if kind not in ("str", "id", "num"):
+                    raise ValueError(f"key {tok!r}")
+                key = js_string(tok) if kind == "str" else tok
+                if take()[1] != ":":
+                    raise ValueError("expected ':'")
+                out[key] = value(depth + 1)
+                kind, tok = take()
+                if tok == "}":
+                    return out
+                if tok != ",":
+                    raise ValueError("expected ',' or '}'")
+        if tok == "[":
+            out = []
+            while True:
+                if i < len(tokens_) and tokens_[i][1] == "]":
+                    i += 1
+                    return out
+                out.append(value(depth + 1))
+                kind, tok = take()
+                if tok == "]":
+                    return out
+                if tok != ",":
+                    raise ValueError("expected ',' or ']'")
+        raise ValueError(f"unexpected {tok!r}")
+
+    result = value(0)
+    if i != len(tokens_):
+        raise ValueError("trailing tokens")
+    return result
+
+
+def js_truthy(value):
+    return bool(value) and not (isinstance(value, float) and math.isnan(value))
+
+
+@dataclasses.dataclass(frozen=True)
+class RegistryEntry:
+    id: str
+    openweight: bool
+    link: object            # "org/name" from huggingface: https://huggingface.co/org/name, or None
+    link_raw: object        # a huggingface: value that is not such a URL (never used to name a repository)
+    variant_of: object = None
+
+
+def registry_entries(doc):
+    """{id: RegistryEntry} of one registry object, variants included as the site builds them: a variant's rawName
+    inherits its entry's fields (huggingface included) and overrides openweight when it sets one; entries win over
+    variants of the same name."""
+    if not isinstance(doc, dict) or not doc:
+        raise ValueError("not an object of entries")
+
+    def entry(name, openweight, hf, parent=None):
+        link = HF_LINK_RE.match(hf) if isinstance(hf, str) else None
+        return RegistryEntry(name, js_truthy(openweight), link.group(1) if link else None,
+                             hf if isinstance(hf, str) and not link else None, parent)
+    out, variants = {}, {}
+    for name, value in doc.items():
+        if not isinstance(value, dict):
+            raise ValueError(f"entry {name!r} is not an object")
+        out[name] = entry(name, value.get("openweight"), value.get("huggingface"))
+        found = value.get("variants")
+        if found is None:
+            continue
+        if not isinstance(found, list):
+            raise ValueError(f"variants of {name!r} is not a list")
+        for v in found:
+            if not isinstance(v, dict) or not isinstance(v.get("rawName"), str) or not v["rawName"]:
+                raise ValueError(f"a variant of {name!r} has no rawName")
+            ow = v.get("openweight") if v.get("openweight") is not None else value.get("openweight")
+            variants[v["rawName"]] = entry(v["rawName"], ow, value.get("huggingface"), name)
+    return {**variants, **out}
 
 
 @dataclasses.dataclass
-class Commit:
-    sha: str
-    tree: str
-    date: str
+class Registry:
+    """LiveBench's model registries in the main script (an object for the 2.0 ids and an older one for v1 ids).
 
+    A matching hint only: when it is missing or does not parse, matching uses the name rules alone."""
+    tables: list            # [{id: RegistryEntry}] in script order
+    sizes: list             # characters of each object literal
+    problem: object = None  # why the registry is not used, or None
+    order: list = dataclasses.field(default_factory=list)
+    coverage: list = dataclasses.field(default_factory=list)
 
-@dataclasses.dataclass
-class Entry:
-    path: str
-    type: str
-    sha: str
-    size: object
+    def rank(self, ids):
+        """Consult first the registry that holds the most of these ids (the release's own), then the others."""
+        ids = set(ids)
+        self.coverage = [len(ids & set(t)) for t in self.tables]
+        self.order = sorted(range(len(self.tables)), key=lambda k: (-self.coverage[k], k))
 
-
-class Leaderboard:
-    def __init__(self, net, repo):
-        self.net, self.repo = net, repo
-        self.trees, self.blobs = {}, {}
-
-    def api(self, path):
-        return f"https://{GITHUB_API}/repos/{self.repo}/{path}"
-
-    def commit(self, ref, pinned=False):
-        url = self.api(f"commits/{ref}")
-        try:
-            doc = self.net.get(url).json()
-        except HttpStatus as exc:
-            if exc.code in (404, 410, 451):
-                raise ShapeError("leaderboard repository moved or private; update the source_table URLs in "
-                                 "livebench-evidence.json", got=f"HTTP {exc.code} for commits/{ref[:12]}") from None
-            if exc.code == 422 and pinned:
-                raise ShapeError(f"commit {ref[:12]} to be reachable in {self.repo} (after a history rewrite, re-pin "
-                                 "catalog/livebench-evidence.json)", got="HTTP 422 (no commit found)") from None
-            raise
-        try:
-            sha, tree, date = doc["sha"], doc["commit"]["tree"]["sha"], doc["commit"]["committer"]["date"]
-        except (KeyError, TypeError):
-            raise ShapeError(f"{{sha, commit: {{tree: {{sha}}, committer: {{date}}}}}} from {url}", got=excerpt(compact(doc) if isinstance(doc, (dict, list)) else doc)) from None
-        if not isinstance(sha, str) or not SHA_RE.match(sha) or not isinstance(tree, str) or not SHA_RE.match(tree):
-            raise ShapeError(f"40-hex commit and tree shas from {url}", got=excerpt(f"{sha} {tree}"))
-        if pinned and sha != ref:
-            raise ShapeError(f"commit {ref} from {url}", got=excerpt(sha))
-        return Commit(sha, tree, str(date))
-
-    def tree(self, sha):
-        if sha in self.trees:
-            return self.trees[sha]
-        url = self.api(f"git/trees/{sha}")
-        doc = self.net.get(url).json()
-        if not isinstance(doc, dict) or not isinstance(doc.get("tree"), list):
-            raise ShapeError(f"a git tree object from {url}", got=excerpt(compact(doc)))
-        names = [str(e.get("path")) for e in doc["tree"] if isinstance(e, dict)]
-        if doc.get("truncated") is not False:
-            raise ShapeError(f"a complete (truncated: false) tree from {url}", got="truncated: " + excerpt(
-                str(doc.get("truncated")) + "; entries " + ", ".join(names[:20])))
-        entries = []
-        for e in doc["tree"]:
-            if not isinstance(e, dict) or not isinstance(e.get("path"), str) or e.get("type") not in ("blob", "tree", "commit") \
-                    or not isinstance(e.get("sha"), str) or not SHA_RE.match(e["sha"]):
-                raise ShapeError(f"tree entries {{path, type, sha, size}} from {url}", got=excerpt(compact(e)))
-            entries.append(Entry(e["path"], e["type"], e["sha"], e.get("size")))
-        self.trees[sha] = entries
-        return entries
-
-    @staticmethod
-    def find(entries, name, kind):
-        for e in entries:
-            if e.path == name and e.type == kind:
-                return e
+    def get(self, lb_id):
+        for k in self.order or range(len(self.tables)):
+            if lb_id in self.tables[k]:
+                return self.tables[k][lb_id]
         return None
 
-    def public(self, commit):
-        root = self.tree(commit.tree)
-        entry = self.find(root, "public", "tree")
-        if entry is None:
-            raise ShapeError(f"a public/ tree at {commit.sha[:12]}", got="entries " + excerpt(", ".join(e.path for e in root[:20])))
-        return self.tree(entry.sha)
-
-    def averaging(self, commit):
-        """git blob sha of src/Table/Averaging.js, or None when the file is gone."""
-        node = self.tree(commit.tree)
-        for name in ("src", "Table"):
-            entry = self.find(node, name, "tree")
-            if entry is None:
-                return None
-            node = self.tree(entry.sha)
-        entry = self.find(node, "Averaging.js", "blob")
-        return entry.sha if entry else None
-
-    def blob(self, entry, cap=MAX_TABLE_BYTES):
-        if entry.sha in self.blobs:
-            return self.blobs[entry.sha]
-        if isinstance(entry.size, int) and entry.size > cap:
-            raise ShapeError(f"{entry.path} of at most {cap} bytes", got=f"{entry.size} bytes")
-        url = self.api(f"git/blobs/{entry.sha}")
-        data = verify_blob(self.net.get(url, cap=max(MAX_BODY_BYTES, cap * 2)).json(), entry.sha, url)
-        if len(data) > cap:
-            raise ShapeError(f"{entry.path} of at most {cap} bytes", got=f"{len(data)} bytes")
-        self.blobs[entry.sha] = data
-        return data
-
-    def blob_url(self, commit_sha, path, line=None):
-        url = f"https://github.com/{self.repo}/blob/{commit_sha}/{path}"
-        return url + (f"?plain=1#L{line}" if line else "")
+    def counts(self):
+        """(entries, open weight, linked) of the registry consulted first."""
+        if not self.tables:
+            return 0, 0, 0
+        t = self.tables[(self.order or [0])[0]]
+        return len(t), sum(e.openweight for e in t.values()), sum(bool(e.openweight and e.link) for e in t.values())
 
 
-def release_files(entries):
-    """{date: entry} for table_D.csv and categories_D.json; names that do not parse are ignored."""
-    tables, cats = {}, {}
-    for e in entries:
-        if e.type != "blob":
+def parse_registries(text):
+    """Registry of every `X={"id":{...},...}` object literal in the main script that holds `openweight:!0` entries.
+
+    Unparseable (a registry object that is not plain data, or an `openweight:!0` outside every object read) or
+    missing registries give Registry([], [], problem): a header warning, never a run failure."""
+    marks = [m.start() for m in re.finditer(re.escape(OPENWEIGHT_MARK), text)]
+    if not marks:
+        return Registry([], [], f"no model registry (no `{OPENWEIGHT_MARK}` entry) in the main script")
+    tables, sizes, spans = [], [], []
+    for m in REGISTRY_START_RE.finditer(text):
+        start = m.end()
+        end = balanced_end(text, start)
+        if end is None:
+            return Registry([], [], f"the object literal at offset {start} of the main script never closes")
+        if OPENWEIGHT_MARK not in text[start:end]:
             continue
-        for regex, target in ((TABLE_NAME_RE, tables), (CATEGORIES_NAME_RE, cats)):
-            m = regex.match(e.path)
-            if m:
-                try:
-                    target[dt.date.fromisoformat("-".join(m.groups())).isoformat()] = e
-                except ValueError:
-                    pass
-    return tables, cats
+        try:
+            tables.append(registry_entries(parse_js_literal(text[start:end])))
+        except (ValueError, IndexError, OverflowError) as exc:
+            return Registry([], [], f"the registry object at offset {start} of the main script does not parse "
+                                    f"({excerpt(exc, 80)})")
+        sizes.append(end - start)
+        spans.append((start, end))
+    outside = [p for p in marks if not any(a <= p < b for a, b in spans)]
+    if outside:
+        return Registry([], [], f"{len(outside)} of {len(marks)} `{OPENWEIGHT_MARK}` entries lie outside the "
+                                "registry objects read")
+    return Registry(tables, sizes)
+
+
+class Site:
+    """https://livebench.ai/, read without any token. Every file must have its expected media type: a 404 page or
+    any other HTML body where a CSV or JSON file belongs is a shape error, never data."""
+
+    def __init__(self, net):
+        self.net, self.cache = net, {}
+
+    def url(self, path):
+        return SITE_URL + path
+
+    def get(self, path, kind, cap=MAX_BODY_BYTES):
+        if path in self.cache:
+            return self.cache[path]
+        url = self.url(path)
+        reply = self.net.get(url, cap=cap)
+        mtype = media_type(reply.headers)
+        if mtype not in SITE_TYPES[kind] or (kind != "html" and looks_html(reply.body)):
+            raise ShapeError(f"{' or '.join(SITE_TYPES[kind])} from {url}",
+                             got=f"content-type {mtype or 'none'}, body " + excerpt(reply.body[:120]))
+        self.cache[path] = reply
+        return reply
+
+    def text(self, path, kind, cap=MAX_BODY_BYTES):
+        try:
+            return self.get(path, kind, cap).body.decode("utf-8")
+        except UnicodeDecodeError:
+            raise ShapeError(f"UTF-8 text from {self.url(path)}", got="bytes that are not UTF-8") from None
+
+    def required(self, path, kind, what):
+        """A file the site layout must have: a 404 or 410 means the layout changed (exit 2), not a network fault."""
+        try:
+            return self.get(path, kind)
+        except HttpStatus as exc:
+            if exc.code in (404, 410):
+                raise ShapeError(f"{what} at {self.url(path)} (leaderboard site layout changed?)",
+                                 got=f"HTTP {exc.code}") from None
+            raise
+
+    def main_script(self):
+        """(path, text) of the main script: asset-manifest.json files["main.js"], which index.html must load."""
+        self.required("", "html", "the leaderboard page")
+        page = self.text("", "html")
+        manifest = self.required("asset-manifest.json", "json", "the build's asset manifest").json()
+        named = manifest.get("files", {}).get("main.js") if isinstance(manifest, dict) and \
+            isinstance(manifest.get("files"), dict) else None
+        path = script_path(named) if isinstance(named, str) else None
+        if path is None:
+            raise ShapeError('asset-manifest.json files["main.js"] naming a same-site static/js/<name>.js script',
+                             got=excerpt(compact(manifest)[:200] if isinstance(manifest, (dict, list)) else manifest))
+        srcs = SCRIPT_SRC_RE.findall(page)
+        mains = [script_path(s) or s for s in srcs if urllib.parse.urlsplit(s).path.rsplit("/", 1)[-1].startswith("main.")]
+        if mains != [path]:
+            raise ShapeError(f"index.html loading the main script asset-manifest.json names ({path})",
+                             got="script src " + excerpt(", ".join(srcs) or "none"))
+        self.required(path, "js", "the main script")
+        return path, self.text(path, "js")
 
 
 # --- tables, categories, scoring ---------------------------------------------------------------
@@ -1017,7 +1308,7 @@ class RawTable:
     url: str
     header: list
     model_col: int
-    rows: list          # (id, cells, first physical line)
+    rows: list          # (id, cells, first physical line, data row number)
 
     def header_excerpt(self):
         return excerpt(",".join(self.header))
@@ -1049,7 +1340,7 @@ def read_csv(data, url):
     if len(model_cols) != 1:
         raise ShapeError(f"exactly one 'model' column at {url}", got=f"{len(model_cols)} in header " + excerpt(",".join(header)))
     out = []
-    for record, line in rows:
+    for number, (record, line) in enumerate(rows, 1):
         if len(record) != len(header):
             raise ShapeError(f"rows of {len(header)} cells at {url}", got=f"{len(record)} cells at line {line}")
         lb_id = record[model_cols[0]]
@@ -1058,26 +1349,55 @@ def read_csv(data, url):
         if lb_id in seen:
             raise ShapeError(f"one row per model id at {url}", got=f"a second row for {lb_id} at line {line}")
         seen.add(lb_id)
-        out.append((lb_id, record, line))
+        out.append((lb_id, record, line, number))
     return RawTable(url, header, model_cols[0], out)
 
 
-def parse_categories(data, url):
+def parse_categories(data, url, generation="v1"):
+    """(categories, weights, ignored weights) of a categories file.
+
+    v1: {category: [task, ...]}. 2.0: {suite: [column, ...], "_overall_weights": {suite: number}}, the weights read as
+    the site's code reads them: kept for an existing suite with a finite weight > 0 (else ignored and reported);
+    a weight that is not a finite number, or any other key starting with "_", is a shape error."""
     try:
         doc = json.loads(data.decode("utf-8-sig"))
-    except (UnicodeDecodeError, ValueError):
+    except (UnicodeDecodeError, ValueError, RecursionError):
         raise ShapeError(f"a JSON categories file at {url}", got=excerpt(data)) from None
     if not isinstance(doc, dict) or not doc:
         raise ShapeError(f"a JSON object {{category: [task, ...]}} at {url}", got=type(doc).__name__)
+    raw_weights = None
+    for name in doc:
+        if name.startswith("_"):
+            if name != WEIGHTS_KEY or generation != "2.0":
+                allowed = f"no key starting with _ other than {WEIGHTS_KEY}" if generation == "2.0" else \
+                    "no key starting with _ (v1 categories carry no weights)"
+                raise ShapeError(f"{allowed} at {url}", got=excerpt(name))
+            raw_weights = doc[name]
+    categories = {k: v for k, v in doc.items() if not k.startswith("_")}
+    if not categories:
+        raise ShapeError(f"at least one category at {url}", got="none")
     seen = set()
-    for name, tasks in doc.items():
+    for name, tasks in categories.items():
         if not isinstance(tasks, list) or not tasks or not all(isinstance(t, str) and t for t in tasks):
             raise ShapeError(f"a non-empty list of task ids per category at {url}", got=excerpt(f"{name}: {compact(tasks)}"))
         for task in tasks:
             if task in seen:
                 raise ShapeError(f"each task in one category at {url}", got=excerpt(f"{task} appears twice"))
             seen.add(task)
-    return {name: list(tasks) for name, tasks in doc.items()}
+    weights, ignored = {}, []
+    if raw_weights is not None:
+        if not isinstance(raw_weights, dict):
+            raise ShapeError(f"{WEIGHTS_KEY} as an object {{suite: number}} at {url}", got=type(raw_weights).__name__)
+        for name, w in raw_weights.items():
+            if not _number(w):
+                raise ShapeError(f"finite numbers in {WEIGHTS_KEY} at {url}", got=excerpt(f"{name}: {w!r}"))
+            if name not in categories:
+                ignored.append((name, w, "not a suite of this file"))
+            elif w <= 0:
+                ignored.append((name, w, "not positive"))
+            else:
+                weights[name] = float(w)
+    return {name: list(tasks) for name, tasks in categories.items()}, weights, ignored
 
 
 @dataclasses.dataclass
@@ -1090,13 +1410,15 @@ class Row:
     missing_tasks: int = 0
     total_tasks: int = 0
     rank: object = None
+    number: int = 0           # data row of the CSV (1 = the row after the header)
+    unit: str = "tasks"       # "suites" for 2.0 tables (one column per suite)
 
     @property
     def available(self):
         return sum(v is not None for v in self.categories.values())
 
     def missing_label(self):
-        return f"{self.missing_tasks} of {self.total_tasks} tasks missing" if self.missing_tasks else ""
+        return f"{self.missing_tasks} of {self.total_tasks} {self.unit} missing" if self.missing_tasks else ""
 
     def partial_label(self):
         return f"partial ({self.available} of {len(self.categories)} categories)"
@@ -1112,6 +1434,43 @@ def parse_cell(text, url, line, column):
     if not math.isfinite(number) or not SCORE_RANGE[0] <= number <= SCORE_RANGE[1]:
         raise ShapeError(f"decimal scores in [0, 100] at {url}", got=excerpt(f"{value} in {column} at line {line}"))
     return number
+
+
+def js_fixed2(x):
+    """JavaScript x.toFixed(2) read back with parseFloat: the exact binary value rounded half up (Python's round()
+    and "%.2f" round half to even), so 1.125 gives 1.13 and 2.675 (really 2.67499999...) gives 2.67."""
+    return float(decimal.Decimal(x).quantize(decimal.Decimal("0.01"), rounding=decimal.ROUND_HALF_UP))
+
+
+def js_mean(values):
+    """values.reduce((a, b) => a + b) / values.length, added left to right as JavaScript does (Python 3.12's sum()
+    compensates rounding errors, which can move a mean across a .xx5 rounding boundary)."""
+    total = 0.0
+    for v in values:
+        total += v
+    return total / len(values)
+
+
+def score_row_site(lb_id, line, values, categories, weights):
+    """A 2.0 row as the site's averaging code scores it: each suite is the mean of its columns that hold a number;
+    the overall is the weighted mean of the suites with a score (weight from _overall_weights, else 1), rounded to
+    2 decimals as toFixed(2). A row with no suite score has no overall."""
+    cats, missing, total = {}, 0, 0
+    for name, cols in categories.items():
+        present = [values[c] for c in cols if values[c] is not None]
+        total += len(cols)
+        missing += len(cols) - len(present)
+        cats[name] = js_mean(present) if present else None
+    row = Row(lb_id, line, cats, missing_tasks=missing, total_tasks=total, unit="suites")
+    num = den = 0.0
+    for name in categories:
+        w = weights.get(name, 1)
+        if cats[name] is not None and w > 0:
+            num += cats[name] * w
+            den += w
+    if den > 0:
+        row.overall = js_fixed2(num / den)
+    return row
 
 
 def score_row(lb_id, line, values, categories):
@@ -1130,8 +1489,10 @@ def score_row(lb_id, line, values, categories):
     return row
 
 
-def score_table(raw, categories):
-    """Rows ranked by (overall desc, id asc) with standard competition ranks; partial rows after them."""
+def score_table(raw, categories, generation="v1", weights=None):
+    """Rows ranked by (overall desc, id asc) with standard competition ranks; partial rows after them.
+
+    v1: the two-level mean (a whole category missing gives no overall). 2.0: the site's weighted suite mean."""
     columns = {}
     for i, h in enumerate(raw.header):
         name = h.strip()
@@ -1146,10 +1507,13 @@ def score_table(raw, categories):
                 raise ShapeError(f"task column {task} at {raw.url}", got="header " + raw.header_excerpt())
     tasks = [t for ts in categories.values() for t in ts]
     rows, values_seen = [], []
-    for lb_id, record, line in raw.rows:
+    for lb_id, record, line, number in raw.rows:
         values = {t: parse_cell(record[columns[t]], raw.url, line, t) for t in tasks}
         values_seen += [v for v in values.values() if v is not None]
-        rows.append(score_row(lb_id, line, values, categories))
+        row = (score_row_site(lb_id, line, values, categories, weights or {}) if generation == "2.0"
+               else score_row(lb_id, line, values, categories))
+        row.number = number
+        rows.append(row)
     if values_seen and max(values_seen) <= 1.0:
         raise ShapeError(f"percent-scale scores (0-100) at {raw.url}", got="every cell at most 1.0 (fraction scale?)")
     scored = sorted((r for r in rows if r.overall is not None), key=lambda r: (-r.overall, r.id))
@@ -1162,19 +1526,62 @@ def score_table(raw, categories):
 
 @dataclasses.dataclass
 class Release:
-    date: str
-    table: Entry
-    cats: Entry
+    entry: SiteRelease
     table_sha256: str
     cats_sha256: str
     categories: dict
+    weights: dict             # 2.0 suite weights in use (empty: every suite x1; always empty for v1)
+    ignored_weights: list     # (suite, value, why) entries of _overall_weights the site's code ignores
     scored: list
     partial: list
     extras: list
 
     @property
+    def date(self):
+        return self.entry.date
+
+    @property
+    def id(self):
+        return self.entry.id
+
+    @property
+    def generation(self):
+        return self.entry.generation
+
+    @property
+    def table_url(self):
+        return SITE_URL + self.entry.table_path
+
+    @property
+    def cats_url(self):
+        return SITE_URL + self.entry.categories_path
+
+    @property
     def task_count(self):
         return sum(len(t) for t in self.categories.values())
+
+    def taxonomy(self):
+        if self.generation == "2.0":
+            return f"{len(self.categories)} suites / {self.task_count} columns"
+        return f"{len(self.categories)} categories / {self.task_count} tasks"
+
+    def averaging(self, reviewed_on=None):
+        """The rule the overall follows, as the issue header states it."""
+        if self.generation == "v1":
+            return ("Overall: the two-level mean (task means within each category, then every category equally), "
+                    "calibrated against the recorded rows")
+        return (f"Overall per the site's averaging code (reviewed {reviewed_on}): " + weights_text(self.weights, list(self.categories))
+                + "; rounded to 2 decimals as the site shows it")
+
+
+def weights_text(weights, suites, quote=None):
+    """The site's own description (Cn in the reviewed script): which suites weigh other than 1."""
+    quote = quote or md_code
+    heavy = [s for s in suites if weights.get(s, 1) != 1]
+    if not heavy:
+        return "mean of the suites with a score (every suite ×1)"
+    return ("weighted mean of the suites with a score; weights " + ", ".join(f"{quote(s)} ×{weights[s]:g}" for s in heavy)
+            + ", the rest ×1")
 
 
 # --- strict matcher (the only route to naming a repository) -------------------------------
@@ -1483,7 +1890,7 @@ def next_link(header):
 @dataclasses.dataclass(eq=False)
 class Outcome:
     row: Row
-    kind: str                 # candidate | look | known | decided | info | variant
+    kind: str                 # candidate | look | known | decided | closed | info | variant
     reason: str
     counts: bool = False
     repo: object = None
@@ -1505,6 +1912,7 @@ class Outcome:
     note: str = ""
     variants: list = dataclasses.field(default_factory=list)
     variant_of: object = None
+    hint: object = None       # the LiveBench registry entry of the row, when there is one
 
     @property
     def reportable(self):
@@ -1544,44 +1952,37 @@ def count_rows(data):
 
 
 class Discovery:
-    def __init__(self, net, root, today):
+    def __init__(self, net, root, today, release=None):
         self.net, self.root, self.today = net, pathlib.Path(root), today
+        self.forced = release              # a --release id, or None (the newest release)
         self.stage = "local inputs"
-        self.local = self.lb = self.head = self.reviewed = self.release = None
+        self.local = self.site = self.release = self.script = self.registry = None
+        self.timeline = []
         self.complete = False
-        self.header_notes, self.warnings, self.notices = [], [], []
-        self.calibration, self.anchors, self.canary_results = [], [], []
+        self.header_notes, self.header_warnings, self.warnings, self.notices = [], [], [], []
+        self.calibration, self.soft_calibration, self.anchors, self.canary_results = [], [], [], []
         self.taxonomy = self.excluded_check = None
+        self.canary_score = (0, 0)
         self.listings, self.listing_pages = {}, 0
         self.info_cache, self.info_calls = {}, 0
         self.limits_hit = []
         self.outcomes, self.pool, self.partial_listed = [], [], []
         self.cutoff, self.below, self.best = None, 0, None
-        self.averaging, self.withheld = {}, False
 
     # .. pipeline ..........................................................................
     def run(self):
         self.local = load_local(self.root, self.today)
-        ev = self.local.evidence
-        self.lb = Leaderboard(self.net, ev.repo)
-        self.stage = "leaderboard commits"
-        self.head = self.lb.commit("HEAD")
-        self.reviewed = self.lb.commit(ev.revision, pinned=True)
-        averaging_commit = self.reviewed if self.local.averaging_revision == ev.revision \
-            else self.lb.commit(self.local.averaging_revision, pinned=True)
-        self.stage = "leaderboard trees"
-        self.head_public = self.lb.public(self.head)
-        self.reviewed_public = self.lb.public(self.reviewed)
-        self.averaging = {"revision": self.local.averaging_revision, "head": self.lb.averaging(self.head),
-                          "reviewed": self.lb.averaging(averaging_commit)}
+        self.site = Site(self.net)
+        self.stage = "leaderboard site"
+        self.read_site()
         self.stage = "release discovery"
-        dates = self.discover_releases()
+        self.discover_releases()
         self.stage = "calibration"
         self.calibrate()
         self.stage = "Hugging Face anchors"
         self.check_anchors()
         self.stage = "release table"
-        self.pick_release(dates)
+        self.pick_release()
         self.stage = "notices"
         self.static_notices()
         self.stage = "matcher canary"
@@ -1592,133 +1993,239 @@ class Discovery:
         self.complete = True
         return self
 
+    def read_site(self):
+        path, text = self.site.main_script()
+        body = self.site.get(path, "js").body
+        self.script = {"path": path, "url": SITE_URL + path, "sha256": hashlib.sha256(body).hexdigest(),
+                       "bytes": len(body)}
+        self.timeline = parse_release_lists(text)
+        if f'"{WEIGHTS_KEY}"' not in text:
+            raise ShapeError(f'the averaging code\'s "{WEIGHTS_KEY}" literal in {path}', got="no such literal")
+        self.registry = parse_registries(text)
+        if self.registry.problem:
+            self.header_warnings.append(f"LiveBench's model registry is not used: {md_code(self.registry.problem, EXCERPT_CAP)}"
+                                        "; matching uses the name rules alone.")
+
+    def entry(self, date):
+        return next((r for r in self.timeline if r.date == date), None)
+
     def discover_releases(self):
-        tables, cats = release_files(self.head_public)
-        names = ", ".join(e.path for e in self.head_public[:20])
-        if not tables:
-            raise ShapeError("public/table_YYYY_MM_DD.csv files at head", got="public/ entries " + excerpt(names))
-        dates = sorted(d for d in tables if d in cats)
         latest = self.local.evidence.latest_release
-        if latest not in dates:
-            raise ShapeError(f"release {latest} (latest_release in catalog/livebench-evidence.json) at head as "
-                             "public/table_ and public/categories_ files: leaderboard layout changed",
-                             got="public/ entries " + excerpt(names))
-        for date in sorted(tables):
-            if date > dates[-1] and date not in cats:
-                rows = count_rows(self.lb.blob(tables[date]))
+        if self.entry(latest) is None:
+            raise ShapeError(f"release {latest} (latest_release in catalog/livebench-evidence.json) on the "
+                             "livebench.ai timeline: leaderboard layout changed",
+                             got="timeline " + excerpt(", ".join(r.id for r in self.timeline)))
+        if self.forced is not None:
+            self.forced_entry()
+
+    def forced_entry(self):
+        """The timeline entry --release names: v1 YYYY-MM-DD, or a 2.0 release as YYYYMMDD or YYYY-MM-DD."""
+        rid = self.forced
+        found = None
+        if V2_ID_RE.match(rid):
+            found = next((r for r in self.timeline if r.generation == "2.0" and r.id == rid), None)
+        elif V1_ID_RE.match(rid):
+            found = self.entry(rid)
+        if found is None:
+            v1 = ", ".join(r.id for r in self.timeline if r.generation == "v1")
+            v2 = ", ".join(r.id for r in self.timeline if r.generation == "2.0")
+            raise ConfigError(f"--release {plain(rid, 40)} is not on the livebench.ai timeline (v1: {v1}; 2.0: {v2})")
+        return found
+
+    def load_release(self, entry):
+        table_url, cats_url = SITE_URL + entry.table_path, SITE_URL + entry.categories_path
+        table_bytes = self.site.get(entry.table_path, "csv", cap=MAX_TABLE_BYTES).body
+        cat_bytes = self.site.get(entry.categories_path, "json", cap=MAX_TABLE_BYTES).body
+        categories, weights, ignored = parse_categories(cat_bytes, cats_url, entry.generation)
+        scored, partial, extras = score_table(read_csv(table_bytes, table_url), categories, entry.generation, weights)
+        return Release(entry, hashlib.sha256(table_bytes).hexdigest(), hashlib.sha256(cat_bytes).hexdigest(),
+                       categories, weights, ignored, scored, partial, extras)
+
+    def pick_release(self):
+        if self.forced is not None:
+            entry = self.forced_entry()
+            try:
+                self.release = self.load_release(entry)
+            except HttpStatus as exc:
+                if exc.code not in (404, 410):
+                    raise
+                raise ShapeError(f"the table and categories files of release {entry.label} (forced with --release)",
+                                 got=f"HTTP {exc.code} for {urllib.parse.urlsplit(exc.url).path}") from None
+            n = len(self.release.scored)
+            self.header_notes.append(f"release {entry.date} is analysed because --release named it"
+                                     + (f"; it has only {n} scored rows (in progress?)" if n < MIN_RELEASE_ROWS else ""))
+        else:
+            self.pick_newest()
+        self.registry.rank([r.id for r in self.release.scored + self.release.partial])
+        if self.release.ignored_weights:
+            self.header_notes.append("weights the site's code ignores in `" + self.release.entry.categories_path + "`: "
+                                     + ", ".join(f"{md_code(n)} = {w!r} ({why})" for n, w, why in self.release.ignored_weights))
+
+    def pick_newest(self):
+        latest, waiting = self.local.evidence.latest_release, []
+        for entry in reversed(self.timeline):
+            if entry.date < latest:
+                break
+            try:
+                table = self.site.get(entry.table_path, "csv", cap=MAX_TABLE_BYTES)
+            except HttpStatus as exc:
+                if exc.code not in (404, 410):
+                    raise
+                self.header_notes.append(f"release {entry.label} is on the site's timeline, but `{entry.table_path}` "
+                                         f"answers HTTP {exc.code}; not analysed")
+                continue
+            try:
+                self.site.get(entry.categories_path, "json", cap=MAX_TABLE_BYTES)
+            except HttpStatus as exc:
+                if exc.code not in (404, 410):
+                    raise
+                rows = count_rows(table.body)
                 if rows >= MIN_RELEASE_ROWS:
                     self.notices.append(Notice(
-                        "release_without_categories", date,
-                        f"Release {date} published without a categories file; not analysed (layout change?)",
-                        [f"`public/table_{date.replace('-', '_')}.csv` has {rows} data rows at head and no "
-                         f"`public/categories_{date.replace('-', '_')}.json`."],
-                        "Clears when LiveBench publishes the categories file (the release is then analysed) or removes the table."))
+                        "release_without_categories", entry.date,
+                        f"Release {entry.date} published without a categories file; not analysed (layout change?)",
+                        [f"`{entry.table_path}` has {rows} data rows on livebench.ai and `{entry.categories_path}` "
+                         f"answers HTTP {exc.code}."],
+                        "Clears when LiveBench publishes the categories file (the release is then analysed) or "
+                        "removes the release."))
                 else:
-                    self.header_notes.append(f"`table_{date.replace('-', '_')}.csv` ({rows} rows) has no categories "
-                                             "file yet; not analysed.")
-        return dates
-
-    def load_release(self, date, entries, commit):
-        tables, cats = release_files(entries)
-        table, cat = tables[date], cats[date]
-        table_url = self.lb.blob_url(commit.sha, f"public/{table.path}")
-        table_bytes = self.lb.blob(table)
-        cat_bytes = self.lb.blob(cat)
-        categories = parse_categories(cat_bytes, self.lb.blob_url(commit.sha, f"public/{cat.path}"))
-        scored, partial, extras = score_table(read_csv(table_bytes, table_url), categories)
-        return Release(date, table, cat, hashlib.sha256(table_bytes).hexdigest(), hashlib.sha256(cat_bytes).hexdigest(),
-                       categories, scored, partial, extras)
-
-    def pick_release(self, dates):
-        latest, waiting = self.local.evidence.latest_release, []
-        for date in reversed(dates):
-            if date < latest:
-                break
-            release = self.load_release(date, self.head_public, self.head)
+                    self.header_notes.append(f"`{entry.table_path}` ({rows} rows) has no categories file yet; not analysed.")
+                continue
+            release = self.load_release(entry)
             if len(release.scored) >= MIN_RELEASE_ROWS:
                 self.release = release
                 break
-            waiting.append((date, len(release.scored)))
+            waiting.append((entry.date, len(release.scored)))
         if self.release is None:
             raise ShapeError(f"a release on or after {latest} with at least {MIN_RELEASE_ROWS} scored rows",
-                             got=", ".join(f"{d}: {n} scored rows" for d, n in waiting))
+                             got=", ".join(f"{d}: {n} scored rows" for d, n in waiting) or "no release loaded")
         for date, n in waiting:
             self.header_notes.append(f"release {date} looks in progress ({n} scored rows); analysing {self.release.date}")
 
     # .. calibration ..........................................................................
+    def site_file(self, path, kind, what):
+        """Bytes of a release file calibration needs; a missing one is a calibration failure."""
+        try:
+            return self.site.get(path, kind, cap=MAX_TABLE_BYTES).body
+        except HttpStatus as exc:
+            if exc.code in (404, 410):
+                raise ShapeError(f"calibration failed: {what} at {SITE_URL}{path}", got=f"HTTP {exc.code}") from None
+            raise
+
     def calibrate(self):
-        ev, rev12 = self.local.evidence, self.local.evidence.revision[:12]
-        tables, cats = release_files(self.reviewed_public)
+        ev = self.local.evidence
+        v1_dates = [r.date for r in self.timeline if r.generation == "v1"]
         groups = {}
         for rec in ev.recommendations:
-            groups.setdefault(rec.path, []).append(rec)
+            groups.setdefault(rec.site_path, []).append(rec)
         for path, recs in groups.items():
-            name = path.rsplit("/", 1)[1]
-            date = dt.date.fromisoformat("-".join(TABLE_NAME_RE.match(name).groups()))
-            entry = tables.get(date.isoformat())
-            if entry is None:
-                raise ShapeError(f"calibration failed: {name} at {rev12}", got="no such file in public/")
-            data = self.lb.blob(entry)
+            if recs[0].generation == "2.0":
+                self.check_recorded_v2(path, recs)
+                continue
+            name, url = recs[0].table_name, SITE_URL + path
+            data = self.site_file(path, "csv", f"the recorded table {name}")
             digest = hashlib.sha256(data).hexdigest()
             if digest != recs[0].sha256:
-                raise ShapeError(f"calibration failed: {name} at {rev12} with sha256 {recs[0].sha256}", got=f"sha256 {digest}")
-            raw = read_csv(data, self.lb.blob_url(ev.revision, path))
-            own = date.isoformat()
-            order = ([own] if own in cats else []) + sorted(
-                (d for d in cats if d != own), key=lambda d: (abs((dt.date.fromisoformat(d) - date).days), d))
+                raise ShapeError(f"calibration failed: {url} with the recorded sha256 {recs[0].sha256}", got=f"sha256 {digest}")
+            raw = read_csv(data, url)
+            own = "-".join(TABLE_NAME_RE.match(name).groups())
+            order = [own] + sorted((d for d in v1_dates if d != own),
+                                   key=lambda d: (abs((dt.date.fromisoformat(d) - dt.date.fromisoformat(own)).days), d))
             first_problem, used = None, None
             for cdate in order:
-                url = self.lb.blob_url(ev.revision, f"public/{cats[cdate].path}")
-                categories = parse_categories(self.lb.blob(cats[cdate]), url)
+                cpath = f"v1/categories_{cdate.replace('-', '_')}.json"
+                try:
+                    cbytes = self.site.get(cpath, "json", cap=MAX_TABLE_BYTES).body
+                except HttpStatus as exc:
+                    if exc.code not in (404, 410):
+                        raise
+                    first_problem = first_problem or f"{cpath}: HTTP {exc.code}"
+                    continue
+                categories, _, _ = parse_categories(cbytes, SITE_URL + cpath)
                 header = {h.strip() for h in raw.header}
                 missing = [t for ts in categories.values() for t in ts if t not in header]
                 if missing:
-                    first_problem = first_problem or f"{cats[cdate].path}: task {missing[0]} is not a column"
+                    first_problem = first_problem or f"{cpath}: task {missing[0]} is not a column"
                     continue
                 scored, partial, _ = score_table(raw, categories)
                 problem, names_differ = reproduces(scored + partial, recs)
                 if problem is None:
-                    used = (cats[cdate].path, names_differ)
+                    used = (cpath.split("/", 1)[1], names_differ)
                     break
-                first_problem = first_problem or f"{cats[cdate].path}: {problem}"
+                first_problem = first_problem or f"{cpath}: {problem}"
             if used is None:
-                raise ShapeError(f"calibration failed: no categories file at {rev12} reproduces the recorded scores "
-                                 f"of {name}", got=first_problem or "no categories files")
-            self.calibration.append({"table": name, "sha256": digest, "categories": used[0], "rows": len(recs),
-                                     "fallback": used[0] != f"categories_{own.replace('-', '_')}.json",
+                raise ShapeError(f"calibration failed: no categories file on livebench.ai/v1/ reproduces the recorded "
+                                 f"scores of {name}", got=first_problem or "no categories files")
+            self.calibration.append({"table": name, "url": url, "sha256": digest, "categories": used[0],
+                                     "rows": len(recs), "fallback": used[0] != f"categories_{own.replace('-', '_')}.json",
                                      "names_differ": used[1]})
-        ref = self.local.benchmarks.reference_release
-        entry = cats.get(ref)
-        if entry is None:
-            raise ShapeError(f"calibration failed: categories_{ref.replace('-', '_')}.json at {rev12}", got="no such file")
-        reference = parse_categories(self.lb.blob(entry), self.lb.blob_url(ev.revision, f"public/{entry.path}"))
         bench = self.local.benchmarks
+        ref = self.entry(bench.reference_release)
+        if ref is None or ref.generation != "v1":
+            raise ShapeError(f"catalog/benchmarks.json reference_release {bench.reference_release} as a v1 release on the "
+                             "livebench.ai timeline (2.0 suites are another taxonomy, never compared with benchmarks.json)",
+                             got="not on the timeline" if ref is None else "a 2.0 release")
+        url = SITE_URL + ref.categories_path
+        reference, _, _ = parse_categories(self.site_file(ref.categories_path, "json", "the reference categories"), url)
         if partition(reference) != bench.partition:
-            raise ShapeError(f"calibration failed: {entry.path} at {rev12} with the task partition of "
-                             f"catalog/benchmarks.json ({len(bench.partition)} sets, "
-                             f"{sum(len(s) for s in bench.partition)} tasks; re-pin leaderboard_revision when "
-                             "benchmarks.json changes)", got=partition_diff(reference, bench.categories))
-        self.taxonomy = {"file": entry.path, "sets": len(bench.partition), "tasks": sum(len(s) for s in bench.partition)}
-        self.check_excluded_examples(tables, cats)
+            raise ShapeError(f"calibration failed: {url} with the task partition of catalog/benchmarks.json "
+                             f"({len(bench.partition)} sets, {sum(len(s) for s in bench.partition)} tasks)",
+                             got=partition_diff(reference, bench.categories),
+                             fix="livebench.ai serves this file unversioned. If LiveBench changed it, record the new "
+                                 "partition in catalog/benchmarks.json together with catalog/livebench-evidence.json "
+                                 "(latest_release, checked_on and the recorded rows of that release) in one change; "
+                                 "editing either file alone leaves them disagreeing.")
+        self.taxonomy = {"file": ref.categories_path, "url": url, "sets": len(bench.partition),
+                         "tasks": sum(len(s) for s in bench.partition)}
+        self.check_excluded_examples()
 
-    def check_excluded_examples(self, tables, cats):
-        """Soft: the evidence's excluded examples' scores still appear in their release table at the reviewed commit."""
+    def check_recorded_v2(self, path, recs):
+        """Soft: a recorded 2.0 row. 2.0 tables are not versioned and grow as LiveBench adds rows, so other bytes are
+        a warning, never a failure; the same bytes must reproduce the recorded scores with the site's averaging."""
+        url, entry = SITE_URL + path, None
+        date = "-".join(SITE_V2_TABLE_RE.match(url).group(2, 3, 4))
+        result = {"table": path, "rows": len(recs), "status": None}
+        self.soft_calibration.append(result)
+        entry = next((r for r in self.timeline if r.generation == "2.0" and r.date == date), None)
+        try:
+            if entry is None:
+                raise ShapeError(f"release {date} on the timeline", got="absent")
+            data = self.site.get(path, "csv", cap=MAX_TABLE_BYTES).body
+            digest = hashlib.sha256(data).hexdigest()
+            if digest != recs[0].sha256:
+                result["status"] = "changed"
+                self.warnings.append(f"recorded 2.0 rows of `{path}` not re-checked: livebench.ai now serves other bytes "
+                                     f"(sha256 `{digest}`, recorded `{recs[0].sha256}`); 2.0 tables are not versioned")
+                return
+            release = self.load_release(entry)
+            problem, _ = reproduces(release.scored + release.partial, recs)
+        except (ShapeError, HttpStatus) as exc:
+            result["status"] = "unreadable"
+            self.warnings.append(f"recorded 2.0 rows of `{path}` not re-checked: {md_code(exc, EXCERPT_CAP)}")
+            return
+        result["status"] = "reproduced" if problem is None else "differs"
+        if problem:
+            self.warnings.append(f"recorded 2.0 rows of `{path}` do not reproduce: {md_code(problem, EXCERPT_CAP)}")
+
+    def check_excluded_examples(self):
+        """Soft: the evidence's excluded examples' scores still appear in their release table on livebench.ai."""
         self.excluded_check, scored = [], {}
         for ex in self.local.evidence.excluded:
             date = ex["release"]
             try:
-                if date not in tables or date not in cats:
-                    raise ShapeError(f"table and categories files of {date} at the reviewed commit", got="missing")
+                entry = self.entry(date)
+                if entry is None:
+                    raise ShapeError(f"release {date} on the livebench.ai timeline", got="absent")
                 if date not in scored:
-                    scored[date] = self.load_release(date, self.reviewed_public, self.reviewed).scored
+                    scored[date] = self.load_release(entry).scored
                 hits = [r for r in scored[date] if abs(r.overall - ex["score"]) <= OVERALL_TOL]
-            except ShapeError as exc:
+            except (ShapeError, HttpStatus) as exc:
                 self.warnings.append(f"excluded-example check for {md_code(ex['model'])} not run: {md_code(exc, EXCERPT_CAP)}")
                 self.excluded_check.append({"model": ex["model"], "score": ex["score"], "found": None})
                 continue
             if not hits:
-                self.warnings.append(f"no row of table_{date.replace('-', '_')}.csv at the reviewed commit has the "
-                                     f"overall {ex['score']:.2f} recorded for {md_code(ex['model'])}")
+                self.warnings.append(f"no row of the {date} table on livebench.ai has the overall {ex['score']:.2f} "
+                                     f"recorded for {md_code(ex['model'])}")
             self.excluded_check.append({"model": ex["model"], "score": ex["score"], "found": hits[0].id if hits else None})
 
     def check_anchors(self):
@@ -1735,64 +2242,73 @@ class Discovery:
                 raise
             if not isinstance(doc, dict):
                 raise ShapeError("Hugging Face metadata shape changed: a model-info object", got=type(doc).__name__)
+            recorded, reported = meta["safetensors"], _safetensors(doc.get("safetensors"))
+            # id, sha, total, the set of dtypes and every float count must be as recorded; an integer count may differ
+            # (Hugging Face changed how it counts packed U8 elements at unchanged revisions): a warning only.
             same = (str(doc.get("id", "")).casefold() == model.repo.casefold() and doc.get("sha") == meta["sha"]
-                    and doc.get("safetensors") is not None and doc.get("safetensors") == meta["safetensors"])
+                    and reported is not None and reported["total"] == recorded["total"]
+                    and set(reported["parameters"]) == set(recorded["parameters"])
+                    and all(reported["parameters"][k] == v for k, v in recorded["parameters"].items() if k not in INT_DTYPES))
             if not same:
                 raise ShapeError(f"Hugging Face metadata shape changed: {cid} revision {meta['sha'][:12]} with the "
-                                 "id, sha and safetensors recorded in catalog/models.json",
+                                 "id, sha, safetensors total, dtypes and float counts recorded in catalog/models.json",
                                  got=excerpt(compact({k: doc.get(k) for k in ("id", "sha", "safetensors")})))
-            kind = parameter_count(meta["safetensors"], tokens(model.repo, model.repo.split("/")[0]), self.local.budgets).kind
-            if kind != ANCHOR_CLASSES[cid]:
-                raise ShapeError(f"anchor {cid} classified as a {ANCHOR_CLASSES[cid]} checkpoint", got=kind)
+            int_changes = [(k, reported["parameters"][k], v) for k, v in sorted(recorded["parameters"].items())
+                           if k in INT_DTYPES and reported["parameters"][k] != v]
+            for k, now, then in int_changes:
+                self.header_warnings.append(
+                    f"Hugging Face now reports {k} = {now} at the recorded revision of {md_code(model.repo)} "
+                    f"(`{meta['sha'][:12]}`); catalog records {then}; packed size ranges use the reported counts.")
+            names = tokens(model.repo, model.repo.split("/")[0])
+            kinds = {parameter_count(st, names, self.local.budgets).kind for st in (recorded, reported)}
+            if kinds != {ANCHOR_CLASSES[cid]}:
+                raise ShapeError(f"anchor {cid} classified as a {ANCHOR_CLASSES[cid]} checkpoint",
+                                 got=" / ".join(sorted(kinds)) + " (recorded / reported counts)")
             note = ""
             if doc.get("gated") != meta["gated"]:
                 note = f"gated is {doc.get('gated')!r}, catalog records {meta['gated']!r}"
                 self.warnings.append(f"HF anchor `{cid}`: {md_code(note)} (a repo-level setting; not a shape change)")
-            self.anchors.append({"catalog_id": cid, "repo": model.repo, "sha": meta["sha"], "class": kind, "note": note})
+            self.anchors.append({"catalog_id": cid, "repo": model.repo, "sha": meta["sha"], "class": ANCHOR_CLASSES[cid],
+                                 "note": note, "int_changes": [{"dtype": k, "reported": a, "recorded": b}
+                                                               for k, a, b in int_changes]})
 
     # .. notices that need no Hugging Face ...................................................
     def static_notices(self):
         ev, r = self.local.evidence, self.release
-        head12, repo_name = self.head.sha[:12], ev.repo.split("/")[1]
         if r.date > ev.latest_release:
             releases = self.local.releases
             scorer = ("scorer support unknown (RELEASES not found in src/llm_eval/livebench.py)" if releases is None
                       else f"{r.date} is in `src/llm_eval/livebench.py` RELEASES: the pinned scorer lane can run it"
                       if r.date in releases else
                       f"{r.date} is not in `src/llm_eval/livebench.py` RELEASES: the pinned scorer lane cannot run it yet")
-            lines = [f"LiveBench publishes release {r.date} ({len(r.scored)} scored rows) at {repo_name}@{head12}; "
+            gen = "v1" if r.generation == "v1" else f"LiveBench 2.0, id `{r.id}`"
+            lines = [f"LiveBench publishes release {r.date} ({gen}, {len(r.scored)} scored rows) on livebench.ai; "
                      f"catalog/livebench-evidence.json still records latest_release {ev.latest_release}. Releases are "
-                     "different test sets: keep every recorded score labelled with its own release.",
-                     "Categories and tasks against catalog/benchmarks.json: " + partition_diff(r.categories, self.local.benchmarks.categories, markdown=True),
-                     scorer,
-                     "Checklist: catalog/livebench-evidence.json `latest_release` / `leaderboard_revision` / `checked_on`; "
-                     "catalog/benchmarks.json `reference_release` / categories; catalog/installers.json `livebench.release`; "
-                     "`RELEASES` in src/llm_eval/livebench.py; docs/LIVEBENCH.md."]
+                     "different test sets: keep every recorded score labelled with its own release."]
+            if r.generation == "v1":
+                lines.append("Categories and tasks against catalog/benchmarks.json: "
+                             + partition_diff(r.categories, self.local.benchmarks.categories, markdown=True))
+            else:
+                lines.append("Its suites are LiveBench 2.0's own taxonomy, never compared with catalog/benchmarks.json: "
+                             + ", ".join(md_code(c) for c in r.categories) + "; overall: "
+                             + weights_text(r.weights, list(r.categories)) + ".")
+            lines += [scorer,
+                      "Checklist: catalog/livebench-evidence.json `latest_release` / `checked_on`; "
+                      "catalog/benchmarks.json `reference_release` / categories; catalog/installers.json `livebench.release`; "
+                      "`RELEASES` in src/llm_eval/livebench.py; docs/LIVEBENCH.md."]
             self.notices.append(Notice("new_release", r.date, f"New LiveBench release {r.date}", lines,
                                        "Clears when catalog/livebench-evidence.json `latest_release` records it: that edit is the decision."))
-        head_avg, reviewed_avg = self.averaging["head"], self.averaging["reviewed"]
-        if head_avg is None or head_avg != reviewed_avg:
-            rev = self.averaging["revision"]
-            compare_url = f"https://github.com/{ev.repo}/compare/{rev}...{self.head.sha}"
-            gone = " (src/Table/Averaging.js is gone at head)" if head_avg is None else ""
+        reviewed, served = self.local.site.main_script, self.script["path"]
+        if served != reviewed:
             self.notices.append(Notice(
-                "averaging_changed", head_avg or "gone", "Leaderboard averaging code changed",
-                [f"leaderboard averaging code changed since {rev[:12]} ([compare]({compare_url})){gone}; candidates are "
-                 "withheld until the aggregation is re-checked: then set leaderboard.averaging_reviewed_revision"],
-                "Clears when `leaderboard.averaging_reviewed_revision` in catalog/model-discovery.json names a commit "
-                "with the same Averaging.js blob as head."))
-            self.withheld = True
-        bench = self.local.benchmarks
-        if r.date == bench.reference_release and partition(r.categories) != bench.partition:
-            self.notices.append(Notice(
-                "categories_drift", r.date, f"Task partition of {r.date} changed at head",
-                [f"`public/{r.cats.path}` at {repo_name}@{head12} no longer has the task partition of "
-                 "catalog/benchmarks.json: " + partition_diff(r.categories, bench.categories, markdown=True)],
-                f"Clears when catalog/benchmarks.json records the new partition and, in the same change, "
-                f"catalog/livebench-evidence.json `leaderboard_revision` and every `source_table` URL name a commit "
-                f"that has it (head is `{head12}`), each table still matching its recorded `source_sha256` there. "
-                f"Calibration checks benchmarks.json against `public/{r.cats.path}` at `leaderboard_revision`, so "
-                "editing benchmarks.json alone fails every run."))
+                "site_code_changed", served, "Leaderboard site code changed",
+                [f"the averaging code was reviewed in {md_code(reviewed)} (on {self.local.site.reviewed_on}); re-read the "
+                 f"weights rule in {md_code(served)} ([script]({SITE_URL}{served})) and update `site` once it still "
+                 "holds. Candidates are not withheld: the site's bundle changes on every deploy, and the run still "
+                 f"requires the `{WEIGHTS_KEY}` literal and checks every categories file's weights."],
+                "Clears when `site.main_script` in catalog/model-discovery.json names the served script (with "
+                "`site.reviewed_on` the date it was re-read)."))
+
 
     # .. Hugging Face ............................................................................
     def fetch_info(self, repo):
@@ -1876,7 +2392,7 @@ class Discovery:
             total += name_equal
             pub, _ = self.local.publisher(rec.lb_id)
             if pub is None:
-                self.warnings.append(f"matcher canary: {md_code(rec.lb_id)} has no publisher entry")
+                self.header_warnings.append(f"matcher canary: {md_code(rec.lb_id)} has no publisher entry")
                 self.canary_results.append({"id": rec.lb_id, "expected": model.repo, "result": "no publisher", "name_equal": name_equal})
                 continue
             status, found, _ = strict_match(rec.lb_id, pub.orgs, self.listing)
@@ -1887,7 +2403,7 @@ class Discovery:
             if status == "match":
                 ok += name_equal
             elif name_equal:
-                self.warnings.append(f"matcher canary: {md_code(rec.lb_id)} is now {status} (expected {md_code(model.repo)})")
+                self.header_warnings.append(f"matcher canary: {md_code(rec.lb_id)} is now {status} (expected {md_code(model.repo)})")
             self.canary_results.append({"id": rec.lb_id, "expected": model.repo, "result": result, "name_equal": name_equal})
         self.canary_score = (ok, total)
 
@@ -1930,6 +2446,13 @@ class Discovery:
         d = L.decisions.for_lb(row.id)
         kind = d["decision"] if d is not None else None
         pub, prefix = L.publisher(row.id)
+        hint = self.registry.get(row.id) if self.registry else None
+        o = self.resolve_with(row, d, kind, pub, prefix, hint)
+        o.hint = hint
+        return o
+
+    def resolve_with(self, row, d, kind, pub, prefix, hint):
+        L = self.local
         if kind == "alias":
             return self.alias(row, d, pub, prefix)
         if kind == "rejected":
@@ -1937,23 +2460,38 @@ class Discovery:
         if kind == "deferred" and self.today <= iso_date(d["until"]):
             return Outcome(row, "decided", "deferred", counts=True, decision=d)
         if kind == "not_open_weight" and pub is None:
-            return Outcome(row, "decided", "not_open_weight", decision=d)
+            note = (f"LiveBench's registry lists it as open weight (links {hint.link})" if hint and hint.openweight
+                    and hint.link else "LiveBench's registry lists it as open weight" if hint and hint.openweight else "")
+            return Outcome(row, "decided", "not_open_weight", decision=d, note=note)
         # Left: no lb: decision, an expired deferral, or not_open_weight with a publisher. A row that resolves to a
-        # known model is known whatever such a decision says: catalogued models are never raised or shadowed.
+        # known model is known whatever such a decision (or LiveBench's registry) says: catalogued models are never
+        # raised or shadowed.
         rec = L.evidence_by_lb.get(row.id)
         if rec:
             model = L.by_id[rec.model_id]
             return self.stale(self.known(row, "evidence", model.repo, model), d)
         if kind == "deferred":
             if pub is not None:
-                status, found, _ = strict_match(row.id, pub.orgs, self.listing)
-                known = self.known_repo(found.repo) if status == "match" else None
+                status, found, _ = self.locate(row, pub, hint)
+                known = self.known_repo(found.repo) if status in ("match", "outside") else None
                 if known:
                     return self.stale(self.known(row, known[0], found.repo, known[1], known[2], match=found), d)
             return Outcome(row, "look", "deferral_expired", counts=True, decision=d, publisher=pub, prefix=prefix)
+        if kind is None and hint is not None and not hint.openweight:
+            return self.closed(row, pub, prefix)
         if pub is None:
+            if hint is not None and hint.link:
+                return self.linked_outside(row, hint.link, None, None)
             return Outcome(row, "look", "unknown_publisher", counts=True)
-        status, found, pool = strict_match(row.id, pub.orgs, self.listing)
+        status, found, pool = self.locate(row, pub, hint)
+        if status == "outside":
+            if kind == "not_open_weight":
+                known = self.known_repo(found.repo)
+                if known:
+                    return self.stale(self.known(row, known[0], found.repo, known[1], known[2], match=found), d)
+                return Outcome(row, "decided", "not_open_weight", decision=d,
+                               note=f"LiveBench links {found.repo}, outside the publisher's orgs")
+            return self.linked_outside(row, found.repo, pub, prefix)
         if kind == "not_open_weight":
             if status != "match":
                 return Outcome(row, "decided", "not_open_weight", decision=d, pool_size=pool)
@@ -1971,6 +2509,47 @@ class Discovery:
         if status == "no_repo":
             return Outcome(row, "look", "no_repo", counts=True, publisher=pub, prefix=prefix, pool_size=pool)
         return self.evaluate(row, found, pub, prefix)
+
+    def locate(self, row, pub, hint):
+        """The repository a row names: the one LiveBench's registry links (an open-weight entry with a huggingface:
+        link), else the strict matcher's answer. ('match', Match, pool) | ('ambiguous', [Match], pool) |
+        ('no_repo', None, pool) | ('outside', Match, 0) for a link outside the publisher's orgs."""
+        if hint is not None and hint.openweight and hint.link:
+            org = hint.link.split("/")[0]
+            m = Match(hint.link, org, "linked", [], 0, [], 0)
+            inside = org.casefold() in {o.casefold() for o in pub.orgs}
+            return ("match" if inside else "outside"), m, 0
+        return strict_match(row.id, pub.orgs, self.listing)
+
+    def closed(self, row, pub, prefix):
+        """A row LiveBench's registry lists without openweight: like a not_open_weight decision, it takes no place in
+        the pool, unless it is catalogued or a strict match in an allowlisted org exists ("weights may be public")."""
+        why = "LiveBench's registry lists it without openweight"
+        if pub is None:
+            return Outcome(row, "closed", "livebench_closed")
+        status, found, pool = strict_match(row.id, pub.orgs, self.listing)
+        if status != "match":
+            return Outcome(row, "closed", "livebench_closed", publisher=pub, prefix=prefix, pool_size=pool)
+        o = self.evaluate(row, found, pub, prefix)
+        if o.reportable:
+            o.underlying, o.kind, o.reason, o.counts = o.label(), "look", "weights_may_be_public", True
+            o.note = why
+            return o
+        if o.kind == "known" or o.reason == "too_large":
+            o.note = f"{why}; the row resolves to {o.repo} ({o.label()})"
+            return o
+        return Outcome(row, "closed", "livebench_closed", repo=found.repo, publisher=pub, prefix=prefix,
+                       note=f"strict match {found.repo}: {o.label()}")
+
+    def linked_outside(self, row, repo, pub, prefix):
+        """LiveBench links a repository outside the publisher's orgs (or the row has no publisher): never a candidate."""
+        match = Match(repo, repo.split("/")[0], "linked", [], 0, [], 0)
+        found = self.known_repo(repo)
+        if found:
+            return self.known(row, found[0], repo, found[1], found[2], match=match)
+        base = {"repo": repo, "match": match, "publisher": pub, "prefix": prefix}
+        return self.repo_decision(row, repo, base) or Outcome(row, "look", "linked_outside_publisher", counts=True, **base)
+
 
     @staticmethod
     def stale(o, d):
@@ -2100,7 +2679,7 @@ class Discovery:
 
     # .. results .................................................................................
     def listed_candidates(self):
-        return [] if self.withheld else [o for o in self.outcomes if o.kind == "candidate"]
+        return [o for o in self.outcomes if o.kind == "candidate"]
 
     def looks(self):
         return [o for o in self.outcomes if o.kind == "look"]
@@ -2223,21 +2802,23 @@ class Report:
     # .. header ......................................................................................
     def header(self):
         d, ev, r = self.d, self.d.local.evidence, self.d.release
-        repo, head = ev.repo, d.head.sha
-        lb_head = f"https://github.com/{repo}/tree/{head}"
         cal_rows = sum(c["rows"] for c in d.calibration)
+        cal_total = sum(1 for rec in ev.recommendations if rec.generation == "v1")
         ok, total = d.canary_score
-        avg_rev = d.averaging["revision"][:12]
-        avg = (f"averaging code unchanged since `{avg_rev}`" if not d.withheld
-               else f"averaging code **changed** since `{avg_rev}`")
+        site, script = d.local.site, d.script
+        code = (f"site code `{script['path']}` as reviewed on {site.reviewed_on}" if script["path"] == site.main_script
+                else f"site code **changed**: `{script['path']}` served, `{site.main_script}` reviewed")
+        gen = "v1" if r.generation == "v1" else f"LiveBench 2.0, id `{r.id}`"
         lines = [
-            f"- Leaderboard: {md_code(repo)} @ [`{head[:12]}`]({lb_head}) (committed {md_code(d.head.date[:10])}).",
-            f"- Analysis release **{r.date}** ({len(r.scored)} scored rows; catalog evidence records {ev.latest_release}).",
-            f"- Table [`{r.table.path}`]({d.lb.blob_url(head, 'public/' + r.table.path)}), sha256 `{r.table_sha256}`, "
-            f"git blob `{r.table.sha}`; categories [`{r.cats.path}`]({d.lb.blob_url(head, 'public/' + r.cats.path)}), "
-            f"sha256 `{r.cats_sha256}`, git blob `{r.cats.sha}`, {len(r.categories)} categories / {r.task_count} tasks.",
-            f"- Checks: calibration {cal_rows}/{len(ev.recommendations)} recorded rows reproduced, HF anchors "
-            f"{len(d.anchors)}/{len(HF_ANCHORS)}, matcher canary {ok}/{total}; {avg}.",
+            f"- Leaderboard: [livebench.ai]({SITE_URL}), main script [`{script['path']}`]({script['url']}) (sha256 "
+            f"`{script['sha256']}`). livebench.ai serves no versioned history; the sha256 values identify the bytes read.",
+            f"- Analysis release **{r.date}** ({gen}; {len(r.scored)} scored rows; catalog evidence records "
+            f"{ev.latest_release}).",
+            f"- Table [`{r.entry.table_path}`]({r.table_url}), sha256 `{r.table_sha256}`; categories "
+            f"[`{r.entry.categories_path}`]({r.cats_url}), sha256 `{r.cats_sha256}`, {r.taxonomy()}.",
+            f"- {r.averaging(site.reviewed_on)}.",
+            f"- Checks: calibration {cal_rows}/{cal_total} recorded v1 rows reproduced, HF anchors "
+            f"{len(d.anchors)}/{len(HF_ANCHORS)}, matcher canary {ok}/{total}; {code}; {self.registry_text()}.",
             f"- Selection: the {POOL_SIZE} highest-scoring entries of {r.date} that could be self-hosted open-weight "
             f"models (ties included; cutoff overall {fmt(d.cutoff)}).",
         ]
@@ -2248,8 +2829,18 @@ class Report:
         else:
             lines.append(f"- Best catalogued model in {r.date}: none listed in {r.date} among the walked rows.")
         lines += [f"- Note: {n}" for n in d.header_notes]
-        lines += [f"- Warning: {w}" for w in d.warnings if w.startswith("matcher canary")]
+        lines += [f"- Warning: {w}" for w in d.header_warnings]
         return lines
+
+    def registry_text(self):
+        reg, r = self.d.registry, self.d.release
+        if reg is None or reg.problem:
+            return "LiveBench model registry not used (see the warning)"
+        entries, open_, linked = reg.counts()
+        held = reg.coverage[reg.order[0]] if reg.order else 0
+        rows = len(r.scored) + len(r.partial)
+        return (f"LiveBench model registry: {entries} entries holding {held} of the release's {rows} ids, "
+                f"{open_} open weight, {linked} with a Hugging Face link")
 
     def disclaimer(self):
         return "> " + DISCLAIMER.format(release=self.d.release.date)
@@ -2261,14 +2852,23 @@ class Report:
         delta = fmt(o.row.overall - d.best.row.overall) if d.best else "n/a"
         if d.best and not delta.startswith("-"):
             delta = "+" + delta
-        head = ["Release", "Overall", "Rank", "Δ vs best catalogued"] + [md_code(c) for c in cats] + ["Tasks"]
+        head = ["Release", "Overall", "Rank", "Δ vs best catalogued"] + [md_code(c) for c in cats] + [
+            "Tasks" if r.generation == "v1" else "Suites"]
         values = [r.date, fmt(o.row.overall), f"{o.row.rank}/{len(r.scored)}", delta]
         values += [fmt(o.row.categories[c]) for c in cats] + [o.row.missing_label() or "all present"]
         return ["| " + " | ".join(head) + " |", "|" + "---|" * len(head), "| " + " | ".join(values) + " |"]
 
+    def row_citation(self, row):
+        r = self.d.release
+        return f"[`{r.entry.table_path}`]({r.table_url}) row {row.number} (line {row.line})"
+
     def match_text(self, o):
         m = o.match
-        if m.tier == "alias":   # no name match and no uniqueness check ran: the owner's alias names the repository
+        if m.tier == "linked":   # LiveBench's own registry names the repository: no name match, no uniqueness check
+            text = (f"Match: LiveBench links this repository (its registry entry for {md_code(o.row.id)}), not "
+                    f"matched by name; org {md_code(m.org)} is an allowlisted publisher org"
+                    + (f" via prefix {md_code(o.prefix)}" if o.prefix else ""))
+        elif m.tier == "alias":   # no name match and no uniqueness check ran: the owner's alias names the repository
             org = o.info.org if o.info else m.org
             text = (f"Match: set by the alias decision {md_code(o.decision['key'])}, not by name; model info places "
                     f"the repository in the publisher org {md_code(org)}")
@@ -2321,26 +2921,20 @@ class Report:
         new = " (new since last refresh)" if self.is_new(o.key()) else ""
         out = [f"#### {md_code(o.row.id)} → [{md_code(i.id)}]({hf_tree(i.id, i.sha)}){new}", ""]
         out += self.row_table(o) + [""]
-        row_url = d.lb.blob_url(d.head.sha, "public/" + r.table.path, o.row.line)
         variants = "".join(f"; variant {md_code(v.row.id)} {fmt(v.row.overall)}" for v in o.variants)
-        out += [f"- Leaderboard row: [{r.table.path} line {o.row.line}]({row_url}){variants}.",
+        out += [f"- Leaderboard row: {self.row_citation(o.row)} on [livebench.ai]({SITE_URL}){variants}.",
                 f"- {self.open_weights_text(o)}", f"- {self.match_text(o)}", f"- {self.params_text(o)}",
                 f"- {self.fit_text(o)}", ""]
         reject = {"key": f"hf:{i.id}", "decision": "rejected", "reason": "TODO", "decided_on": d.today.isoformat(),
                   "release": r.date}
         stanza = {"model_id": "TODO", "leaderboard_model_id": o.row.id, "release": r.date,
                   "overall": round(o.row.overall, 2), "category_scores": dict(o.row.categories),
-                  "source_table": d.lb.blob_url(d.head.sha, "public/" + r.table.path),
-                  "source_sha256": r.table_sha256, "meaning": d.local.evidence.meaning}
-        ev, head12 = d.local.evidence, d.head.sha[:12]
-        stanza_note = "Set `model_id` to its catalog/models.json id."
-        if d.head.sha != ev.revision:
-            stanza_note += (
-                f" Its `source_table` is pinned to head `{head12}`, but every recommendation must name one commit, "
-                f"`leaderboard_revision` (now `{ev.revision[:12]}`): add it only together with moving "
-                f"`leaderboard_revision` and every existing `source_table` URL to `{head12}`, after checking that "
-                "each existing table still has its recorded `source_sha256` at that commit (calibration checks "
-                "them). Pasted alone, it fails local validation and every run.")
+                  "source_table": r.table_url, "source_sha256": r.table_sha256, "meaning": d.local.evidence.meaning}
+        stanza_note = ("Set `model_id` to its catalog/models.json id. livebench.ai serves no versioned history: "
+                       "`source_sha256` identifies the bytes read.")
+        if r.generation == "2.0":
+            stanza_note += (" A 2.0 table grows as LiveBench adds rows, so every run re-checks a recorded 2.0 row "
+                            "softly: other bytes are a step-summary warning, never a failure.")
         out += ["<details><summary>Decision snippets</summary>", "",
                 "Reject: append to `decisions` in catalog/model-discovery.json. Pasting it unedited fails CI until "
                 "the reason is real.", "", "```json", snippet(reject), "```", "",
@@ -2360,6 +2954,10 @@ class Report:
             return {"key": f"lb:{o.row.id}", "decision": "alias", "target": "TODO", **base}, \
                 "Replace the target with the reviewed repository" + (
                     " (replace the existing alias entry)." if o.reason == "alias_target_unavailable" else ".")
+        if o.reason == "linked_outside_publisher":
+            return {"key": f"hf:{o.repo}", "decision": "rejected", **base}, (
+                "Or, when the linked org is the model's official publisher, add a publisher entry for it to "
+                "catalog/model-discovery.json (the repository is then verified as a candidate).")
         if o.reason in ("no_repo", "unknown_publisher"):
             note = "Or add a publisher entry (prefix and official Hugging Face org) to catalog/model-discovery.json."
             if o.reason == "no_repo":
@@ -2384,7 +2982,13 @@ class Report:
         if o.reason == "deferral_expired":
             return f" {md_code(o.decision['key'])} was deferred until {o.decision['until']}: {md_code(o.decision['reason'])}."
         if o.reason == "weights_may_be_public":
-            return f" {md_code(o.decision['key'])} recorded not_open_weight; strict match {md_code(o.repo)} ({o.underlying})."
+            what = (f"{md_code(o.decision['key'])} recorded not_open_weight" if o.decision
+                    else "LiveBench's registry lists it without `openweight`")
+            return f" {what}; strict match {md_code(o.repo)} ({o.underlying})."
+        if o.reason == "linked_outside_publisher":
+            orgs = (f"the publisher's orgs are {', '.join(md_code(x) for x in o.publisher.orgs)}" if o.publisher
+                    else "no publisher entry matches this id")
+            return f" LiveBench links {md_code(o.repo)}; {orgs}."
         if o.reason == "size_mismatch" and o.params:
             p = o.params
             if p.kind == "float" and o.gate:
@@ -2420,7 +3024,7 @@ class Report:
             if len(items) > len(shown):
                 out.append(f"- and {len(items) - len(shown)} more in the run artifact")
             return out + [""]
-        known, decided, large, unavailable = [], [], [], []
+        known, decided, closed, large, unavailable = [], [], [], [], []
         for o in d.outcomes:
             if o.kind == "variant":
                 continue
@@ -2447,6 +3051,9 @@ class Report:
                 note = f"; {md_code(o.note)}" if o.note else ""
                 until = f" until {o.decision['until']}" if o.reason == "deferred" else ""
                 decided.append(f"{name}: {o.reason}{until} ({md_code(o.decision['key'])}): {md_code(o.decision['reason'])}{note}{variants}")
+            elif o.kind == "closed":
+                note = f"; {md_code(o.note)}" if o.note else ""
+                closed.append(f"{name}: LiveBench marks it closed (its registry entry has no `openweight`){note}")
             elif o.kind == "info" and o.reason == "too_large":
                 g = o.fit.gib
                 size = (f"Q4_K_M {g['Q4_K_M']:.2f} / IQ2_XS {g['IQ2_XS']:.2f} GiB" if g else "packed range too large")
@@ -2455,10 +3062,12 @@ class Report:
                 unavailable.append(f"{name}: {o.reason}")
         partial = [f"{md_code(r.id)}: {r.partial_label()}, partial mean {fmt(r.partial_mean)} (not an overall)"
                    for r in d.partial_listed]
-        out = capped("Known", known) + capped("Decided", decided) + capped("Open weights but too large", large)
+        out = capped("Known", known) + capped("Decided", decided) + capped("LiveBench marks it closed", closed)
+        out += capped("Open weights but too large", large)
         out += capped("No weights yet, private or disabled", unavailable) + capped("Partial rows", partial)
         out += [f"**Below the cutoff**: {d.below} rows.", ""]
-        return len(known) + len(decided) + len(large) + len(unavailable) + len(partial) + d.below, out
+        total = len(known) + len(decided) + len(closed) + len(large) + len(unavailable) + len(partial) + d.below
+        return total, out
 
     # .. issue body .....................................................................................
     def notice_lines(self, n):
@@ -2476,9 +3085,6 @@ class Report:
                 out += self.notice_lines(n)
             candidates = d.listed_candidates()
             out += [f"### Candidates ({len(candidates)})", ""]
-            if d.withheld:
-                out += ["Withheld while the averaging-code notice is open; the run's step summary and JSON artifact "
-                        f"name the {sum(o.kind == 'candidate' for o in d.outcomes)} rows.", ""]
             for o in candidates:
                 out += self.candidate(o)
             looks = d.looks()
@@ -2496,8 +3102,8 @@ class Report:
         total, lines = self.not_raised(cap)
         out += [f"<details><summary>Not raised ({total})</summary>", ""] + lines + ["</details>", "",
                 "How to record a decision: see `docs/MODEL_DISCOVERY.md`.", "",
-                encode_marker({"release": r.date, "head": d.head.sha, "table_sha256": r.table_sha256,
-                               "keys": self.keys, "on": d.today.isoformat()}), ""]
+                encode_marker({"release": r.date, "id": r.id, "script": d.script["path"],
+                               "table_sha256": r.table_sha256, "keys": self.keys, "on": d.today.isoformat()}), ""]
         return "\n".join(out)
 
     def issue_body(self):
@@ -2511,10 +3117,10 @@ class Report:
     def comment(self):
         d, r = self.d, self.d.release
         if not d.reportable:
-            repo_name = d.local.evidence.repo.split("/")[1]
+            gen = "v1" if r.generation == "v1" else "2.0"
             return (f"No unreviewed model among the {POOL_SIZE} best entries of LiveBench release {r.date} "
-                    f"({repo_name}@{d.head.sha[:12]}) that could be self-hosted needs a decision, and no notice is open "
-                    f"({run_reference()}); closing.\n")
+                    f"({gen}, livebench.ai table sha256 `{r.table_sha256[:12]}`) that could be self-hosted needs a "
+                    f"decision, and no notice is open ({run_reference()}); closing.\n")
         if not self.new_keys:
             return None
         lines = ["New since the last refresh:", ""]
@@ -2537,14 +3143,32 @@ class Report:
             out += [failure_line(error, d.stage), ""]
         if d.complete:
             out += self.header() + [""]
+        if d.script:
+            out += ["### Leaderboard site", "",
+                    f"- Main script `{d.script['path']}` ({d.script['bytes']} bytes, sha256 `{d.script['sha256']}`); "
+                    f"reviewed `{d.local.site.main_script}` on {d.local.site.reviewed_on}.",
+                    "- Timeline: v1 " + (", ".join(r.id for r in d.timeline if r.generation == "v1") or "none")
+                    + "; 2.0 " + (", ".join(r.id for r in d.timeline if r.generation == "2.0") or "none") + "."]
+            if d.registry is not None:
+                if d.registry.problem:
+                    out.append(f"- Model registry not used: {md_code(d.registry.problem, EXCERPT_CAP)}.")
+                else:
+                    sizes = ", ".join(f"{len(t)} entries" + (f" ({d.registry.coverage[k]} of this release's ids)"
+                                                             if d.registry.coverage else "")
+                                      for k, t in enumerate(d.registry.tables))
+                    out.append(f"- Model registries: {sizes}.")
+            out.append("")
         if d.calibration or d.taxonomy:
             out += ["### Calibration", "", f"- Tolerances: category {CATEGORY_TOL:g}, overall {OVERALL_TOL:.9f}."]
             for c in d.calibration:
-                out.append(f"- `{c['table']}`: sha256 `{c['sha256']}` as recorded; categories file `{c['categories']}`"
-                           + (" (fallback)" if c["fallback"] else "") + (", category names differ" if c["names_differ"] else "")
+                out.append(f"- [`{c['table']}`]({c['url']}): sha256 `{c['sha256']}` as recorded; categories file "
+                           f"`{c['categories']}`" + (" (fallback)" if c["fallback"] else "")
+                           + (", category names differ" if c["names_differ"] else "")
                            + f"; {c['rows']} recorded rows reproduced.")
+            for c in d.soft_calibration:
+                out.append(f"- `{c['table']}` (2.0, soft): {c['rows']} recorded rows, {c['status']}.")
             if d.taxonomy:
-                out.append(f"- Taxonomy: `{d.taxonomy['file']}` at the reviewed commit has the partition of "
+                out.append(f"- Taxonomy: [`{d.taxonomy['file']}`]({d.taxonomy['url']}) has the partition of "
                            f"catalog/benchmarks.json ({d.taxonomy['sets']} sets, {d.taxonomy['tasks']} tasks).")
             for x in d.excluded_check or []:
                 out.append(f"- Excluded example {md_code(x['model'])} {x['score']:.2f}: "
@@ -2552,16 +3176,17 @@ class Report:
             out.append("")
         if d.anchors:
             out += ["### Hugging Face anchors", ""] + [
-                f"- `{a['catalog_id']}` {md_code(a['repo'])} @ `{a['sha'][:12]}`: id, sha and safetensors as recorded; "
-                f"{a['class']}" + (f"; {md_code(a['note'])}" if a["note"] else "") for a in d.anchors] + [""]
+                f"- `{a['catalog_id']}` {md_code(a['repo'])} @ `{a['sha'][:12]}`: id, sha, safetensors total, dtypes and "
+                "float counts as recorded" + ("; integer counts differ: " + ", ".join(
+                    f"{c['dtype']} {c['reported']} (recorded {c['recorded']})" for c in a["int_changes"])
+                    if a["int_changes"] else "") + f"; {a['class']}"
+                + (f"; {md_code(a['note'])}" if a["note"] else "") for a in d.anchors] + [""]
         if d.canary_results:
             out += ["### Matcher canary", ""] + [
                 f"- {md_code(c['id'])} → {md_code(c['result'])}" + (" (name-equal)" if c["name_equal"] else " (not name-equal; a miss is expected)")
                 for c in d.canary_results] + [""]
-        if d.warnings:
-            out += ["### Warnings", ""] + [f"- {w}" for w in d.warnings] + [""]
-        if d.withheld:
-            out += ["Candidates are withheld from the issue while the averaging-code notice is open; they are listed below.", ""]
+        if d.warnings or d.header_warnings:
+            out += ["### Warnings", ""] + [f"- {w}" for w in d.header_warnings + d.warnings] + [""]
         if d.outcomes:
             out += [f"### Walked rows ({len(d.outcomes)})", "", "| Rank | Id | Overall | Outcome | Repo | Detail |", "|---|---|---|---|---|---|"]
             for o in d.outcomes:
@@ -2583,7 +3208,7 @@ def failure_line(error, stage):
     stage = getattr(error, "stage", None) or stage
     if isinstance(error, ShapeError):
         return (f"Upstream shape changed at {md_code(stage)}: expected {md_code(error.expected, EXCERPT_CAP)}; "
-                f"got {md_code(error.got or 'n/a', EXCERPT_CAP)}")
+                f"got {md_code(error.got or 'n/a', EXCERPT_CAP)}" + (f". What to do: {error.fix}" if error.fix else ""))
     if isinstance(error, ConfigError):
         return f"Invalid local input at {md_code(stage)}: {md_code(error, EXCERPT_CAP)}"
     if isinstance(error, NetworkError):
@@ -2604,17 +3229,20 @@ def failure_body(error, stage, previous_body, today):
     lines = ["### Problems reading sources", "",
              f"- Stage: {md_code(stage)}",
              f"- Expected: {md_code(expected, EXCERPT_CAP)}",
-             f"- Got: {md_code(got, EXCERPT_CAP)}",
-             f"- Run: {run_reference()} on {today.isoformat()}",
-             "- Nothing below was refreshed since " + (since or "the last good run (date unknown)") + ".",
-             "", "<!-- model-discovery-failure-end -->", ""]
+             f"- Got: {md_code(got, EXCERPT_CAP)}"]
+    if isinstance(error, ShapeError) and error.fix:      # our own text, never upstream content
+        lines.append(f"- What to do: {error.fix}")
+    lines += [f"- Run: {run_reference()} on {today.isoformat()}",
+              "- Nothing below was refreshed since " + (since or "the last good run (date unknown)") + ".",
+              "", "<!-- model-discovery-failure-end -->", ""]
     rest = FAILURE_BLOCK_RE.sub("", previous_body or "").strip("\n")
     return "\n".join(lines) + ("\n" + rest + "\n" if rest else "")
 
 
 def to_json(d, report, error=None):
     def outcome(o):
-        x = {"rank": o.row.rank, "id": o.row.id, "overall": o.row.overall, "line": o.row.line, "outcome": o.kind,
+        x = {"rank": o.row.rank, "id": o.row.id, "overall": o.row.overall, "line": o.row.line, "row": o.row.number,
+             "outcome": o.kind,
              "reason": o.reason, "repo": o.repo, "counts": o.counts, "catalog_id": o.catalog.id if o.catalog else None,
              "categories": o.row.categories, "missing_tasks": o.row.missing_tasks, "note": o.note or o.underlying or None,
              "variant_of": o.variant_of.row.id if o.variant_of else None,
@@ -2624,6 +3252,8 @@ def to_json(d, report, error=None):
                           "stripped": o.match.stripped, "org": o.match.org}
         if o.found:
             x["candidates"] = [m.repo for m in o.found]
+        if o.hint:
+            x["registry"] = {"openweight": o.hint.openweight, "link": o.hint.link, "variant_of": o.hint.variant_of}
         if o.info:
             x["hf"] = {"id": o.info.id, "sha": o.info.sha, "gated": o.info.gated, "license": o.info.licenses(),
                        "safetensors_files": o.info.weights()}
@@ -2638,17 +3268,23 @@ def to_json(d, report, error=None):
         "today": d.today.isoformat(), "stage": d.stage,
         "error": None if error is None else {"type": type(error).__name__, "stage": getattr(error, "stage", None) or d.stage,
                                              "message": str(error) if isinstance(error, DiscoveryError) else None},
-        "sources": {"repository": d.local.evidence.repo if d.local else None,
-                    "head": d.head.sha if d.head else None, "reviewed": d.reviewed.sha if d.reviewed else None,
-                    "averaging": d.averaging},
-        "release": None if r is None else {"date": r.date, "table": r.table.path, "table_sha256": r.table_sha256,
-                                           "table_blob": r.table.sha, "categories": r.categories,
-                                           "categories_sha256": r.cats_sha256, "categories_blob": r.cats.sha,
+        "sources": {"site": SITE_URL, "main_script": d.script,
+                    "reviewed_script": dataclasses.asdict(d.local.site) if d.local else None,
+                    "timeline": [dataclasses.asdict(t) for t in d.timeline],
+                    "registry": None if d.registry is None else {
+                        "problem": d.registry.problem, "entries": [len(t) for t in d.registry.tables],
+                        "coverage": d.registry.coverage, "order": d.registry.order}},
+        "release": None if r is None else {"id": r.id, "date": r.date, "generation": r.generation,
+                                           "table": r.table_url, "table_sha256": r.table_sha256,
+                                           "categories_file": r.cats_url, "categories_sha256": r.cats_sha256,
+                                           "categories": r.categories, "weights": r.weights,
+                                           "ignored_weights": r.ignored_weights,
                                            "scored_rows": len(r.scored), "extra_columns": r.extras},
-        "calibration": d.calibration, "taxonomy": d.taxonomy, "excluded_examples": d.excluded_check,
-        "anchors": d.anchors, "canary": d.canary_results, "warnings": d.warnings, "header_notes": d.header_notes,
+        "calibration": d.calibration, "soft_calibration": d.soft_calibration, "taxonomy": d.taxonomy,
+        "excluded_examples": d.excluded_check, "anchors": d.anchors, "canary": d.canary_results,
+        "warnings": d.header_warnings + d.warnings, "header_notes": d.header_notes,
         "notices": [{"kind": n.kind, "detail": n.detail, "title": n.title} for n in d.notices],
-        "withheld": d.withheld, "cutoff": d.cutoff, "below_cutoff": d.below,
+        "cutoff": d.cutoff, "below_cutoff": d.below,
         "rows": [outcome(o) for o in d.outcomes],
         "partial": [{"id": p.id, "partial_mean": p.partial_mean, "available": p.available, "of": len(p.categories)}
                     for p in d.partial_listed],
@@ -2660,9 +3296,10 @@ def to_json(d, report, error=None):
 
 def plain_report(d):
     r = d.release
-    lines = [f"LiveBench model discovery: {plain(d.local.evidence.repo)}@{d.head.sha[:12]}, release {r.date} "
-             f"({len(r.scored)} scored rows), cutoff {fmt(d.cutoff)}"]
-    lines += [f"note: {plain(n, 300)}" for n in d.header_notes] + [f"warning: {plain(w, 300)}" for w in d.warnings]
+    lines = [f"LiveBench model discovery: livebench.ai release {r.date} ({r.generation}, {len(r.scored)} scored rows), "
+             f"cutoff {fmt(d.cutoff)}"]
+    lines += [f"note: {plain(n, 300)}" for n in d.header_notes]
+    lines += [f"warning: {plain(w, 300)}" for w in d.header_warnings + d.warnings]
     lines += [f"NOTICE {n.kind}: {plain(n.title)}" for n in d.notices]
     for o in d.outcomes:
         lines.append(f"{o.row.rank:>4} {plain(o.row.id, 48):48} {fmt(o.row.overall):>6}  {o.label():34} {plain(o.repo or '')}")
@@ -2672,9 +3309,11 @@ def plain_report(d):
 
 # --- probe (first-deploy validation; enforces nothing) ------------------------------------------
 def probe(net, root, today, lines):
+    """A digest of what livebench.ai and Hugging Face serve, in the shapes the run relies on. It reports and never
+    enforces: only a network failure (exit 1) ends it early."""
     local = load_local(root, today)
     ev = local.evidence
-    api = f"https://{GITHUB_API}/repos/{ev.repo}"
+    site = Site(net)
 
     def part(title, fn):
         try:
@@ -2684,64 +3323,95 @@ def probe(net, root, today, lines):
         except NetworkError:
             raise
         except Exception as exc:  # noqa: BLE001 - the probe reports, it never enforces
-            lines.append(f"- {title}: unreadable ({type(exc).__name__})")
+            detail = f": {md_code(str(exc), 300)}" if isinstance(exc, DiscoveryError) else ""
+            lines.append(f"- {title}: unreadable ({type(exc).__name__}){detail}")
 
-    def get_json(url):
-        return net.get(url).json()
-
-    def tree_names(sha):
-        doc = get_json(f"{api}/git/trees/{sha}")
-        return doc, {e.get("path"): e for e in doc.get("tree", []) if isinstance(e, dict)}
-
-    def blob(sha):
-        doc = get_json(f"{api}/git/blobs/{sha}")
-        return base64.b64decode(doc.get("content", ""))
+    def describe(reply):
+        return (f"HTTP {reply.status}, content-type {md_code(reply.headers.get('content-type'))}, "
+                f"{len(reply.body)} bytes, sha256 `{hashlib.sha256(reply.body).hexdigest()}`")
 
     state = {}
 
-    def heads():
-        for label, ref in (("head", "HEAD"), ("reviewed", ev.revision)):
-            doc = get_json(f"{api}/commits/{ref}")
-            state[label] = doc["commit"]["tree"]["sha"]
-            lines.append(f"- {label} commit: `{excerpt(doc.get('sha'), 40)}`, keys {md_code(', '.join(sorted(doc)))}")
+    def page():
+        reply = net.get(SITE_URL)
+        srcs = SCRIPT_SRC_RE.findall(reply.body.decode("utf-8", errors="replace"))
+        lines.append(f"- page {SITE_URL}: {describe(reply)}; script src {md_code(', '.join(srcs) or 'none', 600)}")
 
-    def public():
-        for label in ("head", "reviewed"):
-            if label not in state:
-                continue
-            root_doc, root_names = tree_names(state[label])
-            pub_doc, names = tree_names(root_names["public"]["sha"])
-            state[label + "_public"] = names
-            matching = sorted(n for n in names if TABLE_NAME_RE.match(str(n)) or CATEGORIES_NAME_RE.match(str(n)))
-            lines.append(f"- {label} public/: {len(names)} entries, truncated {md_code(pub_doc.get('truncated'))}; "
-                         f"{len(matching)} names matching the release patterns: {md_code(', '.join(matching), 6000)}")
-            if label == "reviewed":
-                cats = [n for n in matching if CATEGORIES_NAME_RE.match(n)]
-                lines.append(f"- categories files at {ev.revision[:12]}: {md_code(', '.join(cats))}")
-            node = root_names
-            for name in ("src", "Table"):
-                node = tree_names(node[name]["sha"])[1]
-            lines.append(f"- {label} src/Table/Averaging.js blob: `{excerpt(node.get('Averaging.js', {}).get('sha'), 40)}`")
+    def manifest():
+        reply = net.get(SITE_URL + "asset-manifest.json")
+        doc = reply.json()
+        files = doc.get("files") if isinstance(doc, dict) else None
+        main = files.get("main.js") if isinstance(files, dict) else None
+        lines.append(f"- asset-manifest.json: {describe(reply)}; files[\"main.js\"] {md_code(main)}")
 
-    def newest():
-        names = state.get("head_public", {})
-        tables, cats = release_files([Entry(n, e.get("type"), e.get("sha"), e.get("size")) for n, e in names.items()])
-        dates = sorted(d for d in tables if d in cats)
-        lines.append(f"- newest release: {dates[-1] if dates else 'none'}; newest table: {max(tables) if tables else 'none'}")
-        if not dates:
+    def script():
+        path, text = site.main_script()
+        state["text"] = text
+        body = site.get(path, "js").body
+        literal = f'"{WEIGHTS_KEY}"'
+        lines.append(f"- main script `{path}` (agrees with index.html): {len(body)} bytes, sha256 "
+                     f"`{hashlib.sha256(body).hexdigest()}`; reviewed script `{local.site.main_script}` "
+                     f"({'the same' if path == local.site.main_script else 'DIFFERENT'}); "
+                     f"`{literal}` literal {'present' if literal in text else 'ABSENT'}")
+
+    def releases():
+        timeline = parse_release_lists(state.get("text", ""))
+        state["timeline"] = timeline
+        for gen in GENERATIONS:
+            ids = [r.id for r in timeline if r.generation == gen]
+            lines.append(f"- {gen} release list: {len(ids)} releases: {md_code(', '.join(ids), 1000)}")
+
+    def registry():
+        reg = parse_registries(state.get("text", ""))
+        if reg.problem:
+            lines.append(f"- model registry: not usable: {md_code(reg.problem, 300)}")
             return
-        data = blob(tables[dates[-1]].sha)
-        text = data.decode("utf-8", errors="replace").lstrip("\ufeff")
+        for k, table in enumerate(reg.tables):
+            entries = [e for e in table.values() if e.variant_of is None]
+            lines.append(f"- model registry {k + 1}: {len(entries)} entries (+{len(table) - len(entries)} variants), "
+                         f"{sum(e.openweight for e in entries)} with openweight, "
+                         f"{sum(bool(e.openweight and e.link) for e in entries)} of them with a huggingface link, "
+                         f"{sum(bool(e.link_raw) for e in entries)} links that are not a repository URL")
+
+    def calibration_tables():
+        for path in sorted({r.site_path for r in ev.recommendations}):
+            recorded = next(r.sha256 for r in ev.recommendations if r.site_path == path)
+            try:
+                reply = net.get(SITE_URL + path, cap=MAX_TABLE_BYTES)
+            except HttpStatus as exc:
+                lines.append(f"- {path}: HTTP {exc.code}")
+                continue
+            same = hashlib.sha256(reply.body).hexdigest() == recorded
+            lines.append(f"- {path}: {describe(reply)}; "
+                         + ("equal to the recorded source_sha256" if same else f"DIFFERS from the recorded source_sha256 `{recorded}`"))
+
+    def newest_v2():
+        v2 = [r for r in state.get("timeline", []) if r.generation == "2.0"]
+        if not v2:
+            lines.append("- newest 2.0 release: none on the timeline")
+            return
+        entry = v2[-1]
+        reply = net.get(SITE_URL + entry.table_path, cap=MAX_TABLE_BYTES)
+        text = reply.body.decode("utf-8", errors="replace").lstrip("﻿")
         rows = [r for r in csv.reader(io.StringIO(text, newline="")) if r]
-        header = rows[0] if rows else []
-        model = [i for i, h in enumerate(header) if h.strip().casefold() == "model"]
-        col = model[0] if model else 0
-        numbers = [float(c) for r in rows[1:] for c in r if NUMBER_RE.match(c.strip())]
-        lines.append(f"- table: header length {len(header)}, first columns {md_code(', '.join(header[:40]), 2000)}, "
-                     f"{len(rows) - 1} rows, {'model column ' + str(col) if model else 'no model column (first column shown)'}, "
-                     f"first ids {md_code(', '.join(r[col] for r in rows[1:4] if len(r) > col))}, max cell {max(numbers) if numbers else 'n/a'}")
-        cat_doc = json.loads(blob(cats[dates[-1]].sha).decode("utf-8-sig"))
-        lines.append(f"- categories: {md_code(', '.join(f'{k} ({len(v) if isinstance(v, list) else type(v).__name__})' for k, v in cat_doc.items()), 400)}")
+        lines.append(f"- newest 2.0 release {entry.id}: `{entry.table_path}` {describe(reply)}; header "
+                     f"{md_code(','.join(rows[0]) if rows else '', 600)}; {max(len(rows) - 1, 0)} rows")
+        reply = net.get(SITE_URL + entry.categories_path, cap=MAX_TABLE_BYTES)
+        doc = reply.json()
+        keys = ", ".join(f"{k} ({len(v) if isinstance(v, (list, dict)) else type(v).__name__})" for k, v in doc.items()) \
+            if isinstance(doc, dict) else type(doc).__name__
+        weights = doc.get(WEIGHTS_KEY) if isinstance(doc, dict) else None
+        lines.append(f"- `{entry.categories_path}`: {describe(reply)}; keys {md_code(keys, 600)}; "
+                     f"{WEIGHTS_KEY} {md_code(compact(weights) if weights is not None else 'absent', 400)}")
+
+    def unknown():
+        for path in ("no-such-page", "v1/table_1999_01_01.csv"):
+            try:
+                reply = net.get(SITE_URL + path)
+            except HttpStatus as exc:
+                lines.append(f"- unknown /{path}: HTTP {exc.code}")
+                continue
+            lines.append(f"- unknown /{path}: {describe(reply)} (a page where 404 was expected)")
 
     def listing(org):
         def go():
@@ -2754,164 +3424,31 @@ def probe(net, root, today, lines):
 
     def info():
         model = local.by_id[HF_ANCHORS[0]]
-        doc = get_json(f"https://{HF_HOST}/api/models/{model.repo}")
+        doc = net.get(f"https://{HF_HOST}/api/models/{model.repo}").json()
         lines.append(f"- model info {md_code(model.repo)}: keys {md_code(', '.join(sorted(doc)), 600)}; safetensors "
                      f"{'present' if 'safetensors' in doc else 'absent'}")
 
     def anchor():
-        model = local.by_id[HF_ANCHORS[1]]
-        meta = model.metadata
-        doc = get_json(f"https://{HF_HOST}/api/models/{model.repo}/revision/{meta['sha']}")
-        same = {k: doc.get(k) == meta[k] for k in ("sha", "gated", "safetensors")}
-        lines.append(f"- anchor {model.id} revision: id {md_code(doc.get('id'))}, equal to the catalog: {md_code(compact(same))}")
+        for cid in HF_ANCHORS[1:3]:
+            model = local.by_id[cid]
+            meta = model.metadata
+            doc = net.get(f"https://{HF_HOST}/api/models/{model.repo}/revision/{meta['sha']}").json()
+            st = doc.get("safetensors") if isinstance(doc.get("safetensors"), dict) else {}
+            params = st.get("parameters") if isinstance(st.get("parameters"), dict) else {}
+            diff = {k: [params.get(k), v] for k, v in meta["safetensors"]["parameters"].items() if params.get(k) != v}
+            same = {"sha": doc.get("sha") == meta["sha"], "gated": doc.get("gated") == meta["gated"],
+                    "total": st.get("total") == meta["safetensors"]["total"],
+                    "dtypes": set(params) == set(meta["safetensors"]["parameters"])}
+            lines.append(f"- anchor {cid} revision: id {md_code(doc.get('id'))}, equal to the catalog: {md_code(compact(same))}; "
+                         f"counts that differ (reported, recorded): {md_code(compact(diff) if diff else 'none', 400)}")
 
-    site_probe(net, local, lines)
-    part("commits", heads)
-    part("trees", public)
-    part("newest release", newest)
-    part("listing google", listing("google"))
-    part("listing deepseek-ai", listing("deepseek-ai"))
-    part("model info", info)
-    part("anchor", anchor)
+    for title, fn in (("site page", page), ("asset manifest", manifest), ("main script", script),
+                      ("release lists", releases), ("model registry", registry),
+                      ("calibration tables", calibration_tables), ("newest 2.0 release", newest_v2),
+                      ("unknown paths", unknown), ("listing google", listing("google")),
+                      ("listing deepseek-ai", listing("deepseek-ai")), ("model info", info), ("anchors", anchor)):
+        part(title, fn)
     return 0
-
-
-SCRIPT_SRC_RE = re.compile(r"""<script\b[^>]*?\bsrc=["']([^"']+)["']""", re.I)
-LINK_HREF_RE = re.compile(r"""<link\b[^>]*?\bhref=["']([^"']+)["']""", re.I)
-CHUNK_RE = re.compile(r"""(?:/?(?:static/js|assets|_next/static/chunks)/[A-Za-z0-9_./-]+?\.js)""")
-SITE_FILE_RE = re.compile(r"(?:table|categories)_\d{4}_\d{2}_\d{2}(?:\.csv|\.json)?")
-SITE_DATE_RE = re.compile(r"20\d{2}[-_]\d{2}[-_]\d{2}")
-SITE_HINTS = ("table_", "categories_", ".csv", "Averag", "release")
-SITE_BUNDLES = 12
-
-
-def site_probe(net, local, lines):
-    """What livebench.ai serves: the page, its scripts, the release files the catalog records, an unknown path."""
-    ev, bench = local.evidence, local.benchmarks
-
-    def describe(reply):
-        return (f"HTTP {reply.status}, content-type {md_code(reply.headers.get('content-type'))}, "
-                f"{len(reply.body)} bytes, sha256 `{hashlib.sha256(reply.body).hexdigest()}`")
-
-    def text_of(reply):
-        return reply.body.decode("utf-8", errors="replace")
-
-    def site_part(title, fn):
-        try:
-            fn()
-        except HttpStatus as exc:
-            lines.append(f"- {title}: HTTP {exc.code}")
-        except (ShapeError, NetworkError) as exc:
-            lines.append(f"- {title}: {type(exc).__name__}: {md_code(str(exc), 300)}")
-        except Exception as exc:  # noqa: BLE001 - the probe reports, it never enforces
-            lines.append(f"- {title}: unreadable ({type(exc).__name__})")
-
-    state = {"scripts": []}
-
-    def page(host):
-        def go():
-            reply = net.get(f"https://{host}/")
-            body = text_of(reply)
-            scripts, links = SCRIPT_SRC_RE.findall(body), LINK_HREF_RE.findall(body)
-            if host == LIVEBENCH_SITE:
-                state["scripts"] = scripts
-            lines.append(f"- page https://{host}/: {describe(reply)}; scripts {md_code(', '.join(scripts), 1500)}; "
-                         f"links {md_code(', '.join(links), 1500)}; head {md_code(body[:600], 700)}")
-        return go
-
-    def small(path):
-        def go():
-            reply = net.get(f"https://{LIVEBENCH_SITE}{path}")
-            lines.append(f"- {path}: {describe(reply)}; starts {md_code(text_of(reply)[:400], 500)}")
-        return go
-
-    def scan(name, body, seen, queue):
-        files = sorted(set(SITE_FILE_RE.findall(body)))
-        dates = sorted(set(SITE_DATE_RE.findall(body)))
-        contexts = []
-        for hint in SITE_HINTS:
-            for m in list(re.finditer(re.escape(hint), body))[:3]:
-                contexts.append(body[max(0, m.start() - 160):m.end() + 160])
-        lines.append(f"- script {md_code(name, 200)}: {len(body)} chars; release-file names "
-                     f"{md_code(', '.join(files), 3000)}; dates {md_code(', '.join(dates), 3000)}")
-        for c in contexts[:12]:
-            lines.append(f"  - context {md_code(c, 400)}")
-        for chunk in sorted(set(CHUNK_RE.findall(body))):
-            chunk = urllib.parse.urlsplit(urllib.parse.urljoin(f"https://{LIVEBENCH_SITE}/", chunk)).path
-            if chunk not in seen:
-                seen.add(chunk)
-                queue.append(chunk)
-
-    def scripts():
-        seen, queue = set(), []
-        base = f"https://{LIVEBENCH_SITE}/"
-        for src in state["scripts"]:
-            parts = urllib.parse.urlsplit(urllib.parse.urljoin(base, src))
-            if parts.hostname != LIVEBENCH_SITE:
-                lines.append(f"- script {md_code(src, 200)}: other host, not fetched")
-                continue
-            if parts.path not in seen:
-                seen.add(parts.path)
-                queue.append(parts.path)
-        fetched = 0
-        while queue and fetched < SITE_BUNDLES:
-            path = urllib.parse.urlsplit(urllib.parse.urljoin(base, queue.pop(0))).path
-            fetched += 1
-            try:
-                reply = net.get(f"https://{LIVEBENCH_SITE}{path}")
-            except HttpStatus as exc:
-                lines.append(f"- script {md_code(path, 200)}: HTTP {exc.code}")
-                continue
-            lines.append(f"- script {md_code(path, 200)}: {describe(reply)}")
-            if "main" in path and "bundle" not in state:
-                state["bundle"] = text_of(reply)
-            scan(path, text_of(reply), seen, queue)
-        if queue:
-            lines.append(f"- {len(queue)} more script chunks not fetched: {md_code(', '.join(queue), 2000)}")
-
-    def release_files():
-        recorded = {r.path.rsplit("/", 1)[1]: r.sha256 for r in ev.recommendations}
-        bundle = state.get("bundle", "")
-        v1 = re.search(r'\[((?:"\d{4}-\d{2}-\d{2}",?)+)\]\.map\(e=>\(\{id:e,label:e,gen:"v1"\}\)\)', bundle)
-        v2 = re.search(r'=\[((?:"\d{8}",?)+)\]', bundle)
-        v1_dates = re.findall(r'\d{4}-\d{2}-\d{2}', v1.group(1)) if v1 else []
-        v2_ids = re.findall(r'\d{8}', v2.group(1)) if v2 else []
-        lines.append(f"- release lists in the bundle: v1 {md_code(', '.join(v1_dates))}; 2.0 {md_code(', '.join(v2_ids))}")
-        wanted = sorted({n[len("table_"):-len(".csv")] for n in recorded}
-                        | {d.replace("-", "_") for d in (bench.reference_release, ev.latest_release) if d}
-                        | {d.replace("-", "_") for d in v1_dates[-2:]})
-        paths = [f"/v1/{kind}_{date}.{ext}" for date in wanted for kind, ext in (("table", "csv"), ("categories", "json"), ("cost", "csv"))]
-        paths += [f"/data/{rid}/{name}" for rid in v2_ids for name in ("table.csv", "categories.json", "cost.csv", "breakdown.json", "notes.json")]
-        for path in paths:
-            try:
-                reply = net.get(f"https://{LIVEBENCH_SITE}{path}", cap=MAX_TABLE_BYTES)
-            except HttpStatus as exc:
-                lines.append(f"- {path}: HTTP {exc.code}")
-                continue
-            digest = hashlib.sha256(reply.body).hexdigest()
-            name = path.rsplit("/", 1)[1]
-            match = ""
-            if name in recorded:
-                match = "; equal to the recorded source_sha256" if digest == recorded[name] else \
-                    f"; DIFFERS from the recorded source_sha256 `{recorded[name]}`"
-            lines.append(f"- {path}: {describe(reply)}{match}; starts {md_code(text_of(reply)[:300], 400)}")
-
-    def unknown():
-        for path in ("/table_1999_01_01.csv", "/categories_1999_01_01.json", "/no-such-page"):
-            try:
-                reply = net.get(f"https://{LIVEBENCH_SITE}{path}")
-            except HttpStatus as exc:
-                lines.append(f"- unknown {path}: HTTP {exc.code}")
-                continue
-            lines.append(f"- unknown {path}: {describe(reply)}; starts {md_code(text_of(reply)[:200], 300)}")
-
-    site_part("site page", page(LIVEBENCH_SITE))
-    site_part("site page www", page(LIVEBENCH_WWW))
-    for path in ("/asset-manifest.json", "/manifest.json", "/robots.txt", "/sitemap.xml"):
-        site_part(f"site {path}", small(path))
-    site_part("site scripts", scripts)
-    site_part("site release files", release_files)
-    site_part("site unknown paths", unknown)
 
 
 # --- CLI -----------------------------------------------------------------------------------------------
@@ -2938,8 +3475,14 @@ def main(argv=None, net=None, root=ROOT):
     ap.add_argument("--github-output", action="store_true", help="append complete=/reportable=/new= to $GITHUB_OUTPUT")
     ap.add_argument("--record", metavar="DIR", help="save raw responses and an index (never request headers)")
     ap.add_argument("--today", metavar="YYYY-MM-DD", help="date override (tests)")
+    ap.add_argument("--release", metavar="ID", help="analyse this release instead of the newest one: v1 YYYY-MM-DD, "
+                                                     "or 2.0 YYYYMMDD / YYYY-MM-DD (manual runs)")
     ap.add_argument("--probe", action="store_true", help="print upstream shapes; enforces nothing; never touches the issue")
     args = ap.parse_args(argv)
+    if args.release is not None:
+        args.release = args.release.strip()
+        if not (V1_ID_RE.match(args.release) or V2_ID_RE.match(args.release)):
+            ap.error("--release expects a v1 release YYYY-MM-DD or a 2.0 release YYYYMMDD (or its YYYY-MM-DD date)")
     try:
         today = dt.date.fromisoformat(args.today) if args.today else dt.datetime.now(dt.timezone.utc).date()
     except ValueError:
@@ -2951,7 +3494,7 @@ def main(argv=None, net=None, root=ROOT):
         except OSError:
             previous_body = ""
     net = net if net is not None else Net(record_dir=args.record)
-    d, report, error, code = Discovery(net, root, today), None, None, 0
+    d, report, error, code = Discovery(net, root, today, release=args.release or None), None, None, 0
     probe_lines = []
     try:
         if args.probe:

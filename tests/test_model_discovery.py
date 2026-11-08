@@ -1,11 +1,13 @@
 """Offline tests for scripts/model_discovery.py.
 
-Every upstream is scripted by FakeNet: the GitHub git API of a fake leaderboard repository
-(real git blob sha1s computed by the fixture builder), Hugging Face listings, model info and
-revision answers. The calibration tables are built from the rows recorded in
-catalog/livebench-evidence.json; their sha256 cannot equal the recorded one, so each run uses a
-fixture root whose copy of the evidence file carries the fixture hashes. The production check
-(sha256 of the fetched blob == source_sha256) is unchanged.
+Every upstream is scripted by FakeNet: livebench.ai (the page, asset-manifest.json, a main script carrying both
+release lists, LiveBench's model registries and the averaging code's weights literal, and the v1 and 2.0 release
+files), Hugging Face listings, model info and revision answers. The fixture files are hand-authored in the shapes the
+CI probe recorded from the real site on 2026-11-08; the script excerpts below are copied from the real bundle
+(main.1e1ce12d.js) with the lists and registries cut down. The calibration tables are built from the rows recorded in
+catalog/livebench-evidence.json; their sha256 cannot equal the recorded one, so each run uses a fixture root whose
+copy of the evidence file carries the fixture hashes. The production check (sha256 of the served file ==
+source_sha256) is unchanged.
 """
 import ast
 import base64
@@ -51,10 +53,13 @@ DISCOVERY = json.loads((ROOT / 'catalog/model-discovery.json').read_text(encodin
 BY_ID = {m['id']: m for m in MODELS['models']}
 REPO = 'LiveBench/new-livebench'
 REVIEWED = EVIDENCE['leaderboard_revision']
-HEAD = hashlib.sha1(b'fixture head commit').hexdigest()
-GITHUB = f'https://api.github.com/repos/{REPO}'
+SITE = 'https://livebench.ai/'
 HF = 'https://huggingface.co/api/models'
-GITHUB_RUN_VARS = ('GITHUB_RUN_ID', 'GITHUB_SERVER_URL', 'GITHUB_REPOSITORY')   # set by GitHub Actions in every step
+# Set by GitHub Actions in every step; the runner's own values must never leak into a fixture run.
+GITHUB_RUN_VARS = ('GITHUB_RUN_ID', 'GITHUB_SERVER_URL', 'GITHUB_REPOSITORY')
+SCRIPT = 'static/js/main.1e1ce12d.js'          # the fixture's served and reviewed main script
+NEWEST = '20261025'                             # the newest 2.0 release of the fixture site
+NEWEST_DATE = '2026-10-25'
 
 # A frozen copy of the seeded catalog/model-discovery.json, so that fixture runs never depend on the owner's edits.
 FIXTURE_PUBLISHERS = [
@@ -87,7 +92,7 @@ SEEDED = [('lb:claude*', 'Anthropic Claude'), ('lb:gemini*', 'Google Gemini'), (
 SEEDED_KEYS = [key for key, _ in SEEDED]
 FIXTURE_DISCOVERY = {
     'schema_version': 1,
-    'leaderboard': {'averaging_reviewed_revision': REVIEWED},
+    'site': {'main_script': SCRIPT, 'reviewed_on': TODAY},
     'publishers': FIXTURE_PUBLISHERS,
     'decisions': [{'key': key, 'decision': 'not_open_weight', 'decided_on': TODAY,
                    'reason': f'{family}: closed API family with no published weights (fixture copy of the seeded entry)'}
@@ -95,10 +100,6 @@ FIXTURE_DISCOVERY = {
 }
 # Fixture roots carry their own scorer file: only RELEASES is read (with ast), and its dates never move.
 FIXTURE_RELEASES = ('2025-04-25', '2025-05-30', '2026-06-25')
-
-
-def git_sha(data):
-    return hashlib.sha1(b'blob %d\0' % len(data) + data).hexdigest()
 
 
 # --- fixture tables ---------------------------------------------------------------------------
@@ -112,7 +113,10 @@ CATS_2025_04 = {
 }
 CATS_2025_05 = {**CATS_2025_04, 'Agentic Coding': ['javascript', 'typescript', 'python']}
 CATS_2026 = {('IF' if c['id'] == 'instruction_following' else c['name']): list(c['livebench_tasks']) for c in BENCH['categories']}
-AVERAGING = b'export function averageScores(rows) { /* category means, then equal category weight */ }\n'
+# LiveBench 2.0: one column per suite, and the weights the 20261025 categories.json carries.
+SUITES = {'Long Agentic': ['long_agentic'], 'Reasoning': ['reasoning'], 'Coding': ['coding'], 'Browser': ['browser'],
+          'Data Analysis': ['data_analysis'], 'Research': ['research'], 'Design': ['design']}
+WEIGHTS = {'Long Agentic': 2.0, 'Coding': 1.5, 'Design': 1.5}
 
 
 def cells(categories, spec):
@@ -127,7 +131,8 @@ def cells(categories, spec):
     return out
 
 
-def table(categories, rows, extra=('organization',), crlf=False):
+def table(categories, rows, extra=(), crlf=False):
+    """A CSV like livebench.ai serves: the model column first (no organization column), then the tasks."""
     tasks = [t for ts in categories.values() for t in ts]
     buf = io.StringIO()
     writer = csv.writer(buf, lineterminator='\r\n' if crlf else '\n')
@@ -142,16 +147,23 @@ def as_json(obj):
     return (json.dumps(obj, indent=2) + '\n').encode('utf-8')
 
 
+def suites_json(weights=WEIGHTS):
+    doc = {k: list(v) for k, v in SUITES.items()}
+    if weights is not None:
+        doc['_overall_weights'] = dict(weights)
+    return as_json(doc)
+
+
 def recorded_rows(release):
     return [(r['leaderboard_model_id'], dict(r['category_scores'])) for r in EVIDENCE['recommendations'] if r['release'] == release]
 
 
 FILLERS = [(f'filler-model-{i:02d}', 20.0 + i) for i in range(6)]
-TABLE_2025_04 = table(CATS_2025_04, recorded_rows('2025-04-25') + FILLERS, extra=())
-TABLE_2025_05 = table(CATS_2025_05, recorded_rows('2025-05-30') + FILLERS, extra=())
-REVIEWED_2026 = table(CATS_2026, [('deepseek-v4.1-flash', 81.11), ('glm-5.3-flash', 71.59)] + FILLERS)
+TABLE_2025_04 = table(CATS_2025_04, recorded_rows('2025-04-25') + FILLERS)
+TABLE_2025_05 = table(CATS_2025_05, recorded_rows('2025-05-30') + FILLERS)
+TABLE_2026_06 = table(CATS_2026, [('deepseek-v4.1-flash', 81.11), ('glm-5.3-flash', 71.59)] + FILLERS)
 
-# The default head release: closed families on top, then rows the catalog already knows; nothing is reportable.
+# The default newest release: closed families on top, then rows the catalog already knows; nothing is reportable.
 DEFAULT_ROWS = [
     ('claude-opus-5', 90.0), ('gemini-3-pro', 88.0), ('gpt-5.5-high', 86.0), ('o3-pro', 85.0),
     ('deepseek-v4.1-flash', 81.11), ('glm-5.3-flash', 71.59), ('qwen3.8-flash-next', 70.0), ('qwen3.8-27b-thinking', 68.0),
@@ -175,6 +187,86 @@ EXTRA_REPOS = {
 }
 
 
+# --- the main script ---------------------------------------------------------------------------
+def entry(name, organization='Fixture Lab', openweight=None, huggingface=None, variants=None, **extra):
+    """A registry entry as the minified bundle writes it: unquoted keys, !0 for true."""
+    fields = [f'displayName:"{name.title()}"', f'organization:"{organization}"', 'url:"https://example.org/"']
+    if huggingface:
+        fields.append(f'huggingface:"{huggingface}"')
+    if openweight is not None:
+        fields.append('openweight:' + ('!0' if openweight else '!1'))
+    fields += [f'{k}:{v}' for k, v in extra.items()]
+    if variants:
+        fields.append('variants:[' + ','.join('{' + ','.join(f'{k}:{v}' for k, v in var.items()) + '}' for var in variants) + ']')
+    return f'"{name}":{{{",".join(fields)}}}'
+
+
+def hf(repo):
+    return f'https://huggingface.co/{repo}'
+
+
+# The 2.0 registry of the fixture bundle, shaped like the real one (gn in main.1e1ce12d.js). It changes no default
+# outcome: the closed entry is a seeded closed family, the links name known repositories.
+FIXTURE_REGISTRY = [
+    entry('claude-opus-5', 'Anthropic', effort='"max"', reasoner='!0'),
+    entry('glm-5.3-flash', 'Z.AI', True, hf('zai-org/GLM-5.3-Flash'), reasoner='!0'),
+    entry('deepseek-v4.1-flash', 'DeepSeek', True, effort='"max"'),
+    entry('gemma-4-31b-it', 'Google', True, hf('google/gemma-4-31B-it')),
+]
+# The older registry for v1 ids (fa in the real bundle), with a variants list as it has.
+FIXTURE_V1_REGISTRY = [
+    entry('glm-5.3', 'Z.AI', True, hf('zai-org/GLM-5.3')),
+    entry('chatgpt-4o-latest', 'OpenAI', variants=[{'rawName': '"chatgpt-4o-latest-0903"', 'displayName': '"ChatGPT-4o"'}]),
+]
+V1_RELEASES = ['2025-04-02', '2025-04-25', '2025-05-30', '2026-01-08', '2026-06-25']
+V2_RELEASES = ['20261014', NEWEST]
+
+
+def main_script(v1, v2, registry, v1_registry, weights_literal=True, before='', after=''):
+    """A bundle carrying the shapes the run reads: the code around the release lists and the averaging code are
+    copied from the real main.1e1ce12d.js (identifiers as minified there); registries and lists are the fixture's."""
+    v1_list = ','.join(f'"{d}"' for d in v1)
+    v2_list = ','.join(f'"{d}"' for d in v2)
+    weights = ('const kn="_overall_weights";function Nn(e){const{[kn]:t,...n}=e||{},a={};return Object.entries(t||{})'
+               '.forEach(([e,t])=>{const r=Number(t);e in n&&isFinite(r)&&r>0&&(a[e]=r)}),{categories:n,weights:a}}'
+               if weights_literal else 'function Nn(e){return{categories:e,weights:{}}}')
+    return (
+        '/*! For license information please see main.1e1ce12d.js.LICENSE.txt */(()=>{var e={766:function(e){e.exports={}}};'
+        + before
+        + 'const mn=(e,t,n)=>{if(!t)return"-";const a=t.map(t=>parseFloat(e[t])).filter(e=>!isNaN(e)),r=a.length>0?'
+          'a.reduce((e,t)=>e+t,0)/a.length:NaN;return isNaN(r)?"-":n?r.toFixed(n):r},gn={' + ','.join(registry) + '},vn={};'
+        + f'Qt={{tablejoin:"table join"}},Yt=[{v2_list}],Jt="undefined"!==typeof window&&/^\\/new(\\/(index\\.html)?)?$/'
+          '.test(window.location.pathname)?[...Yt]:Yt,Xt=e=>`${e.slice(0,4)}-${e.slice(4,6)}-${e.slice(6,8)}`,'
+          f'Zt="25 October 2026",en=[...[{v1_list}].map(e=>({{id:e,label:e,gen:"v1"}})),...Jt.map(e=>({{id:e,label:Xt(e),'
+          'gen:"v2"}))];if(new Set(en.map(e=>e.label)).size!==en.length)throw new Error("Two releases share a date on '
+          'the timeline (v1 RELEASES vs 2.0 RELEASE_LABELS)");'
+        + weights
+        + 'const Sn=(e,t)=>e&&null!=e[t]?e[t]:1;const pa=e=>fn().parse(e,{header:!0,dynamicTyping:!0,skipEmptyLines:!0})'
+          '.data.filter(e=>e.model);const ha=(e,t,n)=>{if(!t)return"-"},fa={' + ','.join(v1_registry) + '},ma={};'
+          'fetch(`./v1/table_${a}.csv?v=1793398874`);fetch(`./data/${e}/table.csv?v=1793398874`);'
+        + after + '})();'
+    ).encode('utf-8')
+
+
+def index_html(src='./static/js/main.1e1ce12d.js'):
+    return ('<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"/><title>LiveBench 2.0 - A '
+            f'challenging, contamination-free long-horizon AI benchmark</title><script defer="defer" src="{src}"></script>'
+            '<link href="./static/css/main.b6172137.css" rel="stylesheet"></head><body><noscript>You need to enable '
+            'JavaScript to run this app.</noscript><div id="root"></div></body></html>').encode('utf-8')
+
+
+def asset_manifest(main='./static/js/main.1e1ce12d.js'):
+    return as_json({'files': {'main.css': './static/css/main.b6172137.css', 'main.js': main,
+                              'static/js/453.309372f5.chunk.js': './static/js/453.309372f5.chunk.js',
+                              'index.html': './index.html'},
+                    'entrypoints': ['static/css/main.b6172137.css', 'static/js/main.1e1ce12d.js']})
+
+
+NOT_FOUND_PAGE = b'<!DOCTYPE html><html><head><title>Page not found</title></head><body>404</body></html>'
+TYPES = {'.csv': 'text/csv; charset=utf-8', '.json': 'application/json; charset=utf-8',
+         '.js': 'application/javascript; charset=utf-8', '': 'text/html; charset=utf-8'}
+
+
 def model_info(repo, total=40_000_000_000, params=None, license='apache-2.0', private=False, disabled=None, gated=False,
                files=4, license_file='LICENSE', card=None, tags=None, canonical=None, created='2026-10-01T08:00:00.000Z'):
     siblings = [{'rfilename': 'config.json'}, {'rfilename': 'README.md'}]
@@ -193,19 +285,24 @@ def model_info(repo, total=40_000_000_000, params=None, license='apache-2.0', pr
 
 
 class World:
-    """Scripted upstream: one fake leaderboard repository (two commits) and a fake Hugging Face."""
+    """Scripted upstream: livebench.ai (page, manifest, main script, release files) and a fake Hugging Face."""
 
     def __init__(self, rows=DEFAULT_ROWS, categories=None):
-        self.reviewed_files = {
-            'README.md': b'# fixture leaderboard\n',
-            'public/table_2025_04_25.csv': TABLE_2025_04, 'public/categories_2025_04_25.json': as_json(CATS_2025_04),
-            'public/table_2025_05_30.csv': TABLE_2025_05, 'public/categories_2025_05_30.json': as_json(CATS_2025_05),
-            'public/table_2026_06_25.csv': REVIEWED_2026, 'public/categories_2026_06_25.json': as_json(CATS_2026),
-            'src/Table/Averaging.js': AVERAGING, 'src/App.js': b'// app\n',
+        self.v1, self.v2 = list(V1_RELEASES), list(V2_RELEASES)
+        self.registry, self.v1_registry = list(FIXTURE_REGISTRY), list(FIXTURE_V1_REGISTRY)
+        self.weights_literal, self.script_before, self.script_after = True, '', ''
+        self.script_bytes = None              # bytes replacing the generated main script
+        self.index, self.manifest = index_html(), asset_manifest()
+        self.files = {                        # livebench.ai path (no leading slash) -> bytes; anything else is 404
+            'v1/table_2025_04_25.csv': TABLE_2025_04, 'v1/categories_2025_04_25.json': as_json(CATS_2025_04),
+            'v1/table_2025_05_30.csv': TABLE_2025_05, 'v1/categories_2025_05_30.json': as_json(CATS_2025_05),
+            'v1/table_2026_06_25.csv': TABLE_2026_06, 'v1/categories_2026_06_25.json': as_json(CATS_2026),
+            'v1/cost_2026_06_25.csv': b'model,cost\nx,1\n',
+            'data/20261014/table.csv': table(SUITES, DEFAULT_ROWS), 'data/20261014/categories.json': suites_json(None),
+            f'data/{NEWEST}/table.csv': table(categories or SUITES, rows), f'data/{NEWEST}/categories.json': suites_json(),
+            f'data/{NEWEST}/notes.json': as_json(['Every suite counts equally.']),
         }
-        self.head_files = dict(self.reviewed_files)
-        self.head_files['public/table_2026_06_25.csv'] = table(categories or CATS_2026, rows)
-        self.head_date = '2026-11-07T12:00:00Z'
+        self.types = {}                       # path -> content type, overriding the type by extension
         self.listings = {}
         for m in MODELS['models']:
             org, name = m['upstream_repo'].split('/')
@@ -221,8 +318,6 @@ class World:
                 'siblings': [{'rfilename': 'model.safetensors'}], 'safetensors': json.loads(json.dumps(meta['safetensors']))}
         self.errors = {}
         self.page_size = None
-        self.tree_patches = []      # callables (commit label, path, tree doc) -> tree doc
-        self.site = {}              # livebench.ai path -> (headers, body); anything else answers 404
 
     def add_model(self, repo, listed=True, **kw):
         self.infos[repo.casefold()] = model_info(repo, **kw)
@@ -230,8 +325,19 @@ class World:
             self.listings.setdefault(repo.split('/')[0], []).append(repo)
         return self.infos[repo.casefold()]
 
+    def add_release(self, rid, rows=DEFAULT_ROWS, categories=True, weights=WEIGHTS):
+        """A newer 2.0 release on the timeline, with its table and (unless categories=False) its categories file."""
+        self.v2.append(rid)
+        self.files[f'data/{rid}/table.csv'] = table(SUITES, rows)
+        if categories:
+            self.files[f'data/{rid}/categories.json'] = suites_json(weights)
+
+    def head_table(self):
+        return self.files[f'data/{NEWEST}/table.csv']
+
     # -- fixture root ------------------------------------------------------------------------
-    def root(self, tmp, evidence=None, benchmarks=None, decisions=(), publishers=(), discovery=None, releases_extra=()):
+    def root(self, tmp, evidence=None, benchmarks=None, decisions=(), publishers=(), discovery=None, releases_extra=(),
+             latest=NEWEST_DATE):
         for rel in ('catalog/models.json', 'catalog/benchmarks.json', md.HARDWARE_CONFIG, md.NATIVE_PROFILE):
             (tmp / rel).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / rel, tmp / rel)
@@ -244,8 +350,12 @@ class World:
             benchmarks(doc)
             (tmp / 'catalog/benchmarks.json').write_text(json.dumps(doc, indent=2) + '\n', encoding='utf-8')
         ev = json.loads(json.dumps(EVIDENCE))
+        # The fixture site has caught up with the newest release unless a test says otherwise (the real evidence still
+        # records 2026-06-25, so the real nightly raises the new-release notice until the owner records 2.0).
+        ev['latest_release'] = latest
         for rec in ev['recommendations']:
-            rec['source_sha256'] = hashlib.sha256(self.reviewed_files[rec['source_table'].split(REVIEWED + '/', 1)[1]]).hexdigest()
+            name = rec['source_table'].rsplit('/', 1)[1]
+            rec['source_sha256'] = hashlib.sha256(self.files[f'v1/{name}']).hexdigest()
         if evidence:
             evidence(ev)
         (tmp / 'catalog/livebench-evidence.json').write_text(json.dumps(ev, indent=2) + '\n', encoding='utf-8')
@@ -259,44 +369,20 @@ class World:
         (tmp / md.DISCOVERY_FILE).write_text(json.dumps(doc, indent=2) + '\n', encoding='utf-8')
         return tmp
 
-    # -- git objects -------------------------------------------------------------------------
-    def build(self):
-        self.trees, self.blobs, self.commits = {}, {}, {}
-        for label, sha, files, date in (('reviewed', REVIEWED, self.reviewed_files, '2026-10-01T09:00:00Z'),
-                                        ('head', HEAD, self.head_files, self.head_date)):
-            tree = self._tree(label, '', files)
-            self.commits[sha] = {'sha': sha, 'commit': {'tree': {'sha': tree}, 'committer': {'date': date}}}
-        self.commits['HEAD'] = self.commits[HEAD]
-
-    def _tree(self, label, path, files):
-        entries, subdirs = {}, {}
-        for name, data in files.items():
-            first, _, rest = name.partition('/')
-            if rest:
-                subdirs.setdefault(first, {})[rest] = data
-            else:
-                sha = git_sha(data)
-                self.blobs[sha] = data
-                entries[first] = {'path': first, 'mode': '100644', 'type': 'blob', 'sha': sha, 'size': len(data)}
-        for name, sub in subdirs.items():
-            entries[name] = {'path': name, 'mode': '040000', 'type': 'tree',
-                             'sha': self._tree(label, f'{path}{name}/', sub)}
-        doc = {'truncated': False, 'tree': sorted(entries.values(), key=lambda e: e['path'])}
-        for patch in self.tree_patches:
-            doc = patch(label, path, doc)
-        sha = hashlib.sha1((label + path + json.dumps(doc, sort_keys=True)).encode()).hexdigest()
-        doc['sha'] = sha
-        self.trees[sha] = doc
-        return sha
+    # -- the site ----------------------------------------------------------------------------
+    def site(self):
+        script = self.script_bytes if self.script_bytes is not None else main_script(
+            self.v1, self.v2, self.registry, self.v1_registry, self.weights_literal, self.script_before, self.script_after)
+        return {'': self.index, 'asset-manifest.json': self.manifest, SCRIPT: script, **self.files}
 
     def net(self):
-        self.build()
         return FakeNet(self)
 
 
 class FakeNet:
     def __init__(self, world):
         self.world = world
+        self.site = world.site()
         self.calls = []
         self.counts = {}
         self.fail = {}             # url substring -> exception instance
@@ -313,27 +399,19 @@ class FakeNet:
             raise md.HttpStatus(self.world.errors[url], url)
         headers, payload = self.route(url)
         body = payload if isinstance(payload, bytes) else json.dumps(payload).encode('utf-8')
+        if cap is not None and len(body) > cap:
+            raise md.ShapeError(f'response over {cap} bytes', got=f'more than {cap} bytes')
         return md.Reply(url, 200, headers, body)
 
     def route(self, url):
         w, p = self.world, urllib.parse.urlsplit(url)
-        if p.hostname == 'api.github.com':
-            m = re.match(r'^/repos/LiveBench/new-livebench/(commits|git/trees|git/blobs)/([^/]+)$', p.path)
-            assert m, url
-            kind, ref = m.groups()
-            if kind == 'commits':
-                if ref not in w.commits:
-                    raise md.HttpStatus(422, url)
-                return {}, w.commits[ref]
-            if kind == 'git/trees':
-                return {}, w.trees[ref]
-            data = w.blobs[ref]
-            content = base64.encodebytes(data).decode('ascii')
-            return {}, {'sha': ref, 'size': len(data), 'encoding': 'base64', 'content': content}
-        if p.hostname in ('livebench.ai', 'www.livebench.ai'):
-            if p.path not in w.site:
-                raise md.HttpStatus(404, url)
-            return w.site[p.path]
+        if p.hostname == 'livebench.ai':
+            assert not p.query, url                  # release files are read without the site's ?v= cache-buster
+            path = p.path[1:]
+            if path not in self.site:
+                raise md.HttpStatus(404, url)        # the real site answers unknown paths with a 404 page
+            ext = os.path.splitext(path)[1]
+            return {'content-type': w.types.get(path, TYPES.get(ext, 'text/plain'))}, self.site[path]
         assert p.hostname == 'huggingface.co', url
         if p.path == '/api/models':
             q = urllib.parse.parse_qs(p.query)
@@ -342,7 +420,7 @@ class FakeNet:
             ids = [i for o, names in w.listings.items() if o.casefold() == org.casefold() for i in names]
             size = w.page_size or len(ids) or 1
             page = ids[start:start + size]
-            headers = {}
+            headers = {'content-type': 'application/json'}
             if start + size < len(ids):
                 headers['link'] = f'<https://huggingface.co/api/models?author={org}&limit={md.LISTING_LIMIT}&cursor={start + size}>; rel="next"'
             return headers, [{'id': i, 'likes': 1, 'private': False} for i in page]
@@ -363,6 +441,9 @@ class FakeNet:
     def infos_fetched(self):
         return [urllib.parse.unquote(u[len(HF) + 1:]) for u in self.calls
                 if u.startswith(HF + '/') and '/revision/' not in u]
+
+    def site_paths(self):
+        return [urllib.parse.urlsplit(u).path for u in self.calls if u.startswith(SITE)]
 
 
 class Result:
@@ -416,15 +497,24 @@ class Base(unittest.TestCase):
         (out / 'stderr.txt').write_text(stderr.getvalue(), encoding='utf-8')
         return Result(code, net, out)
 
-    def discovery(self, world, **root_kw):
-        """A Discovery with its local inputs loaded, for resolving single rows against the fake Hugging Face."""
+    def discovery(self, world, registry=False, **root_kw):
+        """A Discovery with its local inputs loaded, for resolving single rows against the fake Hugging Face (with
+        registry=True, also the fixture bundle's registries, ranked for the newest release)."""
         d = md.Discovery(world.net(), self.root(world, **root_kw), TODAY_DATE)
         d.local = md.load_local(d.root, TODAY_DATE)
+        if registry:
+            d.registry = md.parse_registries(world.site()[SCRIPT].decode('utf-8'))
+            d.registry.rank([r[0] for r in csv.reader(io.StringIO(world.head_table().decode('utf-8')))][1:])
         return d
 
 
 def row(lb_id, overall=50.0, rank=1):
-    return md.Row(lb_id, 2, {'Reasoning': overall}, overall=overall, rank=rank)
+    return md.Row(lb_id, 2, {'Reasoning': overall}, overall=overall, rank=rank, number=1)
+
+
+def world_rows(world):
+    text = world.head_table().decode('utf-8')
+    return [(r[0],) for r in list(csv.reader(io.StringIO(text)))[1:]]
 
 
 # --- local inputs ----------------------------------------------------------------------------
@@ -444,7 +534,9 @@ class LocalInputsTest(Base):
         # hand, so this checks properties (the seeded keys stay, every entry validates), never the exact contents.
         local = md.load_local(ROOT, REAL_TODAY)
         self.assertEqual(DISCOVERY['schema_version'], 1)
-        self.assertRegex(local.averaging_revision, r'^[0-9a-f]{40}$')
+        self.assertRegex(local.site.main_script, r'^static/js/[A-Za-z0-9_.-]+\.js$')
+        self.assertRegex(local.site.reviewed_on, r'^\d{4}-\d{2}-\d{2}$')
+        self.assertNotIn('leaderboard', DISCOVERY)          # the Averaging.js commit pin is gone with the GitHub source
         prefixes = [p for entry in DISCOVERY['publishers'] for p in entry['prefixes']]
         self.assertEqual(len(prefixes), len(set(prefixes)))
         self.assertTrue(all(p == p.lower() and p for p in prefixes))
@@ -460,6 +552,25 @@ class LocalInputsTest(Base):
         evidence = {r['leaderboard_model_id'] for r in EVIDENCE['recommendations']}
         for i, d in enumerate(DISCOVERY['decisions']):
             self.assertEqual(md.decision_errors([d], catalog, evidence, REAL_TODAY), [], f'decisions[{i}]')
+
+    def test_the_site_review_record_is_validated(self):
+        cases = [({'main_script': 'static/js/main.1e1ce12d.js'}, 'site.reviewed_on'),
+                 ({'main_script': '/static/js/main.js', 'reviewed_on': TODAY}, 'site.main_script'),
+                 ({'main_script': 'https://cdn.example/main.js', 'reviewed_on': TODAY}, 'site.main_script'),
+                 ({'main_script': SCRIPT, 'reviewed_on': '2026-11-10'}, 'site.reviewed_on: later than today'),
+                 ({'main_script': SCRIPT, 'reviewed_on': TODAY, 'commit': 'x'}, 'site.commit: unknown field')]
+        for site, needle in cases:
+            with self.subTest(site=site):
+                result = self.run_world(World(), discovery={**FIXTURE_DISCOVERY, 'site': site})
+                self.assertEqual(result.code, 2)
+                self.assertEqual(result.net.calls, [])
+                self.assertIn(needle, result.failure)
+        old = {k: v for k, v in FIXTURE_DISCOVERY.items() if k != 'site'}
+        old['leaderboard'] = {'averaging_reviewed_revision': REVIEWED}
+        result = self.run_world(World(), discovery=old)
+        self.assertEqual(result.code, 2)
+        self.assertIn('leaderboard: unknown field', result.failure)
+        self.assertIn('site: expected {main_script, reviewed_on}', result.failure)
 
     def test_fixture_roots_do_not_read_the_owner_edited_files(self):
         # A real decision dated after TODAY, as the issue snippets write them, must not break the fixture runs.
@@ -526,9 +637,12 @@ class LocalInputsTest(Base):
         world = World()
         local = md.load_local(self.root(world), TODAY_DATE)
         self.assertEqual((local.evidence.repo, local.evidence.revision), (REPO, 'caa4253c8a3aa93b5c7ec234e681d4f120a20240'))
-        self.assertEqual(local.evidence.latest_release, '2026-06-25')
+        self.assertEqual(EVIDENCE['latest_release'], '2026-06-25')
         self.assertEqual(len({r['meaning'] for r in EVIDENCE['recommendations']}), 1)
         self.assertEqual(len(EVIDENCE['recommendations']), 5)
+        # The recorded GitHub blobs map to the same bytes on livebench.ai/v1/.
+        self.assertEqual(sorted({r.site_path for r in local.evidence.recommendations}),
+                         ['v1/table_2025_04_25.csv', 'v1/table_2025_05_30.csv'])
 
         def two_repos(ev):
             ev['recommendations'][1]['source_table'] = ev['recommendations'][1]['source_table'].replace('LiveBench/new-livebench', 'LiveBench/other')
@@ -545,6 +659,32 @@ class LocalInputsTest(Base):
                 self.assertEqual(result.code, 2)
                 self.assertEqual(result.net.calls, [])
                 self.assertIn(needle, result.failure)
+
+    def test_the_evidence_parser_accepts_livebench_ai_source_tables(self):
+        by_id = {m['id']: md.CatalogModel(m['id'], m['upstream_repo'], m['status'], None, None) for m in MODELS['models']}
+        ev = json.loads(json.dumps(EVIDENCE))
+        ev['recommendations'][0]['source_table'] = 'https://livebench.ai/v1/table_2025_04_25.csv'
+        ev['recommendations'].append({**ev['recommendations'][0], 'leaderboard_model_id': 'qwen3.8-27b',
+                                      'model_id': 'qwen38-27b', 'release': NEWEST_DATE,
+                                      'source_table': f'https://livebench.ai/data/{NEWEST}/table.csv'})
+        parsed = md.parse_evidence(ev, by_id)
+        self.assertEqual([(r.site_path, r.generation) for r in parsed.recommendations][::5],
+                         [('v1/table_2025_04_25.csv', 'v1'), (f'data/{NEWEST}/table.csv', '2.0')])
+        self.assertEqual(parsed.revision, REVIEWED)   # still pins the GitHub-form URLs that remain
+        # leaderboard_revision is required to equal the commit of GitHub-form URLs only
+        for rec in ev['recommendations']:
+            if rec['source_table'].startswith('https://github.com/'):
+                rec['source_table'] = 'https://livebench.ai/v1/' + rec['source_table'].rsplit('/', 1)[1]
+        ev['leaderboard_revision'] = 'f' * 40
+        self.assertEqual(md.parse_evidence(ev, by_id).repo, None)
+        del ev['leaderboard_revision']
+        self.assertIsNone(md.parse_evidence(ev, by_id).revision)
+        for bad in ('https://livebench.ai/table_2025_04_25.csv', 'https://livebench.ai/v1/table_2025_04_25.csv?v=1',
+                    'http://livebench.ai/v1/table_2025_04_25.csv', 'https://www.livebench.ai/v1/table_2025_04_25.csv',
+                    'https://livebench.ai/data/2026-10-25/table.csv', 'https://livebench.ai/data/20261332/table.csv'):
+            with self.subTest(bad=bad), self.assertRaises(md.ConfigError) as ctx:
+                md.parse_evidence({**ev, 'recommendations': [{**ev['recommendations'][0], 'source_table': bad}]}, by_id)
+            self.assertIn('recommendations[0].source_table', str(ctx.exception))
 
     def test_budgets_precision_bits_and_planning_arithmetic_match_the_catalog(self):
         local = md.load_local(ROOT, REAL_TODAY)
@@ -582,7 +722,8 @@ class LocalInputsTest(Base):
         self.assertEqual((md.ISSUE_BODY_CAP, md.STRING_CAP, md.LIST_CAP), (60_000, 120, 30))
         self.assertEqual((md.FAILURE_STREAK, md.DEFERRAL_MAX_DAYS), (3, 365))
         self.assertEqual(md.HF_ANCHORS, ('qwen38-27b', 'nemotron-super-120b', 'gpt-oss-120b', 'llama33-70b'))
-        self.assertEqual(md.ALLOWED_HOSTS, ('api.github.com', 'huggingface.co', 'livebench.ai', 'www.livebench.ai'))
+        self.assertEqual(md.ALLOWED_HOSTS, ('huggingface.co', 'livebench.ai'))
+        self.assertEqual((md.SITE_URL, md.WEIGHTS_KEY), ('https://livebench.ai/', '_overall_weights'))
         self.assertEqual(md.RUN_DEADLINE, 15 * 60)
         local = md.load_local(ROOT, REAL_TODAY)
         derived = [local.publisher(r['leaderboard_model_id'])[0].orgs[0] for r in EVIDENCE['recommendations']]
@@ -597,7 +738,7 @@ class LocalInputsTest(Base):
         releases = md.scorer_releases(ROOT / md.SCORER_SOURCE)
         self.assertIsNotNone(releases)
         self.assertIn(EVIDENCE['latest_release'], releases)
-        self.assertNotIn('2026-10-30', FIXTURE_RELEASES)    # the new-release tests rely on the fixture scorer file
+        self.assertNotIn(NEWEST_DATE, FIXTURE_RELEASES)    # the new-release tests rely on the fixture scorer file
         tmp = self.tmp()
         (tmp / 'livebench.py').write_text('OTHER = {1}\n', encoding='utf-8')
         self.assertIsNone(md.scorer_releases(tmp / 'livebench.py'))
@@ -662,7 +803,8 @@ class NetTest(Base):
 
     def test_only_https_to_the_allowed_hosts(self):
         net = self.net()
-        for url in ('http://api.github.com/repos/x/y', 'https://example.com/x', 'http://livebench.ai/table_2026_06_25.csv',
+        for url in ('https://api.github.com/repos/LiveBench/new-livebench/commits/HEAD', 'https://example.com/x',
+                    'http://livebench.ai/v1/table_2026_06_25.csv', 'https://www.livebench.ai/',
                     'https://raw.githubusercontent.com/LiveBench/new-livebench/main/x', 'https://user@huggingface.co/api',
                     'https://huggingface.co:8443/api', 'https://livebench.ai.evil.net/x', 'https://cdn.livebench.ai/x'):
             with self.subTest(url=url), self.assertRaises(ValueError):
@@ -670,21 +812,21 @@ class NetTest(Base):
         self.assertEqual(net.opener.requests, [])
 
     def test_tokens_go_only_to_their_own_host(self):
-        net = self.net(FakeResponse(), FakeResponse(), env={'GITHUB_TOKEN': 'gh-secret', 'HF_TOKEN': 'hf-secret'})
-        net.get('https://api.github.com/repos/a/b/commits/HEAD')
+        env = {'GITHUB_TOKEN': 'gh-secret', 'HF_TOKEN': 'hf-secret'}      # both set on every Actions runner
+        net = self.net(FakeResponse(), FakeResponse(), FakeResponse(), env=env)
         net.get('https://huggingface.co/api/models/a/b')
-        (gh, _), (hf, _) = net.opener.requests
-        self.assertEqual(gh.get_header('Authorization'), 'Bearer gh-secret')
-        self.assertEqual(hf.get_header('Authorization'), 'Bearer hf-secret')
-        self.assertEqual(gh.get_header('User-agent'), 'llm-eval model_discovery')
-        site = self.net(FakeResponse(), FakeResponse(), env={'GITHUB_TOKEN': 'gh-secret', 'HF_TOKEN': 'hf-secret'})
-        site.get('https://livebench.ai/table_2026_06_25.csv')
-        site.get('https://www.livebench.ai/')
-        for req, _ in site.opener.requests:
+        net.get('https://livebench.ai/v1/table_2026_06_25.csv')
+        net.get('https://livebench.ai/')
+        (hf_req, _), *site = net.opener.requests
+        self.assertEqual(hf_req.get_header('Authorization'), 'Bearer hf-secret')
+        self.assertEqual(hf_req.get_header('User-agent'), 'llm-eval model_discovery')
+        for req, _ in site:
             self.assertIsNone(req.get_header('Authorization'))   # no token ever goes to the leaderboard site
             self.assertEqual(req.get_header('Accept'), '*/*')
-        empty = self.net(FakeResponse(), env={'GITHUB_TOKEN': '', 'HF_TOKEN': ''})
-        empty.get('https://api.github.com/repos/a/b/commits/HEAD')
+            self.assertEqual(req.get_header('User-agent'), 'llm-eval model_discovery')
+        self.assertNotIn('gh-secret', repr(vars(net)))           # the GitHub token is not even read
+        empty = self.net(FakeResponse(), env={'HF_TOKEN': ''})
+        empty.get('https://huggingface.co/api/models/a/b')
         self.assertIsNone(empty.opener.requests[0][0].get_header('Authorization'))
         self.assertEqual(empty.opener.requests[0][1], 60)
 
@@ -698,6 +840,10 @@ class NetTest(Base):
             with self.subTest(target=target), self.assertRaises(md.ShapeError) as ctx:
                 handler.redirect_request(req, io.BytesIO(), 302, 'found', email.message.Message(), target)
             self.assertIn('unexpected redirect to', str(ctx.exception))
+        # www.livebench.ai answers 301 to livebench.ai: another host, refused (the run only ever asks livebench.ai)
+        site = urllib.request.Request('https://livebench.ai/v1/table_2026_06_25.csv')
+        with self.assertRaises(md.ShapeError):
+            handler.redirect_request(site, io.BytesIO(), 301, 'moved', email.message.Message(), 'https://www.livebench.ai/v1/x')
 
     def test_redirects_through_the_urllib_opener(self):
         class Upstream(urllib.request.BaseHandler):
@@ -739,7 +885,7 @@ class NetTest(Base):
         self.assertEqual(net.counts['huggingface.co'], 5)
 
     def test_transport_errors_are_retried_then_raise_network_error(self):
-        url = 'https://api.github.com/repos/a/b/commits/HEAD'
+        url = 'https://livebench.ai/asset-manifest.json'
         net = self.net(urllib.error.URLError('down'), TimeoutError(), ConnectionResetError(), urllib.error.URLError('x'),
                        TimeoutError())
         with self.assertRaises(md.NetworkError) as ctx:
@@ -792,20 +938,13 @@ class NetTest(Base):
         net.get(url)
         self.assertEqual(net.opener.requests[0][1], 10.0)     # no attempt outlives the deadline
 
-    def test_github_rate_limit_403_is_retried_other_403_is_final(self):
-        url = 'https://api.github.com/repos/a/b/commits/HEAD'
-        net = self.net(http_error(url, 403, {'x-ratelimit-remaining': '0'}), FakeResponse(b'{"sha": 1}'))
-        self.assertEqual(net.get(url).json(), {'sha': 1})
-        self.assertEqual(net.sleeps, [10])
-        net = self.net(http_error(url, 403))
-        with self.assertRaises(md.HttpStatus) as ctx:
-            net.get(url)
-        self.assertEqual(ctx.exception.code, 403)
-        hf = 'https://huggingface.co/api/models/a/b'
-        net = self.net(http_error(hf, 403, {'x-ratelimit-remaining': '0'}))
-        with self.assertRaises(md.HttpStatus):
-            net.get(hf)
-        self.assertEqual(net.sleeps, [])
+    def test_a_403_is_final_on_every_host(self):
+        # The GitHub rate-limit retry went with the GitHub source: a 403 is a final status wherever it comes from.
+        for url in ('https://huggingface.co/api/models/a/b', 'https://livebench.ai/v1/table_2026_06_25.csv'):
+            net = self.net(http_error(url, 403, {'x-ratelimit-remaining': '0', 'Retry-After': '5'}))
+            with self.subTest(url=url), self.assertRaises(md.HttpStatus) as ctx:
+                net.get(url)
+            self.assertEqual((ctx.exception.code, net.sleeps), (403, []))
 
     def test_a_body_over_its_cap_is_a_shape_error(self):
         net = self.net(FakeResponse(b'x' * 101))
@@ -836,37 +975,201 @@ class NetTest(Base):
             self.assertNotIn('User-Agent', text)
 
 
-class GitBlobTest(Base):
-    def test_blob_bytes_are_checked_against_the_tree_sha(self):
-        data = b'model,a\n'
-        self.assertEqual(md.git_blob_sha(data), '883d052f7e51626fa819180ad7e9371bb259a513')
-        doc = {'sha': '883d052f7e51626fa819180ad7e9371bb259a513', 'size': 8, 'encoding': 'base64',
-               'content': base64.encodebytes(data).decode('ascii')}
-        self.assertEqual(md.verify_blob(doc, doc['sha'], 'u'), data)
-        bad = [{**doc, 'content': base64.encodebytes(b'model,b\n').decode('ascii')},
-               {**doc, 'encoding': 'utf-8', 'content': 'model,a\n'},
-               {**doc, 'size': 9}]
-        for case in bad:
-            with self.subTest(case=case), self.assertRaises(md.ShapeError):
-                md.verify_blob(case, doc['sha'], 'u')
+# --- the leaderboard site: main script, release lists, registry --------------------------------------
+REAL_LISTS = ('Yt=["20261014","20261025"],Jt="undefined"!==typeof window&&/^\\/new(\\/(index\\.html)?)?$/.test(window.'
+              'location.pathname)?[...Yt]:Yt,Xt=e=>`${e.slice(0,4)}-${e.slice(4,6)}-${e.slice(6,8)}`,Zt="25 October '
+              '2026",en=[...["2024-06-24","2024-07-26","2024-08-31","2024-11-25","2025-04-02","2025-04-25","2025-05-30",'
+              '"2025-11-25","2025-12-23","2026-01-08","2026-06-25"].map(e=>({id:e,label:e,gen:"v1"})),...Jt.map(e=>({id:e,'
+              'label:Xt(e),gen:"v2"}))];if(new Set(en.map(e=>e.label)).size!==en.length)throw new Error("Two releases '
+              'share a date on the timeline (v1 RELEASES vs 2.0 RELEASE_LABELS)");')
+# Two entries of the real 2.0 registry (gn) and one of the real v1 registry (fa), verbatim from main.1e1ce12d.js.
+REAL_REGISTRY = ('gn={"beam-1.0":{displayName:"Beam 1.0",organization:"Reflection AI",url:"https://reflection.ai/",'
+                 'huggingface:"https://huggingface.co/reflection/Beam-1.0-501B-A23B",openweight:!0,effort:"max",reasoner:!0},'
+                 '"claude-fable-5.1":{displayName:"Claude Fable 5.1",organization:"Anthropic",url:"https://www.anthropic.'
+                 'com/news/claude-fable-5-1",effort:"max",reasoner:!0}},vn={},yn={};'
+                 'fa={"claude-sonnet-5-5-xhigh-effort":{url:"https://platform.claude.com/docs/en/models/sonnet-5-5/overview"'
+                 ',organization:"Anthropic",displayName:"Claude Sonnet 5.5 xHigh Effort",reasoner:!0,variants:[{rawName:'
+                 '"claude-sonnet-5-5-max-effort",displayName:"Claude Sonnet 5.5 Max Effort"}]},"glm-5.3":{url:"https://z.ai",'
+                 'organization:"Z.AI",displayName:"GLM-5.3",openweight:!0,reasoner:!0,huggingface:"https://huggingface.co/'
+                 'zai-org/GLM-5.3"}},ma={};')
+
+
+class SiteTest(Base):
+    def test_the_release_lists_of_the_real_bundle(self):
+        timeline = md.parse_release_lists(REAL_LISTS)
+        self.assertEqual([r.id for r in timeline if r.generation == 'v1'][-3:], ['2025-12-23', '2026-01-08', '2026-06-25'])
+        self.assertEqual([(r.id, r.date, r.generation) for r in timeline if r.generation == '2.0'],
+                         [('20261014', '2026-10-14', '2.0'), ('20261025', '2026-10-25', '2.0')])
+        self.assertEqual(len(timeline), 13)
+        self.assertEqual([r.date for r in timeline], sorted(r.date for r in timeline))
+        newest = timeline[-1]
+        self.assertEqual((newest.table_path, newest.categories_path), ('data/20261025/table.csv', 'data/20261025/categories.json'))
+        v1 = timeline[-3]
+        self.assertEqual((v1.table_path, v1.categories_path), ('v1/table_2026_06_25.csv', 'v1/categories_2026_06_25.json'))
+
+    def test_release_lists_must_each_be_found_exactly_once(self):
+        renamed = REAL_LISTS.replace('Yt', 'Q9').replace('Jt', 'Zz').replace('Xt', 'P_').replace('en=', 'k$=')
+        self.assertEqual(len(md.parse_release_lists(renamed)), 13)       # minified names change between builds
+        cases = {
+            'no v1 list': REAL_LISTS.replace('gen:"v1"', 'gen:"old"'),
+            'two v1 lists': REAL_LISTS + '["2027-01-01"].map(e=>({id:e,label:e,gen:"v1"}));',
+            'no 2.0 map': REAL_LISTS.replace('gen:"v2"', 'gen:"new"'),
+            'no 2.0 list': REAL_LISTS.replace('Yt=["20261014","20261025"]', 'Yt=window.releases'),
+            'ambiguous 2.0 lists': REAL_LISTS + 'const Ab=["20251201"];',
+            'a v1 id that is no date': REAL_LISTS.replace('"2025-11-25"', '"2025-11-31"'),
+            'a 2.0 id that is no date': REAL_LISTS.replace('"20261014"', '"20261314"'),
+            'two releases on one date': REAL_LISTS.replace('"2026-06-25"', '"2026-10-25"'),
+        }
+        for name, text in cases.items():
+            with self.subTest(name=name), self.assertRaises(md.ShapeError):
+                md.parse_release_lists(text)
+
+    def test_the_registry_of_the_real_bundle(self):
+        reg = md.parse_registries(REAL_REGISTRY)
+        self.assertIsNone(reg.problem)
+        self.assertEqual([sorted(t) for t in reg.tables], [['beam-1.0', 'claude-fable-5.1'],
+                                                          ['claude-sonnet-5-5-max-effort', 'claude-sonnet-5-5-xhigh-effort', 'glm-5.3']])
+        reg.rank(['claude-fable-5.1', 'beam-1.0', 'glm-5.3'])
+        self.assertEqual((reg.order, reg.coverage), ([0, 1], [2, 1]))
+        beam = reg.get('beam-1.0')
+        self.assertEqual((beam.openweight, beam.link), (True, 'reflection/Beam-1.0-501B-A23B'))
+        fable = reg.get('claude-fable-5.1')
+        self.assertEqual((fable.openweight, fable.link), (False, None))      # no openweight key: LiveBench lists it closed
+        variant = reg.get('claude-sonnet-5-5-max-effort')
+        self.assertEqual((variant.openweight, variant.variant_of), (False, 'claude-sonnet-5-5-xhigh-effort'))
+        self.assertEqual(reg.counts(), (2, 1, 1))
+        self.assertIsNone(reg.get('no-such-id'))
+
+    def test_registry_precedence_variants_and_links(self):
+        js = ('gn={"minimax-m3":{openweight:!0},"open-v":{openweight:!0,huggingface:"https://huggingface.co/Acme/Open-V",'
+              'variants:[{rawName:"open-v-closed",openweight:!1},{rawName:"open-v-max"}]},'
+              '"odd-link":{openweight:!0,huggingface:"https://huggingface.co/Acme/Odd/tree/main"}};'
+              'fa={"minimax-m3":{displayName:"MiniMax M3"},"only-v1":{openweight:!0}};')
+        reg = md.parse_registries(js)
+        reg.rank(['minimax-m3', 'open-v', 'odd-link'])            # the 2.0 release's ids: the 2.0 registry first
+        self.assertTrue(reg.get('minimax-m3').openweight)
+        self.assertTrue(reg.get('only-v1').openweight)           # an id only the other registry holds
+        reg.rank(['minimax-m3', 'only-v1', 'x', 'y'])            # a v1 release: the v1 registry (2 of 4 ids) first
+        self.assertEqual(reg.order, [1, 0])
+        self.assertFalse(reg.get('minimax-m3').openweight)       # the v1 registry lists it closed
+        self.assertEqual(reg.get('open-v-max').link, 'Acme/Open-V')            # a variant inherits the link
+        self.assertEqual((reg.get('open-v-closed').openweight, reg.get('open-v-closed').link), (False, 'Acme/Open-V'))
+        odd = reg.get('odd-link')
+        self.assertEqual((odd.link, odd.link_raw), (None, 'https://huggingface.co/Acme/Odd/tree/main'))
+
+    def test_a_missing_or_unparseable_registry_is_a_problem_never_an_error(self):
+        cases = {
+            'no registry': ('gn={"a":{displayName:"A"}};', 'no model registry'),
+            'not plain data': ('gn={"a":{openweight:!0,url:n.url}};', 'does not parse'),
+            'a spread': ('gn={"a":{openweight:!0,...base}};', 'does not parse'),
+            'outside every registry': ('gn={"a":{openweight:!0}};function f(){return{openweight:!0}}', 'outside'),
+            'never closes': ('gn={"a":{openweight:!0}', 'never closes'),
+        }
+        for name, (js, needle) in cases.items():
+            with self.subTest(name=name):
+                reg = md.parse_registries(js)
+                self.assertIn(needle, reg.problem)
+                self.assertEqual(reg.tables, [])
+                self.assertIsNone(reg.get('a'))
+
+    def test_js_literals(self):
+        self.assertEqual(md.parse_js_literal('{"a-b":{x:"\\xd7 \\u2014 \\u{1F600}",y:!0,z:!1,n:-1.5e2,l:[1,"t",null],t:true}}'),
+                         {'a-b': {'x': '× — 😀', 'y': True, 'z': False, 'n': -150.0, 'l': [1.0, 't', None], 't': True}})
+        self.assertEqual(md.parse_js_literal("{a:'it\\'s',b:[]}"), {'a': "it's", 'b': []})
+        for text in ('{a:b}', '{a:`x`}', '{a:1,,b:2}', '{a:1', '{a:1}}', '{a:function(){}}', '[1 2]'):
+            with self.subTest(text=text), self.assertRaises((ValueError, IndexError)):
+                md.parse_js_literal(text)
+        self.assertEqual(md.balanced_end('x={"}":{a:"{"}},y', 2), len('x={"}":{a:"{"}}'))
+        self.assertIsNone(md.balanced_end('{a:{b:1}', 0))
+
+    def test_the_main_script_comes_from_the_manifest_and_must_be_the_page_s(self):
+        world = World()
+        result = self.run_world(world)
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual(result.net.site_paths()[:3], ['/', '/asset-manifest.json', '/' + SCRIPT])
+        self.assertEqual(result.data['sources']['main_script']['path'], SCRIPT)
+        cases = [
+            ('manifest names another script', lambda w: setattr(w, 'manifest', asset_manifest('./static/js/main.ffff0000.js')),
+             'index.html loading the main script asset-manifest.json names (static/js/main.ffff0000.js)'),
+            ('page loads another script', lambda w: setattr(w, 'index', index_html('./static/js/main.ffff0000.js')),
+             'Got: `script src ./static/js/main.ffff0000.js`'),
+            ('manifest names another host', lambda w: setattr(w, 'manifest', asset_manifest('https://cdn.example.net/main.js')),
+             'asset-manifest.json files["main.js"]'),
+            ('no manifest', lambda w: setattr(w, 'manifest', None), 'asset manifest at https://livebench.ai/asset-manifest.json'),
+            ('manifest as HTML', lambda w: w.types.update({'asset-manifest.json': 'text/html'}), 'application/json from'),
+        ]
+        for name, change, needle in cases:
+            with self.subTest(name=name):
+                world = World()
+                change(world)
+                if world.manifest is None:
+                    world.manifest = b''
+                    world.files['asset-manifest.json'] = None
+                net = world.net()
+                if world.files.get('asset-manifest.json', b'') is None:
+                    del net.site['asset-manifest.json']
+                result = self.run_world(world, net=net)
+                self.assertEqual(result.code, 2, result.failure)
+                self.assertIn('- Stage: `leaderboard site`', result.failure)
+                self.assertIn(needle, result.failure)
+                self.assertFalse(any('huggingface.co' in u for u in result.net.calls))
+
+    def test_the_weights_literal_must_be_in_the_main_script(self):
+        world = World()
+        world.weights_literal = False
+        result = self.run_world(world)
+        self.assertEqual(result.code, 2)
+        self.assertIn('the averaging code\'s "_overall_weights" literal in static/js/main.1e1ce12d.js', result.failure)
+
+    def test_a_broken_release_list_fails_the_run(self):
+        for change in (lambda w: setattr(w, 'v2', ['20261014', '20261332']), lambda w: setattr(w, 'v1', V1_RELEASES + ['2026-10-25']),
+                       lambda w: setattr(w, 'script_after', 'const Xy=["20990101"];')):
+            world = World()
+            change(world)
+            with self.subTest():
+                result = self.run_world(world)
+                self.assertEqual(result.code, 2)
+                self.assertIn('- Stage: `leaderboard site`', result.failure)
+
+    def test_html_and_missing_release_files(self):
+        world = World()
+        world.types[f'data/{NEWEST}/table.csv'] = 'text/html; charset=utf-8'
+        world.files[f'data/{NEWEST}/table.csv'] = NOT_FOUND_PAGE
+        result = self.run_world(world)
+        self.assertEqual(result.code, 2)
+        self.assertIn('text/csv from https://livebench.ai/data/20261025/table.csv', result.failure)
+        world = World()
+        world.files[f'data/{NEWEST}/categories.json'] = NOT_FOUND_PAGE         # an HTML body served as JSON
+        result = self.run_world(world)
+        self.assertEqual(result.code, 2)
+        self.assertIn('content-type application/json, body <!DOCTYPE html>', result.failure)
+        # A release whose table answers 404 is not analysed: the previous one is (here the latest recorded one).
+        world = World()
+        world.add_release('20261107')
+        del world.files['data/20261107/table.csv']
+        result = self.run_world(world)
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual(result.data['release']['id'], NEWEST)
+        self.assertIn('release 2026-11-07 (2.0, id 20261107) is on the site\'s timeline, but `data/20261107/table.csv` '
+                      'answers HTTP 404; not analysed', result.issue)
 
 
 # --- tables, categories, aggregation ------------------------------------------------------------
 class ParsingTest(Base):
     CATS = {'Math': ['m1', 'm2', 'm3', 'm4'], 'Coding': ['c1']}
 
-    def scored(self, text, cats=None):
+    def scored(self, text, cats=None, generation='v1', weights=None):
         raw = md.read_csv(text.encode('utf-8') if isinstance(text, str) else text, 'u')
-        return md.score_table(raw, cats or self.CATS)
+        return md.score_table(raw, cats or self.CATS, generation, weights)
 
     def test_csv_shape(self):
-        text = '\ufeffModel ,m1,m2,m3,m4,c1,notes\r\n"a,b",10,20,30,40,50,x\r\nplain,1,2,3,4,5,y\r\n'
+        text = '﻿Model ,m1,m2,m3,m4,c1,notes\r\n"a,b",10,20,30,40,50,x\r\nplain,1,2,3,4,5,y\r\n'
         scored, partial, extras = self.scored(text)
         self.assertEqual([r.id for r in scored], ['a,b', 'plain'])
         self.assertEqual(extras, ['notes'])
-        self.assertEqual([r.line for r in scored], [2, 3])
+        self.assertEqual([(r.line, r.number) for r in scored], [(2, 1), (3, 2)])
         multi = 'model,m1,m2,m3,m4,c1,notes\n"first",1,2,3,4,5,"two\nlines"\nsecond,1,2,3,4,5,z\n'
-        self.assertEqual([r.line for r in sorted(self.scored(multi)[0], key=lambda r: r.id)], [2, 4])
+        self.assertEqual([(r.line, r.number) for r in sorted(self.scored(multi)[0], key=lambda r: r.id)], [(2, 1), (4, 2)])
         for marker in ('', '-', 'NaN', 'null', 'None', 'n/a', ' N/A '):
             scored, _, _ = self.scored(f'model,m1,m2,m3,m4,c1\nx,{marker},20,30,40,50\n')
             self.assertEqual(scored[0].missing_tasks, 1, marker)
@@ -877,7 +1180,8 @@ class ParsingTest(Base):
                'two model columns': 'model,MODEL,m1,m2,m3,m4,c1\nx,y,1,2,3,4,5\n',
                'duplicate id': 'model,m1,m2,m3,m4,c1\nx,10,2,3,4,5\nx,10,2,3,4,5\n',
                'fraction scale': 'model,m1,m2,m3,m4,c1\nx,0.5,0.2,0.3,0.4,1.0\n',
-               'ragged row': 'model,m1,m2,m3,m4,c1\nx,10,2,3,4\n'}
+               'ragged row': 'model,m1,m2,m3,m4,c1\nx,10,2,3,4\n',
+               'an HTML page': NOT_FOUND_PAGE.decode('utf-8')}
         for name, text in bad.items():
             with self.subTest(name=name), self.assertRaises(md.ShapeError):
                 self.scored(text)
@@ -888,10 +1192,30 @@ class ParsingTest(Base):
             md.read_csv(b'model,m1\n\xff\xfe,1\n', 'u')
 
     def test_categories_shape(self):
-        self.assertEqual(md.parse_categories(b'{"A": ["t1", "t2"], "B": ["t3"]}', 'u'), {'A': ['t1', 't2'], 'B': ['t3']})
-        for text in (b'[["t1"]]', b'{"A": []}', b'{"A": ["t1", 2]}', b'{"A": ["t1"], "B": ["t1"]}', b'{}', b'not json'):
+        self.assertEqual(md.parse_categories(b'{"A": ["t1", "t2"], "B": ["t3"]}', 'u'), ({'A': ['t1', 't2'], 'B': ['t3']}, {}, []))
+        for text in (b'[["t1"]]', b'{"A": []}', b'{"A": ["t1", 2]}', b'{"A": ["t1"], "B": ["t1"]}', b'{}', b'not json',
+                     NOT_FOUND_PAGE, b'{"A": ["t1"], "_overall_weights": {"A": 2}}'):     # v1 categories carry no weights
             with self.subTest(text=text), self.assertRaises(md.ShapeError):
                 md.parse_categories(text, 'u')
+
+    def test_2_0_categories_and_weights(self):
+        cats, weights, ignored = md.parse_categories(suites_json(), 'u', '2.0')
+        self.assertEqual((cats, weights, ignored), (SUITES, WEIGHTS, []))
+        self.assertEqual(md.parse_categories(suites_json(None), 'u', '2.0'), (SUITES, {}, []))
+        doc = {**SUITES, '_overall_weights': {'Coding': 3, 'Design': 0, 'Browser': -1, 'Agentic': 2}}
+        cats, weights, ignored = md.parse_categories(as_json(doc), 'u', '2.0')
+        self.assertEqual(weights, {'Coding': 3.0})                    # non-positive and unknown suites are ignored
+        self.assertEqual(ignored, [('Design', 0, 'not positive'), ('Browser', -1, 'not positive'),
+                                   ('Agentic', 2, 'not a suite of this file')])
+        for bad in ({**SUITES, '_notes': ['x']}, {**SUITES, '_overall_weights': {'Coding': '2'}},
+                    {**SUITES, '_overall_weights': {'Coding': True}}, {**SUITES, '_overall_weights': {'Coding': None}},
+                    {**SUITES, '_overall_weights': [2]}, {'_overall_weights': {}}):
+            with self.subTest(bad=bad), self.assertRaises(md.ShapeError):
+                md.parse_categories(as_json(bad), 'u', '2.0')
+        for literal in (b'NaN', b'Infinity', b'-Infinity'):        # Python's json reads these; they are no finite number
+            with self.subTest(literal=literal), self.assertRaises(md.ShapeError) as ctx:
+                md.parse_categories(b'{"Coding": ["coding"], "_overall_weights": {"Coding": ' + literal + b'}}', 'u', '2.0')
+            self.assertIn('finite numbers in _overall_weights', str(ctx.exception))
 
     def test_two_level_mean(self):
         scored, _, _ = self.scored('model,m1,m2,m3,m4,c1\nx,10,20,30,40,90\n')
@@ -909,6 +1233,52 @@ class ParsingTest(Base):
                                    'd,5,5,5,5,5\n')
         # standard competition rank: the row after a two-way tie at rank 2 is rank 4 (dense rank would say 3)
         self.assertEqual([(r.id, r.rank) for r in scored], [('c', 1), ('a', 2), ('b', 2), ('d', 4)])
+
+    SUITE_HEADER = 'model,long_agentic,reasoning,coding,browser,data_analysis,research,design\n'
+
+    def site_overall(self, cells, weights=WEIGHTS, cats=None):
+        scored, partial, _ = self.scored(self.SUITE_HEADER + 'x,' + cells + '\n', cats or SUITES, '2.0', weights)
+        return (scored or partial)[0]
+
+    def test_2_0_overall_is_the_site_s_weighted_suite_mean(self):
+        # Real row of data/20261025/table.csv (claude-fable-5.1), hand-computed with the 20261025 weights:
+        # (77.9*2 + 91.7 + 97.7*1.5 + 89.8 + 80.3 + 82.0 + 83.4*1.5) / (2 + 1 + 1.5 + 1 + 1 + 1 + 1.5) = 771.25 / 9
+        r = self.site_overall('77.9,91.7,97.7,89.8,80.3,82.0,83.4')
+        self.assertEqual(r.overall, 85.69)
+        self.assertEqual(r.categories['Coding'], 97.7)
+        # every suite x1 (20261014 has no weights): the plain mean of the seven suites, 602.8 / 7 = 86.114...
+        self.assertEqual(self.site_overall('77.9,91.7,97.7,89.8,80.3,82.0,83.4', weights={}).overall, 86.11)
+        # missing suites are left out of numerator and denominator alike: n/a and blank cells
+        # (90 + 60*1.5 + 80 + 80) / (1 + 1.5 + 1 + 1) = 340 / 4.5 = 75.555...
+        r = self.site_overall('n/a,90,60,,80,80,')
+        self.assertEqual((r.overall, r.missing_tasks, r.missing_label()), (75.56, 3, '3 of 7 suites missing'))
+        self.assertEqual(self.site_overall('100,0,0,0,0,0,0').overall, round(200 / 9, 2))   # 22.22: the weight counts
+        self.assertEqual(self.site_overall('100,,,,,,').overall, 100.0)   # one suite with a score is an overall
+        r = self.site_overall(',,,,,,')
+        self.assertIsNone(r.overall)                                       # no suite with a score: no overall
+        # non-positive and unknown-suite weights were dropped by parse_categories; a weight of 1 is the plain mean
+        self.assertEqual(self.site_overall('50,100,100,100,100,100,100', weights={'Long Agentic': 1.0}).overall, 92.86)
+        # a suite of several columns is the mean of those that hold a number
+        cats = {'A': ['long_agentic', 'reasoning'], 'B': ['coding', 'browser', 'data_analysis', 'research', 'design']}
+        r = self.site_overall('10,30,n/a,50,50,50,50', weights={'A': 3.0}, cats=cats)
+        self.assertEqual((r.categories['A'], r.categories['B'], r.overall), (20.0, 50.0, 27.5))
+
+    def test_2_0_rounding_is_javascript_tofixed(self):
+        # toFixed rounds the exact binary value half up: 1.125 is exact, so 1.13 (Python's round() gives 1.12);
+        # 2.675 is really 2.67499999..., so 2.67 (a decimal-string rounding would give 2.68).
+        self.assertEqual(md.js_fixed2(1.125), 1.13)
+        self.assertEqual(round(1.125, 2), 1.12)
+        self.assertEqual(md.js_fixed2(2.675), 2.67)
+        self.assertEqual(md.js_fixed2(0.125), 0.13)
+        self.assertEqual(md.js_fixed2(85.69444444444444), 85.69)
+        self.assertEqual(self.site_overall('1.25,1.0,,,,,', weights={}).overall, 1.13)     # (1.25 + 1.0) / 2 = 1.125
+        self.assertEqual(self.site_overall('2.675,,,,,,', weights={}).overall, 2.67)
+        # Ranking uses the rounded overall, as the site shows it: 70.001 and 69.996 tie at 70.00.
+        scored, _, _ = self.scored(self.SUITE_HEADER + 'b,' + ','.join(['70.001'] * 7) + '\na,' + ','.join(['69.996'] * 7)
+                                   + '\n', SUITES, '2.0', WEIGHTS)
+        self.assertEqual([(r.id, r.overall, r.rank) for r in scored], [('a', 70.0, 1), ('b', 70.0, 1)])
+        # JavaScript adds left to right; Python 3.12's sum() compensates: js_mean must not
+        self.assertEqual(md.js_mean([0.1] * 10), 0.9999999999999999 / 10)
 
     def test_recorded_evidence_reproduces_offline(self):
         overalls = []
@@ -1108,6 +1478,28 @@ class ParameterTest(Base):
         self.assertIsNone(md.size_gate(['foo', '7b', '13b'], ['foo'], 7e9))
         self.assertIsNone(md.size_gate(['foo'], ['foo'], 7e9))
 
+    def test_hugging_face_s_doubled_u8_count_only_widens_the_packed_range(self):
+        # At the catalog's pinned revision ff433f54 Hugging Face now reports U8 = 112,764,911,616 for
+        # Nemotron-3-Super-120B-NVFP4 (the catalog records 56,382,455,808, exactly half); total and the float counts
+        # are unchanged. The packed rule must stay fail-safe with the reported counts.
+        recorded = BY_ID['nemotron-super-120b']['upstream_metadata']['safetensors']
+        self.assertEqual(recorded['parameters']['U8'], 56_382_455_808)
+        reported = {'parameters': {**recorded['parameters'], 'U8': 112_764_911_616}, 'total': recorded['total']}
+        names = md.tokens(BY_ID['nemotron-super-120b']['upstream_repo'], 'nvidia')
+        old, new = (md.parameter_count(st, names, self.B) for st in (recorded, reported))
+        self.assertEqual((old.kind, old.value), ('packed', 120_000_000_000))
+        self.assertEqual((new.kind, new.value, new.problem), ('packed', 120_000_000_000, None))   # 120b still verifies
+        self.assertEqual(new.lower, old.lower)
+        self.assertEqual((round(old.upper / 1e9, 2), round(new.upper / 1e9, 2)), (123.61, 236.38))
+        # An unnamed packed repository with the doubled count gets the wider range, never a tighter fit claim.
+        old, new = (md.parameter_count(st, ['nemotron', 'super'], self.B) for st in (recorded, reported))
+        self.assertGreater(new.upper, old.upper)
+        self.assertEqual((old.cls, old.problem, new.cls, new.problem), (None, 'size_unverified', None, 'size_unverified'))
+        small = {'parameters': {'BF16': 1_000_000_000, 'U8': 39_000_000_000}, 'total': 40_000_000_000}
+        doubled = {'parameters': {'BF16': 1_000_000_000, 'U8': 78_000_000_000}, 'total': 40_000_000_000}
+        self.assertEqual(md.parameter_count(small, ['foo'], self.B).cls, 'offload')            # 40-79 B
+        self.assertEqual(md.parameter_count(doubled, ['foo'], self.B).problem, 'size_unverified')   # 40-157 B
+
 
 class GateTest(Base):
     def world(self):
@@ -1172,6 +1564,8 @@ class GateTest(Base):
         self.assertNotIn('Qwen/Qwen3.8-27B', [u for u in d.net.infos_fetched()])   # base_model is never followed
 
 
+
+
 # --- calibration and anchors --------------------------------------------------------------------
 class CalibrationTest(Base):
     def test_calibration_passes_on_tables_built_from_the_evidence(self):
@@ -1179,9 +1573,12 @@ class CalibrationTest(Base):
         self.assertEqual(result.code, 0, result.failure)
         self.assertEqual(result.outputs, {'complete': 'true', 'reportable': 'false', 'new': 'false'})
         cal = result.data['calibration']
-        self.assertEqual([(c['table'], c['categories'], c['rows']) for c in cal],
-                         [('table_2025_04_25.csv', 'categories_2025_04_25.json', 4), ('table_2025_05_30.csv', 'categories_2025_05_30.json', 1)])
-        self.assertIn('calibration 5/5 recorded rows reproduced, HF anchors 4/4, matcher canary 4/4', result.issue)
+        self.assertEqual([(c['table'], c['url'], c['categories'], c['rows']) for c in cal],
+                         [('table_2025_04_25.csv', 'https://livebench.ai/v1/table_2025_04_25.csv', 'categories_2025_04_25.json', 4),
+                          ('table_2025_05_30.csv', 'https://livebench.ai/v1/table_2025_05_30.csv', 'categories_2025_05_30.json', 1)])
+        self.assertIn('calibration 5/5 recorded v1 rows reproduced, HF anchors 4/4, matcher canary 4/4', result.issue)
+        # the recorded GitHub blob URLs are read at livebench.ai/v1/: the GitHub API is never asked
+        self.assertFalse(any('github' in u for u in result.net.calls))
 
     def assert_calibration_failure(self, result, needle):
         self.assertEqual(result.code, 2)
@@ -1195,11 +1592,11 @@ class CalibrationTest(Base):
     def test_sha_mismatch_missing_row_and_shifted_cell_fail(self):
         world = World()
         root = self.root(world)
-        world.reviewed_files['public/table_2025_04_25.csv'] = TABLE_2025_04.replace(b'filler-model-00', b'filler-model-99')
-        self.assert_calibration_failure(self.run_world(world, root=root), 'sha256')
+        world.files['v1/table_2025_04_25.csv'] = TABLE_2025_04.replace(b'filler-model-00', b'filler-model-99')
+        self.assert_calibration_failure(self.run_world(world, root=root), 'with the recorded sha256')
 
         world = World()
-        world.reviewed_files['public/table_2025_04_25.csv'] = table(CATS_2025_04, recorded_rows('2025-04-25')[1:] + FILLERS, extra=())
+        world.files['v1/table_2025_04_25.csv'] = table(CATS_2025_04, recorded_rows('2025-04-25')[1:] + FILLERS)
         self.assert_calibration_failure(self.run_world(world), 'is not in the table')
 
         world = World()
@@ -1207,19 +1604,25 @@ class CalibrationTest(Base):
         lb_id, scores = rows[0]
         spec = dict(scores)
         spec['zebra_puzzle'] = repr(scores['Reasoning'] + 0.02)
-        world.reviewed_files['public/table_2025_04_25.csv'] = table(CATS_2025_04, [(lb_id, spec)] + rows[1:] + FILLERS, extra=())
-        self.assert_calibration_failure(self.run_world(world), 'no categories file at caa4253c8a3a reproduces')
+        world.files['v1/table_2025_04_25.csv'] = table(CATS_2025_04, [(lb_id, spec)] + rows[1:] + FILLERS)
+        self.assert_calibration_failure(self.run_world(world), 'no categories file on livebench.ai/v1/ reproduces')
+
+        world = World()
+        root = self.root(world)
+        del world.files['v1/table_2025_05_30.csv']
+        self.assert_calibration_failure(self.run_world(world, root=root),
+                                        'the recorded table table_2025_05_30.csv at https://livebench.ai/v1/table_2025_05_30.csv')
 
     def test_categories_fallback(self):
         world = World()
-        del world.reviewed_files['public/categories_2025_04_25.json']
-        world.reviewed_files['public/categories_2025_04_02.json'] = as_json(CATS_2025_04)
+        del world.files['v1/categories_2025_04_25.json']
+        world.files['v1/categories_2025_04_02.json'] = as_json(CATS_2025_04)    # 2025-04-02 is on the v1 timeline
         result = self.run_world(world)
         self.assertEqual(result.code, 0, result.failure)
         self.assertEqual(result.data['calibration'][0]['categories'], 'categories_2025_04_02.json')
         self.assertIn('categories file `categories_2025_04_02.json` (fallback)', result.step)
         world = World()
-        del world.reviewed_files['public/categories_2025_04_25.json']
+        del world.files['v1/categories_2025_04_25.json']
         self.assert_calibration_failure(self.run_world(world), 'reproduces the recorded scores of table_2025_04_25.csv')
 
     def test_taxonomy_against_the_real_benchmarks_file(self):
@@ -1227,29 +1630,74 @@ class CalibrationTest(Base):
         world = World()
         moved = {k: list(v) for k, v in CATS_2026.items()}
         moved['Coding'].append(moved['Language'].pop())
-        world.reviewed_files['public/categories_2026_06_25.json'] = as_json(moved)
-        self.assert_calibration_failure(self.run_world(world), 'task partition of catalog/benchmarks.json')
+        world.files['v1/categories_2026_06_25.json'] = as_json(moved)
+        result = self.run_world(world)
+        self.assert_calibration_failure(result, 'task partition of catalog/benchmarks.json')
+        # The fix names both files together, and the diff says what moved.
+        for needle in ('- What to do: livebench.ai serves this file unversioned. If LiveBench changed it, record the '
+                       'new partition in catalog/benchmarks.json together with catalog/livebench-evidence.json',
+                       'tasks moved typos (Language → Coding)'):
+            self.assertIn(needle, result.failure)
+        self.assertIn('What to do: livebench.ai serves this file unversioned', result.step)
+
+        def move_typos(doc):
+            by_name = {c['name']: c for c in doc['categories']}
+            by_name['Language']['livebench_tasks'].remove('typos')
+            by_name['Coding']['livebench_tasks'].append('typos')
+        result = self.run_world(world, benchmarks=move_typos)        # benchmarks.json records the new partition
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual(result.data['taxonomy']['file'], 'v1/categories_2026_06_25.json')
+
+    def test_the_reference_release_must_be_a_v1_release(self):
+        result = self.run_world(World(), benchmarks=lambda doc: doc.update(reference_release=NEWEST_DATE))
+        self.assert_calibration_failure(result, '2.0 suites are another taxonomy')
 
     def test_the_excluded_example_check_is_soft(self):
         world = World()
-        world.reviewed_files['public/table_2026_06_25.csv'] = table(CATS_2026, FILLERS)
+        world.files['v1/table_2026_06_25.csv'] = table(CATS_2026, FILLERS)
         result = self.run_world(world)
         self.assertEqual((result.code, result.outputs['complete']), (0, 'true'))
         self.assertIn('overall 71.59 recorded for `zai-org/GLM-5.3-Flash`', result.step)
         self.assertIn('overall 81.11 recorded', result.step)
         self.assertNotIn('71.59', result.issue.split('Not raised')[0].replace('71.59, rank', ''))
 
+    def test_a_recorded_2_0_row_is_checked_softly(self):
+        def add_v2(ev):
+            ev['recommendations'].append({**ev['recommendations'][0], 'model_id': 'qwen38-27b',
+                                          'leaderboard_model_id': 'qwen3.8-27b-thinking', 'release': NEWEST_DATE,
+                                          'overall': 68.0, 'category_scores': {k: 68.0 for k in SUITES},
+                                          'source_table': f'https://livebench.ai/data/{NEWEST}/table.csv',
+                                          'source_sha256': hashlib.sha256(World().head_table()).hexdigest()})
+        result = self.run_world(World(), evidence=add_v2)
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual(result.data['soft_calibration'], [{'table': f'data/{NEWEST}/table.csv', 'rows': 1, 'status': 'reproduced'}])
+        self.assertIn('calibration 5/5 recorded v1 rows', result.issue)
+        world = World([('new-row-1', 99.0)] + DEFAULT_ROWS)          # LiveBench added a row: other bytes, a warning only
+        result = self.run_world(world, evidence=add_v2)
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual(result.data['soft_calibration'][0]['status'], 'changed')
+        self.assertIn(f'recorded 2.0 rows of `data/{NEWEST}/table.csv` not re-checked: livebench.ai now serves other bytes',
+                      result.step)
+
     def test_hf_anchors(self):
         result = self.run_world(World())
         self.assertEqual([a['class'] for a in result.data['anchors']], ['float', 'packed', 'packed', 'float'])
-        for field, value in (('sha', 'a' * 40), ('total', 1)):
+        self.assertEqual([a['int_changes'] for a in result.data['anchors']], [[], [], [], []])
+        for field, value in (('sha', 'a' * 40), ('total', 1), ('float count', 1), ('dtype set', 1), ('no safetensors', None)):
             with self.subTest(field=field):
                 world = World()
-                key = next(k for k in world.revisions if k[0] == 'qwen/qwen3.8-27b')
+                key = next(k for k in world.revisions if k[0] == 'nvidia/nvidia-nemotron-3-super-120b-a12b-nvfp4')
+                doc = world.revisions[key]
                 if field == 'sha':
-                    world.revisions[key]['sha'] = value
+                    doc['sha'] = value
+                elif field == 'total':
+                    doc['safetensors']['total'] = value
+                elif field == 'float count':
+                    doc['safetensors']['parameters']['BF16'] += value
+                elif field == 'dtype set':
+                    doc['safetensors']['parameters']['I8'] = value
                 else:
-                    world.revisions[key]['safetensors']['total'] = value
+                    doc['safetensors'] = None
                 result = self.run_world(world)
                 self.assertEqual(result.code, 2)
                 self.assertIn('Hugging Face metadata shape changed', result.failure)
@@ -1263,75 +1711,115 @@ class CalibrationTest(Base):
         self.assertEqual(meta['parameters']['I64'], 35)
         self.assertEqual(md.parameter_count(meta, [], ParameterTest.B).kind, 'float')
 
+    def test_an_integer_count_hugging_face_now_reports_differently_is_a_header_warning(self):
+        # What the CI probe found on 2026-11-08: U8 doubled at the pinned Nemotron revision, everything else unchanged.
+        world = World()
+        key = next(k for k in world.revisions if k[0] == 'nvidia/nvidia-nemotron-3-super-120b-a12b-nvfp4')
+        world.revisions[key]['safetensors']['parameters']['U8'] = 112_764_911_616
+        result = self.run_world(world)
+        self.assertEqual((result.code, result.outputs['complete']), (0, 'true'), result.failure)
+        warning = ('Hugging Face now reports U8 = 112764911616 at the recorded revision of '
+                   '`nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4` (`ff433f5493e2`); catalog records 56382455808; '
+                   'packed size ranges use the reported counts.')
+        self.assertIn('- Warning: ' + warning, result.issue)
+        self.assertIn('integer counts differ: U8 112764911616 (recorded 56382455808)', result.step)
+        self.assertEqual(result.data['anchors'][1]['int_changes'],
+                         [{'dtype': 'U8', 'reported': 112_764_911_616, 'recorded': 56_382_455_808}])
+        # an anchor whose reported counts no longer classify as packed is a shape change
+        world = World()
+        key = next(k for k in world.revisions if k[0] == 'openai/gpt-oss-120b')
+        world.revisions[key]['safetensors']['parameters']['U8'] = 0
+        result = self.run_world(world)
+        self.assertEqual(result.code, 2)
+        self.assertIn('anchor gpt-oss-120b classified as a packed checkpoint', result.failure)
+
 
 # --- release discovery ----------------------------------------------------------------------------
 class ReleaseDiscoveryTest(Base):
-    def test_newest_release_with_both_files(self):
+    def test_the_newest_release_with_both_files(self):
         world = World()
-        world.head_files['public/table_2026_10_30.csv'] = table(CATS_2026, DEFAULT_ROWS)
-        world.head_files['public/categories_2026_10_30.json'] = as_json(CATS_2026)
-        world.head_files['public/table_2026_02_30.csv'] = table(CATS_2026, DEFAULT_ROWS)   # not a date: ignored
-        world.head_files['public/categories_2026_02_30.json'] = as_json(CATS_2026)
-        world.head_files['public/table_latest.csv'] = b'model\n'
-        world.head_files['public/table_2026_11_05.csv'] = table(CATS_2026, DEFAULT_ROWS[:5])
+        world.add_release('20261105')
+        world.add_release('20261107', DEFAULT_ROWS[:5], categories=False)
         result = self.run_world(world)
         self.assertEqual(result.code, 0, result.failure)
-        self.assertEqual(result.data['release']['date'], '2026-10-30')
-        self.assertIn('`table_2026_11_05.csv` (5 rows) has no categories file yet', result.issue)
+        self.assertEqual((result.data['release']['id'], result.data['release']['generation']), ('20261105', '2.0'))
+        self.assertEqual(result.data['release']['table'], 'https://livebench.ai/data/20261105/table.csv')
+        self.assertIn('`data/20261107/table.csv` (5 rows) has no categories file yet; not analysed.', result.issue)
         self.assertNotIn('release_without_categories', json.dumps(result.data['notices']))
+        self.assertEqual([n['kind'] for n in result.data['notices']], ['new_release'])
 
-        world.head_files['public/table_2026_11_05.csv'] = table(CATS_2026, DEFAULT_ROWS[:20])
+        world.files['data/20261107/table.csv'] = table(SUITES, DEFAULT_ROWS[:20])
         result = self.run_world(world)
         self.assertEqual(result.outputs['reportable'], 'true')
         self.assertEqual([n['kind'] for n in result.data['notices']], ['release_without_categories', 'new_release'])
+        self.assertIn('`data/20261107/table.csv` has 20 data rows on livebench.ai and `data/20261107/categories.json` '
+                      'answers HTTP 404.', result.issue)
+        # release files are read without the site's ?v= cache-buster (FakeNet refuses a query on livebench.ai)
+        self.assertTrue(all('?' not in u for u in result.net.calls if u.startswith(SITE)))
 
     def test_an_in_progress_release_falls_back(self):
         world = World()
-        world.head_files['public/table_2026_10_30.csv'] = table(CATS_2026, DEFAULT_ROWS[:19])
-        world.head_files['public/categories_2026_10_30.json'] = as_json(CATS_2026)
+        world.add_release('20261107', DEFAULT_ROWS[:19])
         result = self.run_world(world)
-        self.assertEqual(result.data['release']['date'], '2026-06-25')
-        self.assertIn('release 2026-10-30 looks in progress (19 scored rows); analysing 2026-06-25', result.issue)
-        world.head_files['public/table_2026_10_30.csv'] = table(CATS_2026, DEFAULT_ROWS[:md.MIN_RELEASE_ROWS])
+        self.assertEqual(result.data['release']['id'], NEWEST)
+        self.assertIn('release 2026-11-07 looks in progress (19 scored rows); analysing 2026-10-25', result.issue)
+        world.files['data/20261107/table.csv'] = table(SUITES, DEFAULT_ROWS[:md.MIN_RELEASE_ROWS])
         result = self.run_world(world)                     # exactly MIN_RELEASE_ROWS scored rows: analysed
         self.assertEqual(result.code, 0, result.failure)
-        self.assertEqual((result.data['release']['date'], result.data['release']['scored_rows']), ('2026-10-30', 20))
+        self.assertEqual((result.data['release']['id'], result.data['release']['scored_rows']), ('20261107', 20))
         self.assertEqual([n['kind'] for n in result.data['notices']], ['new_release'])
         self.assertNotIn('looks in progress', result.issue)
 
-    def test_layout_changes_exit_2(self):
+    def test_the_recorded_latest_release_must_stay_on_the_timeline(self):
         world = World()
-        del world.head_files['public/categories_2026_06_25.json']
-        result = self.run_world(world)
+        world.v1 = [d for d in V1_RELEASES if d != '2026-06-25']
+        result = self.run_world(world, latest='2026-06-25')
         self.assertEqual(result.code, 2)
         self.assertIn('leaderboard layout changed', result.failure)
-
         world = World()
-        world.tree_patches.append(lambda label, path, doc: {**doc, 'truncated': True} if label == 'head' and path == 'public/' else doc)
-        result = self.run_world(world)
+        del world.files[f'data/{NEWEST}/table.csv']
+        result = self.run_world(world)                       # nothing on or after latest_release loads
         self.assertEqual(result.code, 2)
-        self.assertIn('truncated', result.failure)
+        self.assertIn('a release on or after 2026-10-25 with at least 20 scored rows', result.failure)
 
+    def test_site_status_codes(self):
         world = World()
-        for i in range(25):
-            world.head_files[f'dir{i:02d}/x.txt'] = b'x'
-        world.head_files = {k.replace('public/', 'data/'): v for k, v in world.head_files.items()}
-        result = self.run_world(world)
-        self.assertEqual(result.code, 2)
-        self.assertIn('a public/ tree', result.failure)
-        listed = re.search(r'Got: `entries ([^`]*)`', result.failure).group(1)
-        self.assertEqual(len(listed.split(', ')), 20)
-
-    def test_a_moved_repository_exits_2(self):
-        world = World()
-        world.errors[f'{GITHUB}/commits/HEAD'] = 404
-        result = self.run_world(world)
-        self.assertEqual(result.code, 2)
-        self.assertIn('leaderboard repository moved or private', result.failure)
-        world = World()
-        world.errors[f'{GITHUB}/commits/HEAD'] = 500
+        world.errors[SITE] = 500
         result = self.run_world(world)
         self.assertEqual(result.code, 1)
+        self.assertIn('Network failure at `leaderboard site`', result.step)
+        world = World()
+        world.errors[SITE + f'data/{NEWEST}/table.csv'] = 403
+        result = self.run_world(world)
+        self.assertEqual(result.code, 1)
+
+    def test_release_forces_a_release(self):
+        world = World()
+        for flag, rid in (('20261014', '20261014'), ('2026-10-14', '20261014'), ('2026-06-25', '2026-06-25')):
+            with self.subTest(flag=flag):
+                result = self.run_world(world, '--release', flag)
+                self.assertEqual(result.code, 0, result.failure)
+                self.assertEqual(result.data['release']['id'], rid)
+                self.assertIn('is analysed because --release named it', result.issue)
+        result = self.run_world(world, '--release', '2026-06-25')
+        self.assertEqual(result.data['release']['generation'], 'v1')
+        self.assertIn('the two-level mean', result.issue)
+        self.assertIn('it has only 8 scored rows (in progress?)', result.issue)     # analysed anyway, and said so
+        self.assertEqual(result.data['notices'], [])        # 2026-06-25 is older than latest_release
+        for flag in ('2026-10-15', '20260625'):             # not on the timeline; 20260625 is no 2.0 id
+            with self.subTest(flag=flag):
+                result = self.run_world(world, '--release', flag)
+                self.assertEqual(result.code, 2)
+                self.assertIn(f'--release {flag} is not on the livebench.ai timeline (v1: 2025-04-02', result.failure)
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as ctx:
+            md.main(['--release', 'latest'], net=world.net(), root=self.root(world))
+        self.assertEqual(ctx.exception.code, 2)
+        world = World()
+        world.v1.append('2026-07-01')                        # on the timeline, files missing
+        result = self.run_world(world, '--release', '2026-07-01')
+        self.assertEqual(result.code, 2)
+        self.assertIn('forced with --release', result.failure)
+        self.assertIn('HTTP 404 for /v1/table_2026_07_01.csv', result.failure)
 
 
 # --- Hugging Face listings and the canary ----------------------------------------------------------
@@ -1441,7 +1929,8 @@ class WalkTest(Base):
         self.assertEqual(looks, {'zz-model-9': 'unknown_publisher', 'qwen3-max': 'no_repo', 'llama-3.1-70b': 'ambiguous'})
         authors = result.net.authors()
         self.assertEqual(len(authors), len(set(authors)))
-        self.assertEqual(set(authors), {'deepseek-ai', 'zai-org', 'microsoft', 'mistralai', 'Qwen', 'meta-llama', 'google',
+        # google is never listed: LiveBench's registry links gemma-4-31b-it's repository, which needs no name match
+        self.assertEqual(set(authors), {'deepseek-ai', 'zai-org', 'microsoft', 'mistralai', 'Qwen', 'meta-llama',
                                         'moonshotai', 'poolside'})
         self.assertNotIn('nvidia', authors)   # rows after the cutoff cost no request
         self.assertNotIn('openai', authors)
@@ -1466,9 +1955,12 @@ class WalkTest(Base):
         self.assertNotIn('qwen4-7b', result.issue)
 
     def test_partial_rows_are_listed_only_at_or_above_the_cutoff(self):
+        # v1 (the two-level mean): a row with a whole category missing has no overall; it is listed, never ranked.
         hi = {'Reasoning': 95.0, 'Coding': 95.0}           # five whole categories missing: no overall
-        world = World([('hi-partial', hi), ('lo-partial', {'Reasoning': 1.0})] + DEFAULT_ROWS)
-        result = self.run_world(world)
+        world = World()
+        world.files['v1/table_2026_06_25.csv'] = table(CATS_2026, [('hi-partial', hi), ('lo-partial', {'Reasoning': 1.0})]
+                                                       + DEFAULT_ROWS)
+        result = self.run_world(world, '--release', '2026-06-25')
         self.assertEqual(result.code, 0, result.failure)
         self.assertEqual(result.data['cutoff'], 43.0)
         self.assertEqual(result.data['partial'], [{'id': 'hi-partial', 'partial_mean': 95.0, 'available': 2, 'of': 7}])
@@ -1478,6 +1970,17 @@ class WalkTest(Base):
         self.assertIn('**Partial rows (1)**', result.issue)
         self.assertIn('- `hi-partial`: partial (2 of 7 categories), partial mean 95.00 (not an overall)', result.issue)
         self.assertNotIn('lo-partial', result.issue)
+
+    def test_a_2_0_row_with_missing_suites_is_scored_from_the_suites_it_has(self):
+        # 2.0 (the site's rule): missing suites are left out; only a row with no suite score at all has no overall.
+        world = World([('some-suites', {'Reasoning': 95.0, 'Coding': 95.0}), ('no-suites', {})] + DEFAULT_ROWS)
+        result = self.run_world(world)
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual((result.rows['some-suites']['overall'], result.rows['some-suites']['missing_tasks']), (95.0, 5))
+        self.assertEqual(result.outcome('some-suites'), 'look:unknown_publisher')
+        self.assertNotIn('no-suites', result.rows)
+        self.assertEqual(result.data['partial'], [])        # no partial mean to list
+        self.assertEqual(result.data['release']['scored_rows'], len(DEFAULT_ROWS) + 1)
 
     def test_the_model_info_budget(self):
         ids = [f'qwen4-{i}0b' for i in range(1, 5)]
@@ -1578,7 +2081,7 @@ class WalkTest(Base):
         self.assertEqual((result.outcome('gemma-4-31b-it'), result.outcome('mistral-small-2503')),
                          ('known:catalog', 'known:evidence'))
         self.assertTrue(result.rows['gemma-4-31b-it']['counts'] and result.rows['mistral-small-2503']['counts'])
-        self.assertIn('Best catalogued model in 2026-06-25: `gemma4-31b` (`gemma-4-31b-it`) 82.00, rank 5/', result.issue)
+        self.assertIn('Best catalogued model in 2026-10-25: `gemma4-31b` (`gemma-4-31b-it`) 82.00, rank 5/', result.issue)
         self.assertIn('`lb:gemma-4* (not_open_weight) no longer applies: the row resolves to google/gemma-4-31B-it '
                       '(known:catalog)`', result.issue)
         # a not_open_weight row whose strict match is public but too large is listed as too large
@@ -1610,83 +2113,158 @@ class WalkTest(Base):
         self.assertIn('license `other (nvidia-open-model-license)`', result.issue)
 
 
-def world_rows(world):
-    text = world.head_files['public/table_2026_06_25.csv'].decode('utf-8')
-    return [(r[0],) for r in list(csv.reader(io.StringIO(text)))[1:]]
+# --- LiveBench's registry as a matching hint -----------------------------------------------------------
+class RegistryHintTest(Base):
+    def test_a_linked_repository_in_an_allowlisted_org_is_verified_as_a_match(self):
+        world = World([('deepseek-v4-flash', 95.0), ('deepseek-v4-flash-max', 94.5), ('glm-5.9', 94.0),
+                       ('qwen4-moved', 93.5), ('qwen4-rejected', 93.0)] + DEFAULT_ROWS)
+        world.registry += [
+            entry('deepseek-v4-flash', 'DeepSeek', True, hf('deepseek-ai/DeepSeek-V4-Flash-0731'),
+                  variants=[{'rawName': '"deepseek-v4-flash-max"', 'displayName': '"DeepSeek V4 Flash Max"'}]),
+            entry('glm-5.9', 'Z.AI', True, hf('zai-org/GLM-5.9-Gone')),
+            entry('qwen4-moved', 'Qwen', True, hf('Qwen/Qwen4-Moved')),
+            entry('qwen4-rejected', 'Qwen', True, hf('Qwen/Qwen4-Rejected')),
+        ]
+        world.add_model('deepseek-ai/DeepSeek-V4-Flash-0731', total=40_000_000_000, listed=False)   # no name match
+        world.add_model('Qwen/Qwen4-Moved', canonical='someone/Qwen4-Moved', listed=False)
+        world.add_model('Qwen/Qwen4-Rejected', listed=False)
+        rejected = {'key': 'hf:Qwen/Qwen4-Rejected', 'decision': 'rejected', 'reason': 'Reviewed by the owner',
+                    'decided_on': '2026-10-01'}
+        result = self.run_world(world, decisions=[rejected])
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual({k: result.outcome(k) for k in ('deepseek-v4-flash', 'deepseek-v4-flash-max', 'glm-5.9',
+                                                         'qwen4-moved', 'qwen4-rejected')},
+                         {'deepseek-v4-flash': 'candidate', 'deepseek-v4-flash-max': 'variant:candidate',
+                          'glm-5.9': 'look:info_unreadable', 'qwen4-moved': 'look:moved_outside_publisher',
+                          'qwen4-rejected': 'decided:rejected'})
+        flash = result.rows['deepseek-v4-flash']
+        self.assertEqual((flash['repo'], flash['match']['tier']), ('deepseek-ai/DeepSeek-V4-Flash-0731', 'linked'))
+        self.assertEqual(flash['registry'], {'openweight': True, 'link': 'deepseek-ai/DeepSeek-V4-Flash-0731', 'variant_of': None})
+        self.assertEqual(result.rows['deepseek-v4-flash-max']['registry']['variant_of'], 'deepseek-v4-flash')
+        self.assertIn('- Match: LiveBench links this repository (its registry entry for `deepseek-v4-flash`), not matched '
+                      'by name; org `deepseek-ai` is an allowlisted publisher org via prefix `deepseek-`.', result.issue)
+        self.assertNotIn('unique among 0 repos', result.issue)
+        self.assertNotIn('Qwen/Qwen4-Rejected', result.net.infos_fetched())       # hf: decisions apply before model info
+        self.assertIn('zai-org/GLM-5.9-Gone', result.net.infos_fetched())
+
+    def test_a_link_outside_the_publisher_orgs_is_never_a_candidate(self):
+        world = World([('beam-1.0', 95.0), ('qwen-x-1', 94.0), ('qwen-x-2', 93.0), ('qwen-x-3', 92.0)] + DEFAULT_ROWS)
+        world.registry += [entry('beam-1.0', 'Reflection AI', True, hf('reflection/Beam-1.0-501B-A23B'), effort='"max"'),
+                           entry('qwen-x-1', 'Someone', True, hf('someone/Qwen-X-1')),
+                           entry('qwen-x-2', 'Someone', True, hf('someone/Qwen-X-2')),
+                           entry('qwen-x-3', 'Someone', True, hf('someone/Qwen-X-3'))]
+        world.add_model('someone/Qwen-X-1')
+        reason = {'reason': 'Reviewed by the owner', 'decided_on': '2026-10-01'}
+        decisions = [{'key': 'hf:someone/Qwen-X-2', 'decision': 'rejected', **reason},
+                     {'key': 'lb:qwen-x-3', 'decision': 'not_open_weight', **reason}]
+        result = self.run_world(world, decisions=decisions)
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual({k: result.outcome(k) for k in ('beam-1.0', 'qwen-x-1', 'qwen-x-2', 'qwen-x-3')},
+                         {'beam-1.0': 'look:linked_outside_publisher', 'qwen-x-1': 'look:linked_outside_publisher',
+                          'qwen-x-2': 'decided:rejected', 'qwen-x-3': 'decided:not_open_weight'})
+        self.assertTrue(result.rows['beam-1.0']['counts'])
+        self.assertEqual(result.rows['qwen-x-3']['note'], 'LiveBench links someone/Qwen-X-3, outside the publisher\'s orgs')
+        self.assertEqual(result.net.infos_fetched(), [])                       # never verified: no model-info request
+        self.assertIn('LiveBench links `reflection/Beam-1.0-501B-A23B`; no publisher entry matches this id.', result.issue)
+        self.assertIn('LiveBench links `someone/Qwen-X-1`; the publisher\'s orgs are `Qwen`.', result.issue)
+        found = [s for s in snippets(result.issue) if s.get('key') == 'hf:reflection/Beam-1.0-501B-A23B']
+        self.assertEqual([s['decision'] for s in found], ['rejected'])
+
+    def test_an_entry_without_openweight_is_listed_as_closed(self):
+        world = World([('gpt-6-astra', 99.0), ('mistral-large-4', 98.0), ('qwen4-closed', 97.0), ('qwen3.8-27b', 96.0),
+                       ('step-closed', 95.5)] + DEFAULT_ROWS)
+        world.registry += [entry('gpt-6-astra', 'OpenAI', effort='"max"'), entry('mistral-large-4', 'Mistral AI'),
+                           entry('qwen4-closed', 'Qwen'), entry('qwen3.8-27b', 'Qwen', openweight=False),
+                           entry('step-closed', 'StepFun')]
+        world.add_model('Qwen/Qwen4-Closed', total=30_000_000_000)
+        world.add_model('stepfun-ai/Step-Closed', private=True)
+        result = self.run_world(world)
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual({k: result.outcome(k) for k in ('gpt-6-astra', 'mistral-large-4', 'qwen4-closed', 'qwen3.8-27b',
+                                                         'step-closed')},
+                         {'gpt-6-astra': 'closed:livebench_closed', 'mistral-large-4': 'closed:livebench_closed',
+                          'qwen4-closed': 'look:weights_may_be_public', 'qwen3.8-27b': 'known:catalog',
+                          'step-closed': 'closed:livebench_closed'})
+        self.assertEqual([k for k in ('gpt-6-astra', 'mistral-large-4', 'step-closed') if result.rows[k]['counts']], [])
+        self.assertTrue(result.rows['qwen4-closed']['counts'])
+        self.assertTrue(result.rows['qwen3.8-27b']['counts'])
+        self.assertIn('LiveBench\'s registry lists it without openweight', result.rows['qwen3.8-27b']['note'])
+        self.assertIn('**LiveBench marks it closed (3)**', result.issue)
+        self.assertIn('- `gpt-6-astra` 99.00: LiveBench marks it closed (its registry entry has no `openweight`)', result.issue)
+        self.assertIn('LiveBench\'s registry lists it without `openweight`; strict match `Qwen/Qwen4-Closed`', result.issue)
+        self.assertIn('strict match stepfun-ai/Step-Closed: info:private', result.rows['step-closed']['note'])
+        self.assertIn('Qwen/Qwen4-Closed', result.net.infos_fetched())    # a strict match is verified, as a decision's
+
+    def test_a_missing_or_unparseable_registry_falls_back_to_the_name_rules(self):
+        for registry, needle in (([], '`no model registry (no openweight:!0 entry) in the main script`'),
+                                 (['"x":{openweight:!0,url:n.url}'], 'does not parse')):
+            with self.subTest(needle=needle):
+                world = World()
+                world.registry, world.v1_registry = registry, []
+                result = self.run_world(world)
+                self.assertEqual((result.code, result.outputs['complete']), (0, 'true'), result.failure)
+                self.assertIn("- Warning: LiveBench's model registry is not used: ", result.issue)
+                self.assertIn(needle, result.issue)
+                self.assertIn('matching uses the name rules alone.', result.issue)
+                self.assertIn('LiveBench model registry not used (see the warning)', result.issue)
+                self.assertEqual(result.outcome('gemma-4-31b-it'), 'known:catalog')     # by name now
+                self.assertIn('google', result.net.authors())
+                self.assertIsNone(result.rows['gemma-4-31b-it'].get('registry'))
+
+    def test_the_release_s_own_registry_wins(self):
+        world = World([('minimax-m3', 95.0)] + DEFAULT_ROWS)
+        world.registry.append(entry('minimax-m3', 'MiniMax', True))          # the 2.0 registry: open weight, no link
+        world.v1_registry.append(entry('minimax-m3', 'MiniMax'))             # the v1 registry lists it closed
+        world.add_model('MiniMaxAI/MiniMax-M3', total=30_000_000_000)
+        result = self.run_world(world)
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual(result.outcome('minimax-m3'), 'candidate')          # matched by name, as an open-weight entry
+        self.assertEqual(result.data['sources']['registry']['order'], [0, 1])
+        self.assertIn('LiveBench model registry: 5 entries holding 5 of the release\'s 25 ids, 4 open weight, 2 with a '
+                      'Hugging Face link', result.issue)
 
 
 class NoticeTest(Base):
-    def new_release_world(self):
-        world = World()
-        world.head_files['public/table_2026_10_30.csv'] = table(CATS_2026, DEFAULT_ROWS)
-        world.head_files['public/categories_2026_10_30.json'] = as_json(CATS_2026)
-        return world
-
     def test_a_new_release(self):
-        result = self.run_world(self.new_release_world())
+        result = self.run_world(World(), latest='2026-06-25')
         self.assertEqual(result.outputs['reportable'], 'true')
-        self.assertIn('LiveBench publishes release 2026-10-30 (24 scored rows) at new-livebench@', result.issue)
-        self.assertIn('2026-10-30 is not in `src/llm_eval/livebench.py` RELEASES', result.issue)
-        self.assertIn('7 categories / 23 tasks: the same partition', result.issue)
-        result = self.run_world(self.new_release_world(), releases_extra=('2026-10-30',))
-        self.assertIn('2026-10-30 is in `src/llm_eval/livebench.py` RELEASES', result.issue)
-        result = self.run_world(self.new_release_world(), evidence=lambda ev: ev.update(latest_release='2026-10-30'))
+        self.assertIn('LiveBench publishes release 2026-10-25 (LiveBench 2.0, id `20261025`, 24 scored rows) on '
+                      'livebench.ai; catalog/livebench-evidence.json still records latest_release 2026-06-25.', result.issue)
+        self.assertIn('2026-10-25 is not in `src/llm_eval/livebench.py` RELEASES', result.issue)
+        self.assertIn("Its suites are LiveBench 2.0's own taxonomy, never compared with catalog/benchmarks.json: "
+                      '`Long Agentic`, `Reasoning`, `Coding`, `Browser`, `Data Analysis`, `Research`, `Design`; overall: '
+                      'weighted mean of the suites with a score; weights `Long Agentic` ×2, `Coding` ×1.5, `Design` ×1.5, '
+                      'the rest ×1.', result.issue)
+        self.assertNotIn('the same partition', result.issue)
+        result = self.run_world(World(), latest='2026-06-25', releases_extra=(NEWEST_DATE,))
+        self.assertIn('2026-10-25 is in `src/llm_eval/livebench.py` RELEASES', result.issue)
+        result = self.run_world(World())                     # latest_release records 2026-10-25: the decision is made
         self.assertEqual(result.code, 0, result.failure)
-        self.assertEqual(result.outputs['reportable'], 'false')
-        self.assertEqual(result.data['notices'], [])
-
-    def test_averaging_change_withholds_candidates(self):
-        world = pool_world()
-        world.head_files['src/Table/Averaging.js'] = AVERAGING + b'// changed\n'
-        result = self.run_world(world, decisions=[ALIAS])
-        self.assertEqual(result.outputs['reportable'], 'true')
-        self.assertIn('leaderboard averaging code changed since caa4253c8a3a', result.issue)
-        self.assertIn(f'/compare/{REVIEWED}...{HEAD}', result.issue)
-        self.assertIn('### Candidates (0)', result.issue)
-        self.assertNotIn('Qwen4-80B', result.issue)
-        self.assertNotIn('qwen4-80b ', result.issue)
-        self.assertIn('Qwen/Qwen4-80B', result.step)
-        self.assertEqual(result.outcome('qwen4-80b'), 'candidate')
-        self.assertTrue(result.data['withheld'])
-        world = World()
-        del world.head_files['src/Table/Averaging.js']
-        result = self.run_world(world)
-        self.assertIn('Averaging.js is gone at head', result.issue)
-
-    def test_categories_drift_for_the_reference_release(self):
-        world = World()
-        moved = {k: list(v) for k, v in CATS_2026.items()}
-        moved['Coding'].append(moved['Language'].pop())
-        world.head_files['public/categories_2026_06_25.json'] = as_json(moved)
-        world.head_files['public/table_2026_06_25.csv'] = table(moved, DEFAULT_ROWS)
-        result = self.run_world(world)
-        self.assertEqual((result.code, result.outputs['reportable']), (0, 'true'))
-        self.assertEqual([n['kind'] for n in result.data['notices']], ['categories_drift'])
-        self.assertIn('tasks moved `typos` (`Language` → `Coding`)', result.issue)
-        clears = next(l for l in result.issue.splitlines() if l.startswith('- Clears when catalog/benchmarks.json'))
-        for needle in ('`leaderboard_revision`', 'every `source_table` URL', f'`{HEAD[:12]}`', '`source_sha256`',
-                       'editing benchmarks.json alone fails every run'):
-            self.assertIn(needle, clears)
-
-        def move_typos(doc):
-            by_name = {c['name']: c for c in doc['categories']}
-            by_name['Language']['livebench_tasks'].remove('typos')
-            by_name['Coding']['livebench_tasks'].append('typos')
-        # benchmarks.json alone: calibration still reads the partition at leaderboard_revision, and says what to do
-        result = self.run_world(world, benchmarks=move_typos)
-        self.assertEqual(result.code, 2)
-        self.assertIn('- Stage: `calibration`', result.failure)
-        self.assertIn('re-pin leaderboard_revision when benchmarks.json changes', result.failure)
-
-        def repin_to_head(ev):
-            ev['leaderboard_revision'] = HEAD
-            for rec in ev['recommendations']:
-                rec['source_table'] = rec['source_table'].replace(f'/blob/{REVIEWED}/', f'/blob/{HEAD}/')
-        # both, as the notice says: complete, and nothing left to decide
-        result = self.run_world(world, benchmarks=move_typos, evidence=repin_to_head)
-        self.assertEqual(result.code, 0, result.failure)
-        self.assertEqual(result.data['sources']['reviewed'], HEAD)
         self.assertEqual((result.outputs['reportable'], result.data['notices']), ('false', []))
+        # a newer v1 release is compared with catalog/benchmarks.json, as before
+        result = self.run_world(World(), '--release', '2026-06-25', latest='2026-01-08')
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertIn('LiveBench publishes release 2026-06-25 (v1, 8 scored rows) on livebench.ai', result.issue)
+        self.assertIn('7 categories / 23 tasks: the same partition', result.issue)
+
+    def test_a_changed_site_script_is_a_notice_and_withholds_nothing(self):
+        reviewed = 'static/js/main.0000aaaa.js'
+        discovery = {**FIXTURE_DISCOVERY, 'site': {'main_script': reviewed, 'reviewed_on': '2026-11-01'}}
+        result = self.run_world(pool_world(), decisions=[ALIAS], discovery=discovery)
+        self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual([n['kind'] for n in result.data['notices']], ['site_code_changed'])
+        self.assertIn('notice:site_code_changed:static/js/main.1e1ce12d.js', result.data['keys'])
+        self.assertIn('the averaging code was reviewed in `static/js/main.0000aaaa.js` (on 2026-11-01); re-read the '
+                      'weights rule in `static/js/main.1e1ce12d.js` ([script](https://livebench.ai/static/js/main.1e1ce12d.js)) '
+                      'and update `site` once it still holds.', result.issue)
+        self.assertIn('Clears when `site.main_script` in catalog/model-discovery.json names the served script', result.issue)
+        self.assertIn('site code **changed**: `static/js/main.1e1ce12d.js` served, `static/js/main.0000aaaa.js` reviewed',
+                      result.issue)
+        self.assertIn('### Candidates (1)', result.issue)          # candidates are not withheld
+        self.assertIn('#### `qwen4-80b` →', result.issue)
+        result = self.run_world(pool_world(), decisions=[ALIAS])   # the reviewed script is served: no notice
+        self.assertEqual(result.data['notices'], [])
+        self.assertIn('site code `static/js/main.1e1ce12d.js` as reviewed on 2026-11-08', result.issue)
 
 
 # --- outputs ---------------------------------------------------------------------------------------
@@ -1704,7 +2282,7 @@ class RenderingTest(Base):
         result = self.run_world(pool_world(), decisions=[ALIAS])
         body = result.issue
         self.assertTrue(body.startswith('## LiveBench model discovery\n'))
-        self.assertIn('> ' + md.DISCLAIMER.format(release='2026-06-25'), body)
+        self.assertIn('> ' + md.DISCLAIMER.format(release=NEWEST_DATE), body)
         self.assertEqual(md.DISCLAIMER.format(release='R'), (
             "Scores are LiveBench's published scores for the source checkpoints in release R. They rank models only within "
             "that release; they are not comparable with other releases (including the older-release scores in "
@@ -1720,17 +2298,18 @@ class RenderingTest(Base):
         urls = re.findall(r'\]\((https?://[^)]+)\)', body)
         self.assertTrue(urls)
         for url in urls:
-            if 'github.com/LiveBench' in url:
-                self.assertRegex(url, rf'/(tree|blob)/{HEAD}(/|$)')    # the head commit, never the reviewed one
-                self.assertNotIn('/main/', url)
+            if url.startswith(SITE):                     # the page, the main script and the release's files only
+                self.assertRegex(url, r'^https://livebench\.ai/(static/js/main\.1e1ce12d\.js|data/20261025/(table\.csv|'
+                                      r'categories\.json))?$')
             elif 'huggingface.co' in url:
                 self.assertRegex(url, r'/(tree|revision|blob)/[0-9a-f]{40}')
             else:
                 self.fail(url)
-        self.assertNotIn('blob/main', body)
+        self.assertNotIn('github.com', body)
         for sha in re.findall(r'sha256 `([^`]*)`', body):
             self.assertRegex(sha, r'^[0-9a-f]{64}$')
-        self.assertIn('?plain=1#L8', body)
+        self.assertIn('- Leaderboard row: [`data/20261025/table.csv`](https://livebench.ai/data/20261025/table.csv) row 7 '
+                      '(line 8) on [livebench.ai](https://livebench.ai/); variant `qwen4-80b-thinking` 69.50.', body)
         found = snippets(body)
         self.assertEqual(len(found), 6)   # reject + upstream_metadata + evidence stanza, and three look snippets
         decisions = [s for s in found if 'decision' in s]
@@ -1740,21 +2319,17 @@ class RenderingTest(Base):
         stanza = next(s for s in found if 'leaderboard_model_id' in s)
         self.assertEqual(stanza['meaning'], EVIDENCE['recommendations'][0]['meaning'])
         self.assertEqual(stanza['source_sha256'], result.data['release']['table_sha256'])
-        self.assertEqual(stanza['source_table'], f'https://github.com/{REPO}/blob/{HEAD}/public/table_2026_06_25.csv')
-        # The stanza names head, the evidence file one commit for every recommendation: the snippet says so.
-        self.assertIn(f'Its `source_table` is pinned to head `{HEAD[:12]}`, but every recommendation must name one '
-                      f'commit, `leaderboard_revision` (now `{REVIEWED[:12]}`): add it only together with moving '
-                      f'`leaderboard_revision` and every existing `source_table` URL to `{HEAD[:12]}`', body)
+        self.assertEqual(stanza['source_table'], f'https://livebench.ai/data/{NEWEST}/table.csv')
+        self.assertIn('livebench.ai serves no versioned history: `source_sha256` identifies the bytes read.', body)
+        self.assertNotIn('pinned to head', body)
+        # Pasted as it is (with its model_id), the stanza is valid evidence: no commit to move.
         by_id = {m['id']: md.CatalogModel(m['id'], m['upstream_repo'], m['status'], None, None) for m in MODELS['models']}
         ev = json.loads(json.dumps(EVIDENCE))
         ev['recommendations'].append({**stanza, 'model_id': 'qwen38-27b'})
-        with self.assertRaises(md.ConfigError) as ctx:      # pasted alone
-            md.parse_evidence(ev, by_id)
-        self.assertIn('differ from leaderboard_revision', str(ctx.exception))
-        ev['leaderboard_revision'] = HEAD
-        for rec in ev['recommendations']:
-            rec['source_table'] = rec['source_table'].replace(f'/blob/{REVIEWED}/', f'/blob/{HEAD}/')
-        self.assertEqual(md.parse_evidence(ev, by_id).revision, HEAD)   # with everything moved to head
+        parsed = md.parse_evidence(ev, by_id)
+        self.assertEqual((parsed.recommendations[-1].site_path, parsed.recommendations[-1].generation),
+                         (f'data/{NEWEST}/table.csv', '2.0'))
+        self.assertEqual(parsed.revision, REVIEWED)
         catalog = {m['upstream_repo'].casefold() for m in MODELS['models']}
         evidence = {r['leaderboard_model_id'] for r in EVIDENCE['recommendations']}
         for d in decisions:
@@ -1767,19 +2342,19 @@ class RenderingTest(Base):
         self.assertIn('Parameters: 80,400,000,000 from safetensors metadata (`BF16`).', body)
         self.assertIn('→ **offload**', body)
         self.assertIn(md.PLANNING_CAVEAT, body)
-        self.assertIn('Best catalogued model in 2026-06-25: `llama33-70b` (`llama-3.3-70b-instruct`) 65.00, rank 9/', body)
+        self.assertIn('Best catalogued model in 2026-10-25: `llama33-70b` (`llama-3.3-70b-instruct`) 65.00, rank 9/', body)
         self.assertIn('- `deepseek-v4-max` 78.00 → `deepseek-ai/DeepSeek-V4-Max`: Q4_K_M 374.95 / IQ2_XS 180.44 GiB: '
                       'would fit 70 GiB only at 0.90 bits per weight or fewer; not a catalog tier', body)
-        self.assertIn('| 2026-06-25 | 70.00 | 7/21 | +5.00 |', body)
+        self.assertIn('| 2026-10-25 | 70.00 | 7/21 | +5.00 |', body)
 
     def test_nothing_reportable_keeps_the_header_and_the_collapsed_lists(self):
         result = self.run_world(World())
-        self.assertIn(md.NOTHING_NEEDED.format(n=10, release='2026-06-25'), result.issue)
+        self.assertIn(md.NOTHING_NEEDED.format(n=10, release=NEWEST_DATE), result.issue)
         self.assertNotIn('### Candidates', result.issue)
         self.assertIn('<details><summary>Not raised (', result.issue)
         self.assertIn('<!-- model-discovery-state v1 ', result.issue)
         self.assertTrue(result.comment.startswith('No unreviewed model among the 10 best entries of LiveBench release '
-                                                  '2026-06-25 (new-livebench@'))
+                                                  '2026-10-25 (2.0, livebench.ai table sha256 `'), result.comment)
         self.assertIn('needs a decision, and no notice is open (this run); closing.', result.comment)
 
     def test_the_run_link_and_the_runners_environment(self):
@@ -1792,7 +2367,7 @@ class RenderingTest(Base):
         result = self.run_world(World(), env=run)
         self.assertIn('no notice is open ([run 123](https://github.com/o/r/actions/runs/123)); closing.', result.comment)
         world = World()
-        world.head_files['public/table_2026_06_25.csv'] = b'id,x\na,1\n'
+        world.files[f'data/{NEWEST}/table.csv'] = b'id,x\na,1\n'
         result = self.run_world(world, env=run)
         self.assertIn('- Run: [run 123](https://github.com/o/r/actions/runs/123) on 2026-11-08', result.failure)
         self.assertEqual(md.run_reference({**run, 'GITHUB_RUN_ID': '12; rm'}), 'this run')
@@ -1831,7 +2406,7 @@ class RenderingTest(Base):
         rows = [(f'claude-v{i:02d}', 99.0 - i * 0.1) for i in range(40)] + [('qwen4-80b', 70.0)] + rows + DEFAULT_ROWS
         world = World(rows)
         world.add_model('Qwen/Qwen4-80B', total=80_400_000_000)
-        world.head_files['public/table_2026_11_05.csv'] = table(CATS_2026, DEFAULT_ROWS)
+        world.add_release('20261105', DEFAULT_ROWS, categories=False)
         result = self.run_world(world)
         body = result.issue
         self.assertLessEqual(len(body), md.ISSUE_BODY_CAP)
@@ -1846,7 +2421,8 @@ class RenderingTest(Base):
 
 class MarkerTest(Base):
     def test_round_trip_and_new_keys(self):
-        state = {'release': '2026-06-25', 'head': HEAD, 'table_sha256': 'a' * 64, 'keys': ['cand:x|o/x', 'look:y|no_repo'], 'on': TODAY}
+        state = {'release': NEWEST_DATE, 'id': NEWEST, 'script': SCRIPT, 'table_sha256': 'a' * 64,
+                 'keys': ['cand:x|o/x', 'look:y|no_repo'], 'on': TODAY}
         self.assertEqual(md.decode_marker('text\n' + md.encode_marker(state) + '\n'), state)
         self.assertIsNone(md.decode_marker('<!-- model-discovery-state v1 !!!! -->'))
         self.assertIsNone(md.decode_marker('<!-- model-discovery-state v1 ' + 'A' * (md.MARKER_CAP + 10) + ' -->'))
@@ -1880,7 +2456,7 @@ class MarkerTest(Base):
         self.assertEqual(r.data['new_keys'], r.data['keys'])
         self.assertIn('## LiveBench model discovery: step summary', r.step)
         world = World()
-        world.head_files['public/table_2026_06_25.csv'] = b'id,x\na,1\n'
+        world.files[f'data/{NEWEST}/table.csv'] = b'id,x\na,1\n'
         r = self.run_world(world, previous='old body\n' + deep + '\n')
         self.assertEqual((r.code, r.outputs['complete']), (2, 'false'))
         self.assertTrue(r.failure.startswith('### Problems reading sources'), r.failure)
@@ -1920,7 +2496,7 @@ class FailureTest(Base):
 
     def test_a_shape_error(self):
         world = World()
-        world.head_files['public/table_2026_06_25.csv'] = b'id,x\n' + b'a' * 400 + b'\n'
+        world.files[f'data/{NEWEST}/table.csv'] = b'id,x\n' + b'a' * 400 + b'\n'
         older = '### Problems reading sources\n\n- Stage: `old`\n\n<!-- model-discovery-failure-end -->\n\n' + self.PREVIOUS
         result = self.run_world(world, previous=older)
         self.assertEqual(result.code, 2)
@@ -1940,10 +2516,10 @@ class FailureTest(Base):
     def test_network_and_unexpected_errors(self):
         world = World()
         net = world.net()
-        net.fail['/git/trees/'] = md.NetworkError('api.github.com/repos/x: TimeoutError after 5 attempts')
+        net.fail['livebench.ai/v1/'] = md.NetworkError('livebench.ai/v1/table_2025_04_25.csv: TimeoutError after 5 attempts')
         result = self.run_world(world, net=net)
         self.assertEqual(result.code, 1)
-        self.assertIn('Network failure at `leaderboard trees`', result.step)
+        self.assertIn('Network failure at `calibration`', result.step)
         self.assertTrue(result.failure.startswith('### Problems reading sources'))
         net = world.net()
         net.fail['/api/models?author='] = RuntimeError('upstream says <script>secret</script>')
@@ -1959,54 +2535,57 @@ class FailureTest(Base):
         self.assertEqual(list(result.outputs), ['complete', 'reportable', 'new'])
         self.assertTrue(all(v in ('true', 'false') for v in result.outputs.values()))
         world = World()
-        world.head_files['public/table_2026_06_25.csv'] = b'name,score\nalpha,1\nbeta,2\n'
+        world.files[f'data/{NEWEST}/table.csv'] = b'name,score\nalpha,1\nbeta,2\n'   # a shape the run refuses
         result = self.run_world(world, '--probe')
         self.assertEqual(result.code, 0, result.stderr)
         self.assertEqual(result.outputs, {'complete': 'false', 'reportable': 'false', 'new': 'false'})
         self.assertIsNone(result.issue)
         self.assertIsNone(result.comment)
         self.assertIsNone(result.failure)
-        self.assertIn('no model column', result.step)
-        self.assertIn('listing google', result.step)
-        self.assertIn('categories files at caa4253c8a3a', result.step)
-        self.assertIn('anchor nemotron-super-120b revision', result.step)
+        step = result.step
+        for needle in ('- page https://livebench.ai/: HTTP 200, content-type `text/html; charset=utf-8`',
+                       'files["main.js"] `./static/js/main.1e1ce12d.js`',
+                       '- main script `static/js/main.1e1ce12d.js` (agrees with index.html)', 'reviewed script '
+                       '`static/js/main.1e1ce12d.js` (the same); `"_overall_weights"` literal present',
+                       '- v1 release list: 5 releases: `2025-04-02, 2025-04-25, 2025-05-30, 2026-01-08, 2026-06-25`',
+                       '- 2.0 release list: 2 releases: `20261014, 20261025`',
+                       '- model registry 1: 4 entries (+0 variants), 3 with openweight, 2 of them with a huggingface link',
+                       '- model registry 2: 2 entries (+1 variants), 1 with openweight',
+                       '- v1/table_2025_04_25.csv: HTTP 200', 'equal to the recorded source_sha256',
+                       '- newest 2.0 release 20261025: `data/20261025/table.csv`', 'header `name,score`; 2 rows',
+                       '_overall_weights `{"Coding":1.5,"Design":1.5,"Long Agentic":2.0}`',
+                       '- unknown /no-such-page: HTTP 404', 'listing google', 'anchor nemotron-super-120b revision',
+                       'counts that differ (reported, recorded): `none`'):
+            self.assertIn(needle, step)
         net = world.net()
-        net.fail['api.github.com'] = md.NetworkError('down')
+        net.fail['livebench.ai'] = md.NetworkError('down')
         result = self.run_world(world, '--probe', net=net)
         self.assertEqual(result.code, 1)
         self.assertEqual(result.outputs['complete'], 'false')
 
-    def test_the_probe_reports_what_the_leaderboard_site_serves(self):
+    def test_the_probe_reports_shapes_the_run_would_refuse(self):
         world = World()
-        html = (b'<!doctype html><html><head><script defer="defer" src="./static/js/main.1e1ce12d.js"></script>'
-                b'<link href="./static/css/main.b6172137.css" rel="stylesheet"></head><body></body></html>')
-        bundle = (b'const Yt=["20261014","20261025"],en=[...["2025-04-25","2025-05-30","2026-06-25"].map(e=>({id:e,label:e,gen:"v1"}))];'
-                  b'fetch(`${r}/table_${a}.csv${o}`);fetch(`./data/${e}/table.csv`);import("./static/js/453.309372f5.chunk.js");')
-        world.site = {'/': ({'content-type': 'text/html'}, html),
-                      '/static/js/main.1e1ce12d.js': ({'content-type': 'application/javascript'}, bundle),
-                      '/static/js/453.309372f5.chunk.js': ({'content-type': 'application/javascript'}, b'function x(){}'),
-                      '/v1/table_2025_04_25.csv': ({'content-type': 'text/csv'}, TABLE_2025_04),
-                      '/v1/table_2025_05_30.csv': ({'content-type': 'text/csv'}, TABLE_2025_05 + b'changed'),
-                      '/v1/categories_2026_06_25.json': ({'content-type': 'application/json'}, as_json(CATS_2026)),
-                      '/data/20261025/table.csv': ({'content-type': 'text/csv'}, b'model,a\nx,1\n'),
-                      '/no-such-page': ({'content-type': 'text/html'}, html)}
+        root = self.root(world, discovery={**FIXTURE_DISCOVERY, 'site': {'main_script': 'static/js/main.0000aaaa.js',
+                                                                         'reviewed_on': TODAY}})
+        world.registry.append('"broken":{openweight:!0,url:n.url}')
+        world.files['v1/table_2025_05_30.csv'] = TABLE_2025_05 + b'changed'
+        key = next(k for k in world.revisions if k[0] == 'nvidia/nvidia-nemotron-3-super-120b-a12b-nvfp4')
+        world.revisions[key]['safetensors']['parameters']['U8'] = 112_764_911_616
         net = world.net()
-        result = self.run_world(world, '--probe', net=net)
+        net.site['asset-manifest.json'] = asset_manifest('./static/js/main.ffff0000.js')
+        result = self.run_world(world, '--probe', net=net, root=root)
         self.assertEqual(result.code, 0, result.stderr)
         step = result.step
-        self.assertIn('scripts `./static/js/main.1e1ce12d.js`', step)
-        self.assertIn('script `/static/js/453.309372f5.chunk.js`', step)          # chunks a script imports are followed
-        self.assertIn('release lists in the bundle: v1 `2025-04-25, 2025-05-30, 2026-06-25`; 2.0 `20261014, 20261025`', step)
-        self.assertIn('/v1/table_2025_04_25.csv: HTTP 200', step)
-        self.assertIn('equal to the recorded source_sha256', step)
+        self.assertIn('- main script: unreadable (ShapeError): `expected index.html loading the main script', step)
         self.assertIn('DIFFERS from the recorded source_sha256', step)
-        self.assertIn('/v1/cost_2025_04_25.csv: HTTP 404', step)
-        self.assertIn('/data/20261025/table.csv: HTTP 200', step)
-        self.assertIn('/data/20261014/notes.json: HTTP 404', step)
-        self.assertIn('unknown /table_1999_01_01.csv: HTTP 404', step)
-        self.assertIn('unknown /no-such-page: HTTP 200', step)          # a single-page-app fallback shows up here
-        site_calls = [u for u in net.calls if 'livebench.ai' in u]
-        self.assertTrue(all(u.startswith(('https://livebench.ai/', 'https://www.livebench.ai/')) for u in site_calls))
+        self.assertIn('counts that differ (reported, recorded): `{"U8":[112764911616,56382455808]}`', step)
+        self.assertTrue(all(u.startswith(SITE) for u in result.net.calls if 'livebench' in u))
+        self.assertFalse(any('github.com' in u for u in result.net.calls))
+        world = World()
+        world.registry.append('"broken":{openweight:!0,url:n.url}')
+        result = self.run_world(world, '--probe')
+        self.assertIn('- model registry: not usable: `the registry object at offset', result.step)
+        self.assertIn("reviewed script `static/js/main.1e1ce12d.js` (the same)", result.step)
 
     def test_no_repository_writes(self):
         world = pool_world()
@@ -2080,7 +2659,7 @@ class WorkflowTest(unittest.TestCase):
             self.assertIn('GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}', self.block(name))
         discover = self.block('Discover')
         for flag in ('--previous-issue', '--issue-summary', '--comment', '--failure-summary', '--step-summary',
-                     '--json', '--github-output', '--record', '--probe'):
+                     '--json', '--github-output', '--record', '--probe', '--release'):
             self.assertIn(flag, discover)
         self.assertIn("python3 -m unittest discover -s tests -p 'test_model_discovery.py' -v", self.TEXT)
         self.assertIn('ISSUE_TITLE: "LiveBench models needing a catalog decision"', self.TEXT)
@@ -2117,6 +2696,24 @@ class WorkflowTest(unittest.TestCase):
         out = subprocess.run([jq, '-r', f'{mine} | {tails[1]}'], input=json.dumps(issues[:2]), capture_output=True,
                              text=True, encoding='utf-8', env=env, check=True).stdout.strip()
         self.assertEqual(out, '')                   # only a stranger's issue: none, so the workflow creates its own
+
+    def test_the_release_input_and_the_leaderboard_site(self):
+        dispatch = re.search(r'^  workflow_dispatch:\n(.*?)(?=^\S)', self.TEXT, re.S | re.M).group(1)
+        release = re.search(r'^      release:\n((?:        .*\n)+)', dispatch, re.M).group(1)
+        self.assertIn('type: string', release)
+        self.assertIn('default: ""', release)
+        self.assertIn('empty = newest', release)
+        discover = self.block('Discover')
+        # the input reaches the script through an env var, never interpolated into the shell text
+        self.assertIn("RELEASE: ${{ github.event_name == 'workflow_dispatch' && inputs.release || '' }}", discover)
+        self.assertIn('if [ -n "$RELEASE" ]; then args+=(--release "$RELEASE"); fi', discover)
+        self.assertNotIn('${{ inputs.release }}', discover.split('run: |', 1)[1])
+        # nothing reads api.github.com any more: no GITHUB_TOKEN for the script (the issue steps keep GH_TOKEN)
+        self.assertNotIn('GITHUB_TOKEN:', discover)
+        self.assertIn('HF_TOKEN: ${{ secrets.HF_TOKEN }}', discover)
+        self.assertNotIn('Probe the leaderboard site', self.TEXT)        # the temporary probe step is gone
+        self.assertNotIn('www.livebench.ai', self.TEXT)
+        self.assertIn('livebench.ai', self.TEXT.split('\non:', 1)[0])     # the header comment names the source
 
     def test_the_run_deadline_ends_the_reads_before_the_job_timeout(self):
         minutes = int(re.search(r'^    timeout-minutes: (\d+)$', self.TEXT, re.M).group(1))

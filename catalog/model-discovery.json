@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "leaderboard": {"averaging_reviewed_revision": "caa4253c8a3aa93b5c7ec234e681d4f120a20240"},
+  "site": {"main_script": "static/js/main.1e1ce12d.js", "reviewed_on": "2026-11-08"},
   "publishers": [
     {"prefixes": ["deepseek-"], "hf_orgs": ["deepseek-ai"]},
     {"prefixes": ["qwen", "qwq-"], "hf_orgs": ["Qwen"]},
