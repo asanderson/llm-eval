@@ -67,7 +67,7 @@ llm-eval publish-results --input results/campaign-EXAMPLE/experiments/EXPERIMENT
 - [Report generation and results pull requests](docs/RESULTS.md)
 - [Add a new experiment](docs/NEW_EXPERIMENT.md)
 - [Original platform setup/run workflows](docs/WORKFLOWS.md)
-- [LiveBench integration](docs/LIVEBENCH.md)
+- [LiveBench integration](docs/LIVEBENCH.md) and [nightly LiveBench model discovery](docs/MODEL_DISCOVERY.md)
 - [Model catalog](docs/MODELS.md), [platforms](docs/PLATFORMS.md), [methodology](docs/METHODOLOGY.md), [security](docs/SECURITY.md)
 
 Existing `llm-eval run --config FILE`, `scripts/run.py --config FILE`, and platform/OS wrappers remain supported. Their original installation and local-inference defaults remain in place. Source, workloads and experiment settings must be pinned for meaningful comparisons.

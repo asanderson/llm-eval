@@ -8,7 +8,8 @@ name: Upstream pin check
 # refreshes (and closes once nothing needs a decision). Dependencies that
 # live in ecosystem manifests (pyproject.toml, the livebench Dockerfile base
 # image, GitHub Actions) are handled by Dependabot (.github/dependabot.yml)
-# on the same nightly cadence.
+# on the same nightly cadence. Leaderboard discovery (new LiveBench releases
+# and models) lives in model-discovery.yml.
 #
 # Token: the default GITHUB_TOKEN cannot open pull requests here and the
 # ones it could open would not trigger harness-tests. Add a fine-grained PAT

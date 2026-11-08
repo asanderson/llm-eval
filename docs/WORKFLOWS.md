@@ -104,10 +104,11 @@ Exact source revisions, package pins and release-asset SHA256 values live in [ca
 
 ### Dependency updates
 
-Two nightly jobs keep the pins current without touching `main` directly:
+Three nightly jobs keep the pins and the model shortlist current without touching `main` directly:
 
 * **Upstream pin check** (`.github/workflows/upstream-pins.yml`, 06:17 UTC) runs `scripts/upstream_pins.py --apply`, which compares every entry in `catalog/installers.json` with upstream and opens or refreshes one `auto/upstream-pins` pull request. It moves exact PyPI pins (only to releases whose requires-python still admits 3.11), torch (only to releases the pinned CUDA wheel index serves), ollama and koboldcpp release assets (new URLs, byte counts and SHA256), the commit behind the newest llama.cpp and ik_llama.cpp release tags, and the LM Studio version with its winget-published installer hash; `checked_on` moves with them and the docs that spell the LM Studio version are rewritten. Strata and LiveBench are reviewed-commit pins: HEAD drift is only reported: in the PR body, and in the "Upstream pins needing a manual decision" issue, which every run refreshes and closes once nothing needs a decision. The bump PR runs `harness-tests` like any other; the target-laptop gate above still decides whether a bump is usable.
 * **Dependabot** (`.github/dependabot.yml`, same cadence) covers what lives in ecosystem manifests: `pyproject.toml` optional dependencies, the `containers/livebench` base image and the SHA-pinned GitHub Actions.
+* **Model discovery** (`.github/workflows/model-discovery.yml`, 06:47 UTC) runs `scripts/model_discovery.py`, a report only: it reads the newest LiveBench release and keeps its own "LiveBench models needing a catalog decision" issue up to date with the high-scoring self-hostable open-weight models the catalog has not reviewed, and closes it once nothing needs a decision. It never edits the repository and needs no PAT (the default `GITHUB_TOKEN` edits the issue). See [MODEL_DISCOVERY.md](MODEL_DISCOVERY.md).
 
 Run `python3 scripts/upstream_pins.py` locally for a report without writing anything. Pull requests opened with the default `GITHUB_TOKEN` do not trigger CI, so the workflow expects a fine-grained PAT (contents, pull requests, issues: write) in the `UPSTREAM_BUMP_TOKEN` secret.
 

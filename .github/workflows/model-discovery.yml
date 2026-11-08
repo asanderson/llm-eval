@@ -1,0 +1,194 @@
+name: Model discovery
+
+# Nightly, read-only: newest LiveBench release -> high-scoring self-hosted
+# open-weight models the catalog has not reviewed -> one tracking issue.
+# Never edits the repository (contents: read). See docs/MODEL_DISCOVERY.md.
+#
+# Who may touch the "LiveBench models needing a catalog decision" issue:
+# scheduled runs, pushes to main, and workflow_dispatch with update_issue.
+# Pull requests that change the pipeline run it against the real upstreams
+# (the step summary and the artifact show the result) but never touch the
+# issue; only scheduled runs count towards the repeated-failure block.
+
+on:
+  schedule:
+    - cron: "47 6 * * *"   # 06:47 UTC, 30 min after upstream-pins and Dependabot
+  push:
+    branches: [main]
+    paths:
+      - catalog/model-discovery.json
+      - catalog/models.json
+      - catalog/livebench-evidence.json
+      - catalog/benchmarks.json
+      - scripts/model_discovery.py
+      - .github/workflows/model-discovery.yml
+  pull_request:
+    paths:   # calibration reads benchmarks.json and the evidence pins: a re-pin is checked before it merges
+      - scripts/model_discovery.py
+      - .github/workflows/model-discovery.yml
+      - catalog/model-discovery.json
+      - catalog/livebench-evidence.json
+      - catalog/benchmarks.json
+      - tests/test_model_discovery.py
+  workflow_dispatch:
+    inputs:
+      probe:
+        description: "Print upstream shapes, upload raw responses; never touches the issue"
+        type: boolean
+        default: false
+      update_issue:
+        description: "Refresh or close the tracking issue"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
+concurrency:
+  group: model-discovery-${{ github.event_name == 'pull_request' && github.ref || 'main' }}
+  cancel-in-progress: false
+
+env:
+  ISSUE_TITLE: "LiveBench models needing a catalog decision"
+  ISSUE_LABEL: model-discovery
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Offline tests
+        run: python3 -m unittest discover -s tests -p 'test_model_discovery.py' -v
+
+      - name: Read the tracking issue
+        id: issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/out"
+          : > "$RUNNER_TEMP/previous.md"
+          # Only an issue this workflow created counts: anyone can open one with this title. The issues endpoint
+          # (no search index, so no lag) is filtered by the label, which only collaborators can apply, and by the
+          # author, github-actions[bot], which only workflow tokens create issues as.
+          mine='[.[] | select(.pull_request == null and .title == env.ISSUE_TITLE and .user.login == "github-actions[bot]")]'
+          number="$(gh api "repos/$GITHUB_REPOSITORY/issues?state=open&labels=$ISSUE_LABEL&per_page=100" \
+                    --jq "$mine | .[0].number // empty")"
+          state=open
+          if [ -z "$number" ]; then
+            number="$(gh api "repos/$GITHUB_REPOSITORY/issues?state=closed&labels=$ISSUE_LABEL&per_page=100" \
+                      --jq "$mine | sort_by(.closed_at) | last | .number // empty")"
+            state=closed
+          fi
+          if [ -n "$number" ]; then
+            gh issue view "$number" --json body --jq .body > "$RUNNER_TEMP/previous.md"
+          else
+            state=none
+          fi
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+          echo "state=$state" >> "$GITHUB_OUTPUT"
+
+      - name: Discover
+        id: discover
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # authenticated api.github.com rate limit
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}           # optional; unauthenticated Hugging Face works
+          PROBE: ${{ github.event_name == 'workflow_dispatch' && inputs.probe }}
+          RECORD: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' }}
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/out"
+          args=(--previous-issue "$RUNNER_TEMP/previous.md" --issue-summary "$out/issue.md" --comment "$out/comment.md"
+                --failure-summary "$out/failure.md" --step-summary "$GITHUB_STEP_SUMMARY" --json "$out/discovery.json"
+                --github-output)
+          if [ "$RECORD" = "true" ]; then args+=(--record "$out/raw"); fi
+          if [ "$PROBE" = "true" ]; then args+=(--probe); fi
+          python3 scripts/model_discovery.py "${args[@]}"
+
+      - name: Upload the report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: model-discovery
+          path: ${{ runner.temp }}/out
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Refresh the tracking issue
+        if: >-
+          steps.discover.outputs.complete == 'true' && steps.discover.outputs.reportable == 'true' &&
+          (github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+           (github.event_name == 'workflow_dispatch' && inputs.update_issue))
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUMBER: ${{ steps.issue.outputs.number }}
+          STATE: ${{ steps.issue.outputs.state }}
+          NEW: ${{ steps.discover.outputs.new }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/out"
+          { printf '_Refreshed by the nightly model discovery ([run %s](%s))._\n\n' "$RUN_ID" "$RUN_URL"; cat "$out/issue.md"; } > "$out/issue-body.md"
+          gh label create "$ISSUE_LABEL" --description "LiveBench models needing a catalog decision" --color 5319e7 --force >/dev/null
+          case "$STATE" in
+            open)   gh issue edit "$NUMBER" --body-file "$out/issue-body.md" ;;
+            closed) gh issue reopen "$NUMBER"
+                    gh issue edit "$NUMBER" --body-file "$out/issue-body.md" ;;
+            *)      gh issue create --title "$ISSUE_TITLE" --body-file "$out/issue-body.md" --label "$ISSUE_LABEL" ;;
+          esac
+          # Body edits send no notifications: comment when an existing issue gained new entries.
+          if [ -n "$NUMBER" ] && [ "$NEW" = "true" ] && [ -s "$out/comment.md" ]; then
+            gh issue comment "$NUMBER" --body-file "$out/comment.md"
+          fi
+
+      - name: Close the tracking issue
+        if: >-
+          steps.discover.outputs.complete == 'true' && steps.discover.outputs.reportable == 'false' &&
+          steps.issue.outputs.state == 'open' &&
+          (github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+           (github.event_name == 'workflow_dispatch' && inputs.update_issue))
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUMBER: ${{ steps.issue.outputs.number }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/out"
+          { printf '_Refreshed by the nightly model discovery ([run %s](%s))._\n\n' "$RUN_ID" "$RUN_URL"; cat "$out/issue.md"; } > "$out/issue-body.md"
+          gh issue edit "$NUMBER" --body-file "$out/issue-body.md"
+          gh issue close "$NUMBER" --comment "$(cat "$out/comment.md")"
+
+      - name: Report repeated failures in the issue
+        if: failure() && steps.discover.outcome == 'failure' && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUMBER: ${{ steps.issue.outputs.number }}
+          STATE: ${{ steps.issue.outputs.state }}
+          RUN_ID: ${{ github.run_id }}
+          FAILURE_STREAK: 3
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/out"
+          earlier="$(gh run list --workflow model-discovery.yml --event schedule --limit 10 --json databaseId,status,conclusion \
+                     --jq "[.[] | select(.databaseId != $RUN_ID and .status == \"completed\") | .conclusion == \"failure\"] | (index(false) // length)")"
+          streak=$((earlier + 1))
+          echo "Consecutive failed scheduled runs, this one included: $streak"
+          if [ "$streak" -lt "$FAILURE_STREAK" ] || [ ! -s "$out/failure.md" ]; then
+            exit 0
+          fi
+          gh label create "$ISSUE_LABEL" --description "LiveBench models needing a catalog decision" --color 5319e7 --force >/dev/null
+          case "$STATE" in
+            open)   gh issue edit "$NUMBER" --body-file "$out/failure.md" ;;
+            closed) gh issue reopen "$NUMBER"
+                    gh issue edit "$NUMBER" --body-file "$out/failure.md" ;;
+            *)      NUMBER="$(gh issue create --title "$ISSUE_TITLE" --body-file "$out/failure.md" --label "$ISSUE_LABEL" | sed 's#.*/##')" ;;
+          esac
+          if [ "$streak" -eq "$FAILURE_STREAK" ]; then
+            gh issue comment "$NUMBER" --body "Model discovery failed $streak scheduled runs in a row; the issue body names the source that could not be read."
+          fi
