@@ -1978,34 +1978,33 @@ class FailureTest(Base):
 
     def test_the_probe_reports_what_the_leaderboard_site_serves(self):
         world = World()
-        html = (b'<!doctype html><html><head><script type="module" crossorigin src="/assets/index-abc123.js"></script>'
-                b'<link rel="stylesheet" href="/assets/index-abc123.css"></head><body></body></html>')
-        bundle = (b'const R=["2026-06-25","2025-05-30"];fetch(`/table_${d}.csv`);import("/assets/Table-def456.js");'
-                  b'const c="categories_2026_06_25.json";')
-        chunk = b'function Averaging(t){return t}'
+        html = (b'<!doctype html><html><head><script defer="defer" src="./static/js/main.1e1ce12d.js"></script>'
+                b'<link href="./static/css/main.b6172137.css" rel="stylesheet"></head><body></body></html>')
+        bundle = (b'const Yt=["20261014","20261025"],en=[...["2025-04-25","2025-05-30","2026-06-25"].map(e=>({id:e,label:e,gen:"v1"}))];'
+                  b'fetch(`${r}/table_${a}.csv${o}`);fetch(`./data/${e}/table.csv`);import("./static/js/453.309372f5.chunk.js");')
         world.site = {'/': ({'content-type': 'text/html'}, html),
-                      '/assets/index-abc123.js': ({'content-type': 'text/javascript'}, bundle),
-                      '/assets/Table-def456.js': ({'content-type': 'text/javascript'}, chunk),
-                      '/table_2025_04_25.csv': ({'content-type': 'text/csv'}, TABLE_2025_04),
-                      '/table_2025_05_30.csv': ({'content-type': 'text/csv'}, TABLE_2025_05 + b'changed'),
-                      '/categories_2026_06_25.json': ({'content-type': 'application/json'}, as_json(CATS_2026)),
+                      '/static/js/main.1e1ce12d.js': ({'content-type': 'application/javascript'}, bundle),
+                      '/static/js/453.309372f5.chunk.js': ({'content-type': 'application/javascript'}, b'function x(){}'),
+                      '/v1/table_2025_04_25.csv': ({'content-type': 'text/csv'}, TABLE_2025_04),
+                      '/v1/table_2025_05_30.csv': ({'content-type': 'text/csv'}, TABLE_2025_05 + b'changed'),
+                      '/v1/categories_2026_06_25.json': ({'content-type': 'application/json'}, as_json(CATS_2026)),
+                      '/data/20261025/table.csv': ({'content-type': 'text/csv'}, b'model,a\nx,1\n'),
                       '/no-such-page': ({'content-type': 'text/html'}, html)}
         net = world.net()
         result = self.run_world(world, '--probe', net=net)
         self.assertEqual(result.code, 0, result.stderr)
         step = result.step
-        self.assertIn('scripts `/assets/index-abc123.js`', step)
-        self.assertIn('release-file names `categories_2026_06_25.json`', step)
-        self.assertIn('dates `2025-05-30, 2026-06-25, 2026_06_25`', step)
-        self.assertIn('script `/assets/Table-def456.js`', step)            # chunks a script imports are followed
-        self.assertIn('/table_2025_04_25.csv: HTTP 200', step)
+        self.assertIn('scripts `./static/js/main.1e1ce12d.js`', step)
+        self.assertIn('script `/static/js/453.309372f5.chunk.js`', step)          # chunks a script imports are followed
+        self.assertIn('release lists in the bundle: v1 `2025-04-25, 2025-05-30, 2026-06-25`; 2.0 `20261014, 20261025`', step)
+        self.assertIn('/v1/table_2025_04_25.csv: HTTP 200', step)
         self.assertIn('equal to the recorded source_sha256', step)
-        self.assertIn('/table_2025_05_30.csv: HTTP 200', step)
         self.assertIn('DIFFERS from the recorded source_sha256', step)
-        self.assertIn('/public/table_2026_06_25.csv: HTTP 404', step)    # the root path missed, the public/ one is tried
+        self.assertIn('/v1/cost_2025_04_25.csv: HTTP 404', step)
+        self.assertIn('/data/20261025/table.csv: HTTP 200', step)
+        self.assertIn('/data/20261014/notes.json: HTTP 404', step)
         self.assertIn('unknown /table_1999_01_01.csv: HTTP 404', step)
         self.assertIn('unknown /no-such-page: HTTP 200', step)          # a single-page-app fallback shows up here
-        self.assertIn('page https://www.livebench.ai/: HTTP 200', step)
         site_calls = [u for u in net.calls if 'livebench.ai' in u]
         self.assertTrue(all(u.startswith(('https://livebench.ai/', 'https://www.livebench.ai/')) for u in site_calls))
 

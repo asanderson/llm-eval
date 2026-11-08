@@ -2837,26 +2837,25 @@ def site_probe(net, local, lines):
         for c in contexts[:12]:
             lines.append(f"  - context {md_code(c, 400)}")
         for chunk in sorted(set(CHUNK_RE.findall(body))):
+            chunk = urllib.parse.urlsplit(urllib.parse.urljoin(f"https://{LIVEBENCH_SITE}/", chunk)).path
             if chunk not in seen:
                 seen.add(chunk)
                 queue.append(chunk)
 
     def scripts():
         seen, queue = set(), []
+        base = f"https://{LIVEBENCH_SITE}/"
         for src in state["scripts"]:
-            parts = urllib.parse.urlsplit(src)
-            if parts.scheme or parts.netloc:
-                if parts.hostname != LIVEBENCH_SITE:
-                    lines.append(f"- script {md_code(src, 200)}: other host, not fetched")
-                    continue
-                src = parts.path
-            if src not in seen:
-                seen.add(src)
-                queue.append(src)
+            parts = urllib.parse.urlsplit(urllib.parse.urljoin(base, src))
+            if parts.hostname != LIVEBENCH_SITE:
+                lines.append(f"- script {md_code(src, 200)}: other host, not fetched")
+                continue
+            if parts.path not in seen:
+                seen.add(parts.path)
+                queue.append(parts.path)
         fetched = 0
         while queue and fetched < SITE_BUNDLES:
-            path = queue.pop(0)
-            path = path if path.startswith("/") else "/" + path
+            path = urllib.parse.urlsplit(urllib.parse.urljoin(base, queue.pop(0))).path
             fetched += 1
             try:
                 reply = net.get(f"https://{LIVEBENCH_SITE}{path}")
@@ -2864,31 +2863,38 @@ def site_probe(net, local, lines):
                 lines.append(f"- script {md_code(path, 200)}: HTTP {exc.code}")
                 continue
             lines.append(f"- script {md_code(path, 200)}: {describe(reply)}")
+            if "main" in path and "bundle" not in state:
+                state["bundle"] = text_of(reply)
             scan(path, text_of(reply), seen, queue)
         if queue:
             lines.append(f"- {len(queue)} more script chunks not fetched: {md_code(', '.join(queue), 2000)}")
 
     def release_files():
-        recorded = {}
-        for r in ev.recommendations:
-            recorded[r.path.rsplit("/", 1)[1]] = r.sha256
-        dates = sorted({n[len("table_"):-len(".csv")] for n in recorded}
-                       | {d.replace("-", "_") for d in (bench.reference_release, ev.latest_release) if d})
-        for date in dates:
-            for name in (f"table_{date}.csv", f"categories_{date}.json"):
-                for path in (f"/{name}", f"/public/{name}"):
-                    try:
-                        reply = net.get(f"https://{LIVEBENCH_SITE}{path}", cap=MAX_TABLE_BYTES)
-                    except HttpStatus as exc:
-                        lines.append(f"- {path}: HTTP {exc.code}")
-                        continue
-                    digest = hashlib.sha256(reply.body).hexdigest()
-                    match = ""
-                    if name in recorded:
-                        match = "; equal to the recorded source_sha256" if digest == recorded[name] else \
-                            f"; DIFFERS from the recorded source_sha256 `{recorded[name]}`"
-                    lines.append(f"- {path}: {describe(reply)}{match}; starts {md_code(text_of(reply)[:300], 400)}")
-                    break
+        recorded = {r.path.rsplit("/", 1)[1]: r.sha256 for r in ev.recommendations}
+        bundle = state.get("bundle", "")
+        v1 = re.search(r'\[((?:"\d{4}-\d{2}-\d{2}",?)+)\]\.map\(e=>\(\{id:e,label:e,gen:"v1"\}\)\)', bundle)
+        v2 = re.search(r'=\[((?:"\d{8}",?)+)\]', bundle)
+        v1_dates = re.findall(r'\d{4}-\d{2}-\d{2}', v1.group(1)) if v1 else []
+        v2_ids = re.findall(r'\d{8}', v2.group(1)) if v2 else []
+        lines.append(f"- release lists in the bundle: v1 {md_code(', '.join(v1_dates))}; 2.0 {md_code(', '.join(v2_ids))}")
+        wanted = sorted({n[len("table_"):-len(".csv")] for n in recorded}
+                        | {d.replace("-", "_") for d in (bench.reference_release, ev.latest_release) if d}
+                        | {d.replace("-", "_") for d in v1_dates[-2:]})
+        paths = [f"/v1/{kind}_{date}.{ext}" for date in wanted for kind, ext in (("table", "csv"), ("categories", "json"), ("cost", "csv"))]
+        paths += [f"/data/{rid}/{name}" for rid in v2_ids for name in ("table.csv", "categories.json", "cost.csv", "breakdown.json", "notes.json")]
+        for path in paths:
+            try:
+                reply = net.get(f"https://{LIVEBENCH_SITE}{path}", cap=MAX_TABLE_BYTES)
+            except HttpStatus as exc:
+                lines.append(f"- {path}: HTTP {exc.code}")
+                continue
+            digest = hashlib.sha256(reply.body).hexdigest()
+            name = path.rsplit("/", 1)[1]
+            match = ""
+            if name in recorded:
+                match = "; equal to the recorded source_sha256" if digest == recorded[name] else \
+                    f"; DIFFERS from the recorded source_sha256 `{recorded[name]}`"
+            lines.append(f"- {path}: {describe(reply)}{match}; starts {md_code(text_of(reply)[:300], 400)}")
 
     def unknown():
         for path in ("/table_1999_01_01.csv", "/categories_1999_01_01.json", "/no-such-page"):
