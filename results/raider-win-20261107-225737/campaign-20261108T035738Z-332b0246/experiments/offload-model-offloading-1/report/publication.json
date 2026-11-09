@@ -1,0 +1,12 @@
+{
+  "repository": "asanderson/llm-eval",
+  "base_branch": "main",
+  "report_path": "docs/results/model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1",
+  "chart_path": "diagrams/results/model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1",
+  "report_fingerprint": "6ecd843bfd79cfce9368eb18d0e5c7f0731dbadb87d50e036cb6b35fb0520c9f",
+  "experiment_id": "model-offloading",
+  "publication_id": "campaign-20261108T035738Z-332b0246-offload-model-offloading-1",
+  "draft": false,
+  "max_artifact_bytes": 41943040,
+  "code_revision": "3fc8f649b2d5756dc3db2dcaa6142f40e719512b"
+}

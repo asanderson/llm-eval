@@ -1,0 +1,12 @@
+{
+  "experiment_run_id": "routing-llm-routing-1",
+  "experiment_id": "llm-routing",
+  "version": 1,
+  "mode": "decision",
+  "job_ids": [
+    "routing-llm-routing-1-389a241fd7b8",
+    "routing-llm-routing-1-25eff864a7d1"
+  ],
+  "campaign_id": "raider-windows-combined",
+  "code_revision": "3fc8f649b2d5756dc3db2dcaa6142f40e719512b"
+}

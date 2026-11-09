@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "campaign_id": "raider-windows-combined",
+  "created_utc": "2026-11-08T03:57:38.117849+00:00",
+  "status": "succeeded",
+  "jobs": {
+    "offload-model-offloading-1-db17c5930ec0": {
+      "status": "succeeded",
+      "reason": null,
+      "attempts": [
+        {
+          "attempt_id": "aac342bf2b5947c68a82c91b2b5bd447",
+          "status": "succeeded",
+          "stage": "submitted",
+          "started_utc": "2026-11-08T03:57:38.234343+00:00",
+          "output": "experiments\\offload-model-offloading-1\\jobs\\offload-model-offloading-1-db17c5930ec0\\aac342bf2b5947c68a82c91b2b5bd447",
+          "worker_output": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\results\\raider-win-20261107-225737\\campaign-20261108T035738Z-332b0246\\experiments\\offload-model-offloading-1\\jobs\\offload-model-offloading-1-db17c5930ec0\\aac342bf2b5947c68a82c91b2b5bd447",
+          "result_path": "measurements",
+          "benchmark": "category-smoke",
+          "finished_unix": 1794112997.673013,
+          "finished_utc": "2026-11-08T04:43:18.060339+00:00"
+        }
+      ]
+    },
+    "routing-llm-routing-1-389a241fd7b8": {
+      "status": "succeeded",
+      "reason": null,
+      "attempts": [
+        {
+          "attempt_id": "d5941e6e32bb4120a09ef1c545466da4",
+          "status": "succeeded",
+          "stage": "submitted",
+          "started_utc": "2026-11-08T04:43:18.895327+00:00",
+          "output": "experiments\\routing-llm-routing-1\\jobs\\routing-llm-routing-1-389a241fd7b8\\d5941e6e32bb4120a09ef1c545466da4",
+          "worker_output": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\results\\raider-win-20261107-225737\\campaign-20261108T035738Z-332b0246\\experiments\\routing-llm-routing-1\\jobs\\routing-llm-routing-1-389a241fd7b8\\d5941e6e32bb4120a09ef1c545466da4",
+          "result_path": ".",
+          "cost_charged_or_reserved_usd": 0,
+          "finished_unix": 1794113008.5729659,
+          "finished_utc": "2026-11-08T04:43:28.796604+00:00"
+        }
+      ]
+    },
+    "routing-llm-routing-1-25eff864a7d1": {
+      "status": "succeeded",
+      "reason": null,
+      "attempts": [
+        {
+          "attempt_id": "abf3fcd6ac8342849baaea6c3bd363b8",
+          "status": "succeeded",
+          "stage": "submitted",
+          "started_utc": "2026-11-08T04:43:28.803934+00:00",
+          "output": "experiments\\routing-llm-routing-1\\jobs\\routing-llm-routing-1-25eff864a7d1\\abf3fcd6ac8342849baaea6c3bd363b8",
+          "worker_output": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\results\\raider-win-20261107-225737\\campaign-20261108T035738Z-332b0246\\experiments\\routing-llm-routing-1\\jobs\\routing-llm-routing-1-25eff864a7d1\\abf3fcd6ac8342849baaea6c3bd363b8",
+          "result_path": ".",
+          "cost_charged_or_reserved_usd": 0,
+          "finished_unix": 1794113014.718371,
+          "finished_utc": "2026-11-08T04:43:34.924401+00:00"
+        }
+      ]
+    }
+  },
+  "reports": {
+    "offload-model-offloading-1": {
+      "status": "generated",
+      "report": "experiments\\offload-model-offloading-1\\report",
+      "result_signature": "18dc3d39e304e27330091ff469d32524cfd855a2920b3e6cb2e6a89ba76c19a7"
+    },
+    "routing-llm-routing-1": {
+      "status": "generated",
+      "report": "experiments\\routing-llm-routing-1\\report",
+      "result_signature": "440f2c07d02745803ee42364a5915235368cb995ec39adb39aef53ca71af590b"
+    }
+  },
+  "enabled_targets": []
+}

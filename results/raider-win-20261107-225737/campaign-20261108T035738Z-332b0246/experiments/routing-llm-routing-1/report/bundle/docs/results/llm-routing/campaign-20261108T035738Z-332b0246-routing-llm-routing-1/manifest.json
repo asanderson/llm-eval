@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "experiment_id": "llm-routing",
+  "experiment_run_id": "routing-llm-routing-1",
+  "publication_id": "campaign-20261108T035738Z-332b0246-routing-llm-routing-1",
+  "campaign_id": "raider-windows-combined",
+  "created_utc": "2026-11-08T03:57:38.117849+00:00",
+  "code_revision": "3fc8f649b2d5756dc3db2dcaa6142f40e719512b",
+  "status": "complete",
+  "synthetic": false,
+  "coverage": [
+    {
+      "job_id": "routing-llm-routing-1-389a241fd7b8",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "routing-llm-routing-1-25eff864a7d1",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    }
+  ],
+  "raw_records": 50,
+  "removed_fields": [
+    "absolute_path_values",
+    "endpoint",
+    "python"
+  ],
+  "files": {
+    "diagrams/results/llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/latency.png": "65636ceb1d3205d574a053e7931fac99418e633226e62e4e0d2663ebebe2b4a5",
+    "docs/results/llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/benchmark-summary.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/results/llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/benchmark-summary.json": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+    "docs/results/llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/raw/measurements.jsonl.gz": "d84345f38459c02556e027e0530412618c6949a08663672f2ff060bb68cbf47e",
+    "docs/results/llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md": "1a6837b632e59bae4edf95fae3ec8e4719c108767630241b9c8a421a2c3603f5",
+    "docs/results/llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/resolved-config.json": "491b32337fba99f13f1ef6b51262df7c2b5ac1d37c1d6fe93836ca9fd79a836a",
+    "docs/results/llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/summary.csv": "83838b6e33c60bb103196d2bca6a7acbaa0e1aa931e230ffae065f0dba55988a",
+    "docs/results/llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/summary.json": "d81c6b66e51d23daf16b5a650a980308f8a61d7c6a6459c8a0e4bf5ceca448f1"
+  },
+  "report_fingerprint": "8676ba55beb053ffcabbaecaf529d243b2ae258da4689667e74ed80df6a8f963"
+}

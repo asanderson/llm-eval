@@ -1,0 +1,128 @@
+{
+  "action": "run",
+  "job": {
+    "schema_version": 2,
+    "job_id": "routing-llm-routing-1-290257f5d5ab",
+    "experiment_run_id": "routing-llm-routing-1",
+    "experiment_id": "llm-routing",
+    "experiment_version": 1,
+    "mode": "decision",
+    "case_id": "category-smoke",
+    "hardware_config_id": "raider-ubuntu",
+    "hardware": {
+      "target": "raider",
+      "hardware_profile": "msi-raider-18-hx-ai",
+      "os_id": "ubuntu-26.04-native"
+    },
+    "hardware_profile": {
+      "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+      "manufacturer": "MSI",
+      "model": "Raider 18 HX AI A2XWJG-069US",
+      "cpu": {
+        "name": "Intel Core Ultra 9 285HX",
+        "architecture": "Arrow Lake-HX",
+        "p_cores": 8,
+        "e_cores": 16,
+        "threads": 24,
+        "instruction_baseline": "AVX2",
+        "amx": false,
+        "avx512": false,
+        "thread_sweep": [
+          7,
+          8,
+          15,
+          23
+        ],
+        "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+      },
+      "ram": {
+        "installed_gib": 64,
+        "type": "DDR5-6400",
+        "channels": 2
+      },
+      "gpu": {
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "architecture": "Blackwell",
+        "compute_capability": "12.0",
+        "vram_gib": 24,
+        "initial_reserve_gib": 2,
+        "desktop_gpu": false
+      },
+      "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+      "storage": [
+        {
+          "name": "Factory NVMe",
+          "capacity_tb": 2,
+          "model": "not inventoried"
+        },
+        {
+          "name": "WD_BLACK SN7100",
+          "capacity_tb": 4,
+          "interface": "PCIe Gen4 x4",
+          "role": "Model files, artifacts, results; separate swap/offload experiments"
+        }
+      ],
+      "evidence": {
+        "configuration": "user-provided",
+        "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+      },
+      "required_recordings": [
+        "BIOS version",
+        "NVIDIA driver",
+        "GPU power limit/TGP",
+        "AC state",
+        "MSI power/fan profile",
+        "hybrid/MUX setting",
+        "RAM configured speed",
+        "SSD mount and filesystem",
+        "SSD free space and temperature",
+        "OS build/kernel",
+        "WSL version and memory cap if applicable"
+      ],
+      "host_reserve_gib": 12,
+      "os_limits": {
+        "windows-11-wsl2-ubuntu-26.04": {
+          "ram_budget_gib": 46
+        }
+      }
+    },
+    "target_id": "raider",
+    "target": {
+      "transport": "local",
+      "physical_host_id": "raider"
+    },
+    "parameters": {
+      "suite": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\experiments\\llm-routing\\workloads\\decisions.json",
+      "synthetic": true,
+      "router": {
+        "kind": "category",
+        "default_category": "general",
+        "keywords": {
+          "coding": [
+            "python"
+          ],
+          "math": [
+            "equation"
+          ]
+        }
+      }
+    },
+    "depends_on": [],
+    "resources": [
+      "raider"
+    ],
+    "status": "planned",
+    "reason": null,
+    "config_sha256": "e53447f6b2c8a1f8e3ff00eeaa1dfbb704d03a5c56eb8b92650c9e3878bffa99",
+    "input_files": [
+      {
+        "path": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\experiments\\llm-routing\\workloads\\decisions.json",
+        "sha256": "819cafec81eb9ba56db56b4a1c360fae55d5caf49fa0e1f14668b2952f4eb797"
+      }
+    ]
+  },
+  "root": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval",
+  "output": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\results\\campaign-20261108T013814Z-7ff2610d\\experiments\\routing-llm-routing-1\\jobs\\routing-llm-routing-1-290257f5d5ab\\a4b724deb2d740ce90e47d47a07c0be0",
+  "owner": "a4b724deb2d740ce90e47d47a07c0be0",
+  "code_revision": "3fc8f649b2d5756dc3db2dcaa6142f40e719512b"
+}

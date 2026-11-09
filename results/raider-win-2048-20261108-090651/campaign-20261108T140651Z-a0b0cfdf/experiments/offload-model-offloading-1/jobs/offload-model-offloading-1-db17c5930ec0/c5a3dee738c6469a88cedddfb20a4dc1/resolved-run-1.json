@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "model_id": "deepseek-r1-32b",
+  "os_id": "windows-11-native",
+  "lane": "offload",
+  "context_tokens": 4096,
+  "max_output_tokens": 2048,
+  "repeats": 3,
+  "warmups": 1,
+  "temperature": 0.0,
+  "seed": 20261005,
+  "concurrency": 1,
+  "timeout_s": 300,
+  "load_timeout_s": 900,
+  "telemetry_interval_s": 1.0,
+  "ram_budget_gib": 52,
+  "gpu_budget_gib": 22,
+  "suite": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\workloads\\categories\\coding.json",
+  "artifact_root": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\models\\deepseek-r1-32b-q8",
+  "artifact_lock": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\artifacts\\deepseek-r1-32b-q8.lock.json",
+  "offload_dir": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\offload",
+  "backend_version": "0.40.15",
+  "tokenizer_revision": "bartowski/DeepSeek-R1-Distill-Qwen-32B-GGUF@1dc8cf9ffa5dd333057ea1b09ccf4772d8726dec (tokenizer embedded in locked GGUF)",
+  "chat_template_sha256": "b6835114b7303ddd78919a82e4d9f7d8c26ed0d7dfc36beeb12d524f6144eab1",
+  "placement_notes": "Observed from ollama ps and server log with model loaded: 20/65 layers offloaded to GPU (19 repeating + output), CUDA0 model buffer 10177 MiB, CUDA_Host buffer 23025 MiB, KV cache 1024 MiB f16, ollama ps 69%/31% CPU/GPU, 36 GB total; num_thread 16, num_ctx 4096 honored via Modelfile; load_duration 58.0 s; nvidia-smi 12985/24463 MiB used after load. RAM used 59.9/63.4 GiB, available 3.5 GiB; pagefile used 5.1 GiB",
+  "hardware_attestation": {
+    "bios": "E1824IMS.317",
+    "os_build": "10.0.26300",
+    "nvidia_driver": "610.74",
+    "ac_connected": true,
+    "ram_configured_mhz": [
+      6400,
+      6400
+    ],
+    "msi_power_fan_profile": "Best Performance (user-reported, MSI Center)",
+    "mux_hybrid_setting": "MSHybrid (observed: Intel Graphics and NVIDIA both active display adapters, Intel drives internal 3840px panel; MSI Center GPU Switch not read directly)",
+    "gpu_tgp_power_limit": "nvidia-smi power.limit N/A; default 95 W, max 175 W",
+    "model_ssd_filesystem": "Phison 2TB NVMe ESR02TBTLCA3-E1J-2MS, NTFS C:, 488 GB free before import; temperature unavailable (needs admin)",
+    "model_path": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\models\\deepseek-r1-32b-q8",
+    "other_workloads": "VMware VM, default Ollama tray app and Teams closed by user before measurement; 53.8 GiB RAM free, commit 17 GiB with model unloaded. First campaign attempt (results/raider-win-20261107-225331) failed with ConnectionRefusedError: private Ollama pid 40844 was terminated externally before the run; service restarted as pid 7568 and campaign restarted."
+  },
+  "save_outputs": false,
+  "cache_condition": "warm_process_repeated_prompt; prefix-cache policy must be recorded",
+  "speculative_decoding": "disabled",
+  "reasoning_mode": "model default; preflight response began with <think> block (thinking enabled by default)",
+  "backend_pid": 7568,
+  "platform": "ollama",
+  "protocol": "ollama",
+  "endpoint": "http://127.0.0.1:11435/api/chat",
+  "served_model": "llm-eval-deepseek-r1-32b-q8:locked",
+  "request_usage": true,
+  "request_options": {
+    "keep_alive": "5m"
+  },
+  "hardware_profile": "msi-raider-18-hx-ai",
+  "launch": {
+    "model_file": "DeepSeek-R1-Distill-Qwen-32B-Q8_0.gguf",
+    "threads": 16,
+    "gpu_layers": 20
+  }
+}

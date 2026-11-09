@@ -1,0 +1,28 @@
+{
+  "system": "Windows",
+  "release": "11",
+  "machine": "AMD64",
+  "processor": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+  "python": "3.14.7",
+  "environment_kind": "windows-11-native",
+  "gpus": [
+    {
+      "index": "0",
+      "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+      "driver_version": "610.74",
+      "total_mib": 24463.0,
+      "used_mib": 2121.0,
+      "utilization_pct": 4.0,
+      "power_w": 11.05,
+      "temperature_c": 31.0,
+      "sm_clock_mhz": 742.0
+    }
+  ],
+  "memory_scope": "host",
+  "psutil_available": true,
+  "ram_total_gib": 63.43864822387695,
+  "ram_available_gib": 7.565635681152344,
+  "logical_cpus": 24,
+  "physical_cores": 24,
+  "ac_connected": true
+}

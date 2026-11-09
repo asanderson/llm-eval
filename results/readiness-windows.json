@@ -1,0 +1,452 @@
+{
+  "ready": true,
+  "before": [
+    {
+      "id": "os",
+      "label": "Selected OS matches this host",
+      "status": "pass",
+      "required": true,
+      "detail": "windows-11-native",
+      "install_commands": [],
+      "remedy": ""
+    },
+    {
+      "id": "architecture",
+      "label": "x86-64 host and 64-bit Python",
+      "status": "pass",
+      "required": true,
+      "detail": "AMD64",
+      "install_commands": [],
+      "remedy": ""
+    },
+    {
+      "id": "python",
+      "label": "Python 3.11-3.13 with venv, pip and TLS",
+      "status": "pass",
+      "required": true,
+      "detail": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+      "install_commands": [],
+      "remedy": "Use scripts/readiness.ps1 or bash scripts/readiness.sh to bootstrap a compatible Python."
+    },
+    {
+      "id": "package-manager",
+      "label": "winget",
+      "status": "pass",
+      "required": false,
+      "detail": "v1.29.380",
+      "install_commands": [],
+      "remedy": "Install/repair Windows App Installer (winget)."
+    },
+    {
+      "id": "git",
+      "label": "Git",
+      "status": "pass",
+      "required": true,
+      "detail": "git version 2.55.0.windows.5",
+      "install_commands": [
+        [
+          "winget",
+          "install",
+          "--id",
+          "Git.Git",
+          "--exact",
+          "--source",
+          "winget",
+          "--accept-source-agreements",
+          "--accept-package-agreements"
+        ]
+      ],
+      "remedy": ""
+    },
+    {
+      "id": "powershell",
+      "label": "PowerShell 7.4 or newer",
+      "status": "missing",
+      "required": true,
+      "detail": "[WinError 2] The system cannot find the file specified",
+      "install_commands": [
+        [
+          "winget",
+          "install",
+          "--id",
+          "Microsoft.PowerShell",
+          "--exact",
+          "--source",
+          "winget",
+          "--accept-source-agreements",
+          "--accept-package-agreements"
+        ]
+      ],
+      "remedy": ""
+    },
+    {
+      "id": "vc-runtime",
+      "label": "Visual C++ x64 runtime",
+      "status": "pass",
+      "required": true,
+      "detail": "VC runtime loadable",
+      "install_commands": [
+        [
+          "winget",
+          "install",
+          "--id",
+          "Microsoft.VCRedist.2015+.x64",
+          "--exact",
+          "--source",
+          "winget",
+          "--accept-source-agreements",
+          "--accept-package-agreements"
+        ]
+      ],
+      "remedy": ""
+    },
+    {
+      "id": "harness",
+      "label": "Local harness, telemetry and report libraries",
+      "status": "missing",
+      "required": true,
+      "detail": "[WinError 2] The system cannot find the file specified",
+      "install_commands": [
+        [
+          "C:\\Users\\astev\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+          "-m",
+          "venv",
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.venv"
+        ],
+        [
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.venv\\Scripts\\python.exe",
+          "-m",
+          "pip",
+          "install",
+          "-e",
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval[telemetry,reporting]"
+        ]
+      ],
+      "remedy": "A conflicting/broken .venv is not deleted; preserve it and choose a clean checkout."
+    },
+    {
+      "id": "model-downloader",
+      "label": "huggingface-hub==2.4.0",
+      "status": "missing",
+      "required": true,
+      "detail": "[WinError 2] The system cannot find the file specified",
+      "install_commands": [
+        [
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.venv\\Scripts\\python.exe",
+          "-m",
+          "pip",
+          "install",
+          "huggingface-hub==2.4.0"
+        ]
+      ],
+      "remedy": ""
+    },
+    {
+      "id": "gpu",
+      "label": "NVIDIA driver, configured GPU name and VRAM",
+      "status": "pass",
+      "required": true,
+      "detail": "NVIDIA GeForce RTX 5090 Laptop GPU, 24463, 610.74",
+      "install_commands": [],
+      "remedy": "Install/repair the NVIDIA driver for this OS, then reboot if requested and rerun readiness."
+    },
+    {
+      "id": "ram",
+      "label": "Memory visible to the selected OS",
+      "status": "missing",
+      "required": true,
+      "detail": "[WinError 2] The system cannot find the file specified",
+      "install_commands": [],
+      "remedy": "Check hardware/profile or the WSL guest memory cap; this is not a model-fit test."
+    },
+    {
+      "id": "runtime-0",
+      "label": "ollama pinned runtime at C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.platforms\\windows-11-native\\ollama",
+      "status": "missing",
+      "required": true,
+      "detail": "Missing C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.platforms\\windows-11-native\\ollama\\state.json",
+      "install_commands": [
+        [
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.venv\\Scripts\\python.exe",
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\scripts\\setup.py",
+          "--non-interactive",
+          "--platform",
+          "ollama",
+          "--os",
+          "windows-11-native",
+          "--prefix",
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.platforms\\windows-11-native\\ollama",
+          "--hardware-profile",
+          "msi-raider-18-hx-ai",
+          "--jobs",
+          "8"
+        ]
+      ],
+      "remedy": "Matching environments can repair Python dependencies after consent. Conflicting state or missing binaries require a new prefix/checkout; see docs/READINESS.md."
+    }
+  ],
+  "checks": [
+    {
+      "id": "os",
+      "label": "Selected OS matches this host",
+      "status": "pass",
+      "required": true,
+      "detail": "windows-11-native",
+      "install_commands": [],
+      "remedy": ""
+    },
+    {
+      "id": "architecture",
+      "label": "x86-64 host and 64-bit Python",
+      "status": "pass",
+      "required": true,
+      "detail": "AMD64",
+      "install_commands": [],
+      "remedy": ""
+    },
+    {
+      "id": "python",
+      "label": "Python 3.11-3.13 with venv, pip and TLS",
+      "status": "pass",
+      "required": true,
+      "detail": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+      "install_commands": [],
+      "remedy": "Use scripts/readiness.ps1 or bash scripts/readiness.sh to bootstrap a compatible Python."
+    },
+    {
+      "id": "package-manager",
+      "label": "winget",
+      "status": "pass",
+      "required": false,
+      "detail": "v1.29.380",
+      "install_commands": [],
+      "remedy": "Install/repair Windows App Installer (winget)."
+    },
+    {
+      "id": "git",
+      "label": "Git",
+      "status": "pass",
+      "required": true,
+      "detail": "git version 2.55.0.windows.5",
+      "install_commands": [
+        [
+          "winget",
+          "install",
+          "--id",
+          "Git.Git",
+          "--exact",
+          "--source",
+          "winget",
+          "--accept-source-agreements",
+          "--accept-package-agreements"
+        ]
+      ],
+      "remedy": ""
+    },
+    {
+      "id": "powershell",
+      "label": "PowerShell 7.4 or newer",
+      "status": "pass",
+      "required": true,
+      "detail": "7.6.9",
+      "install_commands": [
+        [
+          "winget",
+          "install",
+          "--id",
+          "Microsoft.PowerShell",
+          "--exact",
+          "--source",
+          "winget",
+          "--accept-source-agreements",
+          "--accept-package-agreements"
+        ]
+      ],
+      "remedy": ""
+    },
+    {
+      "id": "vc-runtime",
+      "label": "Visual C++ x64 runtime",
+      "status": "pass",
+      "required": true,
+      "detail": "VC runtime loadable",
+      "install_commands": [
+        [
+          "winget",
+          "install",
+          "--id",
+          "Microsoft.VCRedist.2015+.x64",
+          "--exact",
+          "--source",
+          "winget",
+          "--accept-source-agreements",
+          "--accept-package-agreements"
+        ]
+      ],
+      "remedy": ""
+    },
+    {
+      "id": "harness",
+      "label": "Local harness, telemetry and report libraries",
+      "status": "pass",
+      "required": true,
+      "detail": "No broken requirements found.",
+      "install_commands": [
+        [
+          "C:\\Users\\astev\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+          "-m",
+          "venv",
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.venv"
+        ],
+        [
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.venv\\Scripts\\python.exe",
+          "-m",
+          "pip",
+          "install",
+          "-e",
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval[telemetry,reporting]"
+        ]
+      ],
+      "remedy": "A conflicting/broken .venv is not deleted; preserve it and choose a clean checkout."
+    },
+    {
+      "id": "model-downloader",
+      "label": "huggingface-hub==2.4.0",
+      "status": "pass",
+      "required": true,
+      "detail": "2.4.0",
+      "install_commands": [
+        [
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.venv\\Scripts\\python.exe",
+          "-m",
+          "pip",
+          "install",
+          "huggingface-hub==2.4.0"
+        ]
+      ],
+      "remedy": ""
+    },
+    {
+      "id": "gpu",
+      "label": "NVIDIA driver, configured GPU name and VRAM",
+      "status": "pass",
+      "required": true,
+      "detail": "NVIDIA GeForce RTX 5090 Laptop GPU, 24463, 610.74",
+      "install_commands": [],
+      "remedy": "Install/repair the NVIDIA driver for this OS, then reboot if requested and rerun readiness."
+    },
+    {
+      "id": "ram",
+      "label": "Memory visible to the selected OS",
+      "status": "pass",
+      "required": true,
+      "detail": "63.43864822387695 GiB visible",
+      "install_commands": [],
+      "remedy": "Check hardware/profile or the WSL guest memory cap; this is not a model-fit test."
+    },
+    {
+      "id": "runtime-0",
+      "label": "ollama pinned runtime at C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.platforms\\windows-11-native\\ollama",
+      "status": "pass",
+      "required": true,
+      "detail": "Pinned runtime, Python dependency consistency and executable/library probes passed",
+      "install_commands": [
+        [
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.venv\\Scripts\\python.exe",
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\scripts\\setup.py",
+          "--non-interactive",
+          "--platform",
+          "ollama",
+          "--os",
+          "windows-11-native",
+          "--prefix",
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.platforms\\windows-11-native\\ollama",
+          "--hardware-profile",
+          "msi-raider-18-hx-ai",
+          "--jobs",
+          "8"
+        ]
+      ],
+      "remedy": "Matching environments can repair Python dependencies after consent. Conflicting state or missing binaries require a new prefix/checkout; see docs/READINESS.md."
+    }
+  ],
+  "actions": [
+    {
+      "id": "powershell",
+      "status": "installed",
+      "commands": [
+        [
+          "winget",
+          "install",
+          "--id",
+          "Microsoft.PowerShell",
+          "--exact",
+          "--source",
+          "winget",
+          "--accept-source-agreements",
+          "--accept-package-agreements"
+        ]
+      ]
+    },
+    {
+      "id": "harness",
+      "status": "installed",
+      "commands": [
+        [
+          "C:\\Users\\astev\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+          "-m",
+          "venv",
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.venv"
+        ],
+        [
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.venv\\Scripts\\python.exe",
+          "-m",
+          "pip",
+          "install",
+          "-e",
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval[telemetry,reporting]"
+        ]
+      ]
+    },
+    {
+      "id": "model-downloader",
+      "status": "installed",
+      "commands": [
+        [
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.venv\\Scripts\\python.exe",
+          "-m",
+          "pip",
+          "install",
+          "huggingface-hub==2.4.0"
+        ]
+      ]
+    },
+    {
+      "id": "runtime-0",
+      "status": "installed",
+      "commands": [
+        [
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.venv\\Scripts\\python.exe",
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\scripts\\setup.py",
+          "--non-interactive",
+          "--platform",
+          "ollama",
+          "--os",
+          "windows-11-native",
+          "--prefix",
+          "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\.platforms\\windows-11-native\\ollama",
+          "--hardware-profile",
+          "msi-raider-18-hx-ai",
+          "--jobs",
+          "8"
+        ]
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "scope": "local-tools-and-runtime-dependencies",
+  "os_id": "windows-11-native",
+  "hardware_profile": "msi-raider-18-hx-ai",
+  "python": "C:\\Users\\astev\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+  "note": "Does not certify models, services, benchmark data, credentials, GPU performance or memory fit."
+}

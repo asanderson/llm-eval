@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "harness_version": "0.3.0",
+  "synthetic": false,
+  "created_utc": "20261108T140712Z",
+  "status": "completed",
+  "config": {
+    "schema_version": 1,
+    "model_id": "deepseek-r1-32b",
+    "os_id": "windows-11-native",
+    "lane": "offload",
+    "context_tokens": 4096,
+    "max_output_tokens": 2048,
+    "repeats": 3,
+    "warmups": 1,
+    "temperature": 0.0,
+    "seed": 20261005,
+    "concurrency": 1,
+    "timeout_s": 300,
+    "load_timeout_s": 900,
+    "telemetry_interval_s": 1.0,
+    "ram_budget_gib": 52,
+    "gpu_budget_gib": 22,
+    "suite": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\workloads\\categories\\reasoning.json",
+    "artifact_root": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\models\\deepseek-r1-32b-q8",
+    "artifact_lock": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\artifacts\\deepseek-r1-32b-q8.lock.json",
+    "offload_dir": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\offload",
+    "backend_version": "0.40.15",
+    "tokenizer_revision": "bartowski/DeepSeek-R1-Distill-Qwen-32B-GGUF@1dc8cf9ffa5dd333057ea1b09ccf4772d8726dec (tokenizer embedded in locked GGUF)",
+    "chat_template_sha256": "b6835114b7303ddd78919a82e4d9f7d8c26ed0d7dfc36beeb12d524f6144eab1",
+    "placement_notes": "Observed from ollama ps and server log with model loaded: 20/65 layers offloaded to GPU (19 repeating + output), CUDA0 model buffer 10177 MiB, CUDA_Host buffer 23025 MiB, KV cache 1024 MiB f16, ollama ps 69%/31% CPU/GPU, 36 GB total; num_thread 16, num_ctx 4096 honored via Modelfile; load_duration 58.0 s; nvidia-smi 12985/24463 MiB used after load. RAM used 59.9/63.4 GiB, available 3.5 GiB; pagefile used 5.1 GiB",
+    "hardware_attestation": {
+      "bios": "E1824IMS.317",
+      "os_build": "10.0.26300",
+      "nvidia_driver": "610.74",
+      "ac_connected": true,
+      "ram_configured_mhz": [
+        6400,
+        6400
+      ],
+      "msi_power_fan_profile": "Best Performance (user-reported, MSI Center)",
+      "mux_hybrid_setting": "MSHybrid (observed: Intel Graphics and NVIDIA both active display adapters, Intel drives internal 3840px panel; MSI Center GPU Switch not read directly)",
+      "gpu_tgp_power_limit": "nvidia-smi power.limit N/A; default 95 W, max 175 W",
+      "model_ssd_filesystem": "Phison 2TB NVMe ESR02TBTLCA3-E1J-2MS, NTFS C:, 488 GB free before import; temperature unavailable (needs admin)",
+      "model_path": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\models\\deepseek-r1-32b-q8",
+      "other_workloads": "VMware VM, default Ollama tray app and Teams closed by user before measurement; 53.8 GiB RAM free, commit 17 GiB with model unloaded. First campaign attempt (results/raider-win-20261107-225331) failed with ConnectionRefusedError: private Ollama pid 40844 was terminated externally before the run; service restarted as pid 7568 and campaign restarted."
+    },
+    "save_outputs": false,
+    "cache_condition": "warm_process_repeated_prompt; prefix-cache policy must be recorded",
+    "speculative_decoding": "disabled",
+    "reasoning_mode": "model default; preflight response began with <think> block (thinking enabled by default)",
+    "backend_pid": 7568,
+    "platform": "ollama",
+    "protocol": "ollama",
+    "endpoint": "http://127.0.0.1:11435/api/chat",
+    "served_model": "llm-eval-deepseek-r1-32b-q8:locked",
+    "request_usage": true,
+    "request_options": {
+      "keep_alive": "5m"
+    },
+    "hardware_profile": "msi-raider-18-hx-ai",
+    "launch": {
+      "model_file": "DeepSeek-R1-Distill-Qwen-32B-Q8_0.gguf",
+      "threads": 16,
+      "gpu_layers": 20
+    }
+  },
+  "config_sha256": "23d9d9a36aa37eeed8313bb5f2fd5a881069f181c775be4fc828457cb98048b3",
+  "hardware_profile": {
+    "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+    "manufacturer": "MSI",
+    "model": "Raider 18 HX AI A2XWJG-069US",
+    "cpu": {
+      "name": "Intel Core Ultra 9 285HX",
+      "architecture": "Arrow Lake-HX",
+      "p_cores": 8,
+      "e_cores": 16,
+      "threads": 24,
+      "instruction_baseline": "AVX2",
+      "amx": false,
+      "avx512": false,
+      "thread_sweep": [
+        7,
+        8,
+        15,
+        23
+      ],
+      "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+    },
+    "ram": {
+      "installed_gib": 64,
+      "type": "DDR5-6400",
+      "channels": 2
+    },
+    "gpu": {
+      "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+      "architecture": "Blackwell",
+      "compute_capability": "12.0",
+      "vram_gib": 24,
+      "initial_reserve_gib": 2,
+      "desktop_gpu": false
+    },
+    "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+    "storage": [
+      {
+        "name": "Factory NVMe",
+        "capacity_tb": 2,
+        "model": "not inventoried"
+      },
+      {
+        "name": "WD_BLACK SN7100",
+        "capacity_tb": 4,
+        "interface": "PCIe Gen4 x4",
+        "role": "Model files, artifacts, results; separate swap/offload experiments"
+      }
+    ],
+    "evidence": {
+      "configuration": "user-provided",
+      "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+    },
+    "required_recordings": [
+      "BIOS version",
+      "NVIDIA driver",
+      "GPU power limit/TGP",
+      "AC state",
+      "MSI power/fan profile",
+      "hybrid/MUX setting",
+      "RAM configured speed",
+      "SSD mount and filesystem",
+      "SSD free space and temperature",
+      "OS build/kernel",
+      "WSL version and memory cap if applicable"
+    ],
+    "host_reserve_gib": 12,
+    "os_limits": {
+      "windows-11-wsl2-ubuntu-26.04": {
+        "ram_budget_gib": 46
+      }
+    }
+  },
+  "os_profile": {
+    "id": "windows-11-native",
+    "host_os": "Windows 11 Pro",
+    "guest_os": null,
+    "ram_budget_gib": 52,
+    "vram_budget_gib": 22,
+    "context_sweep": [
+      4096,
+      8192,
+      16384,
+      32768
+    ],
+    "concurrency": 1,
+    "swap_policy": "Record existing swap; reject paging-dependent runs from resident-memory rankings",
+    "model_filesystem": "NTFS on SN7100",
+    "driver_policy": "Supported NVIDIA Windows driver; record WDDM mode",
+    "wsl_memory_gib": null,
+    "comparison_note": "Run a matched 46GiB host-weight-budget lane when comparing against WSL; also retain the 52GiB native capacity lane."
+  },
+  "host": {
+    "system": "Windows",
+    "release": "11",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+    "python": "3.12.10",
+    "environment_kind": "windows-11-native",
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 934.0,
+        "utilization_pct": 1.0,
+        "power_w": 10.44,
+        "temperature_c": 29.0,
+        "sm_clock_mhz": 667.0
+      }
+    ],
+    "memory_scope": "host",
+    "psutil_available": true,
+    "ram_total_gib": 63.43864822387695,
+    "ram_available_gib": 53.3857536315918,
+    "logical_cpus": 24,
+    "physical_cores": 24,
+    "ac_connected": true
+  },
+  "catalog_model": {
+    "id": "deepseek-r1-32b",
+    "provider": "DeepSeek",
+    "rank": null,
+    "recommendation_group": "livebench-expansion",
+    "upstream_repo": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+    "parameters_b": 32.8,
+    "active_parameters_b": 32.8,
+    "target_precision": "GGUF Q8_0",
+    "planning_bits": 8.5,
+    "status": "candidate",
+    "lane": "offload",
+    "task_family": "general",
+    "license": "MIT",
+    "license_class": "permissive",
+    "rationale": "Dense reasoning offload anchor; Q8 exceeds VRAM. Historical score is not a score for this quantization.",
+    "sources": [
+      "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+      "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv"
+    ],
+    "source_revision": "711ad2ea6aa40cfca18895e8aca02ab92df1a746",
+    "artifact_revision": null,
+    "artifact_status": "selection_and_hashing_required",
+    "hardware_validation": "not_measured",
+    "checked_on": "2026-10-05",
+    "max_context_for_initial_plan": 32768,
+    "default_context_tokens": 8192,
+    "planning_weight_gib": 32.46,
+    "upstream_metadata": {
+      "id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+      "sha": "711ad2ea6aa40cfca18895e8aca02ab92df1a746",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 32763876352
+        },
+        "total": 32763876352
+      }
+    },
+    "livebench_reference": {
+      "model_id": "deepseek-r1-32b",
+      "leaderboard_model_id": "deepseek-r1-distill-qwen-32b",
+      "release": "2025-04-25",
+      "overall": 47.52,
+      "category_scores": {
+        "Reasoning": 44.361,
+        "Coding": 47.03,
+        "Mathematics": 60.13166666666667,
+        "Data Analysis": 46.94,
+        "Language": 30.915000000000003,
+        "IF": 55.7125
+      },
+      "source_table": "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv",
+      "source_sha256": "251eb7461da69232733b80d1e63f00a9db5b921d90c966d139ce0e2851c762d9",
+      "meaning": "Published source-model reference; not a local, quantized, or cross-release-comparable score."
+    }
+  },
+  "provenance_note": "Backend version, loaded model identity, actual precision and placement are operator attestations; file hashes alone do not prove what an external server loaded.",
+  "suite_sha256": "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7",
+  "benchmark": "category-smoke",
+  "category": "reasoning",
+  "artifact": {
+    "schema_version": 1,
+    "source_repo": "bartowski/DeepSeek-R1-Distill-Qwen-32B-GGUF",
+    "source_revision": "1dc8cf9ffa5dd333057ea1b09ccf4772d8726dec",
+    "precision": "Q8_0",
+    "weight_bytes": 34820884352,
+    "files": [
+      {
+        "path": "DeepSeek-R1-Distill-Qwen-32B-Q8_0.gguf",
+        "bytes": 34820884352,
+        "sha256": "5b321bce035d98e61636e15cd468467e57dfaee4ea28acd42edd7edd1b6098d7",
+        "weight": true
+      }
+    ],
+    "base_model_repo": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+  },
+  "artifact_sha256": "cdb0278f609227e90e778f3816207b853a3a142ce075b93c6c06a540ccf82433",
+  "telemetry": {
+    "samples": 1098,
+    "interval_s": 1.0,
+    "system_used_gib_peak": 34.067752838134766,
+    "swap_used_gib_peak": 1.0400657653808594,
+    "backend_tree_rss_gib_peak": 24.209617614746094,
+    "gpu_used_mib_peak": 12028.0,
+    "backend_pid_supplied": true,
+    "limitations": "Sampled peaks can miss transients; GPU/system counters include other applications; RSS may double count shared pages; WSL excludes Windows host usage."
+  },
+  "memory_assessment": {
+    "paging_observed": false,
+    "scope": "system-wide counters; other processes can cause paging",
+    "installed_ram_gib": 64,
+    "fits_within_installed_ram": "sampled_host_use_below_installed_ram",
+    "note": "Windows host telemetry is required separately for WSL; no low-RAM certification is inferred from successful loading."
+  },
+  "measured_requests": 9
+}

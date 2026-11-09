@@ -1,0 +1,11 @@
+{
+  "experiment_run_id": "offload-model-offloading-1",
+  "experiment_id": "model-offloading",
+  "version": 1,
+  "mode": "category-smoke",
+  "job_ids": [
+    "offload-model-offloading-1-db17c5930ec0"
+  ],
+  "campaign_id": "raider-windows-offload-2048",
+  "code_revision": "3fc8f649b2d5756dc3db2dcaa6142f40e719512b"
+}
