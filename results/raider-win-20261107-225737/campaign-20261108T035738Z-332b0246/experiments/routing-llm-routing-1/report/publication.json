@@ -3,7 +3,7 @@
   "base_branch": "main",
   "report_path": "docs/results/llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1",
   "chart_path": "diagrams/results/llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1",
-  "report_fingerprint": "8676ba55beb053ffcabbaecaf529d243b2ae258da4689667e74ed80df6a8f963",
+  "report_fingerprint": "0b474a4a46ab2665002fa5c182190af40e29fc1b31ffc602b42d759b16c2d3db",
   "experiment_id": "llm-routing",
   "publication_id": "campaign-20261108T035738Z-332b0246-routing-llm-routing-1",
   "draft": false,

@@ -8,19 +8,19 @@ Campaign: `raider-windows-combined`. Experiment run: `routing-llm-routing-1`. Me
 
 ## Configuration coverage
 
-| Case | Hardware | OS | Platform or router | Status |
-|---|---|---|---|---|
-| ollama-nimble | raider-windows | windows-11-native | llm-eval-nimble:locked | succeeded |
-| ollama-tev1 | raider-windows | windows-11-native | llm-eval-tev1:locked | succeeded |
+| Case | Hardware | OS | Harness | Model | Status |
+|---|---|---|---|---|---|
+| ollama-nimble | raider-windows | windows-11-native | ollama | llm-eval-nimble:locked | succeeded |
+| ollama-tev1 | raider-windows | windows-11-native | ollama | llm-eval-tev1:locked | succeeded |
 
-## Measurements
+## Measurements by harness and model
 
-| Job | Category | Requests | Errors or missing | Decision accuracy | Median seconds |
-|---|---|---:|---:|---:|---:|
-| routing-llm-routing-1-25eff864a7d1 | coding | 3 | 0 | 1 | 0.02739 |
-| routing-llm-routing-1-25eff864a7d1 | math | 3 | 0 | 1 | 0.02906 |
-| routing-llm-routing-1-389a241fd7b8 | coding | 3 | 0 | 1 | 0.04955 |
-| routing-llm-routing-1-389a241fd7b8 | math | 3 | 0 | 1 | 0.04965 |
+| Harness | Model | Category | Requests | Errors or missing | Quality passes | Decision accuracy | Median seconds | Output tokens/s | Job |
+|---|---|---|---:|---:|---:|---:|---:|---:|---|
+| ollama | llm-eval-nimble:locked | coding | 3 | 0 | unavailable | 1 | 0.04955 | unavailable | `389a241fd7b8` |
+| ollama | llm-eval-nimble:locked | math | 3 | 0 | unavailable | 1 | 0.04965 | unavailable | `389a241fd7b8` |
+| ollama | llm-eval-tev1:locked | coding | 3 | 0 | unavailable | 1 | 0.02739 | unavailable | `25eff864a7d1` |
+| ollama | llm-eval-tev1:locked | math | 3 | 0 | unavailable | 1 | 0.02906 | unavailable | `25eff864a7d1` |
 
 ![Request latency](../../../../diagrams/results/llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/latency.png)
 

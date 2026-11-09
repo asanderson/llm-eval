@@ -1,72 +1,116 @@
-# Executive summary of local campaigns (2026-11-08)
+# Executive summary of results
 
-Operator-written summary of the campaigns run on 2026-11-07/08 with `llm-eval-lab 0.3.0` at code revision `3fc8f64`. Raw measurements, per-job reports and resolved configurations live under the gitignored `results/` tree named in each section; nothing here has been published through a results PR. Figures are medians over measured (non-warmup) requests unless stated otherwise.
+Operator-written conclusions over the published result bundles in this directory. The index below is generated from the bundles (`llm-eval index-results`) and links to every result by hardware configuration, experiment, harness, model and date. The narrative that follows is organized the same way: experiment, then harness, then model. Figures are medians over measured (non-warmup) requests unless stated otherwise; per-campaign detail, raw measurements and resolved configurations are in each linked report.
 
-## Hardware config `raider-windows`
+## Results index
 
-MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 285HX, NVIDIA RTX 5090 Laptop (24,463 MiB, driver 610.74), 63.4 GiB RAM, Phison 2 TB NVMe (NTFS), Windows 11 Pro 10.0.26300, AC power, MSI Center "Best Performance", MUX in MSHybrid mode. Pinned Ollama 0.40.15 served privately on `127.0.0.1:11435` with one loaded model and one parallel request. VMware, the consumer Ollama tray app and Teams were closed before the measured runs.
+<!-- results-index:start -->
 
-### Campaign `raider-windows-combined` (offload 256-token cap + routing)
+### Browse by category
 
-`results/raider-win-20261107-225737/campaign-20261108T035738Z-332b0246`, status succeeded, 3 jobs, 0 errors. A first attempt (`results/raider-win-20261107-225331/campaign-20261108T035331Z-833eafe8`) failed with 36 connection-refused requests because the private Ollama process was killed by hand while closing the consumer Ollama tray; it is operator error and carries no measurement.
+| Category | Indexes (results) |
+|---|---|
+| Hardware configuration | [raider-ubuntu](index/hardware/raider-ubuntu.md) (1) · [raider-windows](index/hardware/raider-windows.md) (5) |
+| Experiment | [llm-routing](index/experiment/llm-routing.md) (3) · [model-offloading](index/experiment/model-offloading.md) (3) |
+| Harness | [category](index/harness/category.md) (1) · [ollama](index/harness/ollama.md) (5) |
+| Model | [category](index/model/category.md) (1) · [deepseek-r1-32b](index/model/deepseek-r1-32b.md) (3) · [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) (1) · [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) (1) |
+| Date (UTC) | [2026-11-08](index/date/2026-11-08.md) (6) |
 
-#### Experiment `model-offloading` v1, mode `category-smoke`
+### llm-routing: models by harness
 
-DeepSeek-R1-Distill-Qwen-32B Q8_0 (34.8 GB GGUF, SHA256-locked), 20 of 65 layers on GPU, 4,096-token context, 256-token output cap, 3 repeats + 1 warmup per task, workload `original-text-smoke-v1`.
+Each cell links to the report of every published run of that model on that harness, newest first.
 
-| Category | Requests | Wall s (median / p95) | First output s | Output tok/s | Finish reason | Quality |
-|---|---:|---:|---:|---:|---|---:|
-| coding | 9 | 73.9 / 73.9 | 0.90 | 3.47 | length 9/9 | 0/9 |
-| math | 9 | 70.1 / 73.8 | 0.89 | 3.47 | length 9/9 | 0/9 |
-| reasoning | 9 | 75.4 / 76.5 | 0.92 | 3.39 | length 9/9 | 0/9 |
+| Model | [category](index/harness/category.md) | [ollama](index/harness/ollama.md) |
+|---|---|---|
+| [category](index/model/category.md) | [2026-11-08 raider-ubuntu synthetic](llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md) | – |
+| [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) | – | [2026-11-08 raider-windows](llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
+| [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) | – | [2026-11-08 raider-windows](llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
 
-Telemetry peaks: system RAM used 34.1 GiB, backend process tree RSS 24.6 GiB, GPU memory 12.1 GiB, GPU utilization 100 %, GPU power 39.5 W, GPU 47 °C, swap flat at 1.3 GiB with zero swap-in/out. Cold model load added 22.9 s to the first warmup.
+### model-offloading: models by harness
 
-Conclusion: throughput and memory numbers are valid and stable (p95 within 5 % of median). The quality column is uninformative: every request hit the 256-token cap inside the model's `<think>` block, so no answer was ever emitted. This is a configuration limit of the example case, not a model or harness defect.
+Each cell links to the report of every published run of that model on that harness, newest first.
 
-#### Experiment `llm-routing` v1, mode `decision`
+| Model | [ollama](index/harness/ollama.md) |
+|---|---|
+| [deepseek-r1-32b](index/model/deepseek-r1-32b.md) | [2026-11-08 raider-windows cap 2048](model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/README.md)<br>[2026-11-08 raider-windows cap 256](model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/README.md)<br>[2026-11-08 raider-windows cap 256 failed](model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/README.md) |
 
-Routers `llm-eval-nimble:locked` and `llm-eval-tev1:locked` queried through the Ollama SystemOne API, 3 requests per category, workload `original-routing-smoke`.
+Full table and per-category pages: [results index](index/README.md).
 
-| Router | Decisions | Accuracy | Macro F1 | Brier (median) | Router latency s (median / p95) |
+<!-- results-index:end -->
+
+## Results by experiment, harness and model
+
+### Experiment `model-offloading` (mode `category-smoke`)
+
+Model quality, performance and memory placement of an over-VRAM model on one serving harness. Workload: three short-answer tasks in each of the reasoning, coding and math categories, 3 repeats plus 1 warmup per task, 4,096-token context, one request at a time.
+
+#### Harness: Ollama 0.40.15
+
+Pinned archive install, private server on loopback, one loaded model, one parallel request.
+
+##### Model: `deepseek-r1-32b` (DeepSeek-R1-Distill-Qwen-32B Q8_0, 34.8 GB GGUF, SHA256-locked)
+
+Hardware configuration `raider-windows`, 20 of 65 layers on GPU, 16 CPU threads.
+
+| Run (UTC) | Output cap | Category | Requests | Wall s (median / p95) | First output s | First visible s | Output tokens (median / max) | Output tok/s | Finish reason | Quality |
+|---|---:|---|---:|---:|---:|---:|---:|---:|---|---:|
+| [2026-11-08 03:57](model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/README.md) | 256 | coding | 9 | 73.9 / 73.9 | 0.90 | – | 256 / 256 | 3.47 | length 9/9 | 0/9 |
+| | 256 | math | 9 | 70.1 / 73.8 | 0.89 | 25.6 | 243 / 256 | 3.47 | stop 6/9, length 3/9 | 0/9 |
+| | 256 | reasoning | 9 | 75.4 / 76.5 | 0.92 | 30.2 (3 of 9) | 256 / 256 | 3.39 | length 9/9 | 0/9 |
+| [2026-11-08 14:06](model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/README.md) | 2,048 | coding | 9 | 119.8 / 132.7 | 0.92 | 107.9 | 413 / 457 | 3.44 | stop 9/9 | 3/9 |
+| | 2,048 | math | 9 | 70.3 / 82.5 | 0.90 | 25.7 | 243 / 285 | 3.46 | stop 9/9 | 0/9 |
+| | 2,048 | reasoning | 9 | 88.1 / 112.5 | 0.92 | 83.2 | 304 / 388 | 3.45 | stop 9/9 | 0/9 |
+
+| Run | Peak system RAM | Backend RSS | Peak GPU memory | GPU utilization | GPU power | GPU temperature | Swap used (in/out) |
+|---|---:|---:|---:|---:|---:|---:|---|
+| 256 cap | 34.1 GiB | 24.6 GiB | 12.1 GiB | 100 % | 39.5 W | 47 °C | 1.3 GiB (0 / 0) |
+| 2,048 cap | 34.9 GiB | 25.0 GiB | 12.1 GiB | 94 % | 47.1 W | 47 °C | 1.0 GiB (0 / 0) |
+
+- **Throughput is stable and cap-independent**: about 3.45 output tokens per second in both runs. Cold model load added 22.9 s to the first warmup.
+- **The 256 cap truncates most answers.** 21 of 27 requests ended with `length` and 15 never produced visible text, their budget spent inside the model's `<think>` block. The six math requests that finished naturally still failed the exact checks.
+- **At 2,048 the model stops on its own** after 243 to 460 tokens. "First visible" (time until non-reasoning text) is the user-facing latency: 26 s for math, 108 s for coding.
+- **Quality 3/27 is an instruction-following score, not correctness.** A live reproduction of the arithmetic task returned the right answer as `\boxed{3973}` inside a LaTeX walkthrough, which fails the suite's `exact` check against `3973`. The suite's own `quality_scope` says it is not a reasoning benchmark.
+- An [earlier attempt](model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/README.md) on 2026-11-08 03:53 failed with 36 connection-refused requests because the private Ollama process was ended by hand. It is operator error and carries no measurement.
+
+### Experiment `llm-routing` (mode `decision`)
+
+A router model picks the category of each prompt; decisions are scored against labels. Workload `original-routing-smoke`, 3 requests in each of the coding and math categories.
+
+#### Harness: Ollama 0.40.15 (SystemOne API)
+
+##### Models: `llm-eval-nimble:locked` and `llm-eval-tev1:locked`
+
+Hardware configuration `raider-windows`, [run of 2026-11-08 03:57](llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md).
+
+| Model | Decisions | Accuracy | Macro F1 | Brier (median) | Router latency s (median / p95) |
 |---|---:|---:|---:|---:|---:|
-| Nimble (`389a241fd7b8`) | 6 | 1.00 | 1.00 | <0.0001 | 0.050 / 0.070 |
-| Tev1 (`25eff864a7d1`) | 6 | 1.00 | 1.00 | 0.0010 | 0.028 / 0.052 |
+| `llm-eval-nimble:locked` | 6 | 1.00 | 1.00 | <0.0001 | 0.050 / 0.070 |
+| `llm-eval-tev1:locked` | 6 | 1.00 | 1.00 | 0.0010 | 0.028 / 0.052 |
 
-Conclusion: both routers classify the coding/math smoke prompts perfectly with no abstentions or policy violations. Tev1 is roughly 1.8x faster; Nimble is better calibrated. Six labelled decisions per router is a smoke-level sample and does not establish routing quality on real traffic.
+Both routers classify the smoke prompts perfectly with no abstentions or policy violations. Tev1 is roughly 1.8x faster; Nimble is better calibrated. Six labelled decisions per router is a smoke-level sample and does not establish routing quality on real traffic.
 
-### Campaign `raider-windows-offload-2048` (offload, 2048-token cap)
+#### Harness: built-in `category` router (synthetic fixture)
 
-`results/raider-win-2048-20261108-090651/campaign-20261108T140651Z-a0b0cfdf`, status succeeded, 1 job, 0 errors, 61 minutes wall time. Identical to the offload experiment above except `max_output_tokens` raised from 256 to 2,048.
+Declared for hardware configuration `raider-ubuntu`, [run of 2026-11-08 01:38](llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md): 2 synthetic requests, 0 errors. It validates the harness end to end (plan, run, report, status) at zero cost and establishes nothing about model quality or hardware performance. No real `raider-ubuntu` measurements exist yet.
 
-#### Experiment `model-offloading` v1, mode `category-smoke`
+## Conclusions by hardware configuration
 
-| Category | Requests | Wall s (median / p95) | First output s | First visible s | Output tokens (median / max) | Output tok/s | Finish reason | Quality |
-|---|---:|---:|---:|---:|---:|---:|---|---:|
-| coding | 9 | 119.8 / 132.7 | 0.92 | 107.9 | 413 / 457 | 3.44 | stop 9/9 | 3/9 |
-| math | 9 | 70.3 / 82.5 | 0.90 | 25.7 | 243 / 285 | 3.46 | stop 9/9 | 0/9 |
-| reasoning | 9 | 88.1 / 112.5 | 0.92 | 83.2 | 304 / 388 | 3.45 | stop 9/9 | 0/9 |
+### `raider-windows`
 
-Telemetry peaks: system RAM used 34.9 GiB, backend RSS 25.0 GiB, GPU memory 12.1 GiB, GPU utilization 94 %, GPU power 47.1 W, GPU 47 °C, swap 1.0 GiB with zero swap-in/out.
+MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 285HX, NVIDIA RTX 5090 Laptop (24,463 MiB, driver 610.74), 63.4 GiB RAM, Phison 2 TB NVMe (NTFS), Windows 11 Pro 10.0.26300, AC power, MSI Center "Best Performance", MUX in MSHybrid mode. VMware, the consumer Ollama tray app and Teams were closed before the measured runs.
 
-Conclusion: lifting the cap removed truncation entirely; the model stops on its own at 243 to 460 tokens, so the 2,048 budget is never approached and the run cost one hour rather than the projected four to five. Decode speed is unchanged at 3.45 tok/s, confirming the 256-token run's throughput figures. "First visible" (time until non-reasoning text appears) is the user-facing latency for a reasoning model and ranges from 26 s (math) to 108 s (coding). Quality is 3 of 27: a live reproduction of the arithmetic task shows the model computing the correct answer and returning `\boxed{3973}` inside a LaTeX walkthrough, which fails the suite's `exact` check against `3973`. The smoke suite's deterministic checks therefore measure instruction following, not correctness, for a chain-of-thought model; the suite's own `quality_scope` note says it is not a reasoning benchmark.
+- A 32B Q8_0 model is runnable with 20 GPU layers but slow: about 3.45 output tokens per second and 70 to 120 s per short answer, with a 24 to 25 GiB resident backend and 35 GiB peak system RAM. No paging was observed on a 63.4 GiB host.
+- GPU power peaked at 39 to 47 W against a 95 W default limit, so decode is bound by the CPU and host-memory side of the split (45 of 65 layers on CPU), not by the GPU. More GPU layers or a smaller quantization is the obvious lever; a `gpu_layers` sweep is the next experiment.
+- Both routing candidates cost tens of milliseconds and are perfectly accurate on the smoke set.
+- The two offload runs agree on every performance metric. Read the quality column as zero-information for DeepSeek-R1 on the smoke suites until a check tolerant of trailing prose, or a system prompt forcing terse output, is in place.
+- Only Ollama and one offload model have published results so far. Other harnesses and models appear in the index as their bundles are published.
 
-### Overall conclusion for `raider-windows`
+### `raider-ubuntu`
 
-- A 32B Q8_0 model is runnable with 20 GPU layers but is slow: about 3.45 output tokens per second and 70 to 120 s per short answer, with a 24 to 25 GiB resident backend and 35 GiB peak system RAM. No paging was observed on a 63.4 GiB host once VMware and other trays were closed.
-- GPU power peaked at 39 to 47 W against a 95 W default limit and 100 % utilization, so decode is bound by the CPU/host-memory side of the split (45 of 65 layers on CPU), not by the GPU. More GPU layers or a smaller quantization is the obvious lever; the next experiment should sweep `num_gpu`.
-- Both routing candidates are effectively free (tens of milliseconds) and perfectly accurate on the smoke set.
-- The combined and 2048-token campaigns agree on every performance metric. The quality column should be read as zero-information for DeepSeek-R1 on `original-text-smoke-v1` until the suite either strips reasoning and tolerates trailing prose or a system prompt forces terse output.
-
-## Hardware config `raider-ubuntu`
-
-### Campaign `routing-smoke` (synthetic)
-
-`results/campaign-20261108T013814Z-7ff2610d`, status succeeded, 1 job (`llm-routing` v1, mode `decision`), 2 synthetic requests (one per category), 0 errors. Declared for hardware config `raider-ubuntu` but executed with test fixtures only on the Windows host.
-
-Conclusion: validates the harness end to end (plan, run, report, status) at zero cost. By design it establishes nothing about model quality or hardware performance, and no real `raider-ubuntu` measurements exist yet.
+Synthetic fixture run only. No conclusions.
 
 ## Known tooling issues observed
 
-- `scripts/readiness.ps1` reports Python as MISSING under Windows PowerShell 5.1 even when 3.12 is installed, because the embedded double quotes in its probe string are stripped (`NameError: name 'data_filter' is not defined`). Running `py -3.12 scripts/readiness.py` directly works. Not fixed.
-- Killing any `ollama.exe` while a campaign runs, including the consumer tray app, can take the private pinned server with it and fails every outstanding request with connection refused.
+- `scripts/readiness.ps1` reports Python as MISSING under Windows PowerShell 5.1 even when 3.12 is installed, because the embedded double quotes in its probe string are stripped. Running `py -3.12 scripts/readiness.py` directly works. The `model-downloader` readiness check likewise reports MISSING with `huggingface-hub==2.4.0` installed.
+- Report bundles are written with CRLF line endings on Windows while `.gitattributes` normalizes them to LF, so `manifest.json` SHA256 values do not match the committed files.
+- Ending any `ollama.exe` while a campaign runs, including the consumer tray app, can take the private pinned server with it and fails every outstanding request with connection refused.

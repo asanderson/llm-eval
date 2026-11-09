@@ -22,14 +22,14 @@
     "python"
   ],
   "files": {
-    "diagrams/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/latency.png": "814a8d183649a083d8fc7ea9fca2fc33e262cb11348c84b6b4328f43b9281f5f",
+    "diagrams/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/latency.png": "25920cde4e5aa3dd815225f46b1e17c8142f8ed0fb6dde20b662513ee7ee67ff",
     "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/benchmark-summary.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/benchmark-summary.json": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
-    "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/raw/measurements.jsonl.gz": "ed799d56c28e756ec77898cc709313ee2094724249d304f95ac8c822a8876f09",
-    "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md": "88a9b46cc038d4eddb3d14fe7be9c6e9c1f921e0dfda95c5cbfe49441d854d36",
+    "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/raw/measurements.jsonl.gz": "c7c1323f2bf3818986b2437530d7ffaa9848ad7da763dd06f4084af1febf231e",
+    "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md": "286eb1316401c1d136ef74c7341176338f48070bf9e5f6542c3de607b24b73b7",
     "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/resolved-config.json": "24ae937ea6dcd6be9c5bdc1322ea240b1476b61a9210a3fcf0e2d4c1ee5c60b6",
     "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/summary.csv": "38e5608af07b4462e2cb1c530f1740c78ca0927f9d5456108cefee27256788e6",
     "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/summary.json": "0681de7b79f76f308b8dfcf55b8d16272203b847a777b0b9263a81b7963e17c0"
   },
-  "report_fingerprint": "c369f7b5914b7669c51f0283d16005b3cb046ed9f5842681a473c396c41efd3a"
+  "report_fingerprint": "ff4c2b1e201e101402456cc653d408fce4c3e54ccd3e41655a839176a88b1d57"
 }

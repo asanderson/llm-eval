@@ -29,14 +29,14 @@
     "python"
   ],
   "files": {
-    "diagrams/results/model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/latency.png": "b0f3e8c34a250171e2615fb6f17cf69dc49ca8879c9f16a38501c097e82b9be9",
+    "diagrams/results/model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/latency.png": "2cf9f2ae4f3bc57e96d8b7c8e7381181104e54f21138eef69d6322f2d964a28b",
     "docs/results/model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/benchmark-summary.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "docs/results/model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/benchmark-summary.json": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
     "docs/results/model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/raw/measurements.jsonl.gz": "1a045ca168f3da25c99c7502479122a692714415e2ac9d2d33e64c9c09f4cb74",
-    "docs/results/model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/README.md": "a84798d4fbe4bc1107ea2a1a3ddc7ae238a874ed18553b7e2db9a14a6d4c4d77",
+    "docs/results/model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/README.md": "e3b2cbf2f606f2497b56748151bfa5f5d97c3d045bbd987c3f67fbd9c480c7ac",
     "docs/results/model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/resolved-config.json": "dc12ce12aaac52635c8f3a1ef2a074312e6755d29f60362fd1f4bfc830167cd0",
     "docs/results/model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/summary.csv": "8af5dc0a80894330310fe1feec3e08e949425ff1fd6cac5001b09fae2872160c",
     "docs/results/model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/summary.json": "8ee08e7f267778386e901749c17993d52ea380070d0b918d3b40f14b1a14b28e"
   },
-  "report_fingerprint": "6ecd843bfd79cfce9368eb18d0e5c7f0731dbadb87d50e036cb6b35fb0520c9f"
+  "report_fingerprint": "87beb319b970c6730e6114226ed66dee53d76b54d699dd234922443f828508f4"
 }

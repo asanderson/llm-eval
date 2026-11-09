@@ -29,14 +29,14 @@
     "python"
   ],
   "files": {
-    "diagrams/results/model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/latency.png": "5ad56d8d3267ae1875632e607133dd7eff1e64577c01764ba3ade5000ed4aa20",
+    "diagrams/results/model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/latency.png": "3e946c69235409f6adb763116bae1ca122ff8029fe01651af2a9e5f306d96438",
     "docs/results/model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/benchmark-summary.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "docs/results/model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/benchmark-summary.json": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
     "docs/results/model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/raw/measurements.jsonl.gz": "eb9cdf8543b6b1deac9aa915c88bd4af6da421aa4bb7a0c2b3102b90642e48f7",
-    "docs/results/model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/README.md": "bdec423aa96ff8a2f84b1e22363aef46a461f4e990e42270dfda70972ae148c4",
+    "docs/results/model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/README.md": "63476eb550d15c00707da7afb971a1e42ca748bec7e4e47f420be2440539815d",
     "docs/results/model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/resolved-config.json": "d3118d79adccd6980db59a7d98d50cc0af8cdf8a2b9fbb929398af5893f7e4b4",
     "docs/results/model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/summary.csv": "f2a8e45368f7a51d5dea239594e6669d9f7fd972b85cba94058eceac70dcbf23",
     "docs/results/model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/summary.json": "935e4dd406693a5a3c32c60ce7a243228cf86f6b5c9a16bf35336fddbc865ca2"
   },
-  "report_fingerprint": "a44ee1b361c70f1b35ca16340bc78c5debb01c0b3ef5f3402c81ca1fa78d9167"
+  "report_fingerprint": "488eb4f013784662a365e2abc1bc865d3d50f4c3b3d5448ba8d85a5930f11a38"
 }

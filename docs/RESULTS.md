@@ -24,6 +24,12 @@ The local `report/bundle/` mirrors the eventual repository layout:
 | `manifest.json`, `resolved-config.json` | Input/provenance hashes, export inventory, filtering, checksums and reproducibility settings |
 | `diagrams/results/EXPERIMENT/PUBLICATION/latency.png` | Chart embedded directly in the report |
 
+Each report lists its configuration coverage and measurements **by harness and model** (the serving platform and the model it serves or routes with); the opaque job ID is kept as the last column.
+
+## Navigating published results
+
+`llm-eval index-results` regenerates `docs/results/index/` from the published bundles alone: one page per hardware configuration, experiment, harness, model and UTC date, and an overview with a models-by-harness matrix per experiment whose cells link to every published run. The same overview is written between the `<!-- results-index:start -->` and `<!-- results-index:end -->` markers of [the executive summary](results/EXECUTIVE_SUMMARY.md); the narrative around the markers is hand-written and left untouched. The publisher runs the same step, so a results PR carries the updated indexes. Never edit the generated pages by hand.
+
 Raw records retain warmups and every attempt. Summaries use the latest attempt of each job and exclude warmups. Synthetic measurements remain explicitly labeled. Upstream LiveBench judgments and CSV reports are separate raw record types; their scores are not recomputed as smoke-test pass rates. Report fingerprints and compressed exports are deterministic for unchanged source artifacts.
 
 Decision accuracy measures the router's choice independently of a later generator failure. End-to-end success and answer pass rates retain those failures in their denominators. Latency percentiles describe successful requests, with error/missing counts alongside them.

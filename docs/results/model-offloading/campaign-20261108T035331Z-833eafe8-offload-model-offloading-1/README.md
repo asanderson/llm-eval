@@ -8,17 +8,17 @@ Campaign: `raider-windows-combined`. Experiment run: `offload-model-offloading-1
 
 ## Configuration coverage
 
-| Case | Hardware | OS | Platform or router | Status |
-|---|---|---|---|---|
-| deepseek-r1-32b-q8 | raider-windows | windows-11-native | ollama | failed |
+| Case | Hardware | OS | Harness | Model | Status |
+|---|---|---|---|---|---|
+| deepseek-r1-32b-q8 | raider-windows | windows-11-native | ollama | deepseek-r1-32b | failed |
 
-## Measurements
+## Measurements by harness and model
 
-| Job | Category | Requests | Errors or missing | Decision accuracy | Median seconds |
-|---|---|---:|---:|---:|---:|
-| offload-model-offloading-1-db17c5930ec0 | coding | 9 | 9 | unavailable | unavailable |
-| offload-model-offloading-1-db17c5930ec0 | math | 9 | 9 | unavailable | unavailable |
-| offload-model-offloading-1-db17c5930ec0 | reasoning | 9 | 9 | unavailable | unavailable |
+| Harness | Model | Category | Requests | Errors or missing | Quality passes | Decision accuracy | Median seconds | Output tokens/s | Job |
+|---|---|---|---:|---:|---:|---:|---:|---:|---|
+| ollama | deepseek-r1-32b | coding | 9 | 9 | 0/9 | unavailable | unavailable | unavailable | `db17c5930ec0` |
+| ollama | deepseek-r1-32b | math | 9 | 9 | 0/9 | unavailable | unavailable | unavailable | `db17c5930ec0` |
+| ollama | deepseek-r1-32b | reasoning | 9 | 9 | 0/9 | unavailable | unavailable | unavailable | `db17c5930ec0` |
 
 ![Request latency](../../../../diagrams/results/model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/latency.png)
 

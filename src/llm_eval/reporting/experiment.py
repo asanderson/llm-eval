@@ -13,6 +13,7 @@ import tempfile
 from llm_eval.common import read_json, digest, sha256_file
 from llm_eval.core.contracts import atomic_json, TERMINAL, identifier
 from llm_eval.report import quantile, safe_cell
+from .index import identity
 
 PRIVATE={'api_key','password','secret','token','access_token','authorization','endpoint','host','repo_root','work_root',
          'root','prefix','artifact_root','artifact_lock','offload_dir','installation_state','worker_python','python',
@@ -72,14 +73,14 @@ def summaries(records):
     return result
 
 
-def chart(rows,path):
+def chart(rows,path,names=None):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     n=max(1,len(rows));fig,ax=plt.subplots(figsize=(9,max(2.5,n*.45)))
     values=[r.get('elapsed_s_median') for r in rows]
     ax.barh(range(len(rows)),[v or 0 for v in values],color='#3265a8')
-    labels=[r['job_id'][-12:]+' / '+r['category'] for r in rows]
+    labels=[(names or {}).get(r['job_id'],r['job_id'][-12:])+' / '+r['category'] for r in rows]
     ax.set_yticks(range(len(rows)),labels);ax.invert_yaxis()
     ax.set_xlabel('Median successful request wall time (seconds)')
     ax.set_title('Experiment measurements'+(' — synthetic fixtures' if any(r['synthetic'] for r in rows) else ''))
@@ -145,25 +146,28 @@ def build_report(experiment_dir):
                 writer.writerows({k:safe_cell(json.dumps(v) if isinstance(v,(dict,list)) else v) for k,v in r.items()} for r in summary)
         jobs=[j for j in plan['jobs'] if j['job_id'] in exp['job_ids']]
         atomic_json(dest/'resolved-config.json',sanitize({'experiment':exp,'jobs':jobs,'input_hashes':list(plan['inputs'].values())},removed,False))
-        chart(summary,bundle/chart_rel)
+        chart(summary,bundle/chart_rel,{j['job_id']:' / '.join(identity(j)) for j in jobs})
         complete=all(x['status'] in {'succeeded','skipped'} for x in coverage)
         synthetic=any(j['parameters'].get('synthetic') for j in jobs)
         status='complete' if complete else 'incomplete'
-        metrics=['| Job | Category | Requests | Errors or missing | Decision accuracy | Median seconds |','|---|---|---:|---:|---:|---:|']
-        for row in summary:
+        metrics=['| Harness | Model | Category | Requests | Errors or missing | Quality passes | Decision accuracy | Median seconds | Output tokens/s | Job |','|---|---|---|---:|---:|---:|---:|---:|---:|---|']
+        who={j['job_id']:identity(j) for j in jobs}
+        for row in sorted(summary,key=lambda r:(*who.get(r['job_id'],('unknown','unknown')),r['category'])):
             def fmt(v):return 'unavailable' if v is None else f'{v:.4g}'
-            metrics.append(f"| {row['job_id']} | {row['category']} | {row['requests']} | {row['errors_or_missing']} | {fmt(row['decision_accuracy'])} | {fmt(row['elapsed_s_median'])} |")
+            harness,model=who.get(row['job_id'],('unknown','unknown'))
+            passes='unavailable' if not row['quality_check_n'] else f"{round(row['quality_pass_rate']*row['quality_check_n'])}/{row['quality_check_n']}"
+            metrics.append(f"| {harness} | {model} | {row['category']} | {row['requests']} | {row['errors_or_missing']} | {passes} | {fmt(row['decision_accuracy'])} | {fmt(row['elapsed_s_median'])} | {fmt(row['output_tokens_per_wall_second_median'])} | `{row['job_id'][-12:]}` |")
         image=os.path.relpath(chart_rel,rel).replace(os.sep,'/')
         text=f"# {exp['experiment_id']} results\n\nStatus: **{status}**. Synthetic fixtures: **{str(synthetic).lower()}**.\n\n"
         text+=f"Campaign: `{plan['campaign_id']}`. Experiment run: `{exp['experiment_run_id']}`. Measured code: `{plan['code_revision']}`.\n\n"
         text+='[Raw measurements](raw/measurements.jsonl.gz) · [JSON summary](summary.json) · [CSV summary](summary.csv) · [Manifest](manifest.json) · [Resolved configuration](resolved-config.json)\n\n'
         if benchmark_rows:
             text+='Upstream benchmark score tables: [JSON](benchmark-summary.json) · [CSV](benchmark-summary.csv). Each source cohort is retained separately.\n\n'
-        text+='## Configuration coverage\n\n| Case | Hardware | OS | Platform or router | Status |\n|---|---|---|---|---|\n'
-        for j in jobs:
-            platform=j['parameters'].get('config',{}).get('platform') or j['parameters'].get('router',{}).get('model',j['parameters'].get('router',{}).get('kind','unknown'))
-            text+=f"| {j['case_id']} | {j['hardware_config_id']} | {j['hardware']['os_id']} | {platform} | {state['jobs'][j['job_id']]['status']} |\n"
-        text+='\n## Measurements\n\n'+'\n'.join(metrics)+f'\n\n![Request latency]({image})\n\n'
+        text+='## Configuration coverage\n\n| Case | Hardware | OS | Harness | Model | Status |\n|---|---|---|---|---|---|\n'
+        for j in sorted(jobs,key=identity):
+            harness,model=identity(j)
+            text+=f"| {j['case_id']} | {j['hardware_config_id']} | {j['hardware']['os_id']} | {harness} | {model} | {state['jobs'][j['job_id']]['status']} |\n"
+        text+='\n## Measurements by harness and model\n\n'+'\n'.join(metrics)+f'\n\n![Request latency]({image})\n\n'
         text+='## Interpretation and reproduction\n\nWarmups and superseded attempts remain in raw data and are excluded from summaries. Each job/category is a separate cohort. Missing values remain unknown. Replay cost and generation latency are estimates; an offline oracle is an upper bound. LiveBench upstream grades are exported separately as judgment and benchmark summary records, not relabeled as local smoke scores.\n\n'
         text+='Use the measured code revision and resolved configuration to reconstruct the campaign with your local artifact paths and credential references. Verify the recorded input hashes. Run `llm-eval plan --campaign YOUR_CAMPAIGN.json` before `llm-eval run --campaign YOUR_CAMPAIGN.json`. Synthetic results do not establish model quality or hardware performance.\n'
         (dest/'README.md').write_text(text,encoding='utf-8')
