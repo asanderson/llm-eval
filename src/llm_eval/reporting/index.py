@@ -149,7 +149,7 @@ def top_combinations(records, limit=3):
 
 def ranking(records, index_prefix, report_prefix, limit=3):
     lines = [f'### Top {limit} harness and model combinations per experiment and hardware configuration', '', RANKING_RULE]
-    pairs = sorted({(r['experiment'], r['hardware']) for r in records})
+    pairs = list(dict.fromkeys((r['experiment'], r['hardware']) for r in records))      # newest result first
     best = top_combinations(records, limit)
     for experiment, hardware in pairs:
         lines += ['', f"**{_link('experiment', experiment, index_prefix)} on {_link('hardware', hardware, index_prefix)}**", '']
@@ -167,7 +167,7 @@ def ranking(records, index_prefix, report_prefix, limit=3):
 
 
 def overview(records, index_prefix, report_prefix):
-    """Top combinations, browse-by links and one harness-by-model matrix per experiment."""
+    """Top combinations, browse-by links and one harness-by-model matrix per experiment, newest results first."""
     lines = [ranking(records, index_prefix, report_prefix), '', '### Browse by category', '', '| Category | Indexes (results) |', '|---|---|']
     for category, title in CATEGORIES:
         counts = defaultdict(int)
@@ -176,14 +176,15 @@ def overview(records, index_prefix, report_prefix):
         values = sorted(counts, reverse=category == 'date')
         lines.append(f"| {title} | " + ' · '.join(f"{_link(category, v, index_prefix)} ({counts[v]})" for v in values) + ' |')
     several_hardware = len({r['hardware'] for r in records}) > 1
-    for experiment in sorted({r['experiment'] for r in records}):
+    for experiment in dict.fromkeys(r['experiment'] for r in records):      # records arrive newest first
         chosen = [r for r in records if r['experiment'] == experiment]
         harnesses = sorted({r['harness'] for r in chosen})
         lines += ['', f"### {experiment}: models by harness", '',
-                  'Each cell links to the report of every published run of that model on that harness, newest first.', '',
+                  'Each cell links to the report of every published run of that model on that harness, newest first. '
+                  'Models are ordered by their newest run.', '',
                   '| Model | ' + ' | '.join(_link('harness', h, index_prefix) for h in harnesses) + ' |',
                   '|---|' + '---|' * len(harnesses)]
-        for model in sorted({r['model'] for r in chosen}):
+        for model in dict.fromkeys(r['model'] for r in chosen):
             cells = []
             for harness in harnesses:
                 runs = [r for r in chosen if r['model'] == model and r['harness'] == harness]
