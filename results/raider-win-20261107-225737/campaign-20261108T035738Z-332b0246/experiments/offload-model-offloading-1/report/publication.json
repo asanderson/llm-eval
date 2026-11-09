@@ -3,7 +3,7 @@
   "base_branch": "main",
   "report_path": "docs/results/model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1",
   "chart_path": "diagrams/results/model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1",
-  "report_fingerprint": "6ecd843bfd79cfce9368eb18d0e5c7f0731dbadb87d50e036cb6b35fb0520c9f",
+  "report_fingerprint": "87beb319b970c6730e6114226ed66dee53d76b54d699dd234922443f828508f4",
   "experiment_id": "model-offloading",
   "publication_id": "campaign-20261108T035738Z-332b0246-offload-model-offloading-1",
   "draft": false,

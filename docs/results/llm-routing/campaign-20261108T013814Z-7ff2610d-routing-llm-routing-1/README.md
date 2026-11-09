@@ -8,16 +8,16 @@ Campaign: `routing-smoke`. Experiment run: `routing-llm-routing-1`. Measured cod
 
 ## Configuration coverage
 
-| Case | Hardware | OS | Platform or router | Status |
-|---|---|---|---|---|
-| category-smoke | raider-ubuntu | ubuntu-26.04-native | category | succeeded |
+| Case | Hardware | OS | Harness | Model | Status |
+|---|---|---|---|---|---|
+| category-smoke | raider-ubuntu | ubuntu-26.04-native | category | category | succeeded |
 
-## Measurements
+## Measurements by harness and model
 
-| Job | Category | Requests | Errors or missing | Decision accuracy | Median seconds |
-|---|---|---:|---:|---:|---:|
-| routing-llm-routing-1-290257f5d5ab | coding | 1 | 0 | 1 | 4.97e-05 |
-| routing-llm-routing-1-290257f5d5ab | math | 1 | 0 | 1 | 1.81e-05 |
+| Harness | Model | Category | Requests | Errors or missing | Quality passes | Decision accuracy | Median seconds | Output tokens/s | Job |
+|---|---|---|---:|---:|---:|---:|---:|---:|---|
+| category | category | coding | 1 | 0 | unavailable | 1 | 4.97e-05 | unavailable | `290257f5d5ab` |
+| category | category | math | 1 | 0 | unavailable | 1 | 1.81e-05 | unavailable | `290257f5d5ab` |
 
 ![Request latency](../../../../diagrams/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/latency.png)
 

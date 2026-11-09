@@ -29,14 +29,14 @@
     "python"
   ],
   "files": {
-    "diagrams/results/model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/latency.png": "fbd8cc33928c57a42644bfeb83abebd2a6e31afb61c79da5d3edf0ab09e48728",
+    "diagrams/results/model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/latency.png": "0b26f87d020cd22b1f3da5cb5b49ca62b40693654036d3a045c75d9281901646",
     "docs/results/model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/benchmark-summary.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "docs/results/model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/benchmark-summary.json": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
     "docs/results/model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/raw/measurements.jsonl.gz": "16688d3f8774c567508c83cf30272a76620cd419ac29203bc89f1e20e312cb4b",
-    "docs/results/model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/README.md": "2aa3568ba4b029e1312c5b24492bee082988dffeca7ab88b1543b2078180437c",
+    "docs/results/model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/README.md": "41c5bacf98f3e908593c30cf0eaa5956015bf7a0304ad4381ed585c6ba3d2f08",
     "docs/results/model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/resolved-config.json": "493c6a36387e9e86169c4ec119c6891399412736880b82a61fb7b5fb50e65991",
     "docs/results/model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/summary.csv": "556086c3acb1359b20a6e568844c71cb0e5895810fa41bd9fcaca11f98a5ba21",
     "docs/results/model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/summary.json": "d2ae39785e0e616abe4f1d219da03b09b1db4d1979ef97e7133e41fe7f34d1e6"
   },
-  "report_fingerprint": "db7fe5cdbb02b52a8d2421f1afea53969cb4b143c2702c687d2f12c9443edd05"
+  "report_fingerprint": "b6c1def3ba58655f32baf1e30b9dde94e78c5c503680b2faa1ddde4fedf00e32"
 }

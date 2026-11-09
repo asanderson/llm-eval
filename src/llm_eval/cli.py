@@ -20,7 +20,7 @@ def main():
         elif leading[0].startswith('--project-root='):leading=leading[1:]
         else:break
     command=leading[0] if leading else None
-    if command in {'report','publish-results'}:
+    if command in {'report','publish-results','index-results'}:
         from .reporting.cli import main as reporting_main
         raise SystemExit(reporting_main(sys.argv[1:]))
     campaign_commands = {'experiments', 'plan', 'setup', 'status', 'resume', 'cancel', 'publish-results'}
