@@ -164,6 +164,8 @@
         "nemotron-nano-30b",
         "nemotron-super-49b",
         "nemotron-super-120b",
+        "nemotron-super-vl-120b",
+        "nemotron-super-vl-120b-nvfp4",
         "gpt-oss-120b",
         "gpt-oss-safeguard-120b",
         "gpt-oss-20b",

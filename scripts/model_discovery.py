@@ -94,7 +94,7 @@ FAILURE_STREAK = 3
 DEFERRAL_MAX_DAYS = 365
 HF_ANCHORS = ("qwen38-27b", "nemotron-super-120b", "gpt-oss-120b", "llama33-70b")
 ANCHOR_CLASSES = {"qwen38-27b": "float", "nemotron-super-120b": "packed", "gpt-oss-120b": "packed", "llama33-70b": "float"}
-CANARY_ORGS = ("deepseek-ai", "zai-org", "microsoft", "mistralai")   # derived at run time; a test pins the derivation
+CANARY_ORGS = ("deepseek-ai", "zai-org", "microsoft", "mistralai", "nvidia")   # derived at run time; a test pins the derivation
 
 HF_HOST = "huggingface.co"
 LIVEBENCH_SITE = "livebench.ai"

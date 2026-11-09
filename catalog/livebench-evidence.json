@@ -1,9 +1,9 @@
 {
-  "checked_on": "2026-10-05",
+  "checked_on": "2026-11-08",
   "leaderboard": "https://livebench.ai/",
   "leaderboard_revision": "caa4253c8a3aa93b5c7ec234e681d4f120a20240",
-  "latest_release": "2026-06-25",
-  "aggregation": "Mean of subtask scores within each category, then equal mean of category scores. Different releases cannot be ranked together.",
+  "latest_release": "2026-10-25",
+  "aggregation": "v1 releases: mean of subtask scores within each category, then equal mean of category scores. LiveBench 2.0 releases (2026-10-25 on): weighted mean of the suites with a score, weights Long Agentic x2, Coding x1.5, Design x1.5, others x1, rounded to 2 decimals as the site shows it. Different releases cannot be ranked together.",
   "recommendations": [
     {
       "model_id": "deepseek-r1-32b",
@@ -89,6 +89,42 @@
       },
       "source_table": "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv",
       "source_sha256": "251eb7461da69232733b80d1e63f00a9db5b921d90c966d139ce0e2851c762d9",
+      "meaning": "Published source-model reference; not a local, quantized, or cross-release-comparable score."
+    },
+    {
+      "model_id": "nemotron-super-vl-120b",
+      "leaderboard_model_id": "nemotron-super-vl-3.5",
+      "release": "2026-10-25",
+      "overall": 50.23,
+      "category_scores": {
+        "Long Agentic": 11.7,
+        "Reasoning": 74.6,
+        "Coding": 71.3,
+        "Browser": 21.6,
+        "Data Analysis": 64.6,
+        "Research": 66.7,
+        "Design": 62.8
+      },
+      "source_table": "https://livebench.ai/data/20261025/table.csv",
+      "source_sha256": "a790e07b2ed710fbaa90eec799fcdfcbc04e4d37c16f7dc45cb3071717694d02",
+      "meaning": "Published source-model reference; not a local, quantized, or cross-release-comparable score."
+    },
+    {
+      "model_id": "nemotron-super-vl-120b-nvfp4",
+      "leaderboard_model_id": "nemotron-super-vl-3.5-nvfp4",
+      "release": "2026-10-25",
+      "overall": 46.5,
+      "category_scores": {
+        "Long Agentic": 7.3,
+        "Reasoning": 71.7,
+        "Coding": 61.3,
+        "Browser": 18.0,
+        "Data Analysis": 65.7,
+        "Research": 70.9,
+        "Design": 57.1
+      },
+      "source_table": "https://livebench.ai/data/20261025/table.csv",
+      "source_sha256": "a790e07b2ed710fbaa90eec799fcdfcbc04e4d37c16f7dc45cb3071717694d02",
       "meaning": "Published source-model reference; not a local, quantized, or cross-release-comparable score."
     }
   ],
