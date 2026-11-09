@@ -1,0 +1,546 @@
+{
+  "experiment": {
+    "experiment_run_id": "offload-model-offloading-1",
+    "experiment_id": "model-offloading",
+    "version": 1,
+    "mode": "category-smoke",
+    "job_ids": [
+      "offload-model-offloading-1-e1feb0ce918f",
+      "offload-model-offloading-1-a9c9aeebbc4d",
+      "offload-model-offloading-1-fac3127225ae"
+    ],
+    "campaign_id": "matrix-qwen38-27b",
+    "code_revision": "22875f4287b73f06d0539b5af605bc5fb1fb706d"
+  },
+  "jobs": [
+    {
+      "schema_version": 2,
+      "job_id": "offload-model-offloading-1-e1feb0ce918f",
+      "experiment_run_id": "offload-model-offloading-1",
+      "experiment_id": "model-offloading",
+      "experiment_version": 1,
+      "mode": "category-smoke",
+      "case_id": "qwen38-27b-ollama",
+      "hardware_config_id": "raider-windows",
+      "hardware": {
+        "target": "raider",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-native"
+      },
+      "hardware_profile": {
+        "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+        "manufacturer": "MSI",
+        "model": "Raider 18 HX AI A2XWJG-069US",
+        "cpu": {
+          "name": "Intel Core Ultra 9 285HX",
+          "architecture": "Arrow Lake-HX",
+          "p_cores": 8,
+          "e_cores": 16,
+          "threads": 24,
+          "instruction_baseline": "AVX2",
+          "amx": false,
+          "avx512": false,
+          "thread_sweep": [
+            7,
+            8,
+            15,
+            23
+          ],
+          "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+        },
+        "ram": {
+          "installed_gib": 64,
+          "type": "DDR5-6400",
+          "channels": 2
+        },
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "architecture": "Blackwell",
+          "compute_capability": "12.0",
+          "vram_gib": 24,
+          "initial_reserve_gib": 2,
+          "desktop_gpu": false
+        },
+        "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+        "storage": [
+          {
+            "name": "Factory NVMe",
+            "capacity_tb": 2,
+            "model": "not inventoried"
+          },
+          {
+            "name": "WD_BLACK SN7100",
+            "capacity_tb": 4,
+            "interface": "PCIe Gen4 x4",
+            "role": "Model files, artifacts, results; separate swap/offload experiments"
+          }
+        ],
+        "evidence": {
+          "configuration": "user-provided",
+          "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+        },
+        "required_recordings": [
+          "BIOS version",
+          "NVIDIA driver",
+          "GPU power limit/TGP",
+          "AC state",
+          "MSI power/fan profile",
+          "hybrid/MUX setting",
+          "RAM configured speed",
+          "SSD mount and filesystem",
+          "SSD free space and temperature",
+          "OS build/kernel",
+          "WSL version and memory cap if applicable"
+        ],
+        "host_reserve_gib": 12,
+        "os_limits": {
+          "windows-11-wsl2-ubuntu-26.04": {
+            "ram_budget_gib": 46
+          }
+        }
+      },
+      "target_id": "raider",
+      "target": {
+        "transport": "local",
+        "physical_host_id": "raider"
+      },
+      "parameters": {
+        "config": {
+          "schema_version": 1,
+          "model_id": "qwen38-27b",
+          "os_id": "windows-11-native",
+          "lane": "offload",
+          "context_tokens": 4096,
+          "max_output_tokens": 2048,
+          "repeats": 3,
+          "warmups": 1,
+          "temperature": 0.0,
+          "seed": 20261005,
+          "concurrency": 1,
+          "timeout_s": 900,
+          "load_timeout_s": 1800,
+          "telemetry_interval_s": 1.0,
+          "ram_budget_gib": 52,
+          "gpu_budget_gib": 22,
+          "suite": "[local path omitted]",
+          "backend_version": "0.40.15",
+          "tokenizer_revision": "unsloth/Qwen3.8-27B-GGUF@4ca720788d1e01f1bff70c033e0d0028fd02e502 (tokenizer embedded in locked GGUF)",
+          "chat_template_sha256": "12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce",
+          "placement_notes": "Requested 20 of 66 layers on GPU (arch qwen35, 27.1 GiB weights, policy min(20, floor(18 GiB / per-layer GiB))), 16 CPU threads, Actual placement is in the backend log of each attempt.",
+          "hardware_attestation": {
+            "bios": "E1824IMS.317",
+            "os_build": "10.0.26300",
+            "nvidia_driver": "610.74",
+            "ac_connected": true,
+            "ram_configured_mhz": [
+              6400,
+              6400
+            ],
+            "msi_power_fan_profile": "Best Performance (user-reported, MSI Center)",
+            "mux_hybrid_setting": "MSHybrid (observed: Intel Graphics and NVIDIA both active display adapters, Intel drives internal 3840px panel; MSI Center GPU Switch not read directly)",
+            "gpu_tgp_power_limit": "nvidia-smi power.limit N/A; default 95 W, max 175 W",
+            "model_ssd_filesystem": "Phison 2TB NVMe ESR02TBTLCA3-E1J-2MS, NTFS C:, 488 GB free before import; temperature unavailable (needs admin)",
+            "model_path": "[local path omitted]",
+            "other_workloads": "Harness-by-model matrix run; LM Studio desktop app open (required for its managed runs), VMware, consumer Ollama tray and Teams closed."
+          },
+          "save_outputs": false,
+          "cache_condition": "warm_process_repeated_prompt; prefix-cache policy must be recorded",
+          "speculative_decoding": "disabled",
+          "reasoning_mode": "model default; OpenAI-protocol harnesses may return reasoning inline in content",
+          "platform": "ollama",
+          "protocol": "ollama",
+          "served_model": "llm-eval-qwen38-27b:matrix",
+          "request_usage": true,
+          "request_options": {
+            "keep_alive": "30m"
+          },
+          "hardware_profile": "msi-raider-18-hx-ai",
+          "launch": {
+            "model_file": "Qwen3.8-27B-Q8_0.gguf",
+            "threads": 16,
+            "gpu_layers": 20
+          }
+        },
+        "server_mode": "managed",
+        "categories": [
+          "reasoning",
+          "coding",
+          "math"
+        ]
+      },
+      "depends_on": [],
+      "resources": [
+        "raider"
+      ],
+      "status": "planned",
+      "reason": null,
+      "config_sha256": "940e27b041aa812ddc0d2195a2d4c7987cf7554ff168881372cb11a0237c70bd",
+      "input_files": [
+        {
+          "path": "[local path omitted]",
+          "sha256": "26892545cadcda503b23da4ec13e63820ea43f8c605b9a9e2e248d6049800bd2"
+        },
+        {
+          "path": "[local path omitted]",
+          "sha256": "be5284c0a934bfc7eb1ab277c72bd59721027e485f55f41cad0c372b70d11768"
+        }
+      ]
+    },
+    {
+      "schema_version": 2,
+      "job_id": "offload-model-offloading-1-a9c9aeebbc4d",
+      "experiment_run_id": "offload-model-offloading-1",
+      "experiment_id": "model-offloading",
+      "experiment_version": 1,
+      "mode": "category-smoke",
+      "case_id": "qwen38-27b-koboldcpp",
+      "hardware_config_id": "raider-windows",
+      "hardware": {
+        "target": "raider",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-native"
+      },
+      "hardware_profile": {
+        "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+        "manufacturer": "MSI",
+        "model": "Raider 18 HX AI A2XWJG-069US",
+        "cpu": {
+          "name": "Intel Core Ultra 9 285HX",
+          "architecture": "Arrow Lake-HX",
+          "p_cores": 8,
+          "e_cores": 16,
+          "threads": 24,
+          "instruction_baseline": "AVX2",
+          "amx": false,
+          "avx512": false,
+          "thread_sweep": [
+            7,
+            8,
+            15,
+            23
+          ],
+          "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+        },
+        "ram": {
+          "installed_gib": 64,
+          "type": "DDR5-6400",
+          "channels": 2
+        },
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "architecture": "Blackwell",
+          "compute_capability": "12.0",
+          "vram_gib": 24,
+          "initial_reserve_gib": 2,
+          "desktop_gpu": false
+        },
+        "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+        "storage": [
+          {
+            "name": "Factory NVMe",
+            "capacity_tb": 2,
+            "model": "not inventoried"
+          },
+          {
+            "name": "WD_BLACK SN7100",
+            "capacity_tb": 4,
+            "interface": "PCIe Gen4 x4",
+            "role": "Model files, artifacts, results; separate swap/offload experiments"
+          }
+        ],
+        "evidence": {
+          "configuration": "user-provided",
+          "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+        },
+        "required_recordings": [
+          "BIOS version",
+          "NVIDIA driver",
+          "GPU power limit/TGP",
+          "AC state",
+          "MSI power/fan profile",
+          "hybrid/MUX setting",
+          "RAM configured speed",
+          "SSD mount and filesystem",
+          "SSD free space and temperature",
+          "OS build/kernel",
+          "WSL version and memory cap if applicable"
+        ],
+        "host_reserve_gib": 12,
+        "os_limits": {
+          "windows-11-wsl2-ubuntu-26.04": {
+            "ram_budget_gib": 46
+          }
+        }
+      },
+      "target_id": "raider",
+      "target": {
+        "transport": "local",
+        "physical_host_id": "raider"
+      },
+      "parameters": {
+        "config": {
+          "schema_version": 1,
+          "model_id": "qwen38-27b",
+          "os_id": "windows-11-native",
+          "lane": "offload",
+          "context_tokens": 4096,
+          "max_output_tokens": 2048,
+          "repeats": 3,
+          "warmups": 1,
+          "temperature": 0.0,
+          "seed": 20261005,
+          "concurrency": 1,
+          "timeout_s": 900,
+          "load_timeout_s": 1800,
+          "telemetry_interval_s": 1.0,
+          "ram_budget_gib": 52,
+          "gpu_budget_gib": 22,
+          "suite": "[local path omitted]",
+          "backend_version": "1.124.2",
+          "tokenizer_revision": "unsloth/Qwen3.8-27B-GGUF@4ca720788d1e01f1bff70c033e0d0028fd02e502 (tokenizer embedded in locked GGUF)",
+          "chat_template_sha256": "12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce",
+          "placement_notes": "Requested 20 of 66 layers on GPU (arch qwen35, 27.1 GiB weights, policy min(20, floor(18 GiB / per-layer GiB))), 16 CPU threads, Actual placement is in the backend log of each attempt.",
+          "hardware_attestation": {
+            "bios": "E1824IMS.317",
+            "os_build": "10.0.26300",
+            "nvidia_driver": "610.74",
+            "ac_connected": true,
+            "ram_configured_mhz": [
+              6400,
+              6400
+            ],
+            "msi_power_fan_profile": "Best Performance (user-reported, MSI Center)",
+            "mux_hybrid_setting": "MSHybrid (observed: Intel Graphics and NVIDIA both active display adapters, Intel drives internal 3840px panel; MSI Center GPU Switch not read directly)",
+            "gpu_tgp_power_limit": "nvidia-smi power.limit N/A; default 95 W, max 175 W",
+            "model_ssd_filesystem": "Phison 2TB NVMe ESR02TBTLCA3-E1J-2MS, NTFS C:, 488 GB free before import; temperature unavailable (needs admin)",
+            "model_path": "[local path omitted]",
+            "other_workloads": "Harness-by-model matrix run; LM Studio desktop app open (required for its managed runs), VMware, consumer Ollama tray and Teams closed."
+          },
+          "save_outputs": false,
+          "cache_condition": "warm_process_repeated_prompt; prefix-cache policy must be recorded",
+          "speculative_decoding": "disabled",
+          "reasoning_mode": "model default; OpenAI-protocol harnesses may return reasoning inline in content",
+          "platform": "koboldcpp",
+          "protocol": "openai",
+          "served_model": "koboldcpp",
+          "request_usage": true,
+          "request_options": {},
+          "hardware_profile": "msi-raider-18-hx-ai",
+          "launch": {
+            "model_file": "Qwen3.8-27B-Q8_0.gguf",
+            "threads": 16,
+            "gpu_layers": 20
+          }
+        },
+        "server_mode": "managed",
+        "categories": [
+          "reasoning",
+          "coding",
+          "math"
+        ]
+      },
+      "depends_on": [],
+      "resources": [
+        "raider"
+      ],
+      "status": "planned",
+      "reason": null,
+      "config_sha256": "82e32d23e1a5bc9a2f99fc09ef1d7a37d33e5d88cf340ec03fa6a62df1a47d54",
+      "input_files": [
+        {
+          "path": "[local path omitted]",
+          "sha256": "26892545cadcda503b23da4ec13e63820ea43f8c605b9a9e2e248d6049800bd2"
+        },
+        {
+          "path": "[local path omitted]",
+          "sha256": "be5284c0a934bfc7eb1ab277c72bd59721027e485f55f41cad0c372b70d11768"
+        }
+      ]
+    },
+    {
+      "schema_version": 2,
+      "job_id": "offload-model-offloading-1-fac3127225ae",
+      "experiment_run_id": "offload-model-offloading-1",
+      "experiment_id": "model-offloading",
+      "experiment_version": 1,
+      "mode": "category-smoke",
+      "case_id": "qwen38-27b-lmstudio",
+      "hardware_config_id": "raider-windows",
+      "hardware": {
+        "target": "raider",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-native"
+      },
+      "hardware_profile": {
+        "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+        "manufacturer": "MSI",
+        "model": "Raider 18 HX AI A2XWJG-069US",
+        "cpu": {
+          "name": "Intel Core Ultra 9 285HX",
+          "architecture": "Arrow Lake-HX",
+          "p_cores": 8,
+          "e_cores": 16,
+          "threads": 24,
+          "instruction_baseline": "AVX2",
+          "amx": false,
+          "avx512": false,
+          "thread_sweep": [
+            7,
+            8,
+            15,
+            23
+          ],
+          "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+        },
+        "ram": {
+          "installed_gib": 64,
+          "type": "DDR5-6400",
+          "channels": 2
+        },
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "architecture": "Blackwell",
+          "compute_capability": "12.0",
+          "vram_gib": 24,
+          "initial_reserve_gib": 2,
+          "desktop_gpu": false
+        },
+        "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+        "storage": [
+          {
+            "name": "Factory NVMe",
+            "capacity_tb": 2,
+            "model": "not inventoried"
+          },
+          {
+            "name": "WD_BLACK SN7100",
+            "capacity_tb": 4,
+            "interface": "PCIe Gen4 x4",
+            "role": "Model files, artifacts, results; separate swap/offload experiments"
+          }
+        ],
+        "evidence": {
+          "configuration": "user-provided",
+          "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+        },
+        "required_recordings": [
+          "BIOS version",
+          "NVIDIA driver",
+          "GPU power limit/TGP",
+          "AC state",
+          "MSI power/fan profile",
+          "hybrid/MUX setting",
+          "RAM configured speed",
+          "SSD mount and filesystem",
+          "SSD free space and temperature",
+          "OS build/kernel",
+          "WSL version and memory cap if applicable"
+        ],
+        "host_reserve_gib": 12,
+        "os_limits": {
+          "windows-11-wsl2-ubuntu-26.04": {
+            "ram_budget_gib": 46
+          }
+        }
+      },
+      "target_id": "raider",
+      "target": {
+        "transport": "local",
+        "physical_host_id": "raider"
+      },
+      "parameters": {
+        "config": {
+          "schema_version": 1,
+          "model_id": "qwen38-27b",
+          "os_id": "windows-11-native",
+          "lane": "offload",
+          "context_tokens": 4096,
+          "max_output_tokens": 2048,
+          "repeats": 3,
+          "warmups": 1,
+          "temperature": 0.0,
+          "seed": 20261005,
+          "concurrency": 1,
+          "timeout_s": 900,
+          "load_timeout_s": 1800,
+          "telemetry_interval_s": 1.0,
+          "ram_budget_gib": 52,
+          "gpu_budget_gib": 22,
+          "suite": "[local path omitted]",
+          "backend_version": "0.4.28+2",
+          "tokenizer_revision": "unsloth/Qwen3.8-27B-GGUF@4ca720788d1e01f1bff70c033e0d0028fd02e502 (tokenizer embedded in locked GGUF)",
+          "chat_template_sha256": "12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce",
+          "placement_notes": "Requested 20 of 66 layers on GPU (arch qwen35, 27.1 GiB weights, policy min(20, floor(18 GiB / per-layer GiB))), 16 CPU threads, LM Studio GPU ratio 0.303 (ratio, not a layer count; thread count is the app default). Actual placement is in the backend log of each attempt.",
+          "hardware_attestation": {
+            "bios": "E1824IMS.317",
+            "os_build": "10.0.26300",
+            "nvidia_driver": "610.74",
+            "ac_connected": true,
+            "ram_configured_mhz": [
+              6400,
+              6400
+            ],
+            "msi_power_fan_profile": "Best Performance (user-reported, MSI Center)",
+            "mux_hybrid_setting": "MSHybrid (observed: Intel Graphics and NVIDIA both active display adapters, Intel drives internal 3840px panel; MSI Center GPU Switch not read directly)",
+            "gpu_tgp_power_limit": "nvidia-smi power.limit N/A; default 95 W, max 175 W",
+            "model_ssd_filesystem": "Phison 2TB NVMe ESR02TBTLCA3-E1J-2MS, NTFS C:, 488 GB free before import; temperature unavailable (needs admin)",
+            "model_path": "[local path omitted]",
+            "other_workloads": "Harness-by-model matrix run; LM Studio desktop app open (required for its managed runs), VMware, consumer Ollama tray and Teams closed."
+          },
+          "save_outputs": false,
+          "cache_condition": "warm_process_repeated_prompt; prefix-cache policy must be recorded",
+          "speculative_decoding": "disabled",
+          "reasoning_mode": "model default; OpenAI-protocol harnesses may return reasoning inline in content",
+          "platform": "lmstudio",
+          "protocol": "openai",
+          "served_model": "llm-eval-qwen38-27b",
+          "request_usage": true,
+          "request_options": {},
+          "hardware_profile": "msi-raider-18-hx-ai",
+          "launch": {
+            "model_file": "Qwen3.8-27B-Q8_0.gguf",
+            "gpu_offload": "0.303",
+            "import_mode": "hard-link"
+          }
+        },
+        "server_mode": "managed",
+        "categories": [
+          "reasoning",
+          "coding",
+          "math"
+        ]
+      },
+      "depends_on": [],
+      "resources": [
+        "raider"
+      ],
+      "status": "planned",
+      "reason": null,
+      "config_sha256": "4a3582f9fe424818b768e2857da8fbbac8cb5c248c02d32dc35899f47a4a82ab",
+      "input_files": [
+        {
+          "path": "[local path omitted]",
+          "sha256": "26892545cadcda503b23da4ec13e63820ea43f8c605b9a9e2e248d6049800bd2"
+        },
+        {
+          "path": "[local path omitted]",
+          "sha256": "be5284c0a934bfc7eb1ab277c72bd59721027e485f55f41cad0c372b70d11768"
+        }
+      ]
+    }
+  ],
+  "input_hashes": [
+    "af14bb42fbca8c4f2db182d01d70a92a0cc9ef71ac1f7e4ec51e2013e74e1780",
+    "005c3d62f96dd4fa9b7a777c73aff65c9742c1ad2151d422795c9e006afa95d5",
+    "c11fe651925908ad8b6970426e929440c26f01a97a0db4c5b4bbfcd0720b7347",
+    "39eb44a0a8e3ce2515385898467d8024c63338bbe2db146ffe7ce6fbb709827e",
+    "44abf638cc182faa02f4b3dc41042c8a35c013636980d61d0203d5423432c15a",
+    "9939e1bc67f0af5bda168e4e0092e5378e2471d9bf6299905cb1a0b3dfb8cb6a",
+    "4dbbbf21917d52f2961dc571b3301c32567d7ab75cfc81cc040b974d4f749b63",
+    "e738b2127e97ddc8af9ab7f60549c5a763636bc7799b010f0f3c1582fcf5544e",
+    "01da6a4f1702849065d97cbc2d619dfe8c3545d277b6dcb3ecc825e743f072bb",
+    "c7dcd0b354a245b2ffaff1af4aa7d8102c3c5882beac4fc082b94451b85e0e11",
+    "26892545cadcda503b23da4ec13e63820ea43f8c605b9a9e2e248d6049800bd2",
+    "be5284c0a934bfc7eb1ab277c72bd59721027e485f55f41cad0c372b70d11768"
+  ]
+}
