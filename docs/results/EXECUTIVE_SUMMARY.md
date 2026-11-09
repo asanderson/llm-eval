@@ -25,19 +25,19 @@ No measured run with scored checks has been published yet.
 
 | Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
 |---:|---|---|---:|---:|---:|---|
-| 1 | [lmstudio](index/harness/lmstudio.md) | [qwen38-27b](index/model/qwen38-27b.md) | 24/27 | 7.75 | 6.4 | [2026-11-09 cap 2048](model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md) |
-| 2 | [ollama](index/harness/ollama.md) | [qwen38-27b](index/model/qwen38-27b.md) | 24/27 | 16.8 | 3.56 | [2026-11-09 cap 2048](model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md) |
-| 3 | [koboldcpp](index/harness/koboldcpp.md) | [qwen38-27b](index/model/qwen38-27b.md) | 24/27 | 25 | 3.51 | [2026-11-09 cap 2048](model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md) |
+| 1 | [ollama](index/harness/ollama.md) | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | 24/27 | 2.46 | 29.9 | [2026-11-09 cap 2048](model-offloading/campaign-20261109T174915Z-128e3dcf-offload-model-offloading-1/README.md) |
+| 2 | [lmstudio](index/harness/lmstudio.md) | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | 24/27 | 4.5 | 14.7 | [2026-11-09 cap 2048](model-offloading/campaign-20261109T174915Z-128e3dcf-offload-model-offloading-1/README.md) |
+| 3 | [lmstudio](index/harness/lmstudio.md) | [qwen38-27b](index/model/qwen38-27b.md) | 24/27 | 7.75 | 6.4 | [2026-11-09 cap 2048](model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md) |
 
 ### Browse by category
 
 | Category | Indexes (results) |
 |---|---|
-| Hardware configuration | [raider-ubuntu](index/hardware/raider-ubuntu.md) (1) · [raider-windows](index/hardware/raider-windows.md) (11) |
-| Experiment | [llm-routing](index/experiment/llm-routing.md) (3) · [model-offloading](index/experiment/model-offloading.md) (9) |
-| Harness | [category](index/harness/category.md) (1) · [koboldcpp](index/harness/koboldcpp.md) (2) · [lmstudio](index/harness/lmstudio.md) (2) · [ollama](index/harness/ollama.md) (7) |
-| Model | [category](index/model/category.md) (1) · [deepseek-r1-32b](index/model/deepseek-r1-32b.md) (6) · [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) (1) · [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) (1) · [qwen38-27b](index/model/qwen38-27b.md) (3) |
-| Date (UTC) | [2026-11-09](index/date/2026-11-09.md) (6) · [2026-11-08](index/date/2026-11-08.md) (6) |
+| Hardware configuration | [raider-ubuntu](index/hardware/raider-ubuntu.md) (1) · [raider-windows](index/hardware/raider-windows.md) (21) |
+| Experiment | [llm-routing](index/experiment/llm-routing.md) (3) · [model-offloading](index/experiment/model-offloading.md) (19) |
+| Harness | [category](index/harness/category.md) (1) · [koboldcpp](index/harness/koboldcpp.md) (5) · [lmstudio](index/harness/lmstudio.md) (5) · [ollama](index/harness/ollama.md) (11) |
+| Model | [category](index/model/category.md) (1) · [deepseek-r1-32b](index/model/deepseek-r1-32b.md) (6) · [gemma3-27b](index/model/gemma3-27b.md) (3) · [gemma4-31b](index/model/gemma4-31b.md) (4) · [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) (1) · [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) (1) · [nemotron-nano-30b](index/model/nemotron-nano-30b.md) (3) · [qwen38-27b](index/model/qwen38-27b.md) (3) |
+| Date (UTC) | [2026-11-09](index/date/2026-11-09.md) (16) · [2026-11-08](index/date/2026-11-08.md) (6) |
 
 ### llm-routing: models by harness
 
@@ -56,6 +56,9 @@ Each cell links to the report of every published run of that model on that harne
 | Model | [koboldcpp](index/harness/koboldcpp.md) | [lmstudio](index/harness/lmstudio.md) | [ollama](index/harness/ollama.md) |
 |---|---|---|---|
 | [deepseek-r1-32b](index/model/deepseek-r1-32b.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md)<br>[2026-11-08 raider-windows cap 2048](model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/README.md)<br>[2026-11-08 raider-windows cap 256](model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/README.md)<br>[2026-11-08 raider-windows cap 256 failed](model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/README.md) |
+| [gemma3-27b](index/model/gemma3-27b.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T171430Z-c1c4ab49-offload-model-offloading-1/README.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T171430Z-c1c4ab49-offload-model-offloading-1/README.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T171430Z-c1c4ab49-offload-model-offloading-1/README.md) |
+| [gemma4-31b](index/model/gemma4-31b.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T154341Z-1e8d354f-offload-model-offloading-1/README.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T154341Z-1e8d354f-offload-model-offloading-1/README.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T180247Z-c38f462b-offload-model-offloading-1/README.md)<br>[2026-11-09 raider-windows cap 2048 failed](model-offloading/campaign-20261109T154341Z-1e8d354f-offload-model-offloading-1/README.md) |
+| [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T174915Z-128e3dcf-offload-model-offloading-1/README.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T174915Z-128e3dcf-offload-model-offloading-1/README.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T174915Z-128e3dcf-offload-model-offloading-1/README.md) |
 | [qwen38-27b](index/model/qwen38-27b.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md) |
 
 Full table and per-category pages: [results index](index/README.md).
@@ -114,6 +117,48 @@ Hardware configuration `raider-windows`, 20 of 66 layers on GPU (confirmed in th
 - **Same token rate as DeepSeek-R1-32B, a fifth of the wait.** About 3.56 output tokens per second, but answers take 57 to 67 tokens instead of 243 to 413, so a short answer arrives in 16 to 19 s.
 - **Quality 24/27.** The one failing task, `reasoning-logic`, fails on all three repeats.
 
+##### Model: `gemma3-27b` (gemma-3-27b-it Q8_0, 28.7 GB GGUF, SHA256-locked)
+
+Hardware configuration `raider-windows`, 20 of 63 layers on GPU (confirmed in the backend log), 16 CPU threads, harness-managed server.
+
+| Run (UTC) | Output cap | Category | Requests | Wall s (median / p95) | First output s | First visible s | Output tokens (median / max) | Output tok/s | Finish reason | Quality |
+|---|---:|---|---:|---:|---:|---:|---:|---:|---|---:|
+| [2026-11-09 17:14](model-offloading/campaign-20261109T171430Z-c1c4ab49-offload-model-offloading-1/README.md) | 2,048 | coding | 9 | 1.4 / 2.3 | 0.61 | 0.6 | 4 / 7 | 2.83 | stop 9/9 | 9/9 |
+| | 2,048 | math | 9 | 1.2 / 38.6 | 0.63 | 0.6 | 3 / 136 | 2.55 | stop 9/9 | 6/9 |
+| | 2,048 | reasoning | 9 | 3.9 / 10.6 | 0.61 | 0.6 | 13 / 37 | 3.33 | stop 9/9 | 3/9 |
+
+- **Answers in one to four seconds.** The model does not reason before answering: a typical answer is 3 to 13 tokens, so wall time is mostly the 0.6 s to the first token. One math task occasionally runs to 136 tokens and 39 s, which sets the p95.
+- **Token rate is not comparable with the reasoning models.** With answers this short the rate is dominated by time to first token; read wall time instead.
+- **Quality 18/27.** Three tasks fail on every repeat: `math-arithmetic`, `reasoning-logic` and `reasoning-navigation`.
+
+##### Model: `nemotron-nano-30b` (Nemotron-3-Nano-30B-A3B Q8_0, 33.6 GB GGUF, SHA256-locked)
+
+Hardware configuration `raider-windows`, 20 of 53 layers on GPU (confirmed in the backend log), 16 CPU threads, harness-managed server. Mixture-of-experts model: about 3B of its 30B parameters are active per token.
+
+| Run (UTC) | Output cap | Category | Requests | Wall s (median / p95) | First output s | First visible s | Output tokens (median / max) | Output tok/s | Finish reason | Quality |
+|---|---:|---|---:|---:|---:|---:|---:|---:|---|---:|
+| [2026-11-09 17:49](model-offloading/campaign-20261109T174915Z-128e3dcf-offload-model-offloading-1/README.md) | 2,048 | coding | 9 | 2.5 / 6.2 | 0.11 | 2.4 | 73 / 187 | 29.97 | stop 9/9 | 9/9 |
+| | 2,048 | math | 9 | 2.1 / 2.3 | 0.11 | 2.0 | 62 / 66 | 29.63 | stop 9/9 | 9/9 |
+| | 2,048 | reasoning | 9 | 3.1 / 3.3 | 0.11 | 3.0 | 92 / 97 | 29.89 | stop 9/9 | 6/9 |
+
+- **About 30 output tokens per second with most of the model in RAM**, eight to nine times the dense models of similar size on the same split. Answers arrive in 2 to 3 s including a short reasoning step.
+- **Quality 24/27**, the same single failing task as Qwen 3.8 27B and Gemma 4 31B (`reasoning-logic`).
+- **First run on the fixed request timeout.** The 31.3 GiB model loaded on the first request without the warmup failure seen with Gemma 4 31B.
+
+##### Model: `gemma4-31b` (gemma-4-31B-it Q8_0, 32.6 GB GGUF, SHA256-locked)
+
+Hardware configuration `raider-windows`, 20 of 61 layers on GPU (confirmed in the backend log), 16 CPU threads, harness-managed server. This is a rerun: in the [15:43 campaign](model-offloading/campaign-20261109T154341Z-1e8d354f-offload-model-offloading-1/README.md) the warmup request timed out while the model was still loading, which marked the job failed although its 27 measured requests succeeded. That harness defect was fixed before this run.
+
+| Run (UTC) | Output cap | Category | Requests | Wall s (median / p95) | First output s | First visible s | Output tokens (median / max) | Output tok/s | Finish reason | Quality |
+|---|---:|---|---:|---:|---:|---:|---:|---:|---|---:|
+| [2026-11-09 18:02](model-offloading/campaign-20261109T180247Z-c38f462b-offload-model-offloading-1/README.md) | 2,048 | coding | 9 | 53.9 / 60.2 | 1.62 | 53.3 | 178 / 198 | 3.30 | stop 9/9 | 9/9 |
+| | 2,048 | math | 9 | 39.8 / 88.1 | 1.62 | 39.5 | 131 / 291 | 3.29 | stop 9/9 | 9/9 |
+| | 2,048 | reasoning | 9 | 48.2 / 55.9 | 1.62 | 47.9 | 159 / 184 | 3.29 | stop 9/9 | 6/9 |
+
+- **Reasons before answering**: 131 to 178 output tokens per answer at 3.30 tokens per second, so a short answer takes 40 to 54 s.
+- **Quality 24/27**, with `reasoning-logic` failing on every repeat.
+- **The rerun reproduces the flagged run**: every latency, throughput and quality figure is within 0.1 of the failed-warmup job in the earlier campaign.
+
 #### Harness: KoboldCpp 1.124.2
 
 Pinned prebuilt CUDA binary, started by the harness on loopback with `--usecublas --gpulayers 20 --threads 16`, OpenAI-compatible chat endpoint.
@@ -143,6 +188,46 @@ Hardware configuration `raider-windows`, 20 of 66 layers on GPU (confirmed in th
 
 - **Same token rate as Ollama, longer answers.** 3.31 to 3.54 output tokens per second, but 65 to 91 tokens per answer against 57 to 67, so each answer takes 4 to 8 s longer.
 - **A different prompt reaches the model.** KoboldCpp counted 33 prompt tokens where Ollama and LM Studio counted 76: its chat-completions adapter builds the prompt itself instead of using the template embedded in the GGUF. That is the likely reason for the longer reasoning.
+
+##### Model: `gemma3-27b` (gemma-3-27b-it Q8_0, 28.7 GB GGUF, SHA256-locked)
+
+Hardware configuration `raider-windows`, 20 of 63 layers on GPU (confirmed in the backend log), 16 CPU threads.
+
+| Run (UTC) | Output cap | Category | Requests | Wall s (median / p95) | First output s | First visible s | Output tokens (median / max) | Output tok/s | Finish reason | Quality |
+|---|---:|---|---:|---:|---:|---:|---:|---:|---|---:|
+| [2026-11-09 17:14](model-offloading/campaign-20261109T171430Z-c1c4ab49-offload-model-offloading-1/README.md) | 2,048 | coding | 9 | 1.3 / 2.2 | 0.57 | 0.6 | 4 / 7 | 3.10 | stop 9/9 | 9/9 |
+| | 2,048 | math | 9 | 1.1 / 53.9 | 0.57 | 0.6 | 3 / 194 | 2.90 | stop 9/9 | 6/9 |
+| | 2,048 | reasoning | 9 | 3.8 / 10.5 | 0.58 | 0.6 | 13 / 37 | 3.39 | stop 9/9 | 3/9 |
+
+- **Same behavior as Ollama**: same prompt token counts, same answer lengths, same three failing tasks, wall times within 0.1 s.
+- **Lower GPU utilization peak** (49 % against 86 %) with the same GPU memory. The cause is not established; with answers this short the one-second sampler sees little sustained load.
+
+##### Model: `nemotron-nano-30b` (Nemotron-3-Nano-30B-A3B Q8_0, 33.6 GB GGUF, SHA256-locked)
+
+Hardware configuration `raider-windows`, 20 of 53 layers on GPU (confirmed in the backend log), 16 CPU threads.
+
+| Run (UTC) | Output cap | Category | Requests | Wall s (median / p95) | First output s | First visible s | Output tokens (median / max) | Output tok/s | Finish reason | Quality |
+|---|---:|---|---:|---:|---:|---:|---:|---:|---|---:|
+| [2026-11-09 17:49](model-offloading/campaign-20261109T174915Z-128e3dcf-offload-model-offloading-1/README.md) | 2,048 | coding | 9 | 0.6 / 7.1 | 0.58 | 0.6 | 2 / 196 | 3.53 | stop 9/9 | 3/9 |
+| | 2,048 | math | 9 | 1.1 / 2.3 | 0.58 | 0.6 | 25 / 45 | 19.73 | stop 9/9 | 0/9 |
+| | 2,048 | reasoning | 9 | 2.1 / 3.6 | 0.58 | 0.6 | 53 / 88 | 25.65 | stop 9/9 | 0/9 |
+
+- **Quality collapses to 3/27 on the same weights.** No reasoning is reported separately, and math and reasoning answers are 25 to 53 tokens of visible text where the checks expect a bare answer. KoboldCpp counted 7 fewer prompt tokens than the other two harnesses, so its own chat adapter is the likely cause; outputs are not saved, so this was not confirmed by reading them.
+- **Token rate is lower on paper** (3.5 to 25.7 tokens per second) because most answers are too short to measure a rate.
+
+##### Model: `gemma4-31b` (gemma-4-31B-it Q8_0, 32.6 GB GGUF, SHA256-locked)
+
+Hardware configuration `raider-windows`, 20 of 61 layers on GPU (confirmed in the backend log), 16 CPU threads.
+
+| Run (UTC) | Output cap | Category | Requests | Wall s (median / p95) | First output s | First visible s | Output tokens (median / max) | Output tok/s | Finish reason | Quality |
+|---|---:|---|---:|---:|---:|---:|---:|---:|---|---:|
+| [2026-11-09 15:43](model-offloading/campaign-20261109T154341Z-1e8d354f-offload-model-offloading-1/README.md) | 2,048 | coding | 9 | 1.1 / 2.0 | 0.59 | 0.6 | 3 / 6 | 2.68 | stop 9/9 | 9/9 |
+| | 2,048 | math | 9 | 0.8 / 1.4 | 0.58 | 0.6 | 2 / 4 | 2.45 | stop 9/9 | 9/9 |
+| | 2,048 | reasoning | 9 | 0.8 / 3.8 | 0.58 | 0.6 | 2 / 12 | 2.63 | stop 9/9 | 3/9 |
+
+- **The model answers without reasoning.** No reasoning text is reported and answers are 2 to 3 tokens, so each takes about one second: roughly 50 times faster than on Ollama for the same weights and the same GPU split.
+- **One more task fails**: 21/27, with `reasoning-navigation` failing in addition to `reasoning-logic`.
+- **Token rate is not meaningful** at this answer length. KoboldCpp counted 3 fewer prompt tokens than the other two harnesses: its chat adapter builds the prompt itself, which is the likely reason reasoning is not triggered.
 
 #### Harness: LM Studio 0.4.28+2
 
@@ -175,6 +260,45 @@ Hardware configuration `raider-windows`, GPU offload ratio 0.303 (20 of 66 layer
 - **Fastest harness for this model**: 5.9 to 6.8 output tokens per second against about 3.5 on the other two, the reverse of the DeepSeek-R1-32B result. Token counts were cross-checked against output length, so the rate is real. The cause is not established.
 - **Still the most host memory.** Backend 33.1 GiB resident against 20.4 to 23.4 GiB, peak system RAM 44.0 GiB, and about 0.5 GiB more GPU memory than the other two.
 
+##### Model: `gemma3-27b` (gemma-3-27b-it Q8_0, 28.7 GB GGUF, SHA256-locked)
+
+Hardware configuration `raider-windows`, GPU offload ratio 0.317 (20 of 63 layers requested; the placed layer count is not in the log).
+
+| Run (UTC) | Output cap | Category | Requests | Wall s (median / p95) | First output s | First visible s | Output tokens (median / max) | Output tok/s | Finish reason | Quality |
+|---|---:|---|---:|---:|---:|---:|---:|---:|---|---:|
+| [2026-11-09 17:14](model-offloading/campaign-20261109T171430Z-c1c4ab49-offload-model-offloading-1/README.md) | 2,048 | coding | 9 | 1.9 / 3.0 | 0.80 | 0.8 | 4 / 7 | 2.11 | stop 9/9 | 9/9 |
+| | 2,048 | math | 9 | 1.6 / 48.3 | 0.80 | 0.8 | 3 / 133 | 1.98 | stop 9/9 | 6/9 |
+| | 2,048 | reasoning | 9 | 23.8 / 34.2 | 0.79 | 0.8 | 65 / 94 | 2.73 | stop 9/9 | 3/9 |
+
+- **Longer reasoning-category answers.** 65 tokens and 23.8 s at the median against 13 tokens and 3.9 s on the other two harnesses; coding and math match them. Quality is unchanged, so the extra text does not help.
+- **About 8 GiB more host memory**: 28.9 GiB resident against 20.1 to 20.6 GiB, again roughly the whole model file.
+
+##### Model: `nemotron-nano-30b` (Nemotron-3-Nano-30B-A3B Q8_0, 33.6 GB GGUF, SHA256-locked)
+
+Hardware configuration `raider-windows`, GPU offload ratio 0.377 (20 of 53 layers requested; the placed layer count is not in the log).
+
+| Run (UTC) | Output cap | Category | Requests | Wall s (median / p95) | First output s | First visible s | Output tokens (median / max) | Output tok/s | Finish reason | Quality |
+|---|---:|---|---:|---:|---:|---:|---:|---:|---|---:|
+| [2026-11-09 17:49](model-offloading/campaign-20261109T174915Z-128e3dcf-offload-model-offloading-1/README.md) | 2,048 | coding | 9 | 4.3 / 12.9 | 0.16 | 4.2 | 63 / 192 | 14.74 | stop 9/9 | 9/9 |
+| | 2,048 | math | 9 | 4.5 / 5.8 | 0.16 | 4.3 | 66 / 85 | 14.68 | stop 9/9 | 9/9 |
+| | 2,048 | reasoning | 9 | 6.8 / 9.1 | 0.16 | 6.7 | 100 / 135 | 14.69 | stop 9/9 | 6/9 |
+
+- **Little or no GPU offload happened.** Peak GPU memory was 2,048 MiB for the whole job against 14.6 to 14.9 GiB on the other two harnesses, and the backend held 33.9 GiB of RAM, the whole model. The requested ratio of 0.377 was accepted without an error. The cause is not established.
+- **Half the Ollama token rate**: 14.7 tokens per second against 29.8, consistent with running on CPU. Quality is the same 24/27.
+
+##### Model: `gemma4-31b` (gemma-4-31B-it Q8_0, 32.6 GB GGUF, SHA256-locked)
+
+Hardware configuration `raider-windows`, GPU offload ratio 0.328 (20 of 61 layers requested; the placed layer count is not in the log).
+
+| Run (UTC) | Output cap | Category | Requests | Wall s (median / p95) | First output s | First visible s | Output tokens (median / max) | Output tok/s | Finish reason | Quality |
+|---|---:|---|---:|---:|---:|---:|---:|---:|---|---:|
+| [2026-11-09 15:43](model-offloading/campaign-20261109T154341Z-1e8d354f-offload-model-offloading-1/README.md) | 2,048 | coding | 9 | 65.9 / 89.0 | 2.17 | 65.1 | 163 / 220 | 2.48 | stop 9/9 | 9/9 |
+| | 2,048 | math | 9 | 52.3 / 162.3 | 2.17 | 51.9 | 129 / 401 | 2.47 | stop 9/9 | 9/9 |
+| | 2,048 | reasoning | 9 | 59.7 / 73.1 | 2.15 | 59.3 | 148 / 181 | 2.48 | stop 9/9 | 6/9 |
+
+- **Slower than Ollama**: 2.48 output tokens per second against 3.30, the same direction as DeepSeek-R1-32B and the opposite of Qwen 3.8 27B. Answers take 52 to 66 s; one math request ran to 401 tokens and 162 s.
+- **About 10 GiB more host memory**: 34.8 GiB resident against 22.8 to 24.6 GiB. Quality matches Ollama at 24/27.
+
 #### `deepseek-r1-32b` across harnesses (2026-11-09, 2,048 cap, same GGUF, same 20-layer split)
 
 | Harness | Output tok/s | Wall s (coding / math / reasoning) | First visible s (coding / math / reasoning) | Backend RSS | Peak system RAM | Peak GPU memory | Peak GPU utilization | Peak GPU power | Errors | Quality |
@@ -198,6 +322,42 @@ Hardware configuration `raider-windows`, GPU offload ratio 0.303 (20 of 66 layer
 - **Quality is identical on all three harnesses**: 24/27, with the same task failing everywhere. Unlike DeepSeek-R1-32B, this model ends with the bare answer the `exact` check expects.
 - **Harness ranking is model-dependent.** LM Studio is the slowest of the three for DeepSeek-R1-32B and the fastest for Qwen 3.8 27B, so no harness can be called faster in general from these two models.
 - **No paging** in any job.
+
+#### `gemma3-27b` across harnesses (2026-11-09, 2,048 cap, same GGUF, 20 of 63 layers requested)
+
+| Harness | Output tok/s | Wall s (coding / math / reasoning) | Output tokens per answer (coding / math / reasoning) | Backend RSS | Peak system RAM | Peak GPU memory | Peak GPU utilization | Peak GPU power | Errors | Quality |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Ollama 0.40.15 | 2.83 | 1.4 / 1.2 / 3.9 | 4 / 3 / 13 | 20.6 GiB | 32.4 GiB | 11,222 MiB | 86 % | 47.6 W | 0/27 | 18/27 |
+| KoboldCpp 1.124.2 | 3.18 | 1.3 / 1.1 / 3.8 | 4 / 3 / 13 | 20.1 GiB | 32.0 GiB | 11,512 MiB | 49 % | 44.2 W | 0/27 | 18/27 |
+| LM Studio 0.4.28+2 | 2.11 | 1.9 / 1.6 / 23.8 | 4 / 3 / 65 | 28.9 GiB | 40.0 GiB | 11,267 MiB | 57 % | 38.1 W | 0/27 | 18/27 |
+
+- **The fastest model to answer so far, and the least accurate of the non-DeepSeek models**: one to four seconds per answer on Ollama and KoboldCpp, 18/27 on every harness.
+- **Ollama and KoboldCpp are interchangeable** for this model. LM Studio costs about 20 s on reasoning-category answers and about 8 GiB of RAM.
+- **No errors and no paging** in any job.
+
+#### `nemotron-nano-30b` across harnesses (2026-11-09, 2,048 cap, same GGUF, 20 of 53 layers requested)
+
+| Harness | Output tok/s | Wall s (coding / math / reasoning) | Output tokens per answer (coding / math / reasoning) | Backend RSS | Peak system RAM | Peak GPU memory | Peak GPU utilization | Peak GPU power | Errors | Quality |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Ollama 0.40.15 | 29.82 | 2.5 / 2.1 / 3.1 | 73 / 62 / 92 | 20.7 GiB | 32.4 GiB | 14,634 MiB | 92 % | 51.6 W | 0/27 | 24/27 |
+| KoboldCpp 1.124.2 | 19.73 | 0.6 / 1.1 / 2.1 | 2 / 25 / 53 | 19.9 GiB | 31.7 GiB | 14,884 MiB | 83 % | 48.3 W | 0/27 | 3/27 |
+| LM Studio 0.4.28+2 | 14.71 | 4.3 / 4.5 / 6.8 | 63 / 66 / 100 | 33.9 GiB | 44.9 GiB | 2,048 MiB | 93 % | 34.2 W | 0/27 | 24/27 |
+
+- **Fastest model measured that still passes 24/27**: 2 to 3 s per answer on Ollama.
+- **Harness choice changes the result more than for any other model so far.** Ollama is fast and accurate, LM Studio is accurate but ran without the GPU, and KoboldCpp fails almost every check.
+- **No errors and no paging** in any job.
+
+#### `gemma4-31b` across harnesses (2026-11-09, 2,048 cap, same GGUF, 20 of 61 layers requested)
+
+| Harness | Output tok/s | Wall s (coding / math / reasoning) | Output tokens per answer (coding / math / reasoning) | Backend RSS | Peak system RAM | Peak GPU memory | Peak GPU utilization | Peak GPU power | Errors | Quality |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Ollama 0.40.15 | 3.30 | 53.9 / 39.8 / 48.2 | 178 / 131 / 159 | 24.6 GiB | 36.2 GiB | 12,884 MiB | 94 % | 46.5 W | 0/27 | 24/27 |
+| KoboldCpp 1.124.2 | 2.63 | 1.1 / 0.8 / 0.8 | 3 / 2 / 2 | 22.8 GiB | 34.3 GiB | 13,228 MiB | 92 % | 44.1 W | 0/27 | 21/27 |
+| LM Studio 0.4.28+2 | 2.48 | 65.9 / 52.3 / 59.7 | 163 / 129 / 148 | 34.8 GiB | 46.1 GiB | 12,929 MiB | 100 % | 37.0 W | 0/27 | 24/27 |
+
+- **Whether the model reasons depends on the harness.** Ollama and LM Studio trigger reasoning and pass 24/27 in 40 to 66 s per answer; KoboldCpp does not, answers in about a second and passes 21/27.
+- **For a reasoning run, Ollama is a third faster than LM Studio** and uses about 10 GiB less RAM.
+- **No errors and no paging** in the measured requests of any job.
 
 ### Experiment `llm-routing` (mode `decision`)
 
@@ -228,12 +388,15 @@ MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 285HX, NVIDIA RTX 5090 Laptop (24
 
 - A 32B Q8_0 model is runnable with 20 GPU layers but slow: about 3.45 output tokens per second and 70 to 120 s per short answer on Ollama and KoboldCpp, with a 24 to 25 GiB resident backend and 35 to 37 GiB peak system RAM. No paging was observed on a 63.4 GiB host.
 - Harness choice matters less than placement for that model, with one exception: LM Studio at its defaults delivered 2.60 tokens per second and used about 11 GiB more RAM than the other two.
-- Qwen 3.8 27B Q8_0 with the same 20-layer split answers the smoke tasks in 7 to 26 s and passes 24 of 27 checks on every harness. It is the better fit for this machine of the two models measured: same or higher token rate, far fewer tokens per answer, about 2 GiB less GPU memory.
-- LM Studio always holds roughly the whole model file in RAM (33 to 36 GiB resident) where Ollama and KoboldCpp hold 20 to 25 GiB. Its speed relative to them flipped between the two models.
+- Qwen 3.8 27B Q8_0 with the same 20-layer split answers the smoke tasks in 7 to 26 s and passes 24 of 27 checks on every harness. Against DeepSeek-R1-32B it has the same or higher token rate, far fewer tokens per answer and about 2 GiB less GPU memory.
+- **Best measured combination: Nemotron 3 Nano 30B on Ollama.** About 30 output tokens per second with 20 of 53 layers on GPU, 2 to 3 s per answer, 24 of 27 checks. Its mixture-of-experts design activates about 3B parameters per token, which is why it is eight to nine times faster than the dense models on the same split.
+- Gemma 4 31B Q8_0 reasons before answering on Ollama and LM Studio: 24 of 27 checks at 40 to 66 s per answer. Gemma 3 27B Q8_0 answers in 1 to 4 s without reasoning and passes 18 of 27 on every harness.
+- **The harness is not a neutral wrapper.** KoboldCpp builds its own chat prompt: Gemma 4 31B then skips reasoning (about one second per answer, 21 of 27) and Nemotron 3 Nano 30B drops to 3 of 27. LM Studio accepted the offload ratio for Nemotron 3 Nano 30B but used only 2,048 MiB of GPU memory and ran at half the Ollama token rate. Ollama is the only harness that gave the expected behavior for all five models.
+- LM Studio always holds roughly the whole model file in RAM (29 to 36 GiB resident) where Ollama and KoboldCpp hold 20 to 25 GiB. It was faster than them only for Qwen 3.8 27B.
 - GPU power peaked at 39 to 47 W against a 95 W default limit, so decode is bound by the CPU and host-memory side of the split (45 of 65 layers on CPU), not by the GPU. More GPU layers or a smaller quantization is the obvious lever; a `gpu_layers` sweep is the next experiment.
 - Both routing candidates cost tens of milliseconds and are perfectly accurate on the smoke set.
 - The three Ollama runs agree on every performance metric. Read the quality column as zero-information for DeepSeek-R1 on the smoke suites until a check tolerant of trailing prose, or a system prompt forcing terse output, is in place.
-- Three harnesses and two offload models have published results so far. The remaining catalog candidates are being run on the same three harnesses and appear in the index as their bundles are published.
+- Three harnesses and five offload models have published results so far. The remaining catalog candidates are being run on the same three harnesses and appear in the index as their bundles are published.
 
 ### `raider-ubuntu`
 
@@ -244,4 +407,6 @@ Synthetic fixture run only. No conclusions.
 - `scripts/readiness.ps1` reports Python as MISSING under Windows PowerShell 5.1 even when 3.12 is installed, because the embedded double quotes in its probe string are stripped. Running `py -3.12 scripts/readiness.py` directly works. The `model-downloader` readiness check likewise reports MISSING with `huggingface-hub==2.4.0` installed.
 - Report bundles are written with CRLF line endings on Windows while `.gitattributes` normalizes them to LF, so `manifest.json` SHA256 values do not match the committed files.
 - The managed LM Studio launcher imports a GGUF and loads it immediately. LM Studio indexes new files asynchronously, so the first load of a freshly imported model can fail with "Model not found"; a retry succeeds. Importing ahead of the campaign avoids it.
+- Until 2026-11-09 the request client limited every socket read to 30 s. Ollama loads the model on the first request, and the 29 s load of Gemma 4 31B made the warmup request time out, which marked that job failed although its measured requests succeeded. The limit now applies to the connect only, and the job was rerun.
+- LM Studio does not report how many layers it placed on the GPU. For Nemotron 3 Nano 30B it accepted a ratio of 0.377 and used almost no GPU memory, so a requested ratio is not evidence of placement; compare peak GPU memory instead.
 - Ending any `ollama.exe` while a campaign runs, including the consumer tray app, can take the private pinned server with it and fails every outstanding request with connection refused.
