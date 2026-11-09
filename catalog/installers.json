@@ -10,7 +10,7 @@
   ],
   "livebench": {
     "repository": "https://github.com/LiveBench/LiveBench.git",
-    "revision": "8f8e5c381a16e3f24257776edd53471fe86f8091",
+    "revision": "1d1006a0d10ece52c2e706f8a208a659b5bbb96f",
     "release": "2026-06-25"
   },
   "platforms": {
@@ -22,7 +22,7 @@
     "ik_llama.cpp": {
       "kind": "cmake",
       "repository": "https://github.com/ikawrakow/ik_llama.cpp.git",
-      "revision": "3d27f5bb6348c4d79edded63b03e9a93efb2f80e"
+      "revision": "39fc3128ccc428314a64b98de09af24bd7bb4990"
     },
     "ktransformers": {
       "kind": "pip",

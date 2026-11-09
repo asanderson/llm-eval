@@ -311,7 +311,7 @@ The project's existing [MIT license](../../LICENSE) is preserved. Backend and mo
 [model-qwen38-flash-next-strata]: https://huggingface.co/Qwen/Qwen3.8-Flash-Next
 
 [livebench]: https://livebench.ai/
-[livebench-code]: https://github.com/LiveBench/LiveBench/tree/8f8e5c381a16e3f24257776edd53471fe86f8091
+[livebench-code]: https://github.com/LiveBench/LiveBench/tree/1d1006a0d10ece52c2e706f8a208a659b5bbb96f
 [livebench-data]: https://huggingface.co/livebench
 [docker]: https://docs.docker.com/engine/install/
 [docker-desktop]: https://docs.docker.com/desktop/setup/install/windows-install/

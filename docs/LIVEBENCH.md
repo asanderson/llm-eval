@@ -38,7 +38,7 @@ python scripts/setup.py --non-interactive --platform llama.cpp --os ubuntu-26.04
 
 Use a **new prefix** if the existing installation was created without `--with-livebench`. The exact plan is immutable at a given prefix. [Docker Engine](https://docs.docker.com/engine/install/) or [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/) with Linux containers is required for grading. A native Windows inference run with a Linux grading container remains native Windows **inference**; document the separate grading environment. Prefer Linux/WSL for the experimental Agentic Coding pipeline.
 
-Obtain the questions from [LiveBench's published datasets](https://huggingface.co/livebench) using its [pinned downloader](https://github.com/LiveBench/LiveBench/blob/8f8e5c381a16e3f24257776edd53471fe86f8091/livebench/download_questions.py). For example, from the repository root after the setup above:
+Obtain the questions from [LiveBench's published datasets](https://huggingface.co/livebench) using its [pinned downloader](https://github.com/LiveBench/LiveBench/blob/1d1006a0d10ece52c2e706f8a208a659b5bbb96f/livebench/download_questions.py). For example, from the repository root after the setup above:
 
 ```bash
 cd .platforms/ubuntu-26.04-native/llama.cpp/livebench-source/livebench
