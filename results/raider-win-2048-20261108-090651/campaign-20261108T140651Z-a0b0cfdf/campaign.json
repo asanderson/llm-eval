@@ -1,0 +1,34 @@
+{
+  "schema_version": 2,
+  "campaign_id": "raider-windows-offload-2048",
+  "created_utc": "2026-11-08T14:06:51.610167+00:00",
+  "status": "succeeded",
+  "jobs": {
+    "offload-model-offloading-1-db17c5930ec0": {
+      "status": "succeeded",
+      "reason": null,
+      "attempts": [
+        {
+          "attempt_id": "c5a3dee738c6469a88cedddfb20a4dc1",
+          "status": "succeeded",
+          "stage": "submitted",
+          "started_utc": "2026-11-08T14:06:51.732436+00:00",
+          "output": "experiments\\offload-model-offloading-1\\jobs\\offload-model-offloading-1-db17c5930ec0\\c5a3dee738c6469a88cedddfb20a4dc1",
+          "worker_output": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\results\\raider-win-2048-20261108-090651\\campaign-20261108T140651Z-a0b0cfdf\\experiments\\offload-model-offloading-1\\jobs\\offload-model-offloading-1-db17c5930ec0\\c5a3dee738c6469a88cedddfb20a4dc1",
+          "result_path": "measurements",
+          "benchmark": "category-smoke",
+          "finished_unix": 1794150490.2782285,
+          "finished_utc": "2026-11-08T15:08:10.631416+00:00"
+        }
+      ]
+    }
+  },
+  "reports": {
+    "offload-model-offloading-1": {
+      "status": "generated",
+      "report": "experiments\\offload-model-offloading-1\\report",
+      "result_signature": "30eea3a3caf6ff428d4840bd4cbe8e62a37b5fc1bcec570702dd59f0589d72a7"
+    }
+  },
+  "enabled_targets": []
+}

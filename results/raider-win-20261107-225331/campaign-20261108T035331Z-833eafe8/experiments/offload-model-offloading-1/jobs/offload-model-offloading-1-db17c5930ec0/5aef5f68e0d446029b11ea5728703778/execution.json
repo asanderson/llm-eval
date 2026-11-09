@@ -1,0 +1,185 @@
+{
+  "action": "run",
+  "job": {
+    "schema_version": 2,
+    "job_id": "offload-model-offloading-1-db17c5930ec0",
+    "experiment_run_id": "offload-model-offloading-1",
+    "experiment_id": "model-offloading",
+    "experiment_version": 1,
+    "mode": "category-smoke",
+    "case_id": "deepseek-r1-32b-q8",
+    "hardware_config_id": "raider-windows",
+    "hardware": {
+      "target": "raider",
+      "hardware_profile": "msi-raider-18-hx-ai",
+      "os_id": "windows-11-native"
+    },
+    "hardware_profile": {
+      "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+      "manufacturer": "MSI",
+      "model": "Raider 18 HX AI A2XWJG-069US",
+      "cpu": {
+        "name": "Intel Core Ultra 9 285HX",
+        "architecture": "Arrow Lake-HX",
+        "p_cores": 8,
+        "e_cores": 16,
+        "threads": 24,
+        "instruction_baseline": "AVX2",
+        "amx": false,
+        "avx512": false,
+        "thread_sweep": [
+          7,
+          8,
+          15,
+          23
+        ],
+        "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+      },
+      "ram": {
+        "installed_gib": 64,
+        "type": "DDR5-6400",
+        "channels": 2
+      },
+      "gpu": {
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "architecture": "Blackwell",
+        "compute_capability": "12.0",
+        "vram_gib": 24,
+        "initial_reserve_gib": 2,
+        "desktop_gpu": false
+      },
+      "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+      "storage": [
+        {
+          "name": "Factory NVMe",
+          "capacity_tb": 2,
+          "model": "not inventoried"
+        },
+        {
+          "name": "WD_BLACK SN7100",
+          "capacity_tb": 4,
+          "interface": "PCIe Gen4 x4",
+          "role": "Model files, artifacts, results; separate swap/offload experiments"
+        }
+      ],
+      "evidence": {
+        "configuration": "user-provided",
+        "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+      },
+      "required_recordings": [
+        "BIOS version",
+        "NVIDIA driver",
+        "GPU power limit/TGP",
+        "AC state",
+        "MSI power/fan profile",
+        "hybrid/MUX setting",
+        "RAM configured speed",
+        "SSD mount and filesystem",
+        "SSD free space and temperature",
+        "OS build/kernel",
+        "WSL version and memory cap if applicable"
+      ],
+      "host_reserve_gib": 12,
+      "os_limits": {
+        "windows-11-wsl2-ubuntu-26.04": {
+          "ram_budget_gib": 46
+        }
+      }
+    },
+    "target_id": "raider",
+    "target": {
+      "transport": "local",
+      "physical_host_id": "raider"
+    },
+    "parameters": {
+      "config": {
+        "schema_version": 1,
+        "model_id": "deepseek-r1-32b",
+        "os_id": "windows-11-native",
+        "lane": "offload",
+        "context_tokens": 4096,
+        "max_output_tokens": 256,
+        "repeats": 3,
+        "warmups": 1,
+        "temperature": 0.0,
+        "seed": 20261005,
+        "concurrency": 1,
+        "timeout_s": 300,
+        "load_timeout_s": 900,
+        "telemetry_interval_s": 1.0,
+        "ram_budget_gib": 52,
+        "gpu_budget_gib": 22,
+        "suite": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\workloads\\smoke.json",
+        "artifact_root": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\models\\deepseek-r1-32b-q8",
+        "artifact_lock": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\artifacts\\deepseek-r1-32b-q8.lock.json",
+        "offload_dir": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\offload",
+        "backend_version": "0.40.15",
+        "tokenizer_revision": "bartowski/DeepSeek-R1-Distill-Qwen-32B-GGUF@1dc8cf9ffa5dd333057ea1b09ccf4772d8726dec (tokenizer embedded in locked GGUF)",
+        "chat_template_sha256": "b6835114b7303ddd78919a82e4d9f7d8c26ed0d7dfc36beeb12d524f6144eab1",
+        "placement_notes": "Observed from ollama ps and server log with model loaded: 20/65 layers offloaded to GPU (19 repeating + output), CUDA0 model buffer 10177 MiB, CUDA_Host buffer 23025 MiB, KV cache 1024 MiB f16, ollama ps 69%/31% CPU/GPU, 36 GB total; num_thread 16, num_ctx 4096 honored via Modelfile; load_duration 58.0 s; nvidia-smi 12985/24463 MiB used after load. RAM used 59.9/63.4 GiB, available 3.5 GiB; pagefile used 5.1 GiB",
+        "hardware_attestation": {
+          "bios": "E1824IMS.317",
+          "os_build": "10.0.26300",
+          "nvidia_driver": "610.74",
+          "ac_connected": true,
+          "ram_configured_mhz": [
+            6400,
+            6400
+          ],
+          "msi_power_fan_profile": "Best Performance (user-reported, MSI Center)",
+          "mux_hybrid_setting": "MSHybrid (observed: Intel Graphics and NVIDIA both active display adapters, Intel drives internal 3840px panel; MSI Center GPU Switch not read directly)",
+          "gpu_tgp_power_limit": "nvidia-smi power.limit N/A; default 95 W, max 175 W",
+          "model_ssd_filesystem": "Phison 2TB NVMe ESR02TBTLCA3-E1J-2MS, NTFS C:, 488 GB free before import; temperature unavailable (needs admin)",
+          "model_path": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\models\\deepseek-r1-32b-q8",
+          "other_workloads": "VMware VM, default Ollama tray app and Teams closed by user before measurement; 53.8 GiB RAM free, commit 17 GiB with model unloaded"
+        },
+        "save_outputs": false,
+        "cache_condition": "warm_process_repeated_prompt; prefix-cache policy must be recorded",
+        "speculative_decoding": "disabled",
+        "reasoning_mode": "model default; preflight response began with <think> block (thinking enabled by default)",
+        "backend_pid": 40844,
+        "platform": "ollama",
+        "protocol": "ollama",
+        "endpoint": "http://127.0.0.1:11435/api/chat",
+        "served_model": "llm-eval-deepseek-r1-32b-q8:locked",
+        "request_usage": true,
+        "request_options": {
+          "keep_alive": "5m"
+        },
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "launch": {
+          "model_file": "DeepSeek-R1-Distill-Qwen-32B-Q8_0.gguf",
+          "threads": 16,
+          "gpu_layers": 20
+        }
+      },
+      "server_mode": "external",
+      "categories": [
+        "reasoning",
+        "coding",
+        "math"
+      ]
+    },
+    "depends_on": [],
+    "resources": [
+      "raider"
+    ],
+    "status": "planned",
+    "reason": null,
+    "config_sha256": "9dc6cddeb7898d825d7f8f372fa5888bd05302af75afd3dbf8dee2ea52cddcbf",
+    "input_files": [
+      {
+        "path": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\workloads\\smoke.json",
+        "sha256": "26892545cadcda503b23da4ec13e63820ea43f8c605b9a9e2e248d6049800bd2"
+      },
+      {
+        "path": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\artifacts\\deepseek-r1-32b-q8.lock.json",
+        "sha256": "489df17205eaeb6af8a7171da2fc85121be5c60416b178e23402b5b3d386506c"
+      }
+    ]
+  },
+  "root": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval",
+  "output": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\results\\raider-win-20261107-225331\\campaign-20261108T035331Z-833eafe8\\experiments\\offload-model-offloading-1\\jobs\\offload-model-offloading-1-db17c5930ec0\\5aef5f68e0d446029b11ea5728703778",
+  "owner": "5aef5f68e0d446029b11ea5728703778",
+  "code_revision": "3fc8f649b2d5756dc3db2dcaa6142f40e719512b"
+}

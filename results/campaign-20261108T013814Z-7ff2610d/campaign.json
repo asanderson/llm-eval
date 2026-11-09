@@ -1,0 +1,34 @@
+{
+  "schema_version": 2,
+  "campaign_id": "routing-smoke",
+  "created_utc": "2026-11-08T01:38:14.202071+00:00",
+  "status": "succeeded",
+  "jobs": {
+    "routing-llm-routing-1-290257f5d5ab": {
+      "status": "succeeded",
+      "reason": null,
+      "attempts": [
+        {
+          "attempt_id": "a4b724deb2d740ce90e47d47a07c0be0",
+          "status": "succeeded",
+          "stage": "submitted",
+          "started_utc": "2026-11-08T01:38:14.295445+00:00",
+          "output": "experiments\\routing-llm-routing-1\\jobs\\routing-llm-routing-1-290257f5d5ab\\a4b724deb2d740ce90e47d47a07c0be0",
+          "worker_output": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\results\\campaign-20261108T013814Z-7ff2610d\\experiments\\routing-llm-routing-1\\jobs\\routing-llm-routing-1-290257f5d5ab\\a4b724deb2d740ce90e47d47a07c0be0",
+          "result_path": ".",
+          "cost_charged_or_reserved_usd": 0,
+          "finished_unix": 1794101895.003114,
+          "finished_utc": "2026-11-08T01:38:15.239027+00:00"
+        }
+      ]
+    }
+  },
+  "reports": {
+    "routing-llm-routing-1": {
+      "status": "generated",
+      "report": "experiments\\routing-llm-routing-1\\report",
+      "result_signature": "a9ec81a428116b0cc6685642549a4f6ab343494d599aae0e5aa42c3f4deb9d22"
+    }
+  },
+  "enabled_targets": []
+}

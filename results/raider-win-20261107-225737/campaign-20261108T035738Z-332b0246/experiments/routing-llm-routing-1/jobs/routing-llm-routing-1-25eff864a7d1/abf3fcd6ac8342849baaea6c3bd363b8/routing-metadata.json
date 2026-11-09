@@ -1,0 +1,43 @@
+{
+  "schema_version": 2,
+  "experiment_id": "llm-routing",
+  "mode": "decision",
+  "config": {
+    "suite": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\experiments\\llm-routing\\workloads\\decisions.json",
+    "router": {
+      "kind": "systemone",
+      "platform": "ollama",
+      "model": "llm-eval-tev1:locked",
+      "model_revision": "7954dce22bc6c29c3b119656207681d12cb34434fed7caa086bfbc919bef0740",
+      "endpoint": "http://127.0.0.1:11435/v1/systemone",
+      "instructions": "Choose the category that best describes the user request.",
+      "criteria": {
+        "coding": "Writing or debugging software",
+        "math": "Mathematical reasoning",
+        "general": "Other requests"
+      },
+      "timeout_s": 300
+    },
+    "repeats": 3,
+    "warmups": 1,
+    "save_outputs": false
+  },
+  "suite_sha256": "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8",
+  "synthetic": false,
+  "benchmark": "original-routing-smoke",
+  "policy_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "status": "completed",
+  "baseline": null,
+  "wall_s": 5.134643399971537,
+  "cost_charged_or_reserved_usd": 0,
+  "telemetry": {
+    "samples": 10,
+    "interval_s": 0.5,
+    "system_used_gib_peak": 11.0506591796875,
+    "swap_used_gib_peak": 1.2672576904296875,
+    "backend_tree_rss_gib_peak": null,
+    "gpu_used_mib_peak": 10548.0,
+    "backend_pid_supplied": false,
+    "limitations": "Sampled peaks can miss transients; GPU/system counters include other applications; RSS may double count shared pages; WSL excludes Windows host usage."
+  }
+}

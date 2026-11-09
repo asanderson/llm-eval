@@ -1,0 +1,504 @@
+{
+  "schema_version": 2,
+  "campaign_id": "raider-windows-combined",
+  "source": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\configs\\local\\raider-windows\\campaign.json",
+  "root": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval",
+  "code_revision": "3fc8f649b2d5756dc3db2dcaa6142f40e719512b",
+  "total_api_reservation_usd": 0,
+  "inputs": {
+    "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\configs\\local\\raider-windows\\campaign.json": "b82457c76aa5775b1623d213255d546dcd4e362331b22e9ef691985abfaa0496",
+    "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\configs\\local\\raider-windows\\inventory.json": "005c3d62f96dd4fa9b7a777c73aff65c9742c1ad2151d422795c9e006afa95d5",
+    "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\experiments\\model-offloading\\experiment.json": "c11fe651925908ad8b6970426e929440c26f01a97a0db4c5b4bbfcd0720b7347",
+    "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\configs\\local\\raider-windows\\offload-case.json": "d2d664e2a7f895604ed90be683cdc15f5b804acb25581bf2dd9de0259e94f4de",
+    "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\configs\\local\\raider-windows\\ollama-run.json": "8ede3a1f9d37bcd75db131ed33afb2cb74de9d5e051af17e3715ca432c4cb011",
+    "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\configs\\hardware\\msi-raider-18-hx-ai.json": "9939e1bc67f0af5bda168e4e0092e5378e2471d9bf6299905cb1a0b3dfb8cb6a",
+    "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\experiments\\llm-routing\\experiment.json": "a42fd789784d74c7bdf4b8057f06542c8b242e8393f43a0c9be9bc9d0146c15d",
+    "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\configs\\local\\raider-windows\\nimble-case.json": "2c8bc87567cdeaefa1bc0e9c6a87a19dc45bda0c7f8d73de034b198b20525905",
+    "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\configs\\local\\raider-windows\\tev1-case.json": "246937f2348244b186bf0599e2e9f0aeb76f687fa756381806f52189a5ea9e51",
+    "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\workloads\\smoke.json": "26892545cadcda503b23da4ec13e63820ea43f8c605b9a9e2e248d6049800bd2",
+    "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\artifacts\\deepseek-r1-32b-q8.lock.json": "489df17205eaeb6af8a7171da2fc85121be5c60416b178e23402b5b3d386506c",
+    "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\experiments\\llm-routing\\workloads\\decisions.json": "819cafec81eb9ba56db56b4a1c360fae55d5caf49fa0e1f14668b2952f4eb797"
+  },
+  "execution": {
+    "max_parallel_jobs": 1,
+    "measurement_isolation": "physical-host",
+    "on_failure": "continue-independent"
+  },
+  "reporting": {
+    "on_experiment_end": true,
+    "raw_format": "jsonl.gz",
+    "summary_formats": [
+      "markdown",
+      "json",
+      "csv"
+    ],
+    "publish": {
+      "mode": "none",
+      "repository": "asanderson/llm-eval",
+      "base_branch": "main",
+      "docs_root": "docs/results"
+    }
+  },
+  "experiments": [
+    {
+      "experiment_run_id": "offload-model-offloading-1",
+      "experiment_id": "model-offloading",
+      "version": 1,
+      "mode": "category-smoke",
+      "job_ids": [
+        "offload-model-offloading-1-db17c5930ec0"
+      ]
+    },
+    {
+      "experiment_run_id": "routing-llm-routing-1",
+      "experiment_id": "llm-routing",
+      "version": 1,
+      "mode": "decision",
+      "job_ids": [
+        "routing-llm-routing-1-389a241fd7b8",
+        "routing-llm-routing-1-25eff864a7d1"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "schema_version": 2,
+      "job_id": "offload-model-offloading-1-db17c5930ec0",
+      "experiment_run_id": "offload-model-offloading-1",
+      "experiment_id": "model-offloading",
+      "experiment_version": 1,
+      "mode": "category-smoke",
+      "case_id": "deepseek-r1-32b-q8",
+      "hardware_config_id": "raider-windows",
+      "hardware": {
+        "target": "raider",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-native"
+      },
+      "hardware_profile": {
+        "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+        "manufacturer": "MSI",
+        "model": "Raider 18 HX AI A2XWJG-069US",
+        "cpu": {
+          "name": "Intel Core Ultra 9 285HX",
+          "architecture": "Arrow Lake-HX",
+          "p_cores": 8,
+          "e_cores": 16,
+          "threads": 24,
+          "instruction_baseline": "AVX2",
+          "amx": false,
+          "avx512": false,
+          "thread_sweep": [
+            7,
+            8,
+            15,
+            23
+          ],
+          "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+        },
+        "ram": {
+          "installed_gib": 64,
+          "type": "DDR5-6400",
+          "channels": 2
+        },
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "architecture": "Blackwell",
+          "compute_capability": "12.0",
+          "vram_gib": 24,
+          "initial_reserve_gib": 2,
+          "desktop_gpu": false
+        },
+        "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+        "storage": [
+          {
+            "name": "Factory NVMe",
+            "capacity_tb": 2,
+            "model": "not inventoried"
+          },
+          {
+            "name": "WD_BLACK SN7100",
+            "capacity_tb": 4,
+            "interface": "PCIe Gen4 x4",
+            "role": "Model files, artifacts, results; separate swap/offload experiments"
+          }
+        ],
+        "evidence": {
+          "configuration": "user-provided",
+          "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+        },
+        "required_recordings": [
+          "BIOS version",
+          "NVIDIA driver",
+          "GPU power limit/TGP",
+          "AC state",
+          "MSI power/fan profile",
+          "hybrid/MUX setting",
+          "RAM configured speed",
+          "SSD mount and filesystem",
+          "SSD free space and temperature",
+          "OS build/kernel",
+          "WSL version and memory cap if applicable"
+        ],
+        "host_reserve_gib": 12,
+        "os_limits": {
+          "windows-11-wsl2-ubuntu-26.04": {
+            "ram_budget_gib": 46
+          }
+        }
+      },
+      "target_id": "raider",
+      "target": {
+        "transport": "local",
+        "physical_host_id": "raider"
+      },
+      "parameters": {
+        "config": {
+          "schema_version": 1,
+          "model_id": "deepseek-r1-32b",
+          "os_id": "windows-11-native",
+          "lane": "offload",
+          "context_tokens": 4096,
+          "max_output_tokens": 256,
+          "repeats": 3,
+          "warmups": 1,
+          "temperature": 0.0,
+          "seed": 20261005,
+          "concurrency": 1,
+          "timeout_s": 300,
+          "load_timeout_s": 900,
+          "telemetry_interval_s": 1.0,
+          "ram_budget_gib": 52,
+          "gpu_budget_gib": 22,
+          "suite": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\workloads\\smoke.json",
+          "artifact_root": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\models\\deepseek-r1-32b-q8",
+          "artifact_lock": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\artifacts\\deepseek-r1-32b-q8.lock.json",
+          "offload_dir": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\offload",
+          "backend_version": "0.40.15",
+          "tokenizer_revision": "bartowski/DeepSeek-R1-Distill-Qwen-32B-GGUF@1dc8cf9ffa5dd333057ea1b09ccf4772d8726dec (tokenizer embedded in locked GGUF)",
+          "chat_template_sha256": "b6835114b7303ddd78919a82e4d9f7d8c26ed0d7dfc36beeb12d524f6144eab1",
+          "placement_notes": "Observed from ollama ps and server log with model loaded: 20/65 layers offloaded to GPU (19 repeating + output), CUDA0 model buffer 10177 MiB, CUDA_Host buffer 23025 MiB, KV cache 1024 MiB f16, ollama ps 69%/31% CPU/GPU, 36 GB total; num_thread 16, num_ctx 4096 honored via Modelfile; load_duration 58.0 s; nvidia-smi 12985/24463 MiB used after load. RAM used 59.9/63.4 GiB, available 3.5 GiB; pagefile used 5.1 GiB",
+          "hardware_attestation": {
+            "bios": "E1824IMS.317",
+            "os_build": "10.0.26300",
+            "nvidia_driver": "610.74",
+            "ac_connected": true,
+            "ram_configured_mhz": [
+              6400,
+              6400
+            ],
+            "msi_power_fan_profile": "Best Performance (user-reported, MSI Center)",
+            "mux_hybrid_setting": "MSHybrid (observed: Intel Graphics and NVIDIA both active display adapters, Intel drives internal 3840px panel; MSI Center GPU Switch not read directly)",
+            "gpu_tgp_power_limit": "nvidia-smi power.limit N/A; default 95 W, max 175 W",
+            "model_ssd_filesystem": "Phison 2TB NVMe ESR02TBTLCA3-E1J-2MS, NTFS C:, 488 GB free before import; temperature unavailable (needs admin)",
+            "model_path": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\models\\deepseek-r1-32b-q8",
+            "other_workloads": "VMware VM, default Ollama tray app and Teams closed by user before measurement; 53.8 GiB RAM free, commit 17 GiB with model unloaded"
+          },
+          "save_outputs": false,
+          "cache_condition": "warm_process_repeated_prompt; prefix-cache policy must be recorded",
+          "speculative_decoding": "disabled",
+          "reasoning_mode": "model default; preflight response began with <think> block (thinking enabled by default)",
+          "backend_pid": 40844,
+          "platform": "ollama",
+          "protocol": "ollama",
+          "endpoint": "http://127.0.0.1:11435/api/chat",
+          "served_model": "llm-eval-deepseek-r1-32b-q8:locked",
+          "request_usage": true,
+          "request_options": {
+            "keep_alive": "5m"
+          },
+          "hardware_profile": "msi-raider-18-hx-ai",
+          "launch": {
+            "model_file": "DeepSeek-R1-Distill-Qwen-32B-Q8_0.gguf",
+            "threads": 16,
+            "gpu_layers": 20
+          }
+        },
+        "server_mode": "external",
+        "categories": [
+          "reasoning",
+          "coding",
+          "math"
+        ]
+      },
+      "depends_on": [],
+      "resources": [
+        "raider"
+      ],
+      "status": "planned",
+      "reason": null,
+      "config_sha256": "9dc6cddeb7898d825d7f8f372fa5888bd05302af75afd3dbf8dee2ea52cddcbf",
+      "input_files": [
+        {
+          "path": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\workloads\\smoke.json",
+          "sha256": "26892545cadcda503b23da4ec13e63820ea43f8c605b9a9e2e248d6049800bd2"
+        },
+        {
+          "path": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\artifacts\\deepseek-r1-32b-q8.lock.json",
+          "sha256": "489df17205eaeb6af8a7171da2fc85121be5c60416b178e23402b5b3d386506c"
+        }
+      ]
+    },
+    {
+      "schema_version": 2,
+      "job_id": "routing-llm-routing-1-389a241fd7b8",
+      "experiment_run_id": "routing-llm-routing-1",
+      "experiment_id": "llm-routing",
+      "experiment_version": 1,
+      "mode": "decision",
+      "case_id": "ollama-nimble",
+      "hardware_config_id": "raider-windows",
+      "hardware": {
+        "target": "raider",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-native"
+      },
+      "hardware_profile": {
+        "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+        "manufacturer": "MSI",
+        "model": "Raider 18 HX AI A2XWJG-069US",
+        "cpu": {
+          "name": "Intel Core Ultra 9 285HX",
+          "architecture": "Arrow Lake-HX",
+          "p_cores": 8,
+          "e_cores": 16,
+          "threads": 24,
+          "instruction_baseline": "AVX2",
+          "amx": false,
+          "avx512": false,
+          "thread_sweep": [
+            7,
+            8,
+            15,
+            23
+          ],
+          "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+        },
+        "ram": {
+          "installed_gib": 64,
+          "type": "DDR5-6400",
+          "channels": 2
+        },
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "architecture": "Blackwell",
+          "compute_capability": "12.0",
+          "vram_gib": 24,
+          "initial_reserve_gib": 2,
+          "desktop_gpu": false
+        },
+        "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+        "storage": [
+          {
+            "name": "Factory NVMe",
+            "capacity_tb": 2,
+            "model": "not inventoried"
+          },
+          {
+            "name": "WD_BLACK SN7100",
+            "capacity_tb": 4,
+            "interface": "PCIe Gen4 x4",
+            "role": "Model files, artifacts, results; separate swap/offload experiments"
+          }
+        ],
+        "evidence": {
+          "configuration": "user-provided",
+          "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+        },
+        "required_recordings": [
+          "BIOS version",
+          "NVIDIA driver",
+          "GPU power limit/TGP",
+          "AC state",
+          "MSI power/fan profile",
+          "hybrid/MUX setting",
+          "RAM configured speed",
+          "SSD mount and filesystem",
+          "SSD free space and temperature",
+          "OS build/kernel",
+          "WSL version and memory cap if applicable"
+        ],
+        "host_reserve_gib": 12,
+        "os_limits": {
+          "windows-11-wsl2-ubuntu-26.04": {
+            "ram_budget_gib": 46
+          }
+        }
+      },
+      "target_id": "raider",
+      "target": {
+        "transport": "local",
+        "physical_host_id": "raider"
+      },
+      "parameters": {
+        "suite": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\experiments\\llm-routing\\workloads\\decisions.json",
+        "router": {
+          "kind": "systemone",
+          "platform": "ollama",
+          "model": "llm-eval-nimble:locked",
+          "model_revision": "6aa3fde96874d5d9f03306e795016e232610aaa5f19efcb107bf9311c712ccd9",
+          "endpoint": "http://127.0.0.1:11435/v1/systemone",
+          "instructions": "Choose the category that best describes the user request.",
+          "criteria": {
+            "coding": "Writing or debugging software",
+            "math": "Mathematical reasoning",
+            "general": "Other requests"
+          },
+          "timeout_s": 300
+        },
+        "repeats": 3,
+        "warmups": 1,
+        "save_outputs": false
+      },
+      "depends_on": [
+        "offload-model-offloading-1-db17c5930ec0"
+      ],
+      "resources": [
+        "raider"
+      ],
+      "status": "planned",
+      "reason": null,
+      "config_sha256": "cb387733cfdca52aeefc54f0ed571ed5e6272f177d26070c82e11917bc92ae2c",
+      "input_files": [
+        {
+          "path": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\experiments\\llm-routing\\workloads\\decisions.json",
+          "sha256": "819cafec81eb9ba56db56b4a1c360fae55d5caf49fa0e1f14668b2952f4eb797"
+        }
+      ]
+    },
+    {
+      "schema_version": 2,
+      "job_id": "routing-llm-routing-1-25eff864a7d1",
+      "experiment_run_id": "routing-llm-routing-1",
+      "experiment_id": "llm-routing",
+      "experiment_version": 1,
+      "mode": "decision",
+      "case_id": "ollama-tev1",
+      "hardware_config_id": "raider-windows",
+      "hardware": {
+        "target": "raider",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-native"
+      },
+      "hardware_profile": {
+        "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+        "manufacturer": "MSI",
+        "model": "Raider 18 HX AI A2XWJG-069US",
+        "cpu": {
+          "name": "Intel Core Ultra 9 285HX",
+          "architecture": "Arrow Lake-HX",
+          "p_cores": 8,
+          "e_cores": 16,
+          "threads": 24,
+          "instruction_baseline": "AVX2",
+          "amx": false,
+          "avx512": false,
+          "thread_sweep": [
+            7,
+            8,
+            15,
+            23
+          ],
+          "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+        },
+        "ram": {
+          "installed_gib": 64,
+          "type": "DDR5-6400",
+          "channels": 2
+        },
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "architecture": "Blackwell",
+          "compute_capability": "12.0",
+          "vram_gib": 24,
+          "initial_reserve_gib": 2,
+          "desktop_gpu": false
+        },
+        "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+        "storage": [
+          {
+            "name": "Factory NVMe",
+            "capacity_tb": 2,
+            "model": "not inventoried"
+          },
+          {
+            "name": "WD_BLACK SN7100",
+            "capacity_tb": 4,
+            "interface": "PCIe Gen4 x4",
+            "role": "Model files, artifacts, results; separate swap/offload experiments"
+          }
+        ],
+        "evidence": {
+          "configuration": "user-provided",
+          "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+        },
+        "required_recordings": [
+          "BIOS version",
+          "NVIDIA driver",
+          "GPU power limit/TGP",
+          "AC state",
+          "MSI power/fan profile",
+          "hybrid/MUX setting",
+          "RAM configured speed",
+          "SSD mount and filesystem",
+          "SSD free space and temperature",
+          "OS build/kernel",
+          "WSL version and memory cap if applicable"
+        ],
+        "host_reserve_gib": 12,
+        "os_limits": {
+          "windows-11-wsl2-ubuntu-26.04": {
+            "ram_budget_gib": 46
+          }
+        }
+      },
+      "target_id": "raider",
+      "target": {
+        "transport": "local",
+        "physical_host_id": "raider"
+      },
+      "parameters": {
+        "suite": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\experiments\\llm-routing\\workloads\\decisions.json",
+        "router": {
+          "kind": "systemone",
+          "platform": "ollama",
+          "model": "llm-eval-tev1:locked",
+          "model_revision": "7954dce22bc6c29c3b119656207681d12cb34434fed7caa086bfbc919bef0740",
+          "endpoint": "http://127.0.0.1:11435/v1/systemone",
+          "instructions": "Choose the category that best describes the user request.",
+          "criteria": {
+            "coding": "Writing or debugging software",
+            "math": "Mathematical reasoning",
+            "general": "Other requests"
+          },
+          "timeout_s": 300
+        },
+        "repeats": 3,
+        "warmups": 1,
+        "save_outputs": false
+      },
+      "depends_on": [
+        "offload-model-offloading-1-db17c5930ec0"
+      ],
+      "resources": [
+        "raider"
+      ],
+      "status": "planned",
+      "reason": null,
+      "config_sha256": "6664d5879b530b2a5ba592bac3775d8fed52e0c5797ff7fb10e54783292e99b7",
+      "input_files": [
+        {
+          "path": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\experiments\\llm-routing\\workloads\\decisions.json",
+          "sha256": "819cafec81eb9ba56db56b4a1c360fae55d5caf49fa0e1f14668b2952f4eb797"
+        }
+      ]
+    }
+  ],
+  "targets": {
+    "raider": {
+      "transport": "local",
+      "physical_host_id": "raider"
+    }
+  },
+  "plan_sha256": "671cc73196db6a17a974c010c2b483c6844ea329428d654da946302fc81ac8bc"
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "experiment_id": "llm-routing",
+  "experiment_run_id": "routing-llm-routing-1",
+  "publication_id": "campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1",
+  "campaign_id": "routing-smoke",
+  "created_utc": "2026-11-08T01:38:14.202071+00:00",
+  "code_revision": "3fc8f649b2d5756dc3db2dcaa6142f40e719512b",
+  "status": "complete",
+  "synthetic": true,
+  "coverage": [
+    {
+      "job_id": "routing-llm-routing-1-290257f5d5ab",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    }
+  ],
+  "raw_records": 8,
+  "removed_fields": [
+    "absolute_path_values",
+    "python"
+  ],
+  "files": {
+    "diagrams/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/latency.png": "814a8d183649a083d8fc7ea9fca2fc33e262cb11348c84b6b4328f43b9281f5f",
+    "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/benchmark-summary.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/benchmark-summary.json": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+    "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/raw/measurements.jsonl.gz": "ed799d56c28e756ec77898cc709313ee2094724249d304f95ac8c822a8876f09",
+    "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md": "88a9b46cc038d4eddb3d14fe7be9c6e9c1f921e0dfda95c5cbfe49441d854d36",
+    "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/resolved-config.json": "24ae937ea6dcd6be9c5bdc1322ea240b1476b61a9210a3fcf0e2d4c1ee5c60b6",
+    "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/summary.csv": "38e5608af07b4462e2cb1c530f1740c78ca0927f9d5456108cefee27256788e6",
+    "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/summary.json": "0681de7b79f76f308b8dfcf55b8d16272203b847a777b0b9263a81b7963e17c0"
+  },
+  "report_fingerprint": "c369f7b5914b7669c51f0283d16005b3cb046ed9f5842681a473c396c41efd3a"
+}

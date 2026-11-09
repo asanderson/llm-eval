@@ -1,0 +1,12 @@
+{
+  "repository": "asanderson/llm-eval",
+  "base_branch": "main",
+  "report_path": "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1",
+  "chart_path": "diagrams/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1",
+  "report_fingerprint": "c369f7b5914b7669c51f0283d16005b3cb046ed9f5842681a473c396c41efd3a",
+  "experiment_id": "llm-routing",
+  "publication_id": "campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1",
+  "draft": false,
+  "max_artifact_bytes": 41943040,
+  "code_revision": "3fc8f649b2d5756dc3db2dcaa6142f40e719512b"
+}

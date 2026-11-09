@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "experiment_id": "llm-routing",
+  "mode": "decision",
+  "config": {
+    "suite": "C:\\Users\\astev\\git-projects\\asanderson\\llm-eval\\experiments\\llm-routing\\workloads\\decisions.json",
+    "synthetic": true,
+    "router": {
+      "kind": "category",
+      "default_category": "general",
+      "keywords": {
+        "coding": [
+          "python"
+        ],
+        "math": [
+          "equation"
+        ]
+      }
+    }
+  },
+  "suite_sha256": "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8",
+  "synthetic": true,
+  "benchmark": "original-routing-smoke",
+  "policy_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "status": "completed",
+  "baseline": null,
+  "wall_s": 0.23042800009716302,
+  "cost_charged_or_reserved_usd": 0,
+  "telemetry": {
+    "samples": 2,
+    "interval_s": 0.5,
+    "system_used_gib_peak": 55.88308334350586,
+    "swap_used_gib_peak": 1.1666641235351562,
+    "backend_tree_rss_gib_peak": null,
+    "gpu_used_mib_peak": 2120.0,
+    "backend_pid_supplied": false,
+    "limitations": "Sampled peaks can miss transients; GPU/system counters include other applications; RSS may double count shared pages; WSL excludes Windows host usage."
+  }
+}

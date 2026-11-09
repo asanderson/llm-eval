@@ -1,0 +1,627 @@
+[
+  {
+    "monotonic_s": 679944.875,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 951.0,
+        "utilization_pct": 0.0,
+        "power_w": 9.6,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 180.0
+      }
+    ],
+    "system_used_gib": 9.529605865478516,
+    "available_gib": 53.90904235839844,
+    "swap_used_gib": 1.2481231689453125,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 6.8,
+    "system_disk_read_bytes": 941760787456,
+    "system_disk_write_bytes": 1445487502336,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679945.921,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 951.0,
+        "utilization_pct": 3.0,
+        "power_w": 9.68,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 697.0
+      }
+    ],
+    "system_used_gib": 9.533084869384766,
+    "available_gib": 53.90556335449219,
+    "swap_used_gib": 1.2481231689453125,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 0.0,
+    "system_disk_read_bytes": 941760787456,
+    "system_disk_write_bytes": 1445487850496,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679946.984,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 951.0,
+        "utilization_pct": 3.0,
+        "power_w": 11.15,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 690.0
+      }
+    ],
+    "system_used_gib": 9.540260314941406,
+    "available_gib": 53.89838790893555,
+    "swap_used_gib": 1.2480430603027344,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 2.4,
+    "system_disk_read_bytes": 941760893952,
+    "system_disk_write_bytes": 1445488394240,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679948.031,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 951.0,
+        "utilization_pct": 1.0,
+        "power_w": 9.59,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 180.0
+      }
+    ],
+    "system_used_gib": 9.543621063232422,
+    "available_gib": 53.89502716064453,
+    "swap_used_gib": 1.2480354309082031,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 1.4,
+    "system_disk_read_bytes": 941760898048,
+    "system_disk_write_bytes": 1445489017856,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679949.109,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 9.85,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 705.0
+      }
+    ],
+    "system_used_gib": 9.5355224609375,
+    "available_gib": 53.90312576293945,
+    "swap_used_gib": 1.2480201721191406,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 2.3,
+    "system_disk_read_bytes": 941760914432,
+    "system_disk_write_bytes": 1445489490944,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679950.156,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 11.01,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 697.0
+      }
+    ],
+    "system_used_gib": 9.551311492919922,
+    "available_gib": 53.88733673095703,
+    "swap_used_gib": 1.2480201721191406,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 4.3,
+    "system_disk_read_bytes": 941760914432,
+    "system_disk_write_bytes": 1445489923584,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679951.203,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 8.29,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 240.0
+      }
+    ],
+    "system_used_gib": 9.531227111816406,
+    "available_gib": 53.90742111206055,
+    "swap_used_gib": 1.2479972839355469,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 2.1,
+    "system_disk_read_bytes": 941760918528,
+    "system_disk_write_bytes": 1445490431488,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679952.281,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 4.0,
+        "power_w": 10.87,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 645.0
+      }
+    ],
+    "system_used_gib": 9.538825988769531,
+    "available_gib": 53.89982223510742,
+    "swap_used_gib": 1.2479896545410156,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 2.6,
+    "system_disk_read_bytes": 941760918528,
+    "system_disk_write_bytes": 1445490845184,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679953.359,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 10.85,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 645.0
+      }
+    ],
+    "system_used_gib": 9.554561614990234,
+    "available_gib": 53.88408660888672,
+    "swap_used_gib": 1.2479896545410156,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 2.4,
+    "system_disk_read_bytes": 941760918528,
+    "system_disk_write_bytes": 1445491292672,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679954.406,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 7.99,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 202.0
+      }
+    ],
+    "system_used_gib": 9.559761047363281,
+    "available_gib": 53.87888717651367,
+    "swap_used_gib": 1.2479820251464844,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 3.9,
+    "system_disk_read_bytes": 941760918528,
+    "system_disk_write_bytes": 1445491783168,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679955.468,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 10.89,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 667.0
+      }
+    ],
+    "system_used_gib": 9.529407501220703,
+    "available_gib": 53.90924072265625,
+    "swap_used_gib": 1.2479820251464844,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 2.4,
+    "system_disk_read_bytes": 941760918528,
+    "system_disk_write_bytes": 1445492180480,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679956.515,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 10.98,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 690.0
+      }
+    ],
+    "system_used_gib": 9.54458236694336,
+    "available_gib": 53.894065856933594,
+    "swap_used_gib": 1.2479820251464844,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 2.8,
+    "system_disk_read_bytes": 941760918528,
+    "system_disk_write_bytes": 1445492515840,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679957.578,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 8.17,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 240.0
+      }
+    ],
+    "system_used_gib": 9.567802429199219,
+    "available_gib": 53.870845794677734,
+    "swap_used_gib": 1.2479820251464844,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 2.7,
+    "system_disk_read_bytes": 941760918528,
+    "system_disk_write_bytes": 1445493018624,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679958.625,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 10.83,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 720.0
+      }
+    ],
+    "system_used_gib": 9.52880859375,
+    "available_gib": 53.90983963012695,
+    "swap_used_gib": 1.2479705810546875,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 2.8,
+    "system_disk_read_bytes": 941760922624,
+    "system_disk_write_bytes": 1445493465088,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679959.687,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 10.93,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 697.0
+      }
+    ],
+    "system_used_gib": 9.551399230957031,
+    "available_gib": 53.88724899291992,
+    "swap_used_gib": 1.2479667663574219,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 2.3,
+    "system_disk_read_bytes": 941760934912,
+    "system_disk_write_bytes": 1445493992448,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679960.734,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 4.0,
+        "power_w": 9.66,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 690.0
+      }
+    ],
+    "system_used_gib": 9.553722381591797,
+    "available_gib": 53.884925842285156,
+    "swap_used_gib": 1.247711181640625,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 2.0,
+    "system_disk_read_bytes": 941761025024,
+    "system_disk_write_bytes": 1445494524928,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679961.796,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 10.92,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 720.0
+      }
+    ],
+    "system_used_gib": 9.53939437866211,
+    "available_gib": 53.899253845214844,
+    "swap_used_gib": 1.247650146484375,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 3.0,
+    "system_disk_read_bytes": 941761037312,
+    "system_disk_write_bytes": 1445495191552,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679962.859,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 0.0,
+        "power_w": 9.51,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 202.0
+      }
+    ],
+    "system_used_gib": 9.576610565185547,
+    "available_gib": 53.862037658691406,
+    "swap_used_gib": 1.2476387023925781,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 2.4,
+    "system_disk_read_bytes": 941761045504,
+    "system_disk_write_bytes": 1445495715840,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679963.921,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 9.76,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 705.0
+      }
+    ],
+    "system_used_gib": 9.598316192626953,
+    "available_gib": 53.84033203125,
+    "swap_used_gib": 1.2476387023925781,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 2.6,
+    "system_disk_read_bytes": 941761045504,
+    "system_disk_write_bytes": 1445496177152,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679964.984,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 11.04,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 735.0
+      }
+    ],
+    "system_used_gib": 9.60293960571289,
+    "available_gib": 53.83570861816406,
+    "swap_used_gib": 1.2475166320800781,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 3.5,
+    "system_disk_read_bytes": 941761045504,
+    "system_disk_write_bytes": 1445496504832,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679966.046,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 1.0,
+        "power_w": 9.42,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 225.0
+      }
+    ],
+    "system_used_gib": 9.548542022705078,
+    "available_gib": 53.890106201171875,
+    "swap_used_gib": 1.2475166320800781,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 3.0,
+    "system_disk_read_bytes": 941761045504,
+    "system_disk_write_bytes": 1445497140736,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679967.109,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 9.47,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 727.0
+      }
+    ],
+    "system_used_gib": 9.557605743408203,
+    "available_gib": 53.88104248046875,
+    "swap_used_gib": 1.2475128173828125,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 2.7,
+    "system_disk_read_bytes": 941761045504,
+    "system_disk_write_bytes": 1445497553920,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679968.171,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 10.96,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 720.0
+      }
+    ],
+    "system_used_gib": 9.556045532226562,
+    "available_gib": 53.88260269165039,
+    "swap_used_gib": 1.2472496032714844,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 3.1,
+    "system_disk_read_bytes": 941761256448,
+    "system_disk_write_bytes": 1445498338816,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679969.234,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 8.34,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 277.0
+      }
+    ],
+    "system_used_gib": 9.550750732421875,
+    "available_gib": 53.88789749145508,
+    "swap_used_gib": 1.2472419738769531,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 3.1,
+    "system_disk_read_bytes": 941761256448,
+    "system_disk_write_bytes": 1445498772992,
+    "backend_tree_rss_gib": null
+  },
+  {
+    "monotonic_s": 679969.484,
+    "gpus": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+        "driver_version": "610.74",
+        "total_mib": 24463.0,
+        "used_mib": 949.0,
+        "utilization_pct": 3.0,
+        "power_w": 8.34,
+        "temperature_c": 30.0,
+        "sm_clock_mhz": 277.0
+      }
+    ],
+    "system_used_gib": 9.546688079833984,
+    "available_gib": 53.89196014404297,
+    "swap_used_gib": 1.2472419738769531,
+    "swap_in_bytes": 0,
+    "swap_out_bytes": 0,
+    "cpu_percent": 2.7,
+    "system_disk_read_bytes": 941761256448,
+    "system_disk_write_bytes": 1445500258816,
+    "backend_tree_rss_gib": null
+  }
+]
