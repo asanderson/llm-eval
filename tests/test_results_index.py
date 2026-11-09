@@ -1,10 +1,12 @@
+import gzip
 import json
 import re
 import tempfile
 import unittest
 from pathlib import Path
 
-from llm_eval.reporting.index import END, START, collect, identity, slug, top_combinations, write_results_index
+from llm_eval.reporting.index import (END, LIST_END, LIST_START, START, TOP_END, TOP_START, collect, identity, slug,
+                                      top_combinations, write_results_index)
 
 
 def bundle(root, experiment, publication, created, jobs, summary, synthetic=False):
@@ -47,8 +49,9 @@ class ResultsIndexTests(unittest.TestCase):
                  'hardware': {'os_id': 'ubuntu-26.04-native'},
                  'parameters': {'router': {'kind': 'systemone', 'platform': 'ollama', 'model': 'llm-eval-nimble:locked'}}}],
                [row('r1', 'coding', 0.05, None, decisions=1.0)], synthetic=True)
-        self.summary = self.root / 'docs/results/EXECUTIVE_SUMMARY.md'
-        self.summary.write_text(f'# Summary\n\nintro\n\n{START}\nstale\n{END}\n\nnarrative stays\n', encoding='utf-8')
+        self.summary = self.root / 'docs/results/README.md'
+        self.summary.write_text(f'# Results\n\nintro\n\n{TOP_START}\nstale\n{TOP_END}\n\nconclusions stay\n\n{START}\nstale\n{END}\n\n'
+                                f'narrative stays\n\n{LIST_START}\nstale\n{LIST_END}\n', encoding='utf-8')
 
     def test_identity_and_slug(self):
         self.assertEqual(identity(offload_job('x', 'lmstudio', 'qwen38-27b')), ('lmstudio', 'qwen38-27b'))
@@ -92,8 +95,15 @@ class ResultsIndexTests(unittest.TestCase):
     def test_executive_summary_block_is_replaced_and_the_narrative_kept(self):
         write_results_index(self.root)
         text = self.summary.read_text(encoding='utf-8')
-        self.assertTrue(text.startswith('# Summary\n\nintro\n\n' + START))
-        self.assertTrue(text.endswith(END + '\n\nnarrative stays\n'))
+        self.assertTrue(text.startswith('# Results\n\nintro\n\n' + TOP_START))
+        self.assertIn(TOP_END + '\n\nconclusions stay\n\n' + START, text)
+        self.assertIn(END + '\n\nnarrative stays\n\n' + LIST_START, text)
+        self.assertTrue(text.endswith(LIST_END + '\n'))
+        # each block holds its own part: ranking on top, navigation in the middle, the report list last
+        top, rest = text.split(TOP_END)
+        self.assertIn('### Top 3 harness and model combinations', top)
+        self.assertNotIn('models by harness', top)
+        self.assertIn('[Report](model-offloading/campaign-b-offload/README.md)', rest.split(LIST_START)[1])
         self.assertNotIn('stale', text)
         self.assertIn('### model-offloading: models by harness', text)
         # experiments are ordered by their newest result: offloading ran on 2026-11-09, routing on 2026-11-08
@@ -138,7 +148,14 @@ class ResultsIndexTests(unittest.TestCase):
         self.assertIn('**[llm-routing](index/experiment/llm-routing.md) on [raider-ubuntu](index/hardware/raider-ubuntu.md)**'
                       '\n\n'
                       'No measured run with scored checks has been published yet.', text)
-        self.assertIn(heading, (self.root / 'docs/results/index/README.md').read_text(encoding='utf-8'))
+        overview = (self.root / 'docs/results/index/README.md').read_text(encoding='utf-8')
+        self.assertIn(heading, overview)
+        # four ranked combinations are a comparison: the summary gets a chart, the index page does not repeat it
+        chart = self.root / 'diagrams/results/summary/model-offloading-raider-windows.png'
+        self.assertTrue(chart.read_bytes().startswith(b'\x89PNG'))
+        self.assertIn('](../../diagrams/results/summary/model-offloading-raider-windows.png)', text)
+        self.assertNotIn('.png', overview)
+        self.assertEqual([p.name for p in chart.parent.iterdir()], [chart.name])      # routing has nothing to compare
 
     def test_results_readme_lists_newest_first(self):
         from llm_eval.reporting.publish import write_index
@@ -147,10 +164,36 @@ class ResultsIndexTests(unittest.TestCase):
         self.assertEqual([line.split('](')[1].split('/')[1] for line in rows],
                          ['campaign-b-offload', 'campaign-a-offload', 'campaign-a-routing'])
 
-    def test_a_summary_without_markers_is_left_alone(self):
-        self.summary.write_text('# Summary\n\nhand written\n', encoding='utf-8')
+    def test_peak_memory_comes_from_the_latest_attempt_telemetry(self):
+        raw = self.root / 'docs/results/model-offloading/campaign-b-offload/raw'
+        raw.mkdir()
+        samples = [(True, 20.5, 9000), (True, 24.6, 12084), (False, 99.0, 99999)]
+        with gzip.open(raw / 'measurements.jsonl.gz', 'wt', encoding='utf-8') as out:
+            out.write(json.dumps({'record_type': 'request', 'job_id': 'b1', 'latest_attempt': True, 'data': {}}) + '\n')
+            for latest, rss, used in samples:
+                out.write(json.dumps({'record_type': 'telemetry', 'job_id': 'b1', 'latest_attempt': latest,
+                                      'data': {'backend_tree_rss_gib': rss, 'gpus': [{'used_mib': used}]}}) + '\n')
+        records = collect(self.root)
+        self.assertEqual((records[0]['backend_rss_gib'], round(records[0]['gpu_gib'], 2)), (24.6, 11.8))
+        self.assertEqual((records[1]['backend_rss_gib'], records[1]['gpu_gib']), (None, None))
+
+    def test_a_readme_without_markers_is_left_alone(self):
+        self.summary.write_text('# Results\n\nhand written\n', encoding='utf-8')
         write_results_index(self.root)
-        self.assertEqual(self.summary.read_text(encoding='utf-8'), '# Summary\n\nhand written\n')
+        self.assertEqual(self.summary.read_text(encoding='utf-8'), '# Results\n\nhand written\n')
+
+    def test_a_missing_or_legacy_generated_readme_gets_the_marked_skeleton(self):
+        legacy = '# Experiment results\n\n| Experiment | Run time UTC | Status | Synthetic | Results |\n|---|---|---|---|---|\n'
+        for before in (None, legacy):
+            with self.subTest(before=before):
+                self.summary.unlink()
+                if before:
+                    self.summary.write_text(before, encoding='utf-8')
+                write_results_index(self.root)
+                text = self.summary.read_text(encoding='utf-8')
+                self.assertLess(text.index('## Executive summary'), text.index('### Top 3 harness and model combinations'))
+                self.assertLess(text.index('## Results index'), text.index('### Browse by category'))
+                self.assertLess(text.index('## All published reports'), text.index('campaign-a-routing/README.md)', text.index(LIST_START)))
 
 
 if __name__ == '__main__':

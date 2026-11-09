@@ -67,13 +67,7 @@ def validate_bundle(report):
 
 
 def write_index(worktree):
-    root=Path(worktree)/'docs/results';rows=[]
-    for path in sorted(root.glob('*/*/manifest.json')):
-        m=read_json(path);link=(path.parent/'README.md').relative_to(root).as_posix()
-        rows.append((m['created_utc'],f"| {m['experiment_id']} | {m['created_utc']} | {m['status']} | {m['synthetic']} | [Report]({link}) |"))
-    rows=[row for _,row in sorted(rows,reverse=True)]      # newest result first
-    root.mkdir(parents=True,exist_ok=True)
-    (root/'README.md').write_text('# Experiment results\n\nEach report includes raw measurements, summaries and reproducibility metadata. Synthetic fixtures are explicitly labeled. Newest results are listed first.\n\n| Experiment | Run time UTC | Status | Synthetic | Results |\n|---|---|---|---|---|\n'+'\n'.join(rows)+'\n',encoding='utf-8')
+    # The results README, its charts and the index pages are generated together from the published bundles.
     from .index import write_results_index
     write_results_index(worktree)
     readme=Path(worktree)/'README.md'
@@ -121,12 +115,17 @@ def publish_report(report,root,dry_run=False,api=None):
                     merge=git(worktree,'merge','--no-commit','--no-ff',base,env=env,check=False)
                     if merge.returncode:
                         conflicts=git(worktree,'diff','--name-only','--diff-filter=U',env=env).splitlines()
-                        if any(c!='docs/results/README.md' and not c.startswith('docs/results/index/') for c in conflicts):
+                        generated=('docs/results/index/','diagrams/results/summary/')
+                        if any(c!='docs/results/README.md' and not c.startswith(generated) for c in conflicts):
                             git(worktree,'merge','--abort',env=env,check=False);raise RuntimeError('Results branch needs conflict resolution')
+                        if 'docs/results/README.md' in conflicts:
+                            # A results branch only ever changes the generated blocks, so the base copy carries the
+                            # hand-written text; the blocks are regenerated below.
+                            git(worktree,'checkout','--theirs','--','docs/results/README.md',env=env)
                 for relative in [spec['report_path'],spec['chart_path']]:
                     shutil.copytree(report/'bundle'/relative,worktree/relative,dirs_exist_ok=True)
                 write_index(worktree)
-                generated=[p for p in ('docs/results/index','docs/results/EXECUTIVE_SUMMARY.md') if (worktree/p).exists()]
+                generated=[p for p in ('docs/results/index','diagrams/results/summary') if (worktree/p).exists()]
                 git(worktree,'add','-f','-A','--',spec['report_path'],spec['chart_path'],'docs/results/README.md','README.md',*generated,env=env)
                 changed=git(worktree,'diff','--cached','--quiet',env=env,check=False).returncode!=0
                 merging=git(worktree,'rev-parse','--verify','MERGE_HEAD',env=env,check=False).returncode==0
