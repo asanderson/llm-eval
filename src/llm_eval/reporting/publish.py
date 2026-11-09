@@ -70,9 +70,10 @@ def write_index(worktree):
     root=Path(worktree)/'docs/results';rows=[]
     for path in sorted(root.glob('*/*/manifest.json')):
         m=read_json(path);link=(path.parent/'README.md').relative_to(root).as_posix()
-        rows.append(f"| {m['experiment_id']} | {m['created_utc']} | {m['status']} | {m['synthetic']} | [Report]({link}) |")
+        rows.append((m['created_utc'],f"| {m['experiment_id']} | {m['created_utc']} | {m['status']} | {m['synthetic']} | [Report]({link}) |"))
+    rows=[row for _,row in sorted(rows,reverse=True)]      # newest result first
     root.mkdir(parents=True,exist_ok=True)
-    (root/'README.md').write_text('# Experiment results\n\nEach report includes raw measurements, summaries and reproducibility metadata. Synthetic fixtures are explicitly labeled.\n\n| Experiment | Run time UTC | Status | Synthetic | Results |\n|---|---|---|---|---|\n'+'\n'.join(rows)+'\n',encoding='utf-8')
+    (root/'README.md').write_text('# Experiment results\n\nEach report includes raw measurements, summaries and reproducibility metadata. Synthetic fixtures are explicitly labeled. Newest results are listed first.\n\n| Experiment | Run time UTC | Status | Synthetic | Results |\n|---|---|---|---|---|\n'+'\n'.join(rows)+'\n',encoding='utf-8')
     from .index import write_results_index
     write_results_index(worktree)
     readme=Path(worktree)/'README.md'

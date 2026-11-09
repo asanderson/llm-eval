@@ -96,6 +96,10 @@ class ResultsIndexTests(unittest.TestCase):
         self.assertTrue(text.endswith(END + '\n\nnarrative stays\n'))
         self.assertNotIn('stale', text)
         self.assertIn('### model-offloading: models by harness', text)
+        # experiments are ordered by their newest result: offloading ran on 2026-11-09, routing on 2026-11-08
+        self.assertLess(text.index('### model-offloading: models by harness'), text.index('### llm-routing: models by harness'))
+        self.assertLess(text.index('**[model-offloading](index/experiment/model-offloading.md) on'),
+                        text.index('**[llm-routing](index/experiment/llm-routing.md) on'))
         # newest run first inside a matrix cell; category pages are linked relative to docs/results
         line = next(line for line in text.splitlines() if line.startswith('| [deepseek-r1-32b](index/model/deepseek-r1-32b.md)'))
         koboldcpp, cell = [c.strip() for c in line.strip('|').split(' | ')[1:]]      # harness columns are alphabetical
@@ -135,6 +139,13 @@ class ResultsIndexTests(unittest.TestCase):
                       '\n\n'
                       'No measured run with scored checks has been published yet.', text)
         self.assertIn(heading, (self.root / 'docs/results/index/README.md').read_text(encoding='utf-8'))
+
+    def test_results_readme_lists_newest_first(self):
+        from llm_eval.reporting.publish import write_index
+        write_index(self.root)
+        rows = [line for line in (self.root / 'docs/results/README.md').read_text(encoding='utf-8').splitlines() if '[Report]' in line]
+        self.assertEqual([line.split('](')[1].split('/')[1] for line in rows],
+                         ['campaign-b-offload', 'campaign-a-offload', 'campaign-a-routing'])
 
     def test_a_summary_without_markers_is_left_alone(self):
         self.summary.write_text('# Summary\n\nhand written\n', encoding='utf-8')
