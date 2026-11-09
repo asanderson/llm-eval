@@ -4,6 +4,29 @@ Generated from the published bundles by `llm-eval index-results`; do not edit by
 
 ## Navigate
 
+### Top 3 harness and model combinations per experiment and hardware configuration
+
+Ranked by share of checks passed (correct decisions for routing experiments, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians.
+
+**[llm-routing](experiment/llm-routing.md) on [raider-ubuntu](hardware/raider-ubuntu.md)**
+
+No measured run with scored checks has been published yet.
+
+**[llm-routing](experiment/llm-routing.md) on [raider-windows](hardware/raider-windows.md)**
+
+| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
+|---:|---|---|---:|---:|---:|---|
+| 1 | [ollama](harness/ollama.md) | [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) | 6/6 | 0.0282 | – | [2026-11-08](../llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
+| 2 | [ollama](harness/ollama.md) | [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) | 6/6 | 0.0496 | – | [2026-11-08](../llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
+
+**[model-offloading](experiment/model-offloading.md) on [raider-windows](hardware/raider-windows.md)**
+
+| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
+|---:|---|---|---:|---:|---:|---|
+| 1 | [lmstudio](harness/lmstudio.md) | [qwen38-27b](model/qwen38-27b.md) | 24/27 | 7.75 | 6.4 | [2026-11-09 cap 2048](../model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md) |
+| 2 | [ollama](harness/ollama.md) | [qwen38-27b](model/qwen38-27b.md) | 24/27 | 16.8 | 3.56 | [2026-11-09 cap 2048](../model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md) |
+| 3 | [koboldcpp](harness/koboldcpp.md) | [qwen38-27b](model/qwen38-27b.md) | 24/27 | 25 | 3.51 | [2026-11-09 cap 2048](../model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md) |
+
 ### Browse by category
 
 | Category | Indexes (results) |

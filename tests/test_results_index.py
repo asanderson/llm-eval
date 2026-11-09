@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from llm_eval.reporting.index import END, START, collect, identity, slug, write_results_index
+from llm_eval.reporting.index import END, START, collect, identity, slug, top_combinations, write_results_index
 
 
 def bundle(root, experiment, publication, created, jobs, summary, synthetic=False):
@@ -107,6 +107,34 @@ class ResultsIndexTests(unittest.TestCase):
         before = text
         write_results_index(self.root)
         self.assertEqual(self.summary.read_text(encoding='utf-8'), before)
+
+    def test_top_combinations_rank_by_checks_then_latency_per_experiment_and_hardware(self):
+        bundle(self.root, 'model-offloading', 'campaign-c-offload', '2026-11-09T14:52:55+00:00',
+               [offload_job('c1', 'ollama', 'qwen38-27b'), offload_job('c2', 'lmstudio', 'qwen38-27b'),
+                offload_job('c3', 'koboldcpp', 'gemma4-31b'), offload_job('c4', 'koboldcpp', 'qwen38-27b'),
+                offload_job('c5', 'lmstudio', 'unscored')],
+               [row('c1', 'coding', 18.7, 3.58, quality=1.0), row('c1', 'math', 16.0, 3.55, quality=1.0),
+                row('c2', 'coding', 7.7, 5.93, quality=1.0), row('c2', 'math', 7.2, 6.8, quality=1.0),
+                row('c3', 'coding', 1.1, 2.68, quality=8 / 9), row('c4', 'coding', 25.9, 3.54, quality=7 / 9),
+                row('c5', 'coding', 0.5, 9.0)])
+        best = top_combinations(collect(self.root))
+        self.assertEqual(sorted(best), [('model-offloading', 'raider-windows')])      # the only routing run is synthetic
+        self.assertEqual([(r['harness'], r['model'], r['score']) for r in best[('model-offloading', 'raider-windows')]],
+                         [('lmstudio', 'qwen38-27b', (18, 18)), ('ollama', 'qwen38-27b', (18, 18)), ('koboldcpp', 'gemma4-31b', (8, 9))])
+        # A combination is judged on its newest succeeded run: ollama/deepseek is the 0/9 rerun, not the older 3/18.
+        every = top_combinations(collect(self.root), limit=10)[('model-offloading', 'raider-windows')]
+        self.assertEqual([(r['harness'], r['model'], r['publication']) for r in every][3:],
+                         [('koboldcpp', 'qwen38-27b', 'campaign-c-offload'), ('ollama', 'deepseek-r1-32b', 'campaign-b-offload')])
+        write_results_index(self.root)
+        text = self.summary.read_text(encoding='utf-8')
+        heading = '### Top 3 harness and model combinations per experiment and hardware configuration'
+        self.assertLess(text.index(heading), text.index('### Browse by category'))
+        self.assertIn('| 1 | [lmstudio](index/harness/lmstudio.md) | [qwen38-27b](index/model/qwen38-27b.md) | 18/18 | 7.45 | 6.37 | '
+                      '[2026-11-09 cap 2048](model-offloading/campaign-c-offload/README.md) |', text)
+        self.assertIn('**[llm-routing](index/experiment/llm-routing.md) on [raider-ubuntu](index/hardware/raider-ubuntu.md)**'
+                      '\n\n'
+                      'No measured run with scored checks has been published yet.', text)
+        self.assertIn(heading, (self.root / 'docs/results/index/README.md').read_text(encoding='utf-8'))
 
     def test_a_summary_without_markers_is_left_alone(self):
         self.summary.write_text('# Summary\n\nhand written\n', encoding='utf-8')

@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import re
 import shutil
+import statistics
 from collections import defaultdict
 from pathlib import Path
 
@@ -44,11 +45,21 @@ def _span(values):
     return f'{low:.3g}' if f'{low:.3g}' == f'{high:.3g}' else f'{low:.3g}–{high:.3g}'
 
 
-def _ratio(rows, rate, count):
+def _counts(rows, rate, count):
     total = sum(r.get(count) or 0 for r in rows)
     if not total:
         return None
-    return f"{round(sum((r.get(rate) or 0) * (r.get(count) or 0) for r in rows))}/{total}"
+    return round(sum((r.get(rate) or 0) * (r.get(count) or 0) for r in rows)), total
+
+
+def _ratio(rows, rate, count):
+    counts = _counts(rows, rate, count)
+    return None if counts is None else f"{counts[0]}/{counts[1]}"
+
+
+def _middle(values):
+    values = [v for v in values if isinstance(v, (int, float)) and not isinstance(v, bool)]
+    return statistics.median(values) if values else None
 
 
 def collect(root):
@@ -79,6 +90,10 @@ def collect(root):
                 'tokens_per_s': _span(r.get('output_tokens_per_wall_second_median') for r in rows),
                 'quality': _ratio(rows, 'quality_pass_rate', 'quality_check_n'),
                 'decisions': _ratio(rows, 'decision_accuracy', 'decision_labelled_n'),
+                # Ranking inputs: correct decisions where the experiment labels them, otherwise quality passes.
+                'score': _counts(rows, 'decision_accuracy', 'decision_labelled_n') or _counts(rows, 'quality_pass_rate', 'quality_check_n'),
+                'wall_mid': _middle(r.get('elapsed_s_median') for r in rows),
+                'tokens_mid': _middle(r.get('output_tokens_per_wall_second_median') for r in rows),
                 'report': f"{bundle.parent.name}/{bundle.name}/README.md",
             })
     records.sort(key=lambda r: (r['experiment'], r['hardware'], r['harness'], r['model'], str(r['case'])))
@@ -109,9 +124,51 @@ def table(records, index_prefix, report_prefix):
     return '\n'.join(lines)
 
 
+RANKING_RULE = ('Ranked by share of checks passed (correct decisions for routing experiments, quality checks otherwise), '
+                'then lower median wall time per request, then higher output tokens per second. Each harness and model '
+                'combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and '
+                'runs without scored checks are not ranked. Wall time and token rate are the median of the category medians.')
+
+
+def top_combinations(records, limit=3):
+    """{(experiment, hardware): best `limit` records}, one record per harness and model combination."""
+    newest = {}
+    for r in records:      # records arrive newest first
+        if r['synthetic'] or r['status'] != 'succeeded' or not r['score']:
+            continue
+        newest.setdefault((r['experiment'], r['hardware'], r['harness'], r['model']), r)
+    groups = defaultdict(list)
+    for (experiment, hardware, _, _), r in newest.items():
+        groups[(experiment, hardware)].append(r)
+
+    def order(r):
+        return (-r['score'][0] / r['score'][1], r['wall_mid'] if r['wall_mid'] is not None else float('inf'),
+                -(r['tokens_mid'] or 0), r['harness'], r['model'])
+    return {key: sorted(groups[key], key=order)[:limit] for key in sorted(groups)}
+
+
+def ranking(records, index_prefix, report_prefix, limit=3):
+    lines = [f'### Top {limit} harness and model combinations per experiment and hardware configuration', '', RANKING_RULE]
+    pairs = sorted({(r['experiment'], r['hardware']) for r in records})
+    best = top_combinations(records, limit)
+    for experiment, hardware in pairs:
+        lines += ['', f"**{_link('experiment', experiment, index_prefix)} on {_link('hardware', hardware, index_prefix)}**", '']
+        chosen = best.get((experiment, hardware))
+        if not chosen:
+            lines.append('No measured run with scored checks has been published yet.')
+            continue
+        lines += ['| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |', '|---:|---|---|---:|---:|---:|---|']
+        for rank, r in enumerate(chosen, 1):
+            lines.append(f"| {rank} | {_link('harness', r['harness'], index_prefix)} | {_link('model', r['model'], index_prefix)} | "
+                         f"{r['score'][0]}/{r['score'][1]} | {_cell(None if r['wall_mid'] is None else format(r['wall_mid'], '.3g'))} | "
+                         f"{_cell(None if r['tokens_mid'] is None else format(r['tokens_mid'], '.3g'))} | "
+                         f"[{r['date']}{' cap ' + str(r['output_cap']) if r['output_cap'] else ''}]({report_prefix}{r['report']}) |")
+    return '\n'.join(lines)
+
+
 def overview(records, index_prefix, report_prefix):
-    """Browse-by links and one harness-by-model matrix per experiment."""
-    lines = ['### Browse by category', '', '| Category | Indexes (results) |', '|---|---|']
+    """Top combinations, browse-by links and one harness-by-model matrix per experiment."""
+    lines = [ranking(records, index_prefix, report_prefix), '', '### Browse by category', '', '| Category | Indexes (results) |', '|---|---|']
     for category, title in CATEGORIES:
         counts = defaultdict(int)
         for r in records:
