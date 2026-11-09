@@ -3,7 +3,9 @@ import threading
 import time
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from unittest import mock
 
+from llm_eval import adapters
 from llm_eval.adapters import HTTPAdapter, endpoint_parts, request_events
 
 
@@ -16,6 +18,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         self.rfile.read(int(self.headers["Content-Length"]))
+        if self.mode == "late":
+            time.sleep(.3)
         if self.mode == "redirect":
             self.send_response(302)
             self.send_header("Location", "http://example.com/")
@@ -114,6 +118,13 @@ class ProtocolTests(unittest.TestCase):
         self.config["timeout_s"] = .05
         with self.assertRaises(TimeoutError):
             self.generate()
+
+    def test_slow_first_byte_is_bounded_by_request_deadline_not_connect_timeout(self):
+        # Ollama loads the model on the first request; a 30 GiB load kept the socket silent for 30 s.
+        self.handler.mode = "late"
+        with mock.patch.object(adapters, 'CONNECT_TIMEOUT_S', .1):
+            result = self.generate()
+        self.assertEqual(result["finish_reason"], "stop")
 
     def test_endpoint_scope(self):
         for url in ["https://example.com/", "http://192.168.1.1/", "http://localhost/", "http://user:pw@127.0.0.1/", "file:///tmp/a", "http://127.0.0.1/?key=x"]:

@@ -40,10 +40,13 @@ def configured_endpoint(url, network=None):
     return parts
 
 
+CONNECT_TIMEOUT_S = 30
+
+
 def request_events(url, payload, protocol, timeout_s, api_key_env=None, network=None):
     parts = configured_endpoint(url, network)
     connection = http.client.HTTPSConnection if parts.scheme == 'https' else http.client.HTTPConnection
-    conn = connection(parts.hostname, parts.port or (443 if parts.scheme == 'https' else 80), timeout=min(timeout_s, 30))
+    conn = connection(parts.hostname, parts.port or (443 if parts.scheme == 'https' else 80), timeout=min(timeout_s, CONNECT_TIMEOUT_S))
     headers = {"Content-Type": "application/json", "Accept": "text/event-stream"}
     if api_key_env:
         key = os.environ.get(api_key_env)
@@ -69,6 +72,9 @@ def request_events(url, payload, protocol, timeout_s, api_key_env=None, network=
     timer.start()
     try:
         conn.connect()
+        # The short timeout bounds the connect only. A backend that loads the model on the first request, or
+        # prefills a long prompt on CPU, can stay silent far longer; the request deadline bounds those reads.
+        conn.sock.settimeout(timeout_s)
         active_socket[0] = conn.sock
         conn.request("POST", parts.path or "/", body=json.dumps(payload).encode(), headers=headers)
         response = conn.getresponse()
