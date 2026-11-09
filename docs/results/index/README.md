@@ -8,11 +8,11 @@ Generated from the published bundles by `llm-eval index-results`; do not edit by
 
 | Category | Indexes (results) |
 |---|---|
-| Hardware configuration | [raider-ubuntu](hardware/raider-ubuntu.md) (1) · [raider-windows](hardware/raider-windows.md) (5) |
-| Experiment | [llm-routing](experiment/llm-routing.md) (3) · [model-offloading](experiment/model-offloading.md) (3) |
-| Harness | [category](harness/category.md) (1) · [ollama](harness/ollama.md) (5) |
-| Model | [category](model/category.md) (1) · [deepseek-r1-32b](model/deepseek-r1-32b.md) (3) · [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) (1) · [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) (1) |
-| Date (UTC) | [2026-11-08](date/2026-11-08.md) (6) |
+| Hardware configuration | [raider-ubuntu](hardware/raider-ubuntu.md) (1) · [raider-windows](hardware/raider-windows.md) (8) |
+| Experiment | [llm-routing](experiment/llm-routing.md) (3) · [model-offloading](experiment/model-offloading.md) (6) |
+| Harness | [category](harness/category.md) (1) · [koboldcpp](harness/koboldcpp.md) (1) · [lmstudio](harness/lmstudio.md) (1) · [ollama](harness/ollama.md) (6) |
+| Model | [category](model/category.md) (1) · [deepseek-r1-32b](model/deepseek-r1-32b.md) (6) · [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) (1) · [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) (1) |
+| Date (UTC) | [2026-11-09](date/2026-11-09.md) (3) · [2026-11-08](date/2026-11-08.md) (6) |
 
 ### llm-routing: models by harness
 
@@ -28,14 +28,17 @@ Each cell links to the report of every published run of that model on that harne
 
 Each cell links to the report of every published run of that model on that harness, newest first.
 
-| Model | [ollama](harness/ollama.md) |
-|---|---|
-| [deepseek-r1-32b](model/deepseek-r1-32b.md) | [2026-11-08 raider-windows cap 2048](../model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/README.md)<br>[2026-11-08 raider-windows cap 256](../model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/README.md)<br>[2026-11-08 raider-windows cap 256 failed](../model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/README.md) |
+| Model | [koboldcpp](harness/koboldcpp.md) | [lmstudio](harness/lmstudio.md) | [ollama](harness/ollama.md) |
+|---|---|---|---|
+| [deepseek-r1-32b](model/deepseek-r1-32b.md) | [2026-11-09 raider-windows cap 2048](../model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md) | [2026-11-09 raider-windows cap 2048](../model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md) | [2026-11-09 raider-windows cap 2048](../model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md)<br>[2026-11-08 raider-windows cap 2048](../model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/README.md)<br>[2026-11-08 raider-windows cap 256](../model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/README.md)<br>[2026-11-08 raider-windows cap 256 failed](../model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/README.md) |
 
 ## All results
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
+| [2026-11-09](date/2026-11-09.md) | [model-offloading](experiment/model-offloading.md) | [raider-windows](hardware/raider-windows.md) | [koboldcpp](harness/koboldcpp.md) | [deepseek-r1-32b](model/deepseek-r1-32b.md) | deepseek-r1-32b-koboldcpp | 2048 | succeeded | 27 | 0 | 72.4–114 | 3.49 | 6/27 | – | [report](../model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md) |
+| [2026-11-09](date/2026-11-09.md) | [model-offloading](experiment/model-offloading.md) | [raider-windows](hardware/raider-windows.md) | [lmstudio](harness/lmstudio.md) | [deepseek-r1-32b](model/deepseek-r1-32b.md) | deepseek-r1-32b-lmstudio | 2048 | succeeded | 27 | 0 | 99.5–145 | 2.6 | 3/27 | – | [report](../model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md) |
+| [2026-11-09](date/2026-11-09.md) | [model-offloading](experiment/model-offloading.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [deepseek-r1-32b](model/deepseek-r1-32b.md) | deepseek-r1-32b-ollama | 2048 | succeeded | 27 | 0 | 70.4–120 | 3.44–3.45 | 3/27 | – | [report](../model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md) |
 | [2026-11-08](date/2026-11-08.md) | [model-offloading](experiment/model-offloading.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [deepseek-r1-32b](model/deepseek-r1-32b.md) | deepseek-r1-32b-q8 | 2048 | succeeded | 27 | 0 | 70.3–120 | 3.44–3.46 | 3/27 | – | [report](../model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/README.md) |
 | [2026-11-08](date/2026-11-08.md) | [llm-routing](experiment/llm-routing.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) | ollama-nimble | – | succeeded | 6 | 0 | 0.0495–0.0497 | – | – | 6/6 | [report](../llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
 | [2026-11-08](date/2026-11-08.md) | [llm-routing](experiment/llm-routing.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) | ollama-tev1 | – | succeeded | 6 | 0 | 0.0274–0.0291 | – | – | 6/6 | [report](../llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
