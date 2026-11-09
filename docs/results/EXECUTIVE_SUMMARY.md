@@ -10,11 +10,11 @@ Operator-written conclusions over the published result bundles in this directory
 
 | Category | Indexes (results) |
 |---|---|
-| Hardware configuration | [raider-ubuntu](index/hardware/raider-ubuntu.md) (1) · [raider-windows](index/hardware/raider-windows.md) (5) |
-| Experiment | [llm-routing](index/experiment/llm-routing.md) (3) · [model-offloading](index/experiment/model-offloading.md) (3) |
-| Harness | [category](index/harness/category.md) (1) · [ollama](index/harness/ollama.md) (5) |
-| Model | [category](index/model/category.md) (1) · [deepseek-r1-32b](index/model/deepseek-r1-32b.md) (3) · [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) (1) · [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) (1) |
-| Date (UTC) | [2026-11-08](index/date/2026-11-08.md) (6) |
+| Hardware configuration | [raider-ubuntu](index/hardware/raider-ubuntu.md) (1) · [raider-windows](index/hardware/raider-windows.md) (8) |
+| Experiment | [llm-routing](index/experiment/llm-routing.md) (3) · [model-offloading](index/experiment/model-offloading.md) (6) |
+| Harness | [category](index/harness/category.md) (1) · [koboldcpp](index/harness/koboldcpp.md) (1) · [lmstudio](index/harness/lmstudio.md) (1) · [ollama](index/harness/ollama.md) (6) |
+| Model | [category](index/model/category.md) (1) · [deepseek-r1-32b](index/model/deepseek-r1-32b.md) (6) · [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) (1) · [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) (1) |
+| Date (UTC) | [2026-11-09](index/date/2026-11-09.md) (3) · [2026-11-08](index/date/2026-11-08.md) (6) |
 
 ### llm-routing: models by harness
 
@@ -30,9 +30,9 @@ Each cell links to the report of every published run of that model on that harne
 
 Each cell links to the report of every published run of that model on that harness, newest first.
 
-| Model | [ollama](index/harness/ollama.md) |
-|---|---|
-| [deepseek-r1-32b](index/model/deepseek-r1-32b.md) | [2026-11-08 raider-windows cap 2048](model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/README.md)<br>[2026-11-08 raider-windows cap 256](model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/README.md)<br>[2026-11-08 raider-windows cap 256 failed](model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/README.md) |
+| Model | [koboldcpp](index/harness/koboldcpp.md) | [lmstudio](index/harness/lmstudio.md) | [ollama](index/harness/ollama.md) |
+|---|---|---|---|
+| [deepseek-r1-32b](index/model/deepseek-r1-32b.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md) | [2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md)<br>[2026-11-08 raider-windows cap 2048](model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/README.md)<br>[2026-11-08 raider-windows cap 256](model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/README.md)<br>[2026-11-08 raider-windows cap 256 failed](model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/README.md) |
 
 Full table and per-category pages: [results index](index/README.md).
 
@@ -50,7 +50,7 @@ Pinned archive install, private server on loopback, one loaded model, one parall
 
 ##### Model: `deepseek-r1-32b` (DeepSeek-R1-Distill-Qwen-32B Q8_0, 34.8 GB GGUF, SHA256-locked)
 
-Hardware configuration `raider-windows`, 20 of 65 layers on GPU, 16 CPU threads.
+Hardware configuration `raider-windows`, 20 of 65 layers on GPU, 16 CPU threads. The 2026-11-08 runs used a hand-started private server; the 2026-11-09 run used a harness-managed one.
 
 | Run (UTC) | Output cap | Category | Requests | Wall s (median / p95) | First output s | First visible s | Output tokens (median / max) | Output tok/s | Finish reason | Quality |
 |---|---:|---|---:|---:|---:|---:|---:|---:|---|---:|
@@ -60,17 +60,69 @@ Hardware configuration `raider-windows`, 20 of 65 layers on GPU, 16 CPU threads.
 | [2026-11-08 14:06](model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/README.md) | 2,048 | coding | 9 | 119.8 / 132.7 | 0.92 | 107.9 | 413 / 457 | 3.44 | stop 9/9 | 3/9 |
 | | 2,048 | math | 9 | 70.3 / 82.5 | 0.90 | 25.7 | 243 / 285 | 3.46 | stop 9/9 | 0/9 |
 | | 2,048 | reasoning | 9 | 88.1 / 112.5 | 0.92 | 83.2 | 304 / 388 | 3.45 | stop 9/9 | 0/9 |
+| [2026-11-09 11:12](model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md) | 2,048 | coding | 9 | 119.7 / 134.7 | 0.92 | 107.8 | 413 / 457 | 3.44 | stop 9/9 | 3/9 |
+| | 2,048 | math | 9 | 70.4 / 82.7 | 0.90 | 25.8 | 243 / 285 | 3.44 | stop 9/9 | 0/9 |
+| | 2,048 | reasoning | 9 | 88.2 / 112.5 | 0.92 | 83.3 | 304 / 388 | 3.45 | stop 9/9 | 0/9 |
 
 | Run | Peak system RAM | Backend RSS | Peak GPU memory | GPU utilization | GPU power | GPU temperature | Swap used (in/out) |
 |---|---:|---:|---:|---:|---:|---:|---|
-| 256 cap | 34.1 GiB | 24.6 GiB | 12.1 GiB | 100 % | 39.5 W | 47 °C | 1.3 GiB (0 / 0) |
-| 2,048 cap | 34.9 GiB | 25.0 GiB | 12.1 GiB | 94 % | 47.1 W | 47 °C | 1.0 GiB (0 / 0) |
+| 256 cap | 34.1 GiB | 24.6 GiB | 11.8 GiB | 100 % | 39.5 W | 47 °C | 1.3 GiB (0 / 0) |
+| 2,048 cap | 34.9 GiB | 25.0 GiB | 11.8 GiB | 94 % | 47.1 W | 47 °C | 1.0 GiB (0 / 0) |
+| 2,048 cap, 2026-11-09 | 37.4 GiB | 25.0 GiB | 11.8 GiB | 95 % | 43.5 W | 47 °C | 0.8 GiB (0 / 0) |
 
 - **Throughput is stable and cap-independent**: about 3.45 output tokens per second in both runs. Cold model load added 22.9 s to the first warmup.
 - **The 256 cap truncates most answers.** 21 of 27 requests ended with `length` and 15 never produced visible text, their budget spent inside the model's `<think>` block. The six math requests that finished naturally still failed the exact checks.
 - **At 2,048 the model stops on its own** after 243 to 460 tokens. "First visible" (time until non-reasoning text) is the user-facing latency: 26 s for math, 108 s for coding.
 - **Quality 3/27 is an instruction-following score, not correctness.** A live reproduction of the arithmetic task returned the right answer as `\boxed{3973}` inside a LaTeX walkthrough, which fails the suite's `exact` check against `3973`. The suite's own `quality_scope` says it is not a reasoning benchmark.
+- **The result reproduces.** The 2026-11-09 run used a harness-managed Ollama server instead of a hand-started one and landed within 1 % of the 2026-11-08 run on every latency and throughput figure, with the same three quality passes.
 - An [earlier attempt](model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/README.md) on 2026-11-08 03:53 failed with 36 connection-refused requests because the private Ollama process was ended by hand. It is operator error and carries no measurement.
+
+#### Harness: KoboldCpp 1.124.2
+
+Pinned prebuilt CUDA binary, started by the harness on loopback with `--usecublas --gpulayers 20 --threads 16`, OpenAI-compatible chat endpoint.
+
+##### Model: `deepseek-r1-32b` (same SHA256-locked GGUF)
+
+Hardware configuration `raider-windows`, 20 of 65 layers on GPU (confirmed in the backend log), 16 CPU threads.
+
+| Run (UTC) | Output cap | Category | Requests | Wall s (median / p95) | First output s | First visible s | Output tokens (median / max) | Output tok/s | Finish reason | Quality |
+|---|---:|---|---:|---:|---:|---:|---:|---:|---|---:|
+| [2026-11-09 11:12](model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md) | 2,048 | coding | 9 | 114.0 / 131.7 | 1.09 | 105.7 | 398 / 460 | 3.49 | stop 9/9 | 6/9 |
+| | 2,048 | math | 9 | 72.4 / 81.6 | 1.09 | 28.4 | 252 / 285 | 3.49 | stop 9/9 | 0/9 |
+| | 2,048 | reasoning | 9 | 87.0 / 111.1 | 1.09 | 82.4 | 304 / 388 | 3.49 | stop 9/9 | 0/9 |
+
+- **Same speed as Ollama.** 3.49 output tokens per second against 3.44, a 1.5 % difference, with the same 20-layer split and the same GPU memory.
+- **Reasoning is reported separately** over the OpenAI-compatible endpoint, and token counts come from backend usage, so first-visible latency and throughput are directly comparable with Ollama.
+
+#### Harness: LM Studio 0.4.28+2
+
+Desktop app with its bundled llama.cpp runtime, model imported by hard link and loaded by the harness through `lms`, OpenAI-compatible chat endpoint. LM Studio takes GPU placement as a ratio; the run requested 0.308 (20 of 65 layers).
+
+##### Model: `deepseek-r1-32b` (same SHA256-locked GGUF)
+
+Hardware configuration `raider-windows`, GPU offload ratio 0.308. The layer count LM Studio actually placed is not in its log; peak GPU memory matches the other two harnesses.
+
+| Run (UTC) | Output cap | Category | Requests | Wall s (median / p95) | First output s | First visible s | Output tokens (median / max) | Output tok/s | Finish reason | Quality |
+|---|---:|---|---:|---:|---:|---:|---:|---:|---|---:|
+| [2026-11-09 11:12](model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md) | 2,048 | coding | 9 | 145.5 / 165.0 | 1.20 | 134.7 | 378 / 428 | 2.60 | stop 9/9 | 0/9 |
+| | 2,048 | math | 9 | 99.5 / 115.7 | 1.18 | 36.4 | 259 / 301 | 2.60 | stop 9/9 | 0/9 |
+| | 2,048 | reasoning | 9 | 139.7 / 290.0 | 1.19 | 138.9 | 363 / 749 | 2.60 | stop 9/9 | 3/9 |
+
+- **About 25 % slower than the other two harnesses**: 2.60 output tokens per second against 3.44 to 3.49, on the same weights and the same GPU memory.
+- **Much more host memory.** The backend process tree peaked at 35.7 GiB resident against 23.7 to 25.0 GiB, roughly the whole 32.4 GiB file plus runtime, and system RAM peaked at 46.9 GiB. Peak GPU utilization was 34 % against 95 to 100 %. The cause is not established; thread count and memory-mapping defaults were left at LM Studio's own values, which is the likely place to look.
+- **Longer answers on reasoning tasks.** One request ran to 749 tokens and 290 s, which sets the p95.
+
+#### `deepseek-r1-32b` across harnesses (2026-11-09, 2,048 cap, same GGUF, same 20-layer split)
+
+| Harness | Output tok/s | Wall s (coding / math / reasoning) | First visible s (coding / math / reasoning) | Backend RSS | Peak system RAM | Peak GPU memory | Peak GPU utilization | Peak GPU power | Errors | Quality |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Ollama 0.40.15 | 3.44 | 119.7 / 70.4 / 88.2 | 107.8 / 25.8 / 83.3 | 25.0 GiB | 37.4 GiB | 12,063 MiB | 95 % | 43.5 W | 0/27 | 3/27 |
+| KoboldCpp 1.124.2 | 3.49 | 114.0 / 72.4 / 87.0 | 105.7 / 28.4 / 82.4 | 23.7 GiB | 36.3 GiB | 12,161 MiB | 100 % | 44.8 W | 0/27 | 6/27 |
+| LM Studio 0.4.28+2 | 2.60 | 145.5 / 99.5 / 139.7 | 134.7 / 36.4 / 138.9 | 35.7 GiB | 46.9 GiB | 12,103 MiB | 34 % | 36.2 W | 0/27 | 3/27 |
+
+- **All three harnesses serve the over-VRAM model without errors or paging.** No swap-in or swap-out was recorded in any job.
+- **Ollama and KoboldCpp are interchangeable on speed and memory** for this model. LM Studio at its defaults costs a quarter of the throughput and about 11 GiB more RAM.
+- **Quality differences between harnesses are formatting, not capability.** Passes come in whole tasks: Ollama passes one coding task, KoboldCpp passes two, LM Studio passes one reasoning task, each on all three repeats. The weights are identical, so the spread reflects how each harness's template and sampling defaults shape the final line that the `exact` check reads.
 
 ### Experiment `llm-routing` (mode `decision`)
 
@@ -99,11 +151,12 @@ Declared for hardware configuration `raider-ubuntu`, [run of 2026-11-08 01:38](l
 
 MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 285HX, NVIDIA RTX 5090 Laptop (24,463 MiB, driver 610.74), 63.4 GiB RAM, Phison 2 TB NVMe (NTFS), Windows 11 Pro 10.0.26300, AC power, MSI Center "Best Performance", MUX in MSHybrid mode. VMware, the consumer Ollama tray app and Teams were closed before the measured runs.
 
-- A 32B Q8_0 model is runnable with 20 GPU layers but slow: about 3.45 output tokens per second and 70 to 120 s per short answer, with a 24 to 25 GiB resident backend and 35 GiB peak system RAM. No paging was observed on a 63.4 GiB host.
+- A 32B Q8_0 model is runnable with 20 GPU layers but slow: about 3.45 output tokens per second and 70 to 120 s per short answer on Ollama and KoboldCpp, with a 24 to 25 GiB resident backend and 35 to 37 GiB peak system RAM. No paging was observed on a 63.4 GiB host.
+- Harness choice matters less than placement for this model, with one exception: LM Studio at its defaults delivered 2.60 tokens per second and used about 11 GiB more RAM than the other two.
 - GPU power peaked at 39 to 47 W against a 95 W default limit, so decode is bound by the CPU and host-memory side of the split (45 of 65 layers on CPU), not by the GPU. More GPU layers or a smaller quantization is the obvious lever; a `gpu_layers` sweep is the next experiment.
 - Both routing candidates cost tens of milliseconds and are perfectly accurate on the smoke set.
-- The two offload runs agree on every performance metric. Read the quality column as zero-information for DeepSeek-R1 on the smoke suites until a check tolerant of trailing prose, or a system prompt forcing terse output, is in place.
-- Only Ollama and one offload model have published results so far. Other harnesses and models appear in the index as their bundles are published.
+- The three Ollama runs agree on every performance metric. Read the quality column as zero-information for DeepSeek-R1 on the smoke suites until a check tolerant of trailing prose, or a system prompt forcing terse output, is in place.
+- Three harnesses and one offload model have published results so far. The remaining catalog candidates are being run on the same three harnesses and appear in the index as their bundles are published.
 
 ### `raider-ubuntu`
 
