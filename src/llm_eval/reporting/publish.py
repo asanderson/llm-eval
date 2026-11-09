@@ -79,6 +79,12 @@ def write_index(worktree):
 def publish_report(report,root,dry_run=False,api=None):
     report=Path(report).resolve();root=Path(root).resolve()
     spec,manifest,size=validate_bundle(report)
+    # Decided from every experiment identity the bundle carries, not from one label a caller could edit.
+    from llm_eval.experiments import reporting_policy
+    resolved=read_json(report/'bundle'/spec['report_path']/'resolved-config.json')
+    for name in {spec['experiment_id'],manifest['experiment_id'],resolved['experiment']['experiment_id'],*(j['experiment_id'] for j in resolved['jobs'])}:
+        policy=reporting_policy(name,[])
+        if not policy['publish']:raise ValueError('Publication is not available for '+name+': '+policy['reason'])
     branch='results/'+spec['experiment_id']+'/'+spec['publication_id']
     if dry_run:return {'branch':branch,'bytes':size,'files':list(manifest['files']),'dry_run':True}
     lock=ProcessLock(report/'.publish.lock');lock.acquire()

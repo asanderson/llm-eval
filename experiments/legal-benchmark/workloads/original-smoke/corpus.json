@@ -1,0 +1,435 @@
+{
+  "schema_version": 1,
+  "data_class": "public-synthetic",
+  "jurisdiction_profile": "veld-fictional-v1",
+  "source_set": "candidate",
+  "venues": [
+    "veld-central",
+    "veld-harbor"
+  ],
+  "authorities": [
+    {
+      "authority_id": "vsc-12-4",
+      "version": "2019",
+      "citation": "Veld Statutes Consolidated s12.4",
+      "title": "Removal of entrusted goods",
+      "issuer": "Assembly of Veld (fictional)",
+      "authority_type": "offence",
+      "venues": [
+        "veld-central"
+      ],
+      "effective_from": "2019-01-01",
+      "effective_to": "2024-03-01",
+      "status": "superseded",
+      "pinpoint": "s12.4(1)",
+      "text": "A person who removes entrusted goods valued above 500 marks from a registered warehouse without the keeper's consent commits an offence.",
+      "text_sha256": "945b9a0adb4215fe974468bfbf73d1ff487c3ca0197124f393a5f4ca6ee76810",
+      "elements": [
+        {
+          "element_id": "removal",
+          "description": "Evidence that the goods were removed from the warehouse.",
+          "terms": [
+            "removed the"
+          ]
+        },
+        {
+          "element_id": "entrusted",
+          "description": "Evidence that the goods had been entrusted to the keeper.",
+          "terms": [
+            "entrusted"
+          ]
+        },
+        {
+          "element_id": "no-consent",
+          "description": "Evidence on whether the keeper consented.",
+          "terms": [
+            "without the keeper's consent"
+          ],
+          "negating_terms": [
+            "with the keeper's written consent"
+          ]
+        },
+        {
+          "element_id": "value-threshold",
+          "description": "Evidence that the goods were valued above 500 marks.",
+          "terms": [
+            "valued above 500 marks"
+          ]
+        }
+      ]
+    },
+    {
+      "authority_id": "vsc-12-4",
+      "version": "2024",
+      "citation": "Veld Statutes Consolidated s12.4",
+      "title": "Removal of entrusted goods",
+      "issuer": "Assembly of Veld (fictional)",
+      "authority_type": "offence",
+      "venues": [
+        "veld-central"
+      ],
+      "effective_from": "2024-03-01",
+      "effective_to": null,
+      "status": "in_force",
+      "pinpoint": "s12.4(1)",
+      "text": "A person who removes entrusted goods from a registered warehouse without the keeper's consent commits an offence.",
+      "text_sha256": "2117fa01cc815652e0e56bc4d8b4390fa958b271f302f3d793df170975b517e6",
+      "elements": [
+        {
+          "element_id": "removal",
+          "description": "Evidence that the goods were removed from the warehouse.",
+          "terms": [
+            "removed the"
+          ]
+        },
+        {
+          "element_id": "entrusted",
+          "description": "Evidence that the goods had been entrusted to the keeper.",
+          "terms": [
+            "entrusted"
+          ]
+        },
+        {
+          "element_id": "no-consent",
+          "description": "Evidence on whether the keeper consented.",
+          "terms": [
+            "without the keeper's consent"
+          ],
+          "negating_terms": [
+            "with the keeper's written consent"
+          ]
+        }
+      ]
+    },
+    {
+      "authority_id": "vho-3-1",
+      "version": "2020",
+      "citation": "Veld Harbor Ordinance s3.1",
+      "title": "Unlicensed mooring in the harbor",
+      "issuer": "Assembly of Veld (fictional)",
+      "authority_type": "offence",
+      "venues": [
+        "veld-harbor"
+      ],
+      "effective_from": "2020-05-01",
+      "effective_to": null,
+      "status": "in_force",
+      "pinpoint": "s3.1(1)",
+      "text": "A master who moors a vessel in the harbor basin without a mooring licence commits an offence.",
+      "text_sha256": "8756ed41cb706e44958e2d94ea6b3f8f4adce1b206b06a9ac0d270e23b0a5655",
+      "elements": [
+        {
+          "element_id": "moored",
+          "description": "Evidence that the vessel was moored.",
+          "terms": [
+            "moored the vessel"
+          ]
+        },
+        {
+          "element_id": "no-licence",
+          "description": "Evidence on whether a mooring licence was held.",
+          "terms": [
+            "no mooring licence"
+          ],
+          "negating_terms": [
+            "held a valid mooring licence"
+          ]
+        }
+      ]
+    },
+    {
+      "authority_id": "vsc-30-2",
+      "version": "2026",
+      "citation": "Veld Statutes Consolidated s30.2",
+      "title": "Unlicensed mooring on inland waters",
+      "issuer": "Assembly of Veld (fictional)",
+      "authority_type": "offence",
+      "venues": [
+        "veld-central"
+      ],
+      "effective_from": "2026-01-01",
+      "effective_to": null,
+      "status": "in_force",
+      "pinpoint": "s30.2(1)",
+      "text": "A master who moors a vessel on inland waters without a mooring licence commits an offence.",
+      "text_sha256": "5ae9c72d7cea003eeb6ffaa53820087afb66e20fef1cf1d3c2002bf582dd0cf7",
+      "elements": [
+        {
+          "element_id": "moored",
+          "description": "Evidence that the vessel was moored.",
+          "terms": [
+            "moored the vessel"
+          ]
+        },
+        {
+          "element_id": "no-licence",
+          "description": "Evidence on whether a mooring licence was held.",
+          "terms": [
+            "no mooring licence"
+          ],
+          "negating_terms": [
+            "held a valid mooring licence"
+          ]
+        }
+      ]
+    },
+    {
+      "authority_id": "vsc-18-7",
+      "version": "2016",
+      "citation": "Veld Statutes Consolidated s18.7",
+      "title": "Sale by unstamped measures",
+      "issuer": "Assembly of Veld (fictional)",
+      "authority_type": "offence",
+      "venues": [
+        "veld-central"
+      ],
+      "effective_from": "2016-02-01",
+      "effective_to": null,
+      "status": "in_force",
+      "pinpoint": "s18.7(1)",
+      "text": "A trader who sells goods by an unstamped measure at a public market commits an offence.",
+      "text_sha256": "9780b71bf1517004afecfc63c5fc20641c752265d6fa19f3e2fd34c715e6147b",
+      "elements": [
+        {
+          "element_id": "sale",
+          "description": "Evidence that goods were sold.",
+          "terms": [
+            "sold"
+          ]
+        },
+        {
+          "element_id": "unstamped",
+          "description": "Evidence on whether the measure was stamped.",
+          "terms": [
+            "unstamped measure"
+          ],
+          "negating_terms": [
+            "bore a current stamp"
+          ]
+        }
+      ]
+    },
+    {
+      "authority_id": "vsc-21-3",
+      "version": "2017",
+      "citation": "Veld Statutes Consolidated s21.3",
+      "title": "Tampering with a courier seal",
+      "issuer": "Assembly of Veld (fictional)",
+      "authority_type": "offence",
+      "venues": [
+        "veld-central"
+      ],
+      "effective_from": "2017-09-01",
+      "effective_to": null,
+      "status": "in_force",
+      "pinpoint": "s21.3(1)",
+      "text": "A person who breaks the seal of a courier consignment in their custody without authorisation commits an offence.",
+      "text_sha256": "525f652ccd59bdbbfe69e526db0c395eb0547a569898e46a3b9ad925fd2f51cf",
+      "elements": [
+        {
+          "element_id": "seal-broken",
+          "description": "Evidence on the state of the seal.",
+          "terms": [
+            "seal was broken"
+          ],
+          "negating_terms": [
+            "seal was intact"
+          ]
+        },
+        {
+          "element_id": "custody",
+          "description": "Evidence that the consignment was in the respondent's custody.",
+          "terms": [
+            "in the respondent's custody"
+          ]
+        },
+        {
+          "element_id": "no-authorisation",
+          "description": "Evidence on whether opening was authorised.",
+          "terms": [
+            "without authorisation"
+          ]
+        }
+      ]
+    },
+    {
+      "authority_id": "vsc-40-1",
+      "version": "2012",
+      "citation": "Veld Statutes Consolidated s40.1",
+      "title": "Negligent ignition in a public archive",
+      "issuer": "Assembly of Veld (fictional)",
+      "authority_type": "offence",
+      "venues": [
+        "veld-central"
+      ],
+      "effective_from": "2012-04-01",
+      "effective_to": null,
+      "status": "in_force",
+      "pinpoint": "s40.1(1)",
+      "text": "A person who lights a flame in a public archive and leaves it unattended commits an offence.",
+      "text_sha256": "7695636e0d6fd11950a5f7db84f03f52d9e1ce18eee9e13fbc0e0c6e534b59de",
+      "elements": [
+        {
+          "element_id": "ignition",
+          "description": "Evidence that a flame was lit.",
+          "terms": [
+            "lit a"
+          ]
+        },
+        {
+          "element_id": "public-archive",
+          "description": "Evidence that the place was a public archive.",
+          "terms": [
+            "public archive"
+          ]
+        },
+        {
+          "element_id": "unattended",
+          "description": "Evidence on whether the flame was left unattended.",
+          "terms": [
+            "left it unattended"
+          ],
+          "negating_terms": [
+            "remained in attendance"
+          ]
+        }
+      ]
+    },
+    {
+      "authority_id": "vsc-33-9",
+      "version": "2015",
+      "citation": "Veld Statutes Consolidated s33.9",
+      "title": "Toll evasion at a bridge",
+      "issuer": "Assembly of Veld (fictional)",
+      "authority_type": "offence",
+      "venues": [
+        "veld-central"
+      ],
+      "effective_from": "2015-07-01",
+      "effective_to": "2025-01-01",
+      "status": "repealed",
+      "pinpoint": "s33.9(1)",
+      "text": "A driver who crosses a toll bridge without paying the toll commits an offence.",
+      "text_sha256": "d423746f57af543d8f3bdf6d27002d5edba2d2ed6c43cb3f32589de1c41041ff",
+      "elements": [
+        {
+          "element_id": "crossing",
+          "description": "Evidence that the bridge was crossed.",
+          "terms": [
+            "crossed the"
+          ]
+        },
+        {
+          "element_id": "no-toll",
+          "description": "Evidence on whether the toll was paid.",
+          "terms": [
+            "without paying the toll"
+          ]
+        }
+      ]
+    },
+    {
+      "authority_id": "vsc-27-5",
+      "version": "2021",
+      "citation": "Veld Statutes Consolidated s27.5",
+      "title": "Operating a furnace without a guard",
+      "issuer": "Assembly of Veld (fictional)",
+      "authority_type": "offence",
+      "venues": [
+        "veld-central"
+      ],
+      "effective_from": "2021-06-01",
+      "effective_to": null,
+      "status": "in_force",
+      "pinpoint": "s27.5(1)",
+      "text": "An operator who runs a glass furnace without a fitted guard commits an offence.",
+      "text_sha256": "d0d193df5060e2ea7997b06a2d6d52f8748e9c3ee2404dd652049ca1b2e1a784",
+      "elements": [
+        {
+          "element_id": "operating",
+          "description": "Evidence that the furnace was operated.",
+          "terms": [
+            "operated the furnace"
+          ]
+        },
+        {
+          "element_id": "no-guard",
+          "description": "Evidence on whether a guard was fitted.",
+          "terms": [
+            "guard was absent"
+          ],
+          "negating_terms": [
+            "guard was fitted"
+          ]
+        }
+      ]
+    },
+    {
+      "authority_id": "vsc-45-2",
+      "version": "2018",
+      "citation": "Veld Statutes Consolidated s45.2",
+      "title": "False entry in a ferry manifest",
+      "issuer": "Assembly of Veld (fictional)",
+      "authority_type": "offence",
+      "venues": [
+        "veld-central"
+      ],
+      "effective_from": "2018-01-01",
+      "effective_to": null,
+      "status": "in_force",
+      "pinpoint": "s45.2(1)",
+      "text": "A purser who knowingly makes a false entry in a ferry manifest commits an offence.",
+      "text_sha256": "769f0c6308b9cfce65ba3f3bf7d3d6ca83f5c47e4c70f023bf66cc4a33320557",
+      "elements": [
+        {
+          "element_id": "entry",
+          "description": "Evidence that an entry was made.",
+          "terms": [
+            "entered"
+          ]
+        },
+        {
+          "element_id": "falsity",
+          "description": "Evidence that the entry was false.",
+          "terms": [
+            "entry was false"
+          ]
+        },
+        {
+          "element_id": "knowledge",
+          "description": "Evidence that the purser knew it was false.",
+          "terms": [
+            "knew the"
+          ]
+        }
+      ]
+    },
+    {
+      "authority_id": "vsc-45-6",
+      "version": "2018",
+      "citation": "Veld Statutes Consolidated s45.6",
+      "title": "Ferry manifest entries made on written order",
+      "issuer": "Assembly of Veld (fictional)",
+      "authority_type": "exemption",
+      "venues": [
+        "veld-central"
+      ],
+      "effective_from": "2018-01-01",
+      "effective_to": null,
+      "status": "in_force",
+      "pinpoint": "s45.6(1)",
+      "text": "A false entry in a ferry manifest is excused when made on the written order of the harbormaster.",
+      "text_sha256": "e9f8dcce4289c0d34a83a0566bbee8e4d07ddb3bd20bab47f75ecbf161d88e97",
+      "elements": [
+        {
+          "element_id": "order",
+          "description": "Evidence of a written order of the harbormaster.",
+          "terms": [
+            "written order of the harbormaster"
+          ]
+        }
+      ],
+      "relates_to": "vsc-45-2"
+    }
+  ]
+}

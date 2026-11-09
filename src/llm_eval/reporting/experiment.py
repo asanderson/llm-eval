@@ -14,6 +14,7 @@ from llm_eval.common import read_json, digest, sha256_file
 from llm_eval.core.contracts import atomic_json, TERMINAL, identifier
 from llm_eval.report import quantile, safe_cell
 from .index import identity
+from llm_eval.experiments import reporting_policy
 
 PRIVATE={'api_key','password','secret','token','access_token','authorization','endpoint','host','repo_root','work_root',
          'root','prefix','artifact_root','artifact_lock','offload_dir','installation_state','worker_python','python',
@@ -95,6 +96,8 @@ def build_report(experiment_dir):
     experiment_dir=Path(experiment_dir).resolve();campaign_dir=experiment_dir.parents[1]
     exp=read_json(experiment_dir/'experiment.json');plan=read_json(campaign_dir/'plan.json');state=read_json(campaign_dir/'campaign.json')
     config=plan['reporting'];removed=set();records=[];coverage=[]
+    policy=reporting_policy(exp['experiment_id'],[j for j in plan['jobs'] if j['job_id'] in exp['job_ids']])
+    if not policy['report']:raise ValueError('Report generation is disabled: '+policy['reason'])
     for jid in exp['job_ids']:
         job_state=state['jobs'][jid]
         coverage.append({'job_id':jid,'status':job_state['status'],'reason':job_state.get('reason'),'attempts':len(job_state['attempts'])})
@@ -209,10 +212,15 @@ def _finalize_campaign(directory):
         signature=digest([state['jobs'][j] for j in exp['job_ids']])
         prior=state['reports'].get(exp['experiment_run_id'],{})
         if prior.get('result_signature')==signature and prior.get('status') in {'generated','published'}:continue
+        policy=reporting_policy(exp['experiment_id'],[j for j in plan['jobs'] if j['job_id'] in exp['job_ids']])
+        if not policy['report']:
+            # Not a failure: the attempt outputs stay local and no report bundle is written for these inputs.
+            state['reports'][exp['experiment_run_id']]={'status':'disabled','reason':policy['reason'],'result_signature':signature}
+            atomic_json(directory/'campaign.json',state);continue
         try:
             report=build_report(directory/'experiments'/exp['experiment_run_id'])
             receipt={'status':'generated','report':str(report.relative_to(directory))}
-            if plan['reporting'].get('publish',{}).get('mode')=='pull-request':
+            if plan['reporting'].get('publish',{}).get('mode')=='pull-request' and policy['publish']:
                 from .publish import publish_report
                 publication=publish_report(report,Path(plan['root']))
                 receipt.update(status='published',pull_request=publication['url'])

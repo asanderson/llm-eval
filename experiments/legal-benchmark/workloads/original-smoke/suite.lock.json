@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "legal-original-smoke",
+  "revision": "2026-11-09.1",
+  "split_id": "smoke",
+  "data_class": "public-synthetic",
+  "jurisdiction_profile": "veld-fictional-v1",
+  "matter_manifest": "matters.json",
+  "corpus_manifest": "corpus.json",
+  "rubric_manifest": "rubric.json",
+  "source_files": [
+    {
+      "path": "matters.json",
+      "size": 20413,
+      "sha256": "7148622d3cc8470def5deb8f10d7ba7234afc012400c01cdff0087f4123150fc",
+      "purpose": "matters"
+    },
+    {
+      "path": "corpus.json",
+      "size": 13474,
+      "sha256": "54dc75f6c8c825e38c3b85bf518556defec72471bf7acd05a430ecf62c7a2106",
+      "purpose": "corpus"
+    },
+    {
+      "path": "rubric.json",
+      "size": 8223,
+      "sha256": "8cecf7f5869153d21b78197aa4dbd2c58a19628c6859c29e241364b82ee18cd4",
+      "purpose": "rubric"
+    }
+  ]
+}

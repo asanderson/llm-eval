@@ -4,6 +4,7 @@ import uuid
 
 from .resources import reserve, release, lock_root
 from .transport import rpc, map_paths
+from llm_eval.experiments import get_experiment
 
 
 def setup_campaign(plan):
@@ -11,7 +12,9 @@ def setup_campaign(plan):
     for job in plan['jobs']:
         if job['status']=='skipped':continue
         target=job['target'];params=map_paths(job['parameters'],target,plan['root'])
-        platforms=[params['config']['platform']] if 'config' in params else [params.get('router',{}).get('platform','ollama')]
+        declared=getattr(get_experiment(job['experiment_id']),'setup_platforms',None)
+        if declared:platforms=declared(params,job['mode'])
+        else:platforms=[params['config']['platform']] if 'config' in params else [params.get('router',{}).get('platform','ollama')]
         for platform in platforms:
             if platform not in {'ollama','llama.cpp','ik_llama.cpp','ktransformers','koboldcpp','vllm','strata','accelerate','airllm','lmstudio'}:continue
             root=target.get('repo_root',plan['root'])

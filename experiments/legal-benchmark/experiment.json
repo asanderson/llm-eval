@@ -1,0 +1,10 @@
+{
+  "id": "legal-benchmark",
+  "version": 1,
+  "modes": [
+    "smoke"
+  ],
+  "cases": {
+    "smoke": "cases/smoke.json"
+  }
+}
