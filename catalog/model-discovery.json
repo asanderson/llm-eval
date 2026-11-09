@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "site": {"main_script": "static/js/main.1e1ce12d.js", "reviewed_on": "2026-11-08"},
+  "publishers": [
+    {"prefixes": ["deepseek-"], "hf_orgs": ["deepseek-ai"]},
+    {"prefixes": ["qwen", "qwq-"], "hf_orgs": ["Qwen"]},
+    {"prefixes": ["glm-"], "hf_orgs": ["zai-org"]},
+    {"prefixes": ["mistral-", "magistral-", "devstral-", "ministral-", "codestral-", "mixtral-"], "hf_orgs": ["mistralai"]},
+    {"prefixes": ["phi-"], "hf_orgs": ["microsoft"]},
+    {"prefixes": ["gemma-"], "hf_orgs": ["google"]},
+    {"prefixes": ["llama-", "meta-llama-"], "hf_orgs": ["meta-llama"]},
+    {"prefixes": ["nemotron-", "nvidia-", "llama-3.1-nemotron-", "llama-3.3-nemotron-"], "hf_orgs": ["nvidia"]},
+    {"prefixes": ["gpt-oss-"], "hf_orgs": ["openai"]},
+    {"prefixes": ["kimi-"], "hf_orgs": ["moonshotai"]},
+    {"prefixes": ["grok-"], "hf_orgs": ["xai-org"]},
+    {"prefixes": ["laguna-"], "hf_orgs": ["poolside"]},
+    {"prefixes": ["minimax-"], "hf_orgs": ["MiniMaxAI"]},
+    {"prefixes": ["olmo-"], "hf_orgs": ["allenai"]},
+    {"prefixes": ["granite-"], "hf_orgs": ["ibm-granite"]},
+    {"prefixes": ["hunyuan-"], "hf_orgs": ["tencent"]},
+    {"prefixes": ["ernie-"], "hf_orgs": ["baidu"]},
+    {"prefixes": ["seed-oss-"], "hf_orgs": ["ByteDance-Seed"]},
+    {"prefixes": ["step-"], "hf_orgs": ["stepfun-ai"]},
+    {"prefixes": ["ling-", "ring-"], "hf_orgs": ["inclusionAI"]},
+    {"prefixes": ["longcat-"], "hf_orgs": ["meituan-longcat"]},
+    {"prefixes": ["command-", "aya-"], "hf_orgs": ["CohereLabs"]}
+  ],
+  "decisions": [
+    {"key": "lb:claude*", "decision": "not_open_weight", "reason": "Anthropic Claude: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"},
+    {"key": "lb:gemini*", "decision": "not_open_weight", "reason": "Google Gemini: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"},
+    {"key": "lb:gpt-4*", "decision": "not_open_weight", "reason": "OpenAI GPT-4: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"},
+    {"key": "lb:gpt-5*", "decision": "not_open_weight", "reason": "OpenAI GPT-5: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"},
+    {"key": "lb:chatgpt*", "decision": "not_open_weight", "reason": "OpenAI ChatGPT: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"},
+    {"key": "lb:o1*", "decision": "not_open_weight", "reason": "OpenAI o1: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"},
+    {"key": "lb:o3*", "decision": "not_open_weight", "reason": "OpenAI o3: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"},
+    {"key": "lb:o4*", "decision": "not_open_weight", "reason": "OpenAI o4: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"},
+    {"key": "lb:grok-3*", "decision": "not_open_weight", "reason": "xAI Grok 3: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"},
+    {"key": "lb:grok-4*", "decision": "not_open_weight", "reason": "xAI Grok 4: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"}
+  ]
+}

@@ -129,3 +129,5 @@ A model that returns tokens is not automatically a successful candidate: report 
 ## LiveBench-informed additions
 
 Five additional entries from DeepSeek, Z.AI, Mistral AI and Microsoft bring the catalog to 29. See the [recommendation table and release-specific evidence](LIVEBENCH.md#additional-providers-and-models) for DeepSeek R1 Distill 32B Q8 / 70B Q4, Mistral Small 3.1 BF16, Phi-4 Reasoning Plus BF16 and conditional GLM-4.5-Air Q4. The BF16 selections are precision/capacity tests; their smaller quantizations are controls. The historical published scores guide candidate selection and are not local measurements or comparable across releases. All five remain blocked on the currently audited Strata reference lane.
+
+New candidates are raised by the [model discovery](MODEL_DISCOVERY.md) issue; adding one still needs review of its license file, a real artifact, engine architecture support and measured fit. The `LiveBench/new-livebench` GitHub links in the evidence files are no longer reachable; the recorded tables are verified byte for byte (sha256) on `livebench.ai/v1/` instead.
