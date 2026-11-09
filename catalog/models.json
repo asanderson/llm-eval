@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_on": "2026-10-05",
+  "checked_on": "2026-11-08",
   "scope": "Prioritized hypotheses, not measured performance or guaranteed compatibility",
   "size_note": "Planning bits include rough quant overhead; raw bounds exclude KV, activations, staging, duplicated tensors and loader peaks. Exact locked artifact size decides >VRAM eligibility.",
   "provider_gaps": {
@@ -122,6 +122,90 @@
             "U8": 56382455808
           },
           "total": 67228556288
+        }
+      },
+      "planning_weight_gib": 62.86
+    },
+    {
+      "id": "nemotron-super-vl-120b",
+      "provider": "NVIDIA",
+      "rank": 4,
+      "upstream_repo": "nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-BF16",
+      "parameters_b": 124.45,
+      "active_parameters_b": 12,
+      "target_precision": "GGUF Q4_K_M",
+      "planning_bits": 4.8,
+      "status": "conditional",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "OpenMDW-1.1 (Open Model, Data and Weights License 1.1); no LICENSE file in the repository at the recorded revision, terms linked from the model card",
+      "license_class": "model_specific",
+      "rationale": "LiveBench 2026-10-25 overall 50.23 (rank 28/32). Vision-language hybrid: interleaved Mamba-2, MoE (512 experts, 12B active) and attention layers with a C-RADIO vision encoder (architecture NemotronH_Omni_Reasoning_V3, model_type nemotron_h_omni, remote code). Text-only evaluation here. No GGUF conversion or llama.cpp support for nemotron_h_omni verified; Q4_K_M planning weight sits at the native budget ceiling. Upper-budget experiment, same cohort rules as nemotron-super-120b.",
+      "sources": [
+        "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-BF16",
+        "https://livebench.ai/data/20261025/table.csv"
+      ],
+      "source_revision": "fb0ee0bc6b3f70342afd8d84cb80dbadbaa8a1fe",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-11-08",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 4096,
+      "upstream_metadata": {
+        "id": "nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-BF16",
+        "sha": "fb0ee0bc6b3f70342afd8d84cb80dbadbaa8a1fe",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 124453374976,
+            "F32": 20998,
+            "I64": 2
+          },
+          "total": 124453395976
+        }
+      },
+      "planning_weight_gib": 69.54
+    },
+    {
+      "id": "nemotron-super-vl-120b-nvfp4",
+      "provider": "NVIDIA",
+      "rank": 5,
+      "upstream_repo": "nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4",
+      "parameters_b": 120,
+      "active_parameters_b": 12,
+      "target_precision": "NVFP4 or separately tracked GGUF Q4",
+      "planning_bits": 4.5,
+      "status": "conditional",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "OpenMDW-1.1 (Open Model, Data and Weights License 1.1); no LICENSE file in the repository at the recorded revision, terms linked from the model card",
+      "license_class": "model_specific",
+      "rationale": "LiveBench 2026-10-25 overall 46.50 (rank 30/32). Official NVFP4 quantization of nemotron-super-vl-120b (hf_quant_config, FP8 activations on Mamba projections). Vendor deployment targets vLLM/SGLang on Blackwell-class GPUs; laptop offload is NOT vendor-validated, and no engine here is verified to load nemotron_h_omni NVFP4. Parameter count is the repo name's 120B (safetensors are packed U8). GGUF and NVFP4 results are separate cohorts.",
+      "sources": [
+        "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4",
+        "https://livebench.ai/data/20261025/table.csv"
+      ],
+      "source_revision": "da5b2650a835292c678994a1fa3fb653250fb508",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-11-08",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 4096,
+      "upstream_metadata": {
+        "id": "nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4",
+        "sha": "da5b2650a835292c678994a1fa3fb653250fb508",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "I64": 2,
+            "F32": 21000,
+            "BF16": 1881132032,
+            "F8_E4M3": 5205131264,
+            "U8": 58683555840
+          },
+          "total": 65769840138
         }
       },
       "planning_weight_gib": 62.86

@@ -11,6 +11,8 @@ The target precision is part of the recommendation. Q4 versions of many 27–35B
 | 1 | [nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16) | GGUF Q8_0 | 29.69 | candidate | Small active MoE; Q8 tests RAM offload while Q4 is a separate in-VRAM control. Hybrid architecture needs engine validation. |
 | 2 | [nvidia/Llama-3_3-Nemotron-Super-49B-v1_5](https://huggingface.co/nvidia/Llama-3_3-Nemotron-Super-49B-v1_5) | GGUF Q5_K_M | 32.51 | candidate | Dense/NAS comparison; CPU fallback can dominate. Model-card remote-code path needs review. |
 | 3 | [nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4) | NVFP4 or separately tracked GGUF Q4 | 62.86 | conditional | Upper-budget experiment. Official NVFP4 deployment targets B200/DGX Spark; laptop offload is NOT vendor-validated. GGUF and NVFP4 results are separate cohorts. |
+| 4 | [nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-BF16](https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-BF16) | GGUF Q4_K_M | 69.54 | conditional | LiveBench 2026-10-25 candidate (overall 50.23, rank 28/32). Vision-language hybrid Mamba-2/MoE/attention with a C-RADIO encoder (`nemotron_h_omni`, remote code); text-only here. No GGUF or llama.cpp support verified; Q4_K_M sits at the native budget ceiling. |
+| 5 | [nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4](https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4) | NVFP4 or separately tracked GGUF Q4 | 62.86 | conditional | Official NVFP4 build of the entry above (overall 46.50, rank 30/32). Vendor deployment targets vLLM/SGLang on Blackwell; no engine here is verified to load it. Parameter count is the repo name's 120B. |
 
 ## OpenAI
 
@@ -90,6 +92,8 @@ The target precision is part of the recommendation. Q4 versions of many 27–35B
 | `nemotron-nano-30b` | NVIDIA Nemotron Open Model License | `bf77c3174f68ad409e1c2aa60daeb46e32d1c606` |
 | `nemotron-super-49b` | NVIDIA Open Model License; Llama 3.3 terms also referenced | `420ba7d28211abf116b8b103ab700d92619daf98` |
 | `nemotron-super-120b` | NVIDIA Nemotron Open Model License | `ff433f5493e25d631c9f12b5d55c674229923d02` |
+| `nemotron-super-vl-120b` | OpenMDW-1.1 (linked from the model card; no LICENSE file at the revision) | `fb0ee0bc6b3f70342afd8d84cb80dbadbaa8a1fe` |
+| `nemotron-super-vl-120b-nvfp4` | OpenMDW-1.1 (linked from the model card; no LICENSE file at the revision) | `da5b2650a835292c678994a1fa3fb653250fb508` |
 | `gpt-oss-120b` | Apache-2.0 | `b5c939de8f754692c1647ca79fbf85e8c1e70f8a` |
 | `gpt-oss-safeguard-120b` | Apache-2.0 | `3c7391182603991a904031244e7822488c67796d` |
 | `gpt-oss-20b` | Apache-2.0 | `6cee5e81ee83917806bbde320786a8fb61efebee` |
@@ -128,6 +132,6 @@ A model that returns tokens is not automatically a successful candidate: report 
 
 ## LiveBench-informed additions
 
-Five additional entries from DeepSeek, Z.AI, Mistral AI and Microsoft bring the catalog to 29. See the [recommendation table and release-specific evidence](LIVEBENCH.md#additional-providers-and-models) for DeepSeek R1 Distill 32B Q8 / 70B Q4, Mistral Small 3.1 BF16, Phi-4 Reasoning Plus BF16 and conditional GLM-4.5-Air Q4. The BF16 selections are precision/capacity tests; their smaller quantizations are controls. The historical published scores guide candidate selection and are not local measurements or comparable across releases. All five remain blocked on the currently audited Strata reference lane.
+Five additional entries from DeepSeek, Z.AI, Mistral AI and Microsoft bring the catalog to 29; the two Nemotron 3.5 Super VL entries accepted from the 2026-10-25 LiveBench 2.0 discovery issue bring it to 31. See the [recommendation table and release-specific evidence](LIVEBENCH.md#additional-providers-and-models) for DeepSeek R1 Distill 32B Q8 / 70B Q4, Mistral Small 3.1 BF16, Phi-4 Reasoning Plus BF16 and conditional GLM-4.5-Air Q4. The BF16 selections are precision/capacity tests; their smaller quantizations are controls. The historical published scores guide candidate selection and are not local measurements or comparable across releases. All five remain blocked on the currently audited Strata reference lane.
 
 New candidates are raised by the [model discovery](MODEL_DISCOVERY.md) issue; adding one still needs review of its license file, a real artifact, engine architecture support and measured fit. The `LiveBench/new-livebench` GitHub links in the evidence files are no longer reachable; the recorded tables are verified byte for byte (sha256) on `livebench.ai/v1/` instead.

@@ -363,6 +363,9 @@ class World:
         # The fixture site has caught up with the newest release unless a test says otherwise (the real evidence still
         # records 2026-06-25, so the real nightly raises the new-release notice until the owner records 2.0).
         ev['latest_release'] = latest
+        # The real evidence also records 2.0 rows (livebench.ai/data/...). The fixture site's 2.0 tables are its own
+        # (DEFAULT_ROWS), so those rows are dropped here; tests that need a recorded 2.0 row add one themselves.
+        ev['recommendations'] = [rec for rec in ev['recommendations'] if '/data/' not in rec['source_table']]
         for rec in ev['recommendations']:
             name = rec['source_table'].rsplit('/', 1)[1]
             rec['source_sha256'] = hashlib.sha256(self.files[f'v1/{name}']).hexdigest()
@@ -658,9 +661,9 @@ class LocalInputsTest(Base):
         world = World()
         local = md.load_local(self.root(world), TODAY_DATE)
         self.assertEqual((local.evidence.repo, local.evidence.revision), (REPO, 'caa4253c8a3aa93b5c7ec234e681d4f120a20240'))
-        self.assertEqual(EVIDENCE['latest_release'], '2026-06-25')
+        self.assertEqual(EVIDENCE['latest_release'], '2026-10-25')
         self.assertEqual(len({r['meaning'] for r in EVIDENCE['recommendations']}), 1)
-        self.assertEqual(len(EVIDENCE['recommendations']), 5)
+        self.assertEqual(len(EVIDENCE['recommendations']), 7)
         # The recorded GitHub blobs map to the same bytes on livebench.ai/v1/.
         self.assertEqual(sorted({r.site_path for r in local.evidence.recommendations}),
                          ['v1/table_2025_04_25.csv', 'v1/table_2025_05_30.csv'])
@@ -758,7 +761,9 @@ class LocalInputsTest(Base):
     def test_scorer_releases_are_read_with_ast_from_the_real_file(self):
         releases = md.scorer_releases(ROOT / md.SCORER_SOURCE)
         self.assertIsNotNone(releases)
-        self.assertIn(EVIDENCE['latest_release'], releases)
+        self.assertIn(BENCH['reference_release'], releases)
+        # latest_release records the 2.0 release 2026-10-25 for discovery; the pinned scorer lane does not run 2.0
+        self.assertNotIn(EVIDENCE['latest_release'], releases)
         self.assertNotIn(NEWEST_DATE, FIXTURE_RELEASES)    # the new-release tests rely on the fixture scorer file
         tmp = self.tmp()
         (tmp / 'livebench.py').write_text('OTHER = {1}\n', encoding='utf-8')
@@ -1389,10 +1394,14 @@ class ParsingTest(Base):
         overalls = []
         for rec in EVIDENCE['recommendations']:
             values = list(rec['category_scores'].values())
-            mean = sum(values) / len(values)
+            if '/data/' in rec['source_table']:      # 2.0: weighted mean of the suites, as the site averages
+                weights = [WEIGHTS.get(s, 1.0) for s in rec['category_scores']]
+                mean = sum(v * w for v, w in zip(values, weights)) / sum(weights)
+            else:
+                mean = sum(values) / len(values)
             self.assertLessEqual(abs(mean - rec['overall']), md.OVERALL_TOL, rec['leaderboard_model_id'])
             overalls.append((rec['overall'], len(values)))
-        self.assertEqual(overalls, [(47.52, 6), (55.51, 6), (60.53, 7), (45.92, 6), (56.64, 6)])
+        self.assertEqual(overalls, [(47.52, 6), (55.51, 6), (60.53, 7), (45.92, 6), (56.64, 6), (50.23, 7), (46.5, 7)])
         tightest = EVIDENCE['recommendations'][0]
         mean = sum(tightest['category_scores'].values()) / 6
         self.assertAlmostEqual(mean, 47.515028, places=6)

@@ -1,6 +1,6 @@
 # LiveBench categories and model selection
 
-Evidence checked **2026-10-05**. The [LiveBench leaderboard](https://livebench.ai/) selects release **2026-06-25**. Its [versioned category definition](https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/categories_2026_06_25.json) has **seven categories and 23 tasks**, including Agentic Coding. The older upstream README's six-category description is not the current leaderboard taxonomy.
+Evidence checked **2026-10-05**. The [LiveBench leaderboard](https://livebench.ai/) selects release **2026-06-25**. Its [versioned category definition](https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/categories_2026_06_25.json) has **seven categories and 23 tasks**, including Agentic Coding. The older upstream README's six-category description is not the current leaderboard taxonomy. LiveBench 2.0 release **2026-10-25** (32 scored rows, suites Long Agentic, Reasoning, Coding, Browser, Data Analysis, Research, Design; weighted overall) is recorded in `catalog/livebench-evidence.json` as `latest_release` for model discovery only: its suites are a different taxonomy from the v1 categories below, `catalog/benchmarks.json` keeps the v1 reference release 2026-06-25, and the pinned scorer lane (`RELEASES` in `src/llm_eval/livebench.py`) does not run 2.0 question sets.
 
 ## What this project runs
 

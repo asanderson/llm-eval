@@ -224,7 +224,7 @@ Official publisher repositories for all catalog entries are listed below. These 
 
 | Provider | Model cards and source weights |
 |---|---|
-| NVIDIA | [NVIDIA-Nemotron-3-Nano-30B-A3B-BF16][model-nemotron-nano-30b]; [Llama-3_3-Nemotron-Super-49B-v1_5][model-nemotron-super-49b]; [NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4][model-nemotron-super-120b] (conditional) |
+| NVIDIA | [NVIDIA-Nemotron-3-Nano-30B-A3B-BF16][model-nemotron-nano-30b]; [Llama-3_3-Nemotron-Super-49B-v1_5][model-nemotron-super-49b]; [NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4][model-nemotron-super-120b] (conditional); [NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-BF16][model-nemotron-super-vl-120b] (conditional); [NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4][model-nemotron-super-vl-120b-nvfp4] (conditional) |
 | OpenAI | [gpt-oss-120b][model-gpt-oss-120b] (conditional); [gpt-oss-safeguard-120b][model-gpt-oss-safeguard-120b] (conditional); [gpt-oss-20b][model-gpt-oss-20b] (in-VRAM control) |
 | xAI | [grok-1][model-grok-1] (excluded); [grok-2][model-grok-2] (excluded) |
 | Google | [gemma-4-31B-it][model-gemma4-31b]; [gemma-4-26B-A4B-it][model-gemma4-26b-moe]; [gemma-3-27b-it][model-gemma3-27b] |
@@ -288,6 +288,8 @@ The project's existing [MIT license](../../LICENSE) is preserved. Backend and mo
 [model-nemotron-nano-30b]: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16
 [model-nemotron-super-49b]: https://huggingface.co/nvidia/Llama-3_3-Nemotron-Super-49B-v1_5
 [model-nemotron-super-120b]: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4
+[model-nemotron-super-vl-120b]: https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-BF16
+[model-nemotron-super-vl-120b-nvfp4]: https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4
 [model-gpt-oss-120b]: https://huggingface.co/openai/gpt-oss-120b
 [model-gpt-oss-safeguard-120b]: https://huggingface.co/openai/gpt-oss-safeguard-120b
 [model-gpt-oss-20b]: https://huggingface.co/openai/gpt-oss-20b
