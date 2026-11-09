@@ -1,12 +1,16 @@
-"""Navigable indexes over the published result bundles in docs/results.
+"""Navigable indexes and the generated parts of the results README over the published bundles in docs/results.
 
-Every bundle (docs/results/EXPERIMENT/PUBLICATION/) carries manifest.json, resolved-config.json and summary.json.
-From those alone this writes docs/results/index/: one page per hardware configuration, experiment, harness, model
-and UTC date, plus an overview with a harness-by-model matrix per experiment. The same overview is placed between
-the results-index markers of docs/results/EXECUTIVE_SUMMARY.md when that file has them.
+Every bundle (docs/results/EXPERIMENT/PUBLICATION/) carries manifest.json, resolved-config.json, summary.json and its
+raw measurements. From those this writes:
+
+- docs/results/index/: one page per hardware configuration, experiment, harness, model and UTC date, plus an overview;
+- diagrams/results/summary/: one comparison chart per experiment and hardware configuration;
+- the three marked blocks of docs/results/README.md: the top combinations with their charts (executive summary),
+  the navigation matrices, and the list of published reports. Text outside the markers is hand-written and kept.
 """
 from __future__ import annotations
 
+import gzip
 import json
 import re
 import shutil
@@ -14,8 +18,30 @@ import statistics
 from collections import defaultdict
 from pathlib import Path
 
-START = '<!-- results-index:start -->'
-END = '<!-- results-index:end -->'
+TOP_START, TOP_END = '<!-- results-top:start -->', '<!-- results-top:end -->'
+START, END = '<!-- results-index:start -->', '<!-- results-index:end -->'
+LIST_START, LIST_END = '<!-- results-list:start -->', '<!-- results-list:end -->'
+LEGACY_LIST_HEADER = '| Experiment | Run time UTC | Status | Synthetic | Results |'
+SKELETON = f"""# Experiment results
+
+Each report includes raw measurements, summaries and reproducibility metadata. Synthetic fixtures are explicitly labeled. Newest results are listed first.
+
+## Executive summary
+
+{TOP_START}
+{TOP_END}
+
+## Results index
+
+{START}
+{END}
+
+## All published reports
+
+{LIST_START}
+{LIST_END}
+"""
+CHARTS = 'diagrams/results/summary'
 CATEGORIES = (('hardware', 'Hardware configuration'), ('experiment', 'Experiment'), ('harness', 'Harness'),
               ('model', 'Model'), ('date', 'Date (UTC)'))
 
@@ -62,6 +88,24 @@ def _middle(values):
     return statistics.median(values) if values else None
 
 
+def _peaks(bundle):
+    """{job_id: peak backend RSS and GPU memory in GiB} from the telemetry of each job's latest attempt."""
+    raw, peaks = bundle / 'raw/measurements.jsonl.gz', defaultdict(dict)
+    if not raw.exists():
+        return peaks
+    with gzip.open(raw, 'rt', encoding='utf-8') as lines:
+        for line in lines:
+            record = json.loads(line)
+            if record.get('record_type') != 'telemetry' or not record.get('latest_attempt'):
+                continue
+            data, peak = record.get('data') or {}, peaks[record.get('job_id')]
+            gpus = [g.get('used_mib') for g in data.get('gpus') or [] if g.get('used_mib') is not None]
+            for key, value in (('backend_rss_gib', data.get('backend_tree_rss_gib')), ('gpu_gib', sum(gpus) / 1024 if gpus else None)):
+                if value is not None:
+                    peak[key] = max(peak.get(key, 0), value)
+    return peaks
+
+
 def collect(root):
     """One record per published job, newest first."""
     results = Path(root) / 'docs/results'
@@ -71,6 +115,7 @@ def collect(root):
         manifest, resolved = _read(manifest_path), _read(bundle / 'resolved-config.json')
         summary = _read(bundle / 'summary.json') if (bundle / 'summary.json').exists() else []
         coverage = {c['job_id']: c for c in manifest.get('coverage', [])}
+        peaks = _peaks(bundle)
         for job in resolved.get('jobs', []):
             rows = [r for r in summary if r.get('job_id') == job['job_id']]
             harness, model = identity(job)
@@ -94,6 +139,7 @@ def collect(root):
                 'score': _counts(rows, 'decision_accuracy', 'decision_labelled_n') or _counts(rows, 'quality_pass_rate', 'quality_check_n'),
                 'wall_mid': _middle(r.get('elapsed_s_median') for r in rows),
                 'tokens_mid': _middle(r.get('output_tokens_per_wall_second_median') for r in rows),
+                'backend_rss_gib': peaks[job['job_id']].get('backend_rss_gib'), 'gpu_gib': peaks[job['job_id']].get('gpu_gib'),
                 'report': f"{bundle.parent.name}/{bundle.name}/README.md",
             })
     records.sort(key=lambda r: (r['experiment'], r['hardware'], r['harness'], r['model'], str(r['case'])))
@@ -128,10 +174,12 @@ RANKING_RULE = ('Ranked by share of checks passed (correct decisions for routing
                 'then lower median wall time per request, then higher output tokens per second. Each harness and model '
                 'combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and '
                 'runs without scored checks are not ranked. Wall time and token rate are the median of the category medians.')
+CHART_NOTE = ('Chart: every ranked combination, best-ranked model first, one color per harness. Each panel has its own '
+              'axis; wall time is on a log scale. Exact values are in the tables of this page and in the linked reports.')
 
 
-def top_combinations(records, limit=3):
-    """{(experiment, hardware): best `limit` records}, one record per harness and model combination."""
+def ranked(records):
+    """{(experiment, hardware): every rankable harness and model combination, best first}."""
     newest = {}
     for r in records:      # records arrive newest first
         if r['synthetic'] or r['status'] != 'succeeded' or not r['score']:
@@ -144,10 +192,16 @@ def top_combinations(records, limit=3):
     def order(r):
         return (-r['score'][0] / r['score'][1], r['wall_mid'] if r['wall_mid'] is not None else float('inf'),
                 -(r['tokens_mid'] or 0), r['harness'], r['model'])
-    return {key: sorted(groups[key], key=order)[:limit] for key in sorted(groups)}
+    return {key: sorted(groups[key], key=order) for key in sorted(groups)}
 
 
-def ranking(records, index_prefix, report_prefix, limit=3):
+def top_combinations(records, limit=3):
+    """{(experiment, hardware): best `limit` records}, one record per harness and model combination."""
+    return {key: chosen[:limit] for key, chosen in ranked(records).items()}
+
+
+def ranking(records, index_prefix, report_prefix, limit=3, charts=None):
+    """Top combinations per experiment and hardware configuration; `charts` maps such a pair to an image link."""
     lines = [f'### Top {limit} harness and model combinations per experiment and hardware configuration', '', RANKING_RULE]
     pairs = list(dict.fromkeys((r['experiment'], r['hardware']) for r in records))      # newest result first
     best = top_combinations(records, limit)
@@ -163,12 +217,14 @@ def ranking(records, index_prefix, report_prefix, limit=3):
                          f"{r['score'][0]}/{r['score'][1]} | {_cell(None if r['wall_mid'] is None else format(r['wall_mid'], '.3g'))} | "
                          f"{_cell(None if r['tokens_mid'] is None else format(r['tokens_mid'], '.3g'))} | "
                          f"[{r['date']}{' cap ' + str(r['output_cap']) if r['output_cap'] else ''}]({report_prefix}{r['report']}) |")
+        if (charts or {}).get((experiment, hardware)):
+            lines += ['', f"![{experiment} on {hardware}: harness and model combinations compared]({charts[(experiment, hardware)]})", '', CHART_NOTE]
     return '\n'.join(lines)
 
 
-def overview(records, index_prefix, report_prefix):
-    """Top combinations, browse-by links and one harness-by-model matrix per experiment, newest results first."""
-    lines = [ranking(records, index_prefix, report_prefix), '', '### Browse by category', '', '| Category | Indexes (results) |', '|---|---|']
+def navigation(records, index_prefix, report_prefix):
+    """Browse-by links and one harness-by-model matrix per experiment, newest results first."""
+    lines = ['### Browse by category', '', '| Category | Indexes (results) |', '|---|---|']
     for category, title in CATEGORIES:
         counts = defaultdict(int)
         for r in records:
@@ -197,8 +253,46 @@ def overview(records, index_prefix, report_prefix):
     return '\n'.join(lines)
 
 
+def overview(records, index_prefix, report_prefix):
+    """Top combinations, then the navigation."""
+    return ranking(records, index_prefix, report_prefix) + '\n\n' + navigation(records, index_prefix, report_prefix)
+
+
+def listing(root):
+    """One row per published report, newest first."""
+    results, rows = Path(root) / 'docs/results', []
+    for path in results.glob('*/*/manifest.json'):
+        m, link = _read(path), (path.parent / 'README.md').relative_to(results).as_posix()
+        rows.append((m['created_utc'], f"| {m['experiment_id']} | {m['created_utc']} | {m['status']} | {m['synthetic']} | [Report]({link}) |"))
+    return '\n'.join([LEGACY_LIST_HEADER, '|---|---|---|---|---|'] + [row for _, row in sorted(rows, reverse=True)])
+
+
+def write_charts(root, records):
+    """Redraw the summary charts; {(experiment, hardware): link relative to docs/results}. Needs the reporting extra."""
+    from . import charts
+    directory, links = Path(root) / CHARTS, {}
+    if directory.exists():
+        shutil.rmtree(directory)
+    if not charts.available():
+        return links
+    for (experiment, hardware), chosen in ranked(records).items():
+        if len(chosen) < 2:      # a single combination is a number, not a comparison
+            continue
+        name = f"{slug(experiment)}-{slug(hardware)}.png"
+        charts.summary_chart(chosen, directory / name, f"{experiment} on {hardware}: newest succeeded run of each harness and model")
+        links[(experiment, hardware)] = f"../../{CHARTS}/{name}"
+    return links
+
+
+def _fill(text, start, end, body):
+    if start not in text or end not in text:
+        return text
+    head, rest = text.split(start, 1)
+    return f"{head}{start}\n\n{body}\n\n{end}{rest.split(end, 1)[1]}"
+
+
 def write_results_index(root):
-    """Regenerate docs/results/index and the marked block of the executive summary; returns the record count."""
+    """Regenerate docs/results/index, the summary charts and the marked blocks of the results README; returns the record count."""
     root = Path(root)
     results, index = root / 'docs/results', root / 'docs/results/index'
     records = collect(root)
@@ -218,15 +312,16 @@ def write_results_index(root):
         for value in sorted({r[category] for r in records}):
             chosen = [r for r in records if r[category] == value]
             save(index / category / (slug(value) + '.md'),
-                 f"# {title}: {value}\n\n[Results index](../README.md) · [Executive summary](../../EXECUTIVE_SUMMARY.md)\n\n"
+                 f"# {title}: {value}\n\n[Results index](../README.md) · [Executive summary](../../README.md)\n\n"
                  f"{len(chosen)} published result(s). {note}\n\n" + table(chosen, '../', '../../') + '\n')
-    executive = results / 'EXECUTIVE_SUMMARY.md'
-    if executive.exists():
-        text = executive.read_text(encoding='utf-8')
-        if START in text and END in text:
-            head, rest = text.split(START, 1)
-            tail = rest.split(END, 1)[1]
-            block = (f"{START}\n\n{overview(records, 'index/', '')}\n\nFull table and per-category pages: "
-                     f"[results index](index/README.md).\n\n{END}")
-            save(executive, head + block + tail)
+    readme = results / 'README.md'
+    text = readme.read_text(encoding='utf-8') if readme.exists() else ''
+    if not text or (LEGACY_LIST_HEADER in text and LIST_START not in text):      # absent, or the fully generated list of earlier versions
+        text = SKELETON
+    if TOP_START in text and TOP_END in text:
+        text = _fill(text, TOP_START, TOP_END, ranking(records, 'index/', '', charts=write_charts(root, records)))
+    text = _fill(text, START, END, navigation(records, 'index/', '') +
+                 '\n\nFull table and per-category pages: [results index](index/README.md).')
+    text = _fill(text, LIST_START, LIST_END, listing(root))
+    save(readme, text)
     return len(records)

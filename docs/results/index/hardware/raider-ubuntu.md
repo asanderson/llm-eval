@@ -1,6 +1,6 @@
 # Hardware configuration: raider-ubuntu
 
-[Results index](../README.md) · [Executive summary](../../EXECUTIVE_SUMMARY.md)
+[Results index](../README.md) · [Executive summary](../../README.md)
 
 1 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
 
