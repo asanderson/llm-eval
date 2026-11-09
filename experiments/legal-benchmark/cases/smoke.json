@@ -1,0 +1,8 @@
+{
+  "id": "smoke",
+  "parameters": {
+    "suite": "../workloads/original-smoke/suite.lock.json",
+    "synthetic": true,
+    "top_k": 3
+  }
+}

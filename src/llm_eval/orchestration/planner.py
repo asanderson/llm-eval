@@ -7,7 +7,7 @@ import subprocess
 
 from llm_eval.common import read_json, sha256_file
 from llm_eval.core.contracts import fields, identifier, integer, no_credentials, config_hash
-from llm_eval.experiments import get_experiment
+from llm_eval.experiments import get_experiment, reporting_policy
 
 PATH_KEYS = {'suite', 'artifact_root', 'artifact_lock', 'offload_dir', 'installation_state', 'replay', 'data', 'benchmark_registry'}
 
@@ -152,6 +152,11 @@ def compile_campaign(path, root, max_parallel_jobs=None):
             elif isinstance(value,list):
                 for item in value:job_files(item)
         job_files(job['parameters'])
+        declared=getattr(get_experiment(job['experiment_id']),'input_files',None)
+        for item in (declared(job['parameters'],root,job['mode']) if declared and job['status']!='skipped' else []):
+            # Plugin-declared dependencies: planner, resume and worker then all check the same bytes.
+            inputs[item]=sha256_file(item)
+            if not any(f['path']==item for f in job['input_files']):job['input_files'].append({'path':item,'sha256':inputs[item]})
         for candidate in job['parameters'].get('candidates',{}).values():
             if candidate.get('target_id'):
                 role_target=inv['targets'][candidate['target_id']]
@@ -171,6 +176,10 @@ def compile_campaign(path, root, max_parallel_jobs=None):
     if publication.get('mode','none') not in {'none','pull-request'}:raise ValueError('Invalid publication mode')
     if publication.get('docs_root','docs/results') != 'docs/results':raise ValueError('Results destination must be docs/results')
     integer(reporting.get('max_artifact_bytes', 40*1024*1024), 'max_artifact_bytes', high=500*1024*1024)
+    if publication.get('mode','none')=='pull-request':
+        for exp in experiments:
+            policy=reporting_policy(exp['experiment_id'],[j for j in jobs if j['job_id'] in exp['job_ids']])
+            if not policy['publish']:raise ValueError('Publication is not available for '+exp['experiment_id']+': '+policy['reason'])
     plan = {'schema_version': 2, 'campaign_id': c['id'], 'source': str(path), 'root': str(root),
             'code_revision': revision(root), 'total_api_reservation_usd': total_api_reservation, 'inputs': inputs, 'execution': execution, 'reporting': reporting,
             'experiments': experiments, 'jobs': jobs, 'targets': inv['targets']}

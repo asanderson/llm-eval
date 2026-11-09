@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "id": "legal-smoke",
+  "inventory": "../configs/targets/local.example.json",
+  "phases": [
+    {
+      "id": "legal",
+      "experiments": [
+        {
+          "id": "legal-benchmark",
+          "version": 1,
+          "mode": "smoke",
+          "cases": [
+            "smoke"
+          ],
+          "hardware_configs": [
+            "raider-ubuntu"
+          ]
+        }
+      ]
+    }
+  ],
+  "reporting": {
+    "on_experiment_end": true,
+    "publish": {
+      "mode": "none"
+    }
+  }
+}
