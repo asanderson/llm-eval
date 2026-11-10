@@ -661,7 +661,7 @@ class LocalInputsTest(Base):
         world = World()
         local = md.load_local(self.root(world), TODAY_DATE)
         self.assertEqual((local.evidence.repo, local.evidence.revision), (REPO, 'caa4253c8a3aa93b5c7ec234e681d4f120a20240'))
-        self.assertEqual(EVIDENCE['latest_release'], '2026-10-25')
+        self.assertEqual(EVIDENCE['latest_release'], '2026-11-06')
         self.assertEqual(len({r['meaning'] for r in EVIDENCE['recommendations']}), 1)
         self.assertEqual(len(EVIDENCE['recommendations']), 7)
         # The recorded GitHub blobs map to the same bytes on livebench.ai/v1/.
@@ -762,7 +762,7 @@ class LocalInputsTest(Base):
         releases = md.scorer_releases(ROOT / md.SCORER_SOURCE)
         self.assertIsNotNone(releases)
         self.assertIn(BENCH['reference_release'], releases)
-        # latest_release records the 2.0 release 2026-10-25 for discovery; the pinned scorer lane does not run 2.0
+        # latest_release records the 2.0 release 2026-11-06 for discovery; the pinned scorer lane does not run 2.0
         self.assertNotIn(EVIDENCE['latest_release'], releases)
         self.assertNotIn(NEWEST_DATE, FIXTURE_RELEASES)    # the new-release tests rely on the fixture scorer file
         tmp = self.tmp()

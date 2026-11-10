@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "site": {"main_script": "static/js/main.1e1ce12d.js", "reviewed_on": "2026-11-08"},
+  "site": {"main_script": "static/js/main.c884fa42.js", "reviewed_on": "2026-11-10"},
   "publishers": [
     {"prefixes": ["deepseek-"], "hf_orgs": ["deepseek-ai"]},
     {"prefixes": ["qwen", "qwq-"], "hf_orgs": ["Qwen"]},
@@ -35,6 +35,8 @@
     {"key": "lb:o3*", "decision": "not_open_weight", "reason": "OpenAI o3: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"},
     {"key": "lb:o4*", "decision": "not_open_weight", "reason": "OpenAI o4: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"},
     {"key": "lb:grok-3*", "decision": "not_open_weight", "reason": "xAI Grok 3: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"},
-    {"key": "lb:grok-4*", "decision": "not_open_weight", "reason": "xAI Grok 4: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"}
+    {"key": "lb:grok-4*", "decision": "not_open_weight", "reason": "xAI Grok 4: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"},
+    {"key": "hf:mistralai/Mistral-Large-4-1T-A52B", "decision": "rejected", "reason": "Too large: the repository name states 1T parameters (52B active), far beyond the 70 GiB weight budget at any catalog tier; the safetensors metadata cannot confirm the count", "decided_on": "2026-11-10", "release": "2026-11-06"},
+    {"key": "hf:abacusai/Smaug-Nemotron-3.5-NVFP4", "decision": "rejected", "reason": "Published by abacusai, which is not an allowlisted publisher org (LiveBench lists the organization as Abacus.AI and points at the NVIDIA Nemotron page); the parameter count cannot be verified from the safetensors metadata (packed range 65.77 to 124.45 B)", "decided_on": "2026-11-10", "release": "2026-11-06"}
   ]
 }

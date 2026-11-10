@@ -1,8 +1,8 @@
 {
-  "checked_on": "2026-11-08",
+  "checked_on": "2026-11-10",
   "leaderboard": "https://livebench.ai/",
   "leaderboard_revision": "caa4253c8a3aa93b5c7ec234e681d4f120a20240",
-  "latest_release": "2026-10-25",
+  "latest_release": "2026-11-06",
   "aggregation": "v1 releases: mean of subtask scores within each category, then equal mean of category scores. LiveBench 2.0 releases (2026-10-25 on): weighted mean of the suites with a score, weights Long Agentic x2, Coding x1.5, Design x1.5, others x1, rounded to 2 decimals as the site shows it. Different releases cannot be ranked together.",
   "recommendations": [
     {
