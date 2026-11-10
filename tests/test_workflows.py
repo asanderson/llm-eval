@@ -18,7 +18,7 @@ from llm_eval.common import read_json, write_json
 from llm_eval.launch import launch_spec, wait_port
 from llm_eval.livebench import api_base, question_manifest, result_coverage, result_label, run_livebench, upstream_commands
 from llm_eval.model_download import validate_download_spec
-from llm_eval.provision import OS_IDS, extract_archive, https_download, install_plan
+from llm_eval.provision import OS_IDS, execute_install, extract_archive, https_download, install_plan
 from llm_eval.report import summarize, write_report
 from llm_eval.runner import grade, load_suite, validate_host
 from llm_eval.workflow import Prompts, build_config, main, parser_for
@@ -248,6 +248,54 @@ class InstallSafetyTests(unittest.TestCase):
             write_json(path, {'models': [entry, {**entry, 'model_id': 'mistral-small31', 'artifact_root': tmp + '/model/child'}]})
             with self.assertRaisesRegex(ValueError, 'overlap'):
                 validate_download_spec(ROOT, path)
+
+    def test_strata_build_leaves_out_the_upstream_test_suite(self):
+        # Nothing is built here: every command is recorded, so the install stops where the engine binary is looked for.
+        with tempfile.TemporaryDirectory() as tmp:
+            plan = install_plan(ROOT, 'strata', OS_IDS[0], Path(tmp) / 'prefix')
+            calls = []
+
+            def record(argv, **kwargs):
+                calls.append([str(a) for a in argv])
+                return SimpleNamespace(stdout='')
+            with patch('llm_eval.provision.environment_kind', return_value=OS_IDS[0]), \
+                    patch('llm_eval.provision.shutil.which', return_value='present'), \
+                    patch('llm_eval.provision.checkout'), patch('llm_eval.provision.invoke', side_effect=record):
+                with self.assertRaisesRegex(ValueError, 'strata was not found'):
+                    execute_install(plan, ROOT)
+            configure = [c for c in calls if c[:2] == ['cmake', '-S']]
+            self.assertEqual(len(configure), 1)
+            self.assertIn('-DSTRATA_BUILD_TESTS=OFF', configure[0])
+            self.assertIn('-DSTRATA_PORTABLE=ON', configure[0])
+            # No requirements-build.txt in this checkout (as at the pin before v0.2.13): only the runtime file is installed.
+            self.assertEqual([Path(c[-1]).name for c in calls if c[1:5] == ['-m', 'pip', 'install', '-r']], ['requirements.txt'])
+
+    def test_strata_build_installs_the_upstream_build_helpers_when_the_pin_ships_them(self):
+        # At v0.2.13 upstream keeps cmake and ninja in requirements-build.txt. Nothing is installed or built here.
+        with tempfile.TemporaryDirectory() as tmp:
+            plan = install_plan(ROOT, 'strata', OS_IDS[0], Path(tmp) / 'prefix')
+            calls = []
+
+            def record(argv, **kwargs):
+                calls.append([str(a) for a in argv])
+                return SimpleNamespace(stdout='')
+
+            def checkout(repository, revision, source):
+                Path(source).mkdir(parents=True)
+                (Path(source) / 'requirements-build.txt').write_text('cmake==4.4.3\n', encoding='utf-8')
+            with patch('llm_eval.provision.environment_kind', return_value=OS_IDS[0]), \
+                    patch('llm_eval.provision.shutil.which', return_value='present'), \
+                    patch('llm_eval.provision.checkout', side_effect=checkout), \
+                    patch('llm_eval.provision.invoke', side_effect=record):
+                with self.assertRaisesRegex(ValueError, 'strata was not found'):
+                    execute_install(plan, ROOT)
+            steps = [Path(c[-1]).name if c[0] != 'cmake' else 'configure' for c in calls
+                     if c[1:5] == ['-m', 'pip', 'install', '-r'] or c[:2] == ['cmake', '-S']]
+            self.assertEqual(steps, ['requirements.txt', 'requirements-build.txt', 'configure'])
+            # Both files are installed by the interpreter of the environment this install created.
+            created = next(Path(c[3]) for c in calls if c[1:3] == ['-m', 'venv'])
+            runners = [Path(c[0]) for c in calls if c[1:5] == ['-m', 'pip', 'install', '-r']]
+            self.assertEqual([r.is_relative_to(created) for r in runners], [True, True])
 
 
 class LaunchTests(unittest.TestCase):

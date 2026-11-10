@@ -242,7 +242,7 @@ def runtime_probe(root, selection, name, prefix, livebench, py):
     code = 'import importlib.metadata as m\nimport psutil\n'
     for pin in pins:
         package, version = pin.split('==')
-        # PEP 440 ==2.9.1 accepts the CUDA wheel's 2.9.1+cu128 local label.
+        # PEP 440 ==X.Y.Z accepts the CUDA wheel's X.Y.Z+cu128 local label.
         code += f'v=m.version({package!r}); assert v=={version!r} or ("+" not in {version!r} and v.split("+")[0]=={version!r}), {pin!r}\n'
     if recipe['kind'] == 'pip':
         code += 'import torch\nassert torch.cuda.is_available(), "CUDA unavailable in backend environment"\n'

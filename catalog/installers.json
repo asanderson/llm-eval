@@ -22,7 +22,7 @@
     "ik_llama.cpp": {
       "kind": "cmake",
       "repository": "https://github.com/ikawrakow/ik_llama.cpp.git",
-      "revision": "39fc3128ccc428314a64b98de09af24bd7bb4990"
+      "revision": "308fb08df6fb3fa65943d6b0feed7c87d6cc2d07"
     },
     "ktransformers": {
       "kind": "pip",
@@ -71,7 +71,7 @@
     },
     "accelerate": {
       "kind": "pip",
-      "torch": "2.9.1",
+      "torch": "2.11.0",
       "torch_index": "https://download.pytorch.org/whl/cu128",
       "packages": [
         "transformers==5.22.2",
@@ -81,7 +81,7 @@
     },
     "airllm": {
       "kind": "pip",
-      "torch": "2.9.1",
+      "torch": "2.11.0",
       "torch_index": "https://download.pytorch.org/whl/cu128",
       "packages": [
         "airllm==4.0.0",
@@ -99,7 +99,7 @@
     "strata": {
       "kind": "strata",
       "repository": "https://github.com/Niko1221/Strata.git",
-      "revision": "6f32ec070f23ced9f50e704d854d775da52591ab"
+      "revision": "d2f096475817d4666c364c820b0ca830f751cfc5"
     },
     "lmstudio": {
       "kind": "lmstudio",

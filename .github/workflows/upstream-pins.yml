@@ -1,11 +1,13 @@
 name: Upstream pin check
 
 # Nightly: compare every pin in catalog/installers.json with upstream
-# (PyPI, GitHub releases, the winget-pkgs manifests for LM Studio), apply
+# (PyPI, the download.pytorch.org wheel index for torch, GitHub releases and
+# branch heads, the winget-pkgs manifests for LM Studio), apply
 # the bumps that policy allows, and open (or refresh) one pull request with
-# the result. Reviewed-commit pins (Strata, LiveBench) and anything policy
-# holds back land in the PR body and in a tracking issue that every run
-# refreshes (and closes once nothing needs a decision). Dependencies that
+# the result. The reviewed-commit pin (LiveBench) and anything policy
+# holds back land in the PR body and in a tracking issue. A run refreshes
+# the issue while a pin waits on a decision, and closes it once nothing
+# needs a decision and no upstream lookup failed. Dependencies that
 # live in ecosystem manifests (pyproject.toml, the livebench Dockerfile base
 # image, GitHub Actions) are handled by Dependabot (.github/dependabot.yml)
 # on the same nightly cadence. Leaderboard discovery (new LiveBench releases
@@ -115,8 +117,10 @@ jobs:
             gh issue create --title "$ISSUE_TITLE" --body-file /tmp/issue-body.md --label dependencies
           fi
 
+      # A failed upstream lookup settles nothing: that night the issue is never
+      # closed, because the closing comment could be untrue.
       - name: Close the tracking issue once no pin needs a manual decision
-        if: steps.resolve.outputs.manual == 'false'
+        if: steps.resolve.outputs.manual == 'false' && steps.resolve.outputs.failed == 'false'
         env:
           GH_TOKEN: ${{ secrets.UPSTREAM_BUMP_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
@@ -124,6 +128,6 @@ jobs:
           existing="$(gh issue list --search "\"$ISSUE_TITLE\" in:title" --state open --json number,title \
                       --jq ".[] | select(.title == \"$ISSUE_TITLE\") | .number" | head -1)"
           if [ -n "$existing" ]; then
-            gh issue close "$existing" --comment "Every report-only pin matches upstream again (run ${{ github.run_id }}); nothing needs a manual decision."
+            gh issue close "$existing" --comment "No pin needs a manual decision any more (run ${{ github.run_id }})."
             echo "Closed issue #$existing"
           fi

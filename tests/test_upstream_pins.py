@@ -4,14 +4,19 @@ The scripted upstream is derived from whatever the catalog currently pins, so th
 tests hold on a bump PR (and in the nightly workflow right after --apply), not
 only on the catalog state they were written against.
 """
+import contextlib
 import hashlib
 import importlib.util
+import io
 import json
+import os
 from pathlib import Path
 import re
 import shutil
+import sys
 import tempfile
 import unittest
+from unittest import mock
 import urllib.error
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -60,8 +65,22 @@ def every_pip_pin():
     return {entry.split('==')[0]: pin_of(entry) for group in groups for entry in group}
 
 
+# The harness floor as a wheel file name spells it (cp311).
+FLOOR_TAG = 'cp%d%d' % up.PYTHON_FLOOR
+
+
+def torch_index_html(names):
+    """A wheel listing in the shape download.pytorch.org serves: one PEP 503 anchor per line."""
+    lines = ['<!DOCTYPE html>', '<html>', '  <body>', '    <h1>Links for torch</h1>']
+    for name in names:
+        href = 'https://download-r2.pytorch.org/whl/test/' + name.replace('+', '%2B') + '#sha256=' + '0' * 64
+        lines.append(f'    <a href="{href}" data-upload-time="2026-04-27T17:39:29Z">{name}</a><br/>')
+    lines += ['  </body>', '</html>', '<!--TIMESTAMP 1794276835-->']
+    return '\n'.join(lines) + '\n'
+
+
 class FakeNet:
-    """Scripted upstream derived from the catalog: PyPI, GitHub releases, winget manifests, release assets."""
+    """Scripted upstream derived from the catalog: PyPI, the torch wheel index, GitHub, winget manifests, release assets."""
 
     def __init__(self, current=False):
         self.hashed = []
@@ -75,7 +94,11 @@ class FakeNet:
                 self.pypi_versions[name] = (bump(pinned), '<3.15,>=3.11')
         torch = PLATFORMS['accelerate']['torch']
         self.torch_next = torch if current else bump(torch)
-        self.pypi_versions['torch'] = (self.torch_next, '>=3.10')
+        # What the recipes' own wheel index serves. PyPI has no torch entry: it is never asked.
+        self.torch_served = [torch, self.torch_next]
+        self.torch_served_by = {}   # variant -> its own served list, where one index must differ from the other
+        self.listed = []
+        self.asked_releases = []
         self.ollama_next = PLATFORMS['ollama']['version'] if current else bump(PLATFORMS['ollama']['version'])
         self.kobold_next = PLATFORMS['koboldcpp']['version'] if current else bump(PLATFORMS['koboldcpp']['version'])
         self.sizes = {'ollama-linux-amd64.tar.zst': 10, 'ollama-windows-amd64.zip': 11, 'koboldcpp-linux-x64': 5, 'koboldcpp.exe': 6}
@@ -90,23 +113,29 @@ class FakeNet:
             'LostRuins/koboldcpp': {'tag_name': kobold_tag, 'assets': [asset('LostRuins/koboldcpp', kobold_tag, n) for n in
                                     ('koboldcpp-linux-x64', 'koboldcpp.exe')]},
             'ggml-org/llama.cpp': {'tag_name': 'b7100'},
-            # ik_llama.cpp publishes no releases: /releases/latest is a 404
+            'Niko1221/Strata': {'tag_name': 'v9.9.9'},
+            # ik_llama.cpp follows HEAD: /releases/latest is a 404 there and is never asked
         }
         self.llama_next = PLATFORMS['llama.cpp']['revision'] if current else 'a' * 40
-        self.tags = {('ggml-org/llama.cpp', 'b7100'): self.llama_next}
-        self.heads = {'Niko1221/Strata': PLATFORMS['strata']['revision'] if current else 'c' * 40,
-                      'LiveBench/LiveBench': CATALOG['livebench']['revision'],
-                      'ikawrakow/ik_llama.cpp': PLATFORMS['ik_llama.cpp']['revision'] if current else 'd' * 40}
+        self.strata_next = PLATFORMS['strata']['revision'] if current else 'c' * 40
+        self.ik_next = PLATFORMS['ik_llama.cpp']['revision'] if current else 'd' * 40
+        self.tags = {('ggml-org/llama.cpp', 'b7100'): self.llama_next, ('Niko1221/Strata', 'v9.9.9'): self.strata_next}
+        self.heads = {'LiveBench/LiveBench': CATALOG['livebench']['revision'], 'ikawrakow/ik_llama.cpp': self.ik_next}
         self.winget = [PINNED_LMSTUDIO, '0.3.9'] if current else ['0.3.9', PINNED_LMSTUDIO, NEXT_LMSTUDIO, 'not-a-version']
 
     def pypi(self, name):
         return self.pypi_versions[name]
 
-    def torch_index_has(self, index_url, version):
+    def torch_listing(self, index_url):
         assert index_url.startswith('https://download.pytorch.org/whl/')
-        return version == self.torch_next
+        self.listed.append(index_url)
+        variant = index_url.rsplit('/', 1)[1]
+        return torch_index_html([f'torch-{version}+{variant}-{FLOOR_TAG}-{FLOOR_TAG}-{platform}.whl'
+                                 for version in self.torch_served_by.get(variant, self.torch_served)
+                                 for platform in ('manylinux_2_28_x86_64', 'win_amd64')])
 
     def release(self, repo):
+        self.asked_releases.append(repo)
         if repo not in self.releases:
             raise urllib.error.HTTPError(f'https://api.github.com/repos/{repo}/releases/latest', 404, 'Not Found', {}, None)
         return self.releases[repo]
@@ -139,7 +168,8 @@ def fixture_root():
     for rel in ('catalog/installers.json', 'docs/PLATFORMS.md', 'docs/READINESS.md', 'docs/WORKFLOWS.md'):
         (tmp / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / rel, tmp / rel)
-    (tmp / 'README.md').write_text(f'Still says LM Studio {PINNED_LMSTUDIO} here.\n', encoding='utf-8')
+    (tmp / 'README.md').write_text(f'Still says LM Studio {PINNED_LMSTUDIO} here.\n'
+                                   f"Strata was reviewed at {PLATFORMS['strata']['revision']}.\n", encoding='utf-8')
     (tmp / 'tests').mkdir()
     (tmp / 'tests/test_fixture.py').write_text(f"FAKE = 'ollama version {PLATFORMS['ollama']['version']}'\n", encoding='utf-8')
     return tmp
@@ -174,6 +204,41 @@ class PolicyTest(unittest.TestCase):
         self.assertEqual((sha, date), ('abcdef0123456789' * 4, '2026-10-20'))
         self.assertEqual(up.parse_winget_installer('InstallerSha256: ' + 'F' * 64 + '\n'), ('f' * 64, None))
 
+    def test_served_torch_counts_final_releases_the_index_has_for_the_floor_on_both_platforms(self):
+        tag = FLOOR_TAG
+        near = f'cp{up.PYTHON_FLOOR[0]}{up.PYTHON_FLOOR[1] + 1}'
+        listing = torch_index_html([
+            # counted: a wheel for the floor on Windows and on Linux x86_64
+            f'torch-2.9.1+cu128-{tag}-{tag}-manylinux_2_28_x86_64.whl', f'torch-2.9.1+cu128-{tag}-{tag}-win_amd64.whl',
+            f'torch-2.10.0+cu128-{tag}-{tag}-manylinux_2_28_x86_64.whl', f'torch-2.10.0+cu128-{tag}-{tag}-win_amd64.whl',
+            f'torch-2.0.1-{tag}-{tag}-manylinux_2_17_x86_64.manylinux2014_x86_64.whl', f'torch-2.0.1-{tag}-{tag}-win_amd64.whl',
+            f'torch-2.0.0-{tag}-{tag}-linux_x86_64.whl', f'torch-2.0.0-1-{tag}-{tag}-win_amd64.whl',   # -1: a build tag
+            # not counted: one platform only, another architecture, another Python, not a plain X.Y.Z release
+            f'torch-2.12.0+cu128-{tag}-{tag}-manylinux_2_28_x86_64.whl',
+            f'torch-2.13.0+cu128-{tag}-{tag}-win_amd64.whl',
+            f'torch-2.14.0+cu128-{tag}-{tag}-manylinux_2_28_aarch64.whl', f'torch-2.14.0+cu128-{tag}-{tag}-win_amd64.whl',
+            'torch-2.15.0+cu128-cp399-cp399-manylinux_2_28_x86_64.whl', 'torch-2.15.0+cu128-cp399-cp399-win_amd64.whl',
+            f'torch-2.21.0+cu128-{near}-{near}-manylinux_2_28_x86_64.whl', f'torch-2.21.0+cu128-{near}-{near}-win_amd64.whl',   # the next Python up
+            f'torch-2.16.0.dev20261101+cu128-{tag}-{tag}-manylinux_2_28_x86_64.whl',
+            f'torch-2.16.0.dev20261101+cu128-{tag}-{tag}-win_amd64.whl',
+            f'torch-2.17.0rc1+cu128-{tag}-{tag}-manylinux_2_28_x86_64.whl', f'torch-2.17.0rc1+cu128-{tag}-{tag}-win_amd64.whl',
+            f'torch-2.18.0.post1-{tag}-{tag}-manylinux_2_28_x86_64.whl', f'torch-2.18.0.post1-{tag}-{tag}-win_amd64.whl',
+            f'torch-2.19.0-{tag}-none-macosx_10_9_x86_64.whl', f'torch-2.19.0-{tag}-{tag}-win_amd64.whl',
+            f'torch-2.20.0+cu128-{tag}-{tag}-manylinux_2_28_x86_64.whl', f'torch-2.20.0+cu128-{tag}-{tag}-win_arm64.whl',
+        ])
+        served = up.served_torch(listing)
+        self.assertEqual(served, {'2.0.0', '2.0.1', '2.9.1', '2.10.0'})
+        self.assertEqual(max(served, key=up.vtuple), '2.10.0')
+        self.assertEqual(up.served_torch(listing, floor=(3, 99)), {'2.15.0'})
+        self.assertEqual(up.served_torch(torch_index_html([])), set())
+
+    def test_the_torch_listing_is_read_from_the_torch_page_of_the_index(self):
+        net, asked = up.Net(), []
+        net.text = lambda url: asked.append(url) or '<html></html>'
+        net.torch_listing('https://download.pytorch.org/whl/cu128')
+        net.torch_listing('https://download.pytorch.org/whl/cu128/')
+        self.assertEqual(asked, ['https://download.pytorch.org/whl/cu128/torch/'] * 2)
+
 
 class RealCatalogTest(unittest.TestCase):
     def test_every_pin_is_in_the_shape_the_resolver_expects(self):
@@ -190,6 +255,10 @@ class RealCatalogTest(unittest.TestCase):
             self.assertRegex(p[name]['repository'], up.GITHUB_REPO)
             self.assertRegex(p[name]['revision'], r'^[0-9a-f]{40}$')
         self.assertRegex(CATALOG['livebench']['repository'], up.GITHUB_REPO)
+        for name, recipe in p.items():
+            if 'torch' in recipe:   # followed on the recipe's own download.pytorch.org wheel index, never on PyPI
+                self.assertRegex(recipe['torch'], r'^\d+(\.\d+)+$', name)
+                self.assertRegex(recipe['torch_index'], r'^https://download\.pytorch\.org/whl/[a-z0-9]+$', name)
         for asset in p['lmstudio']['assets'].values():
             self.assertIn(p['lmstudio']['version'].replace('+', '-'), asset['url'])
         for rel in up.LMSTUDIO_MENTIONS:
@@ -225,8 +294,8 @@ class BumpTest(unittest.TestCase):
         self.assertEqual((win['bytes'], win['sha256']), (6, hashlib.sha256(win['url'].encode()).hexdigest()))
         self.assertEqual(sorted(u.rsplit('/', 1)[1] for u in net.hashed), ['koboldcpp-linux-x64', 'koboldcpp.exe'])
         self.assertEqual(p['llama.cpp']['revision'], 'a' * 40)
-        self.assertEqual(p['ik_llama.cpp']['revision'], PLATFORMS['ik_llama.cpp']['revision'])   # no releases: reported only
-        self.assertEqual(p['strata']['revision'], PLATFORMS['strata']['revision'])
+        self.assertEqual(p['ik_llama.cpp']['revision'], 'd' * 40)   # no release upstream: the default branch HEAD
+        self.assertEqual(p['strata']['revision'], 'c' * 40)         # the commit behind the newest release tag
         lm = p['lmstudio']
         self.assertEqual((lm['version'], lm['release_date']), (NEXT_LMSTUDIO, '2026-10-20'))
         self.assertEqual(lm['assets']['windows']['sha256'], 'abcdef0123456789' * 4)
@@ -241,15 +310,16 @@ class BumpTest(unittest.TestCase):
             self.assertNotIn(PINNED_LMSTUDIO, doc)
         self.assertEqual(result['touched'], ['catalog/installers.json', *up.LMSTUDIO_MENTIONS])
         self.assertIn(('README.md', PINNED_LMSTUDIO), result['stale'])
+        self.assertIn(('README.md', PLATFORMS['strata']['revision'][:12]), result['stale'])
         self.assertIn(('tests/test_fixture.py', PLATFORMS['ollama']['version']), result['stale'])
         self.assertTrue(all(rel != 'tests/test_upstream_pins.py' for rel, _ in result['stale']), result['stale'])
-        self.assertEqual(sorted(r.name for r in result['manual']),
-                         ['accelerate transformers', 'airllm transformers', 'ik_llama.cpp', 'strata'])
+        self.assertEqual(sorted(r.name for r in result['manual']), ['accelerate transformers', 'airllm transformers'])
         self.assertEqual(result['failures'], [])
         summary = up.markdown_summary(result)
         self.assertIn(f"| ollama | `{PLATFORMS['ollama']['version']}` | `{net.ollama_next}` | bumped |", summary)
+        self.assertIn(f"| strata | `{PLATFORMS['strata']['revision'][:12]}` | `v9.9.9 (cccccccccccc)` | bumped |", summary)
+        self.assertIn(f"| ik_llama.cpp | `{PLATFORMS['ik_llama.cpp']['revision'][:12]}` | `HEAD (dddddddddddd)` | bumped |", summary)
         self.assertIn('| livebench |', summary)
-        self.assertIn('no GitHub release', summary)
         self.assertIn('Needs a manual decision', summary)
         self.assertIn(f'- `README.md`: still names `{PINNED_LMSTUDIO}`', summary)
         self.assertIn('### Files rewritten', summary)
@@ -281,6 +351,216 @@ class BumpTest(unittest.TestCase):
         self.assertEqual((root / 'catalog/installers.json').read_bytes(), before)
         self.assertEqual([r.name for r in result['failures']], ['vllm vllm'])
         self.assertFalse(any(r.changed for r in result['rows']))
+
+    def test_torch_follows_its_own_wheel_index_and_never_pypi(self):
+        # PyPI moved on while the pinned CUDA index stayed put: not a bump, and not a decision to raise.
+        root, net = fixture_root(), FakeNet(current=True)
+        net.pypi_versions['torch'] = ('99.0.0', '>=3.10')
+        result = up.run(net, root, apply=True, today='2026-10-28')
+        self.assertFalse(result['changed'])
+        self.assertEqual((result['manual'], result['failures']), ([], []))
+        rows = {r.name: r for r in result['rows']}
+        for name in ('accelerate', 'airllm'):
+            self.assertEqual((rows[f'{name} torch'].latest, rows[f'{name} torch'].status), (PLATFORMS[name]['torch'], 'current'))
+        self.assertEqual(set(net.listed), {PLATFORMS['accelerate']['torch_index'], PLATFORMS['airllm']['torch_index']})
+
+    def test_a_torch_pin_ahead_of_its_index_is_a_manual_decision_never_a_downgrade(self):
+        root, net = fixture_root(), FakeNet(current=True)
+        path = root / 'catalog/installers.json'
+        cat = json.loads(path.read_text(encoding='utf-8'))
+        for name in ('accelerate', 'airllm'):
+            cat['platforms'][name]['torch'] = bump(PLATFORMS[name]['torch'])
+        path.write_text(json.dumps(cat, indent=2) + '\n', encoding='utf-8')
+        before = path.read_bytes()
+        result = up.run(net, root, apply=True, today='2026-10-28')
+        self.assertEqual(sorted(r.name for r in result['manual']), ['accelerate torch', 'airllm torch'])
+        self.assertTrue(all('newer than anything' in r.detail for r in result['manual']), [r.detail for r in result['manual']])
+        self.assertEqual(result['failures'], [])
+        self.assertEqual(path.read_bytes(), before)
+
+    def test_the_newest_served_torch_is_picked_by_version_not_as_text(self):
+        # 2.9.1 sorts after 2.10.0 as text and before it as a version.
+        root, net = fixture_root(), FakeNet(current=True)
+        path = root / 'catalog/installers.json'
+        cat = json.loads(path.read_text(encoding='utf-8'))
+        for name in ('accelerate', 'airllm'):
+            cat['platforms'][name]['torch'] = '2.9.1'
+        path.write_text(json.dumps(cat, indent=2) + '\n', encoding='utf-8')
+        net.torch_served = ['2.9.1', '2.10.0']
+        up.run(net, root, apply=True, today='2026-10-28')
+        cat = json.loads(path.read_text(encoding='utf-8'))
+        self.assertEqual([cat['platforms'][name]['torch'] for name in ('accelerate', 'airllm')], ['2.10.0', '2.10.0'])
+
+    def test_each_recipe_follows_its_own_wheel_index(self):
+        root, net = fixture_root(), FakeNet(current=True)
+        path = root / 'catalog/installers.json'
+        cat = json.loads(path.read_text(encoding='utf-8'))
+        other = 'https://download.pytorch.org/whl/cu999'
+        cat['platforms']['airllm']['torch_index'] = other
+        path.write_text(json.dumps(cat, indent=2) + '\n', encoding='utf-8')
+        ahead = bump(PLATFORMS['airllm']['torch'])
+        net.torch_served_by['cu999'] = [PLATFORMS['airllm']['torch'], ahead]
+        up.run(net, root, apply=True, today='2026-10-28')
+        cat = json.loads(path.read_text(encoding='utf-8'))
+        self.assertEqual((cat['platforms']['accelerate']['torch'], cat['platforms']['airllm']['torch']), (PLATFORMS['accelerate']['torch'], ahead))
+        self.assertEqual((cat['platforms']['accelerate']['torch_index'], cat['platforms']['airllm']['torch_index']), (PLATFORMS['accelerate']['torch_index'], other))
+        self.assertEqual(sorted(net.listed), sorted([PLATFORMS['accelerate']['torch_index'], other]))
+
+    def test_an_index_with_no_torch_wheel_for_both_platforms_is_a_failure_row(self):
+        root, net = fixture_root(), FakeNet()
+        net.torch_served = []
+        result = up.run(net, root, apply=False, today='2026-10-28')
+        self.assertEqual(sorted(r.name for r in result['failures']), ['accelerate torch', 'airllm torch'])
+
+    def test_a_head_follower_takes_the_branch_head_and_ignores_releases(self):
+        root, net = fixture_root(), FakeNet()
+        net.releases['ikawrakow/ik_llama.cpp'] = {'tag_name': 't0002'}   # a release, should one appear, must not win
+        net.tags[('ikawrakow/ik_llama.cpp', 't0002')] = 'f' * 40
+        up.run(net, root, apply=True, today='2026-10-28')
+        cat = json.loads((root / 'catalog/installers.json').read_text(encoding='utf-8'))
+        self.assertEqual(cat['platforms']['ik_llama.cpp']['revision'], 'd' * 40)
+        self.assertNotIn('ikawrakow/ik_llama.cpp', net.asked_releases)
+
+    def test_a_release_follower_without_a_release_keeps_its_pin_and_asks(self):
+        root, net = fixture_root(), FakeNet()
+        del net.releases['Niko1221/Strata']       # /releases/latest answers 404
+        net.heads['Niko1221/Strata'] = 'e' * 40   # HEAD has moved, and is still not taken
+        result = up.run(net, root, apply=True, today='2026-10-28')
+        cat = json.loads((root / 'catalog/installers.json').read_text(encoding='utf-8'))
+        self.assertEqual(cat['platforms']['strata']['revision'], PLATFORMS['strata']['revision'])
+        strata = next(r for r in result['rows'] if r.name == 'strata')
+        self.assertEqual((strata.status, strata.changed), ('manual', False))
+        self.assertIn(strata, result['manual'])
+        self.assertEqual(result['failures'], [])
+        self.assertIn('manual: no GitHub release to follow', up.markdown_summary(result, issue=True))
+
+    def test_a_release_lookup_error_other_than_404_is_a_failure_not_a_decision(self):
+        for code in (403, 500):
+            with self.subTest(code=code):
+                root, net = fixture_root(), FakeNet()
+                scripted = net.release
+
+                def release(repo):
+                    if repo == 'Niko1221/Strata':
+                        raise urllib.error.HTTPError(f'https://api.github.com/repos/{repo}/releases/latest', code, 'Error', {}, None)
+                    return scripted(repo)
+                net.release = release
+                result = up.run(net, root, apply=False, today='2026-10-28')
+                self.assertEqual([r.name for r in result['failures']], ['strata'])
+                self.assertNotIn('strata', [r.name for r in result['manual']])
+
+    def test_a_release_tag_with_markup_characters_is_not_followed_and_never_reaches_the_reports(self):
+        hostile = 'v1`|<x>@y'
+        for repo, name, key in (('Niko1221/Strata', 'strata', 'revision'), ('ollama/ollama', 'ollama', 'version')):
+            with self.subTest(repo=repo):
+                root, net = fixture_root(), FakeNet()
+                net.releases[repo] = dict(net.releases[repo], tag_name=hostile)
+                net.tags[(repo, hostile)] = 'f' * 40
+                result = up.run(net, root, apply=True, today='2026-10-28')
+                self.assertEqual([r.name for r in result['failures']], [name])
+                written = (root / 'catalog/installers.json').read_text(encoding='utf-8')
+                self.assertEqual(json.loads(written)['platforms'][name][key], PLATFORMS[name][key])
+                for text in (written, up.markdown_summary(result), up.markdown_summary(result, issue=True)):
+                    self.assertNotIn('<x>', text)
+
+    def test_release_tag_names_are_limited_to_characters_safe_in_the_catalog_a_url_and_markdown(self):
+        for tag in ('v0.2.13', 'b7100', '0.4.26+4', 'v1_2-rc1', '7'):
+            with self.subTest(accepted=tag):
+                self.assertEqual(up.checked_tag({'tag_name': tag}), tag)
+        for tag in ('', 'a/../x', 'release/1.0', 'v1 2', 'v1#x', 'v1?x', 'v1%2f', 'v1:x', 'v1\\x', '-v1', '.v1', '+v1',
+                    '_v1', 'v1\n', 'v1\u00e9', 'v1`|<x>@y'):
+            with self.subTest(rejected=tag):
+                with self.assertRaises(ValueError):
+                    up.checked_tag({'tag_name': tag})
+
+    def test_livebench_head_drift_is_reported_as_a_decision_and_never_rewritten(self):
+        root, net = fixture_root(), FakeNet(current=True)
+        net.heads['LiveBench/LiveBench'] = 'e' * 40
+        before = (root / 'catalog/installers.json').read_bytes()
+        result = up.run(net, root, apply=True, today='2026-10-28')
+        self.assertEqual([(r.name, r.latest) for r in result['manual']], [('livebench', 'e' * 12)])
+        self.assertIn('reviewed-commit', result['manual'][0].detail)
+        self.assertFalse(result['changed'])
+        self.assertEqual((root / 'catalog/installers.json').read_bytes(), before)
+
+    def test_a_torch_index_that_cannot_be_read_is_a_failure_row_and_keeps_the_pin(self):
+        root, net = fixture_root(), FakeNet()
+
+        def torch_listing(index_url):
+            raise urllib.error.HTTPError(index_url + '/torch/', 404, 'Not Found', {}, None)
+        net.torch_listing = torch_listing
+        result = up.run(net, root, apply=True, today='2026-10-28')
+        self.assertEqual(sorted(r.name for r in result['failures']), ['accelerate torch', 'airllm torch'])
+        self.assertEqual([r.name for r in result['manual'] if r.name.endswith(' torch')], [])
+        written = json.loads((root / 'catalog/installers.json').read_text(encoding='utf-8'))['platforms']
+        for name in ('accelerate', 'airllm'):
+            self.assertEqual(written[name]['torch'], PLATFORMS[name]['torch'])
+
+    def test_a_recipe_without_a_wheel_index_is_a_failure_row_and_no_default_index_is_asked(self):
+        root, net = fixture_root(), FakeNet()
+        path = root / 'catalog/installers.json'
+        cat = json.loads(path.read_text(encoding='utf-8'))
+        del cat['platforms']['airllm']['torch_index']
+        path.write_text(json.dumps(cat, indent=2) + '\n', encoding='utf-8')
+        result = up.run(net, root, apply=True, today='2026-10-28')
+        self.assertEqual([r.name for r in result['failures']], ['airllm torch'])
+        self.assertEqual(net.listed, [PLATFORMS['accelerate']['torch_index']])
+        written = json.loads(path.read_text(encoding='utf-8'))['platforms']
+        self.assertEqual(written['airllm']['torch'], PLATFORMS['airllm']['torch'])
+        self.assertEqual(written['accelerate']['torch'], net.torch_next)
+
+
+class MainTest(unittest.TestCase):
+    """The three step outputs the workflow branches on: `changed` opens the bump PR, `manual` refreshes the issue, and
+    the issue closes only when `manual` and `failed` are both false."""
+
+    def outputs(self, net, *extra):
+        root = fixture_root()
+        out = root / 'github-output.txt'
+        with mock.patch.object(up, 'Net', lambda: net), mock.patch.object(up, 'ROOT', root), \
+                mock.patch.object(sys, 'argv', ['upstream_pins.py', '--github-output', *extra]), \
+                mock.patch.dict(os.environ, {'GITHUB_OUTPUT': str(out)}), \
+                contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(up.main(), 0)
+        return dict(line.split('=', 1) for line in out.read_text(encoding='utf-8').split())
+
+    def test_a_report_run_announces_no_change_and_the_open_decision(self):
+        self.assertEqual(self.outputs(FakeNet()), {'changed': 'false', 'manual': 'true', 'failed': 'false'})
+
+    def test_an_apply_run_announces_the_change_and_the_open_decision(self):
+        self.assertEqual(self.outputs(FakeNet(), '--apply'), {'changed': 'true', 'manual': 'true', 'failed': 'false'})
+
+    def test_a_run_with_nothing_to_decide_says_so_and_lets_the_issue_close(self):
+        self.assertEqual(self.outputs(FakeNet(current=True), '--apply'),
+                         {'changed': 'false', 'manual': 'false', 'failed': 'false'})
+
+    def test_a_failed_lookup_is_announced_so_the_issue_is_not_closed_on_a_guess(self):
+        net = FakeNet(current=True)
+        net.pypi_versions.pop('vllm')   # resolver raises KeyError
+        self.assertEqual(self.outputs(net, '--apply'), {'changed': 'false', 'manual': 'false', 'failed': 'true'})
+
+    def test_livebench_head_drift_alone_keeps_the_decision_open(self):
+        net = FakeNet(current=True)
+        net.heads['LiveBench/LiveBench'] = 'e' * 40
+        self.assertEqual(self.outputs(net, '--apply'), {'changed': 'false', 'manual': 'true', 'failed': 'false'})
+
+
+class WorkflowGateTest(unittest.TestCase):
+    """How .github/workflows/upstream-pins.yml reads those outputs."""
+
+    TEXT = (ROOT / '.github/workflows/upstream-pins.yml').read_text(encoding='utf-8')
+
+    def step(self, name):
+        start = self.TEXT.index(f'      - name: {name}\n')
+        end = self.TEXT.find('\n      - name: ', start)
+        return self.TEXT[start:] if end < 0 else self.TEXT[start:end]
+
+    def test_the_issue_is_refreshed_on_a_decision_and_closed_only_after_a_run_without_failed_lookups(self):
+        self.assertIn(' --github-output\n', self.step('Resolve upstream and apply the bumps'))
+        self.assertIn("\n        if: steps.resolve.outputs.manual == 'true'\n",
+                      self.step('Refresh the tracking issue with the pins that need a manual decision'))
+        self.assertIn("\n        if: steps.resolve.outputs.manual == 'false' && steps.resolve.outputs.failed == 'false'\n",
+                      self.step('Close the tracking issue once no pin needs a manual decision'))
 
 
 if __name__ == '__main__':

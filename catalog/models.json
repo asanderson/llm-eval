@@ -986,13 +986,13 @@
       "rationale": "Additional Strata reference, not an invented fourth top-three slot. Reviewed Strata documents ~35.5GB expert RAM for IQ2_XS, GPU dense/cache allocations and SSD lookup table. Full original checkpoint is much larger; count all files and conversion steps. PLE SSD lookup is intrinsic and must be recorded.",
       "sources": [
         "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
-        "https://github.com/Niko1221/Strata/blob/6f32ec070f23ced9f50e704d854d775da52591ab/docs/MODELS.md"
+        "https://github.com/Niko1221/Strata/blob/d2f096475817d4666c364c820b0ca830f751cfc5/docs/MODELS.md"
       ],
       "source_revision": "de4b8e4d43b917e7706784d8bb445c9af86a3540",
       "artifact_revision": null,
       "artifact_status": "selection_and_hashing_required",
       "hardware_validation": "not_measured",
-      "checked_on": "2026-10-05",
+      "checked_on": "2026-11-09",
       "max_context_for_initial_plan": 32768,
       "default_context_tokens": 8192,
       "planning_weight_gib": null,

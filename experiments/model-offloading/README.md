@@ -274,7 +274,7 @@ The project's existing [MIT license](../../LICENSE) is preserved. Backend and mo
 [hf-download]: https://huggingface.co/docs/huggingface_hub/guides/download
 [swe-bench]: https://github.com/SWE-bench/SWE-bench
 [evalplus]: https://github.com/evalplus/evalplus
-[strata-models]: https://github.com/Niko1221/Strata/blob/6f32ec070f23ced9f50e704d854d775da52591ab/docs/MODELS.md
+[strata-models]: https://github.com/Niko1221/Strata/blob/d2f096475817d4666c364c820b0ca830f751cfc5/docs/MODELS.md
 [llama-cpp]: https://github.com/ggml-org/llama.cpp
 [ik-llama]: https://github.com/ikawrakow/ik_llama.cpp
 [ktransformers]: https://github.com/kvcache-ai/ktransformers
