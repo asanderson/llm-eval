@@ -203,10 +203,14 @@ def execute_install(plan, root):
             checkout(recipe['repository'],recipe['revision'],source)
             if kind == 'strata':
                 invoke([py,'-m','pip','install','-r',source/'requirements.txt'],env=env)
+                # At v0.2.13 upstream keeps its cmake and ninja pins in a second file; the pin before it had no such file.
+                if (source/'requirements-build.txt').is_file():
+                    invoke([py,'-m','pip','install','-r',source/'requirements-build.txt'],env=env)
             flag = '-DSTRATA_ENABLE_CUDA=ON' if kind == 'strata' else '-DGGML_CUDA=ON'
             argv=['cmake','-S',source,'-B',source/'build',flag,'-DCMAKE_BUILD_TYPE=Release',
                   '-DCMAKE_CUDA_ARCHITECTURES='+plan['cuda_arch']]
-            if kind == 'strata': argv.append('-DSTRATA_PORTABLE=ON')
+            # Strata's CMake builds its own test suite by default (seen at v0.2.13); upstream's installer passes the same OFF.
+            if kind == 'strata': argv += ['-DSTRATA_PORTABLE=ON','-DSTRATA_BUILD_TESTS=OFF']
             invoke(argv,env=env)
             invoke(['cmake','--build',source/'build','--config','Release','-j',str(plan['jobs'])],env=env)
             name='strata' if kind=='strata' else 'llama-server'

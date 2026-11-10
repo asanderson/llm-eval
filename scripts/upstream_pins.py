@@ -6,30 +6,34 @@
   python3 scripts/upstream_pins.py --summary FILE        write the Markdown pull request body
   python3 scripts/upstream_pins.py --issue-summary FILE  write the tracking-issue body (same pin table and
                                                          decisions, without the sections about the PR's diff)
-  python3 scripts/upstream_pins.py --github-output       append changed=/manual= to $GITHUB_OUTPUT
+  python3 scripts/upstream_pins.py --github-output       append changed=/manual=/failed= to $GITHUB_OUTPUT
   python3 scripts/upstream_pins.py --strict              exit 1 when any resolver failed
 
 What moves automatically (policy "bump"):
   * every exact PyPI pin (harness_packages, archive_packages, the pip recipes'
     packages, model_download_package): newest release on PyPI whose
     requires-python still admits the harness floor (3.11);
-  * torch for the pip recipes that pin it: newest PyPI release that the pinned
-    CUDA wheel index also serves;
+  * torch for the pip recipes that pin it: newest final release that the
+    recipe's own wheel index on download.pytorch.org serves for the harness
+    floor on both Windows and Linux x86_64. PyPI is not consulted, so a release
+    the index never carried is not a pending decision, and the index itself
+    (the CUDA variant) is a choice this check never changes;
   * ollama and koboldcpp: newest GitHub release; asset URLs follow the pinned
     filenames, byte counts come from the release metadata, sha256 from the
     release's checksum file when it publishes one (ollama) or from hashing the
     asset (koboldcpp);
-  * llama.cpp and ik_llama.cpp: the commit behind the newest GitHub release
-    tag (not branch HEAD, which moves many times a day); a repository that
-    publishes no releases (ik_llama.cpp today) is treated like a
-    reviewed-commit pin and only has its HEAD drift reported;
+  * llama.cpp and Strata: the commit behind the newest GitHub release tag (not
+    branch HEAD, which moves many times a day); when no release exists the pin
+    stays and a manual decision is raised, never a silent switch to HEAD;
+  * ik_llama.cpp: the default branch HEAD, because upstream publishes no
+    release to follow (HEAD_FOLLOWERS);
   * LM Studio: newest version in the winget-pkgs manifest tree; the Windows
     installer sha256 and release date come from that manifest, the Linux
     AppImage keeps sha256 null (the vendor publishes none).
 
-What is only reported (policy "report"): Strata and LiveBench, which are
-pinned to a reviewed commit, not a release; HEAD drift lands in the PR body
-or, when nothing else changed, in a tracking issue.
+What is only reported (policy "report"): LiveBench, which is pinned to a
+reviewed commit, not a release; HEAD drift lands in the tracking issue, and
+in the bump PR body when the same run opens or refreshes that PR.
 
 Network goes through one Net object so tests can run offline with a fake.
 GITHUB_TOKEN, when set, authenticates api.github.com calls (CI rate limits).
@@ -51,8 +55,20 @@ CATALOG = ROOT / "catalog" / "installers.json"
 PYTHON_FLOOR = (3, 11)
 PIN = re.compile(r"^([A-Za-z0-9_.-]+)==([A-Za-z0-9.+_-]+)$")
 GITHUB_REPO = re.compile(r"^https://github\.com/([^/]+/[^/]+?)(?:\.git)?$")
+# The anchor text of one wheel in a download.pytorch.org listing, for example
+# torch-2.11.0+cu128-cp311-cp311-win_amd64.whl (PEP 503: the anchor text is the
+# file name; PEP 427: a build tag may sit between the version and the Python
+# tag). Plain X.Y.Z releases only: a dev, rc or post version does not match.
+TORCH_WHEEL = re.compile(r">\s*torch-(\d+(?:\.\d+)+)(?:\+[A-Za-z0-9.]+)?(?:-\d\w*)?-(cp\d+)-[A-Za-z0-9_]+-([A-Za-z0-9_.]+)\.whl\s*<")
+# Release tags are upstream-controlled text that lands in the catalog, the PR body and the tracking issue.
+SAFE_TAG = re.compile(r"[A-Za-z0-9][A-Za-z0-9._+-]*")
 # Reviewed-commit pins: report HEAD drift, never rewrite.
-REPORT_ONLY_SOURCES = ("strata", "livebench")
+REPORT_ONLY_SOURCES = ("livebench",)
+# Source pins that follow the default branch HEAD because upstream publishes no
+# release to follow. Every other source pin follows its newest release tag; when
+# that release goes missing the pin stays and a manual decision is raised, never
+# a silent switch to HEAD.
+HEAD_FOLLOWERS = ("ik_llama.cpp",)
 # Files outside the catalog that spell the LM Studio app version.
 LMSTUDIO_MENTIONS = ("docs/PLATFORMS.md", "docs/READINESS.md")
 
@@ -87,6 +103,20 @@ def admits_python(requires_python, floor=PYTHON_FLOOR) -> bool:
         if (m.group(1) == ">=" and floor < bound) or (m.group(1) == ">" and floor <= bound):
             return False
     return True
+
+
+def served_torch(listing: str, floor=PYTHON_FLOOR) -> set:
+    """Final torch releases one wheel index serves for the harness floor on both Windows and Linux x86_64."""
+    python_tag = f"cp{floor[0]}{floor[1]}"
+    windows, linux = set(), set()
+    for version, tag, platform in TORCH_WHEEL.findall(listing):
+        if tag != python_tag:
+            continue
+        if platform == "win_amd64":
+            windows.add(version)
+        elif platform.startswith(("manylinux", "linux")) and platform.endswith("x86_64"):
+            linux.add(version)
+    return windows & linux
 
 
 class Net:
@@ -136,9 +166,9 @@ class Net:
         info = self.json(f"https://pypi.org/pypi/{name}/json")["info"]
         return info["version"], info.get("requires_python")
 
-    def torch_index_has(self, index_url: str, version: str) -> bool:
-        listing = self.text(index_url.rstrip("/") + "/torch/")
-        return f"torch-{version}+" in listing or f"torch-{version}-" in listing
+    def torch_listing(self, index_url: str) -> str:
+        """The PEP 503 page that lists every torch wheel under one index."""
+        return self.text(index_url.rstrip("/") + "/torch/")
 
     def release(self, repo: str) -> dict:
         return self.json(f"https://api.github.com/repos/{repo}/releases/latest")
@@ -252,6 +282,7 @@ def bump_pip_lists(net: Net, catalog: dict, rows: list):
 
 
 def bump_torch(net: Net, catalog: dict, rows: list) -> bool:
+    """torch: the newest release the recipe's own wheel index serves; PyPI is not consulted."""
     moved = False
     for platform, recipe in catalog["platforms"].items():
         if "torch" not in recipe:
@@ -259,22 +290,29 @@ def bump_torch(net: Net, catalog: dict, rows: list) -> bool:
         row = Row(f"{platform} torch", recipe["torch"], "bump")
         rows.append(row)
         try:
-            latest, requires = net.pypi("torch")
-            if not newer(latest, recipe["torch"]):
+            served = served_torch(net.torch_listing(recipe["torch_index"]))
+            if not served:
+                raise ValueError(f"no torch wheel for the harness floor on Windows and Linux x86_64 at `{recipe['torch_index']}`")
+            latest = max(served, key=vtuple)
+            if newer(latest, recipe["torch"]):
+                recipe["torch"] = latest
+                row.done(latest, "bump")
+                row.changed = moved = True
+            elif newer(recipe["torch"], latest):
+                row.done(latest, "manual", f"pinned release is newer than anything `{recipe['torch_index']}` serves")
+            else:
                 row.done(latest, "current")
-                continue
-            if not admits_python(requires):
-                row.done(latest, "manual", f"requires-python `{requires}` drops the harness floor")
-                continue
-            if not net.torch_index_has(recipe["torch_index"], latest):
-                row.done(latest, "manual", f"not yet served by `{recipe['torch_index']}`")
-                continue
-            recipe["torch"] = latest
-            row.done(latest, "bump")
-            row.changed = moved = True
         except Exception as exc:  # noqa: BLE001
             row.done(None, "failed", str(exc))
     return moved
+
+
+def checked_tag(release: dict) -> str:
+    """The release tag, when it is made only of characters that are safe in the catalog, a URL and Markdown."""
+    tag = release["tag_name"]
+    if not SAFE_TAG.fullmatch(tag):
+        raise ValueError("the newest release tag has characters outside A-Z a-z 0-9 . _ + -; not following it")
+    return tag
 
 
 def bump_release_assets(net: Net, platform: str, recipe: dict, rows: list, checksum_asset=None) -> bool:
@@ -284,7 +322,7 @@ def bump_release_assets(net: Net, platform: str, recipe: dict, rows: list, check
     rows.append(row)
     try:
         release = net.release(repo)
-        tag = release["tag_name"]
+        tag = checked_tag(release)
         version = tag.lstrip("v")
         if not newer(version, recipe["version"]):
             row.done(version, "current")
@@ -316,31 +354,31 @@ def bump_release_assets(net: Net, platform: str, recipe: dict, rows: list, check
         return False
 
 
-def bump_release_revision(net: Net, platform: str, recipe: dict, rows: list) -> bool:
-    """llama.cpp / ik_llama.cpp: the commit behind the newest release tag."""
+def bump_source_revision(net: Net, platform: str, recipe: dict, rows: list) -> bool:
+    """llama.cpp / Strata: the commit behind the newest release tag. ik_llama.cpp: the default branch HEAD."""
     repo = GITHUB_REPO.match(recipe["repository"]).group(1)
     row = Row(platform, recipe["revision"][:12], "bump")
     rows.append(row)
     try:
-        try:
-            tag = net.release(repo)["tag_name"]
-        except urllib.error.HTTPError as exc:
-            if exc.code != 404:
-                raise
-            # No GitHub release to follow: behave like a reviewed-commit pin and only report HEAD drift.
-            head = net.head_commit(repo)
-            row.policy = "report"
-            if head == recipe["revision"]:
-                row.done(head[:12], "current")
-            else:
-                row.done(head[:12], "manual", "no GitHub release to follow; reviewed-commit pin, re-review before moving it")
-            return False
-        commit = net.tag_commit(repo, tag)
+        if platform in HEAD_FOLLOWERS:
+            commit = net.head_commit(repo)
+            latest = f"HEAD ({commit[:12]})"
+        else:
+            try:
+                tag = checked_tag(net.release(repo))
+            except urllib.error.HTTPError as exc:
+                if exc.code != 404:
+                    raise
+                # No GitHub release to follow. Moving to HEAD is the owner's call, never automatic.
+                row.done("no release", "manual", "no GitHub release to follow (or the repository is gone or private); the pin stays until one exists or the source joins HEAD_FOLLOWERS")
+                return False
+            commit = net.tag_commit(repo, tag)
+            latest = f"{tag} ({commit[:12]})"
         if commit == recipe["revision"]:
-            row.done(f"{tag} ({commit[:12]})", "current")
+            row.done(latest, "current")
             return False
         recipe["revision"] = commit
-        row.done(f"{tag} ({commit[:12]})", "bump")
+        row.done(latest, "bump")
         row.changed = True
         return True
     except Exception as exc:  # noqa: BLE001
@@ -447,10 +485,9 @@ def run(net: Net, root: pathlib.Path, apply: bool, today: str):
     platforms = catalog["platforms"]
     bump_release_assets(net, "ollama", platforms["ollama"], rows, checksum_asset="sha256sum.txt")
     bump_release_assets(net, "koboldcpp", platforms["koboldcpp"], rows)
-    for name in ("llama.cpp", "ik_llama.cpp"):
-        bump_release_revision(net, name, platforms[name], rows)
+    for name in ("llama.cpp", "ik_llama.cpp", "strata"):
+        bump_source_revision(net, name, platforms[name], rows)
     bump_lmstudio(net, platforms["lmstudio"], rows)
-    report_head_drift(net, "strata", platforms["strata"], rows)
     report_head_drift(net, "livebench", catalog["livebench"], rows)
 
     after = json.dumps(catalog, indent=2)
@@ -503,7 +540,7 @@ def main() -> int:
     ap.add_argument("--apply", action="store_true", help="rewrite catalog/installers.json and docs when upstream moved")
     ap.add_argument("--summary", metavar="FILE", help="write the Markdown pull request body here")
     ap.add_argument("--issue-summary", metavar="FILE", help="write the Markdown tracking-issue body here")
-    ap.add_argument("--github-output", action="store_true", help="append changed=/manual= to $GITHUB_OUTPUT")
+    ap.add_argument("--github-output", action="store_true", help="append changed=/manual=/failed= to $GITHUB_OUTPUT")
     ap.add_argument("--strict", action="store_true", help="exit 1 if any resolver failed")
     args = ap.parse_args()
     result = run(Net(), ROOT, args.apply, dt.date.today().isoformat())
@@ -519,6 +556,7 @@ def main() -> int:
         with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
             fh.write(f"changed={'true' if result['applied'] else 'false'}\n")
             fh.write(f"manual={'true' if result['manual'] else 'false'}\n")
+            fh.write(f"failed={'true' if result['failures'] else 'false'}\n")
     if result["failures"]:
         print(f"{len(result['failures'])} resolver(s) failed", file=sys.stderr)
         return 1 if args.strict else 0

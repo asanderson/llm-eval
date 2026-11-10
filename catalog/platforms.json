@@ -153,12 +153,12 @@
         "windows-11-native": "supported",
         "windows-11-wsl2-ubuntu-26.04": "conditional"
       },
-      "notes": "Narrow Qwen3.8-Flash-Next family; automatic toolkit setup in audited commit handles Ubuntu 22.04/24.04 only. WSL KV streaming disabled. Model identity and converted artifacts differ from general GGUF.",
+      "notes": "Harness use is limited to the Qwen3.8-Flash-Next family (upstream v0.2.13 also covers DeepSeek V4.1-Flash and Qwen3.6-35B-A3B); automatic toolkit setup in the reviewed commit handles Ubuntu 22.04/24.04 and Debian 12/13 only. WSL KV streaming disabled. Model identity and converted artifacts differ from general GGUF. reviewed_commit is the last statically reviewed release (v0.2.13, 2026-11-09; nothing built or run); the install pin in catalog/installers.json follows upstream releases and can be ahead of it.",
       "sources": [
         "https://github.com/Niko1221/Strata"
       ],
       "tested_version": null,
-      "reviewed_commit": "6f32ec070f23ced9f50e704d854d775da52591ab",
+      "reviewed_commit": "d2f096475817d4666c364c820b0ca830f751cfc5",
       "model_compatibility": "Only declared family included; no GPU measurement",
       "blocked_models": [
         "nemotron-nano-30b",
