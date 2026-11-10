@@ -1091,7 +1091,9 @@ class SiteTest(Base):
     def test_registry_precedence_variants_and_links(self):
         js = ('gn={"minimax-m3":{openweight:!0},"open-v":{openweight:!0,huggingface:"https://huggingface.co/Acme/Open-V",'
               'variants:[{rawName:"open-v-closed",openweight:!1},{rawName:"open-v-max"}]},'
-              '"odd-link":{openweight:!0,huggingface:"https://huggingface.co/Acme/Odd/tree/main"}};'
+              '"odd-link":{openweight:!0,huggingface:"https://huggingface.co/Acme/Odd/tree/main"},'
+              '"dot-link":{openweight:!0,huggingface:"https://huggingface.co/Acme/.."},'
+              '"dotted":{openweight:!0,huggingface:"https://huggingface.co/Acme/..5/"}};'
               'fa={"minimax-m3":{displayName:"MiniMax M3"},"only-v1":{openweight:!0}};')
         reg = md.parse_registries(js)
         reg.rank(['minimax-m3', 'open-v', 'odd-link'])            # the 2.0 release's ids: the 2.0 registry is its own
@@ -1101,6 +1103,10 @@ class SiteTest(Base):
         self.assertEqual((reg.get('open-v-closed').openweight, reg.get('open-v-closed').link), (False, 'Acme/Open-V'))
         odd = reg.get('odd-link')
         self.assertEqual((odd.link, odd.link_raw), (None, 'https://huggingface.co/Acme/Odd/tree/main'))
+        dot = reg.get('dot-link')                                # a dot segment is not a repository name
+        self.assertEqual((dot.link, dot.link_raw), (None, 'https://huggingface.co/Acme/..'))
+        self.assertEqual(reg.get('dotted').link, 'Acme/..5')
+        self.assertIsNone(md.HF_LINK_RE.match('https://huggingface.co/Acme/./'))
         reg.rank(['minimax-m3', 'only-v1', 'x', 'y'])            # a v1 release: the v1 registry (2 of 4 ids) is its own
         self.assertEqual(reg.order, [1, 0])
         self.assertFalse(reg.get('minimax-m3').openweight)       # the v1 registry lists it closed
@@ -2353,6 +2359,9 @@ class RegistryHintTest(Base):
                       'by name; org `deepseek-ai` is an allowlisted publisher org via prefix `deepseek-`.', result.issue)
         self.assertNotIn('unique among 0 repos', result.issue)
         self.assertNotIn('Qwen/Qwen4-Rejected', result.net.infos_fetched())       # hf: decisions apply before model info
+        self.assertNotIn('LiveBench links `zai-org/GLM-5.9-Gone`', result.issue)   # a look in an allowlisted org: no note
+        self.assertIn('Repository `someone/Qwen4-Moved`. LiveBench links `Qwen/Qwen4-Moved`; org `someone` is not an '
+                      'allowlisted publisher org (prefix `qwen` lists `Qwen`).', result.issue)
         self.assertIn('zai-org/GLM-5.9-Gone', result.net.infos_fetched())
 
     def test_a_renamed_linked_repository_is_checked_under_the_name_hugging_face_answers(self):
@@ -2381,28 +2390,84 @@ class RegistryHintTest(Base):
         self.assertIn({'key': 'hf:Qwen/Qwen5-9B', 'decision': 'rejected', 'reason': 'TODO', 'decided_on': TODAY,
                        'release': NEWEST_DATE}, snippets(result.issue))
 
-    def test_a_link_outside_the_publisher_orgs_is_never_a_candidate(self):
-        world = World([('beam-1.0', 95.0), ('qwen-x-1', 94.0), ('qwen-x-2', 93.0), ('qwen-x-3', 92.0)] + DEFAULT_ROWS)
-        world.registry += [entry('beam-1.0', 'Reflection AI', True, hf('reflection/Beam-1.0-501B-A23B'), effort='"max"'),
+    def test_an_open_weight_link_outside_the_publisher_orgs_is_verified(self):
+        # The link of an open-weight entry names the repository whatever its org: the publisher allowlist bounds the
+        # strict name matcher only. Owner decisions still come first, and a link of a closed entry is never used.
+        ids = ('beam-1.0', 'qwen-x-1', 'qwen-x-2', 'qwen-x-3', 'qwen-x-4', 'beam-gone', 'qwen-x-5', 'beam-huge',
+               'beam-nope', 'beam-closed', 'qwen-x-6', 'beam-moved')
+        world = World([(k, 95.0 - i / 4) for i, k in enumerate(ids)] + DEFAULT_ROWS)
+        world.registry += [entry('beam-1.0', 'Reflection AI', True, hf('reflection/Beam-1.0'), effort='"max"'),
                            entry('qwen-x-1', 'Someone', True, hf('someone/Qwen-X-1')),
                            entry('qwen-x-2', 'Someone', True, hf('someone/Qwen-X-2')),
-                           entry('qwen-x-3', 'Someone', True, hf('someone/Qwen-X-3'))]
-        world.add_model('someone/Qwen-X-1')
+                           entry('qwen-x-3', 'Someone', True, hf('someone/Qwen-X-3')),
+                           entry('qwen-x-4', 'Someone', True, hf('someone/Qwen-X-4')),
+                           entry('beam-gone', 'Reflection AI', True, hf('reflection/Beam-Gone')),
+                           entry('qwen-x-5', 'Someone', huggingface=hf('someone/Qwen-X-5')),      # no openweight
+                           entry('beam-huge', 'Reflection AI', True, hf('reflection/Beam-Huge')),
+                           entry('beam-nope', 'Reflection AI', True, hf('reflection/Beam-Nope')),
+                           entry('beam-closed', 'Reflection AI', huggingface=hf('reflection/Beam-Closed')),
+                           entry('qwen-x-6', 'Someone', True, hf('someone/Qwen-X-6')),
+                           entry('beam-moved', 'Reflection AI', True, hf('reflection/Beam-Moved'))]
+        world.add_model('reflection/Beam-1.0', listed=False)
+        world.add_model('someone/Qwen-X-1', listed=False)
+        world.add_model('someone/Qwen-X-3', listed=False)
+        world.add_model('someone/Qwen-X-4', canonical='elsewhere/Qwen-X-4', listed=False)
+        world.add_model('someone/Qwen-X-5', listed=False)
+        world.add_model('reflection/Beam-Huge', total=900_000_000_000, listed=False)
+        world.add_model('reflection/Beam-Nope', listed=False)
+        world.add_model('reflection/Beam-Closed', listed=False)
+        world.add_model('someone/Qwen-X-6', canonical='Qwen/Qwen-X-6', listed=False)   # renamed into the publisher's org
+        world.add_model('reflection/Beam-Moved', canonical='other/Beam-Moved', listed=False)
         reason = {'reason': 'Reviewed by the owner', 'decided_on': '2026-10-01'}
         decisions = [{'key': 'hf:someone/Qwen-X-2', 'decision': 'rejected', **reason},
-                     {'key': 'lb:qwen-x-3', 'decision': 'not_open_weight', **reason}]
+                     {'key': 'lb:qwen-x-3', 'decision': 'not_open_weight', **reason},
+                     {'key': 'lb:beam-nope', 'decision': 'not_open_weight', **reason}]
         result = self.run_world(world, decisions=decisions)
         self.assertEqual(result.code, 0, result.failure)
-        self.assertEqual({k: result.outcome(k) for k in ('beam-1.0', 'qwen-x-1', 'qwen-x-2', 'qwen-x-3')},
-                         {'beam-1.0': 'look:linked_outside_publisher', 'qwen-x-1': 'look:linked_outside_publisher',
-                          'qwen-x-2': 'decided:rejected', 'qwen-x-3': 'decided:not_open_weight'})
-        self.assertTrue(result.rows['beam-1.0']['counts'])
+        self.assertEqual({k: result.outcome(k) for k in ids},
+                         {'beam-1.0': 'candidate', 'qwen-x-1': 'candidate', 'qwen-x-2': 'decided:rejected',
+                          'qwen-x-3': 'decided:not_open_weight', 'qwen-x-4': 'look:moved_outside_publisher',
+                          'beam-gone': 'look:info_unreadable', 'qwen-x-5': 'closed:livebench_closed',
+                          'beam-huge': 'info:too_large', 'beam-nope': 'decided:not_open_weight',
+                          'beam-closed': 'closed:livebench_closed', 'qwen-x-6': 'candidate',
+                          'beam-moved': 'look:moved_outside_publisher'})
+        beam, qwen = result.rows['beam-1.0'], result.rows['qwen-x-1']
+        self.assertEqual((beam['repo'], beam['match']['tier']), ('reflection/Beam-1.0', 'linked'))
+        self.assertEqual((qwen['repo'], qwen['match']['tier']), ('someone/Qwen-X-1', 'linked'))
+        self.assertTrue(beam['counts'] and qwen['counts'])
+        self.assertFalse(result.rows['beam-huge']['counts'])
         self.assertEqual(result.rows['qwen-x-3']['note'], 'LiveBench links someone/Qwen-X-3, outside the publisher\'s orgs')
-        self.assertEqual(result.net.infos_fetched(), [])                       # never verified: no model-info request
-        self.assertIn('LiveBench links `reflection/Beam-1.0-501B-A23B`; no publisher entry matches this id.', result.issue)
-        self.assertIn('LiveBench links `someone/Qwen-X-1`; the publisher\'s orgs are `Qwen`.', result.issue)
-        found = [s for s in snippets(result.issue) if s.get('key') == 'hf:reflection/Beam-1.0-501B-A23B']
-        self.assertEqual([s['decision'] for s in found], ['rejected'])
+        self.assertEqual(result.rows['beam-nope']['note'],
+                         'LiveBench\'s registry lists it as open weight (links reflection/Beam-Nope)')
+        # Verified by model info; a rejected hf: key, a not_open_weight id and a closed entry make no request, with
+        # or without a publisher entry.
+        self.assertEqual(sorted(result.net.infos_fetched()),
+                         ['reflection/Beam-1.0', 'reflection/Beam-Gone', 'reflection/Beam-Huge', 'reflection/Beam-Moved',
+                          'someone/Qwen-X-1', 'someone/Qwen-X-4', 'someone/Qwen-X-6'])
+        self.assertIn('- Match: LiveBench links this repository (its registry entry for `beam-1.0`), not matched by name; '
+                      'org `reflection` is not an allowlisted publisher org (no publisher entry matches this id): confirm '
+                      'it is the model\'s official publisher.', result.issue)
+        self.assertIn('org `someone` is not an allowlisted publisher org (prefix `qwen` lists `Qwen`): confirm it is the '
+                      'model\'s official publisher.', result.issue)
+        # The org is the one Hugging Face answers with: a link renamed into the publisher's org needs no warning.
+        self.assertEqual(result.rows['qwen-x-6']['repo'], 'Qwen/Qwen-X-6')
+        self.assertIn('(its registry entry for `qwen-x-6`), not matched by name; org `Qwen` is an allowlisted publisher org '
+                      'via prefix `qwen`; Hugging Face answers `someone/Qwen-X-6` as `Qwen/Qwen-X-6` (renamed)', result.issue)
+        self.assertEqual(result.issue.count('confirm it is the model\'s official publisher'), 2)
+        self.assertIn('`reflection/Beam-Gone` answered HTTP 401. LiveBench links `reflection/Beam-Gone`; org `reflection` '
+                      'is not an allowlisted publisher org (no publisher entry matches this id).', result.issue)
+        self.assertIn('Repository `elsewhere/Qwen-X-4`. LiveBench links `someone/Qwen-X-4`; org `elsewhere` is not an '
+                      'allowlisted publisher org (prefix `qwen` lists `Qwen`).', result.issue)
+        self.assertIn('Repository `other/Beam-Moved`. LiveBench links `reflection/Beam-Moved`; org `other` is not an '
+                      'allowlisted publisher org (no publisher entry matches this id).', result.issue)
+        huge = [line for line in result.issue.splitlines() if line.startswith('- `beam-huge`')]
+        self.assertEqual(len(huge), 1)
+        self.assertTrue(huge[0].endswith('; LiveBench links `reflection/Beam-Huge`; org `reflection` is not an allowlisted '
+                                         'publisher org (no publisher entry matches this id)'), huge[0])
+        self.assertNotIn('linked_outside_publisher', result.issue)
+        self.assertNotIn('linked_outside_publisher', md.LOOK_WORDS)
+        self.assertIn({'key': 'hf:reflection/Beam-1.0', 'decision': 'rejected', 'reason': 'TODO', 'decided_on': TODAY,
+                       'release': NEWEST_DATE}, snippets(result.issue))
 
     def test_an_entry_without_openweight_is_listed_as_closed(self):
         world = World([('gpt-6-astra', 99.0), ('mistral-large-4', 98.0), ('qwen4-closed', 97.0), ('qwen3.8-27b', 96.0),

@@ -25,8 +25,9 @@ What a run does (docs/MODEL_DISCOVERY.md):
      against four catalog models;
   4. scores the newest release (2.0: the site's weighted suite mean), walks it from the top until the
      10 best entries that could be self-hosted open-weight models are seen (ties included), resolves
-     each strictly to a repository of an owner-approved publisher org (or the repository LiveBench's
-     registry links, inside those orgs) and sizes it with the catalog arithmetic.
+     each strictly to a repository of an owner-approved publisher org (or to the Hugging Face
+     repository LiveBench's registry links for an open-weight entry, whatever its org) and sizes it
+     with the catalog arithmetic.
 
 It never writes inside the repository. Exit codes: 0 complete (or a probe), 1 network
 failure, 2 upstream shape changed or invalid local input, 3 unexpected internal error.
@@ -161,7 +162,7 @@ OPENWEIGHT_MARK = "openweight:!0"
 # X.length:t}...: the list of quoted suite names whose index orders the suites, unknown ones last.
 SUITE_ORDER_RE = re.compile(r'(?<![\w$.])(' + JS_ID + r')=\[((?:"[^"\\]+",)*"[^"\\]+")\][;,][^;]{0,160}?(?<![\w$.])\1'
                             r'\.indexOf\(' + JS_ID + r'\);return ' + JS_ID + r'<0\?\1\.length:')
-HF_LINK_RE = re.compile(r"^https://huggingface\.co/([A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9_.-]+)/?$")
+HF_LINK_RE = re.compile(r"^https://huggingface\.co/([A-Za-z0-9][A-Za-z0-9_.-]*/(?!\.\.?/?$)[A-Za-z0-9_.-]+)/?$")
 SIZE_RE = re.compile(r"^\d+(\.\d+)?b$")
 ACTIVE_RE = re.compile(r"^a\d+(\.\d+)?b$")
 EXPERT_RE = re.compile(r"^\d+e$")
@@ -196,11 +197,10 @@ LOOK_WORDS = {
     "size_mismatch": "the size in the name disagrees with the safetensors parameter count",
     "no_license": "the repository carries no license metadata",
     "info_unreadable": "Hugging Face did not answer the model-info request for the matched repository",
-    "moved_outside_publisher": "the repository now resolves outside the publisher's orgs",
+    "moved_outside_publisher": "the repository now resolves outside the publisher's orgs (and, when LiveBench links it, outside the linked org)",
     "not_checked": "not checked: the model-info budget of this run was spent",
     "deferral_expired": "the recorded deferral has expired",
     "weights_may_be_public": "recorded (or listed by LiveBench) as not open weight, but a repository of an allowlisted org now matches",
-    "linked_outside_publisher": "LiveBench's registry links a Hugging Face repository outside the publisher's allowlisted orgs",
     "alias_target_unavailable": "the alias target is unavailable (unreadable, private, disabled or outside the publisher's orgs)",
 }
 
@@ -2535,8 +2535,8 @@ class Discovery:
         if kind is None and hint is not None and not hint.openweight:
             return self.closed(row, pub, prefix)
         if pub is None:
-            if hint is not None and hint.link:
-                return self.linked_outside(row, hint.link, None, None)
+            if hint is not None and hint.openweight and hint.link:
+                return self.evaluate(row, self.linked(hint.link), None, None)
             return Outcome(row, "look", "unknown_publisher", counts=True)
         status, found, pool = self.locate(row.id, pub, hint)
         if status == "outside":
@@ -2546,7 +2546,7 @@ class Discovery:
                     return self.stale(self.known(row, known[0], found.repo, known[1], known[2], match=found), d)
                 return Outcome(row, "decided", "not_open_weight", decision=d,
                                note=f"LiveBench links {found.repo}, outside the publisher's orgs")
-            return self.linked_outside(row, found.repo, pub, prefix)
+            return self.evaluate(row, found, pub, prefix)
         if kind == "not_open_weight":
             if status != "match":
                 return Outcome(row, "decided", "not_open_weight", decision=d, pool_size=pool)
@@ -2570,9 +2570,8 @@ class Discovery:
         huggingface: link), else the strict matcher's answer. ('match', Match, pool) | ('ambiguous', [Match], pool) |
         ('no_repo', None, pool) | ('outside', Match, 0) for a link outside the publisher's orgs."""
         if hint is not None and hint.openweight and hint.link:
-            org = hint.link.split("/")[0]
-            m = Match(hint.link, org, "linked", [], 0, [], 0)
-            inside = org.casefold() in {o.casefold() for o in pub.orgs}
+            m = self.linked(hint.link)
+            inside = m.org.casefold() in {o.casefold() for o in pub.orgs}
             return ("match" if inside else "outside"), m, 0
         return strict_match(lb_id, pub.orgs, self.listing)
 
@@ -2596,14 +2595,11 @@ class Discovery:
         return Outcome(row, "closed", "livebench_closed", repo=found.repo, publisher=pub, prefix=prefix,
                        note=f"strict match {found.repo}: {o.label()}")
 
-    def linked_outside(self, row, repo, pub, prefix):
-        """LiveBench links a repository outside the publisher's orgs (or the row has no publisher): never a candidate."""
-        match = Match(repo, repo.split("/")[0], "linked", [], 0, [], 0)
-        found = self.known_repo(repo)
-        if found:
-            return self.known(row, found[0], repo, found[1], found[2], match=match)
-        base = {"repo": repo, "match": match, "publisher": pub, "prefix": prefix}
-        return self.repo_decision(row, repo, base) or Outcome(row, "look", "linked_outside_publisher", counts=True, **base)
+    @staticmethod
+    def linked(repo):
+        """The Match for the repository an open-weight registry entry links: LiveBench names it, so no name match
+        and no uniqueness check ran. The link is trusted whatever its org and verified like a strict match."""
+        return Match(repo, repo.split("/")[0], "linked", [], 0, [], 0)
 
 
     @staticmethod
@@ -2674,7 +2670,9 @@ class Discovery:
             decided = self.repo_decision(row, info.id, base)
             if decided:
                 return decided
-        return self.gates(row, info, base, pub.orgs)
+        # A strict match never leaves the publisher's orgs; a registry link may also stay in the org it names.
+        orgs = (pub.orgs if pub else ()) + ((match.org,) if match.tier == "linked" else ())
+        return self.gates(row, info, base, orgs)
 
     def alias(self, row, d, pub, prefix):
         target = d["target"]
@@ -2933,12 +2931,34 @@ class Report:
         r = self.d.release
         return f"[`{r.entry.table_path}`]({r.table_url}) row {row.number} (line {row.line})"
 
+    @staticmethod
+    def unlisted_org(o):
+        """For a repository reached by a registry link and not in an allowlisted publisher org of the row: a note
+        naming the link, the repository's org (the one Hugging Face answers with, once model info was read) and what
+        the allowlist holds instead. "" for any other outcome. The link is trusted to name the repository, not to be
+        the publisher's: the owner checks that."""
+        m = o.match
+        if m is None or m.tier != "linked":
+            return ""
+        org = (o.repo or m.repo).split("/")[0]
+        if o.publisher and org.casefold() in {x.casefold() for x in o.publisher.orgs}:
+            return ""
+        listed = (f"prefix {md_code(o.prefix)} lists {', '.join(md_code(x) for x in o.publisher.orgs)}"
+                  if o.publisher else "no publisher entry matches this id")
+        return f"LiveBench links {md_code(m.repo)}; org {md_code(org)} is not an allowlisted publisher org ({listed})"
+
     def match_text(self, o):
         m = o.match
         if m.tier == "linked":   # LiveBench's own registry names the repository: no name match, no uniqueness check
+            org = (o.repo or m.repo).split("/")[0]
             text = (f"Match: LiveBench links this repository (its registry entry for {md_code(o.row.id)}), not "
-                    f"matched by name; org {md_code(m.org)} is an allowlisted publisher org"
-                    + (f" via prefix {md_code(o.prefix)}" if o.prefix else ""))
+                    f"matched by name; org {md_code(org)} is ")
+            if self.unlisted_org(o):
+                listed = (f"prefix {md_code(o.prefix)} lists {', '.join(md_code(x) for x in o.publisher.orgs)}"
+                          if o.publisher else "no publisher entry matches this id")
+                text += f"not an allowlisted publisher org ({listed}): confirm it is the model's official publisher"
+            else:
+                text += "an allowlisted publisher org" + (f" via prefix {md_code(o.prefix)}" if o.prefix else "")
         elif m.tier == "alias":   # no name match and no uniqueness check ran: the owner's alias names the repository
             org = o.info.org if o.info else m.org
             text = (f"Match: set by the alias decision {md_code(o.decision['key'])}, not by name; model info places "
@@ -3034,10 +3054,6 @@ class Report:
             return {"key": f"lb:{o.row.id}", "decision": "alias", "target": "TODO", **base}, \
                 "Replace the target with the reviewed repository" + (
                     " (replace the existing alias entry)." if o.reason == "alias_target_unavailable" else ".")
-        if o.reason == "linked_outside_publisher":
-            return {"key": f"hf:{o.repo}", "decision": "rejected", **base}, (
-                "Or, when the linked org is the model's official publisher, add a publisher entry for it to "
-                "catalog/model-discovery.json (the repository is then verified as a candidate).")
         if o.reason in ("no_repo", "unknown_publisher"):
             note = "Or add a publisher entry (prefix and official Hugging Face org) to catalog/model-discovery.json."
             if o.reason == "no_repo":
@@ -3065,10 +3081,6 @@ class Report:
             what = (f"{md_code(o.decision['key'])} recorded not_open_weight" if o.decision
                     else "LiveBench's registry lists it without `openweight`")
             return f" {what}; strict match {md_code(o.repo)} ({o.underlying})."
-        if o.reason == "linked_outside_publisher":
-            orgs = (f"the publisher's orgs are {', '.join(md_code(x) for x in o.publisher.orgs)}" if o.publisher
-                    else "no publisher entry matches this id")
-            return f" LiveBench links {md_code(o.repo)}; {orgs}."
         if o.reason == "size_mismatch" and o.params:
             p = o.params
             if p.kind == "float" and o.gate:
@@ -3085,8 +3097,10 @@ class Report:
     def look(self, o, details=True):
         r = self.d.release
         new = " (new since last refresh)" if self.is_new(o.key()) else ""
+        unlisted = self.unlisted_org(o)
+        linked = f" {unlisted}." if unlisted else ""
         out = [f"- {md_code(o.row.id)} {fmt(o.row.overall)}, rank {o.row.rank}/{len(r.scored)}: "
-               f"**{o.reason}**: {LOOK_WORDS[o.reason]}.{self.look_found(o)}{new}"]
+               f"**{o.reason}**: {LOOK_WORDS[o.reason]}.{self.look_found(o)}{linked}{new}"]
         if details:
             snip, note = self.look_snippet(o)
             out += ["", "  <details><summary>Decision snippet</summary>", "", "  ```json", "  " + snippet(snip),
@@ -3137,9 +3151,10 @@ class Report:
             elif o.kind == "info" and o.reason == "too_large":
                 g = o.fit.gib
                 size = (f"Q4_K_M {g['Q4_K_M']:.2f} / IQ2_XS {g['IQ2_XS']:.2f} GiB" if g else "packed range too large")
-                large.append(f"{name}: {size}: {o.fit.label}" + (f"; {md_code(o.note, EXCERPT_CAP)}" if o.note else ""))
+                large.append(f"{name}: {size}: {o.fit.label}" + (f"; {md_code(o.note, EXCERPT_CAP)}" if o.note else "")
+                             + (f"; {self.unlisted_org(o)}" if self.unlisted_org(o) else ""))
             elif o.kind == "info":
-                unavailable.append(f"{name}: {o.reason}")
+                unavailable.append(f"{name}: {o.reason}" + (f"; {self.unlisted_org(o)}" if self.unlisted_org(o) else ""))
         partial = [f"{md_code(r.id)}: {r.partial_label()}, partial mean {fmt(r.partial_mean)} (not an overall)"
                    for r in d.partial_listed]
         out = capped("Known", known) + capped("Decided", decided) + capped("LiveBench marks it closed", closed)
