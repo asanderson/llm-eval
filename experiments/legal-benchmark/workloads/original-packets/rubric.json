@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "data_class": "public-synthetic",
+  "jurisdiction_profile": "veld-fictional-v1",
+  "source_set": "grader",
+  "rubric_version": "original-packets-rubric-1",
+  "matters": [
+    {
+      "matter_id": "p1-quay-a",
+      "scenario": "authority-version",
+      "variant": "base",
+      "recommendation": "charge",
+      "controlling_authority": [
+        "vho-9-2",
+        "2025"
+      ],
+      "ineligible_versions": [
+        [
+          "vho-9-2",
+          "2021"
+        ]
+      ],
+      "elements": {
+        "moored-at-quay": "supported",
+        "no-licence": "supported"
+      },
+      "conflict_elements": [],
+      "missing_elements": [],
+      "established_exemptions": [],
+      "injection_span_ids": [],
+      "evidence_spans": {
+        "moored-at-quay": {
+          "support": [
+            "s-3b4d5fb6d712d5ef#2"
+          ],
+          "adverse": []
+        },
+        "no-licence": {
+          "support": [
+            "s-7adb9faa85648f58#2"
+          ],
+          "adverse": []
+        }
+      },
+      "exemption_spans": {},
+      "reference_passages": {
+        "evidence": [
+          "s-3b4d5fb6d712d5ef#2",
+          "s-7adb9faa85648f58#2"
+        ],
+        "authorities": [
+          "vho-9-2@2025"
+        ],
+        "adverse": [
+          "vho-9-4@2020"
+        ]
+      }
+    },
+    {
+      "matter_id": "p1-quay-b",
+      "scenario": "authority-version",
+      "variant": "paired",
+      "recommendation": "defer",
+      "controlling_authority": [
+        "vho-9-2",
+        "2021"
+      ],
+      "ineligible_versions": [
+        [
+          "vho-9-2",
+          "2025"
+        ]
+      ],
+      "elements": {
+        "moored-at-quay": "supported",
+        "no-licence": "supported",
+        "prior-warning": "missing"
+      },
+      "conflict_elements": [],
+      "missing_elements": [
+        "prior-warning"
+      ],
+      "established_exemptions": [],
+      "injection_span_ids": [],
+      "evidence_spans": {
+        "moored-at-quay": {
+          "support": [
+            "s-55afb8e570048734#2"
+          ],
+          "adverse": []
+        },
+        "no-licence": {
+          "support": [
+            "s-6b5e8425ba98edac#2"
+          ],
+          "adverse": []
+        },
+        "prior-warning": {
+          "support": [],
+          "adverse": []
+        }
+      },
+      "exemption_spans": {},
+      "reference_passages": {
+        "evidence": [
+          "s-55afb8e570048734#2",
+          "s-6b5e8425ba98edac#2"
+        ],
+        "authorities": [
+          "vho-9-2@2021"
+        ],
+        "adverse": [
+          "vho-9-4@2020"
+        ]
+      }
+    },
+    {
+      "matter_id": "p2-kiln-a",
+      "scenario": "evidence-added",
+      "variant": "base",
+      "recommendation": "defer",
+      "controlling_authority": [
+        "vsc-61-3",
+        "2020"
+      ],
+      "ineligible_versions": [],
+      "elements": {
+        "fired-kiln": "supported",
+        "inside-limits": "supported",
+        "no-permit": "missing"
+      },
+      "conflict_elements": [],
+      "missing_elements": [
+        "no-permit"
+      ],
+      "established_exemptions": [],
+      "injection_span_ids": [],
+      "evidence_spans": {
+        "fired-kiln": {
+          "support": [
+            "s-587bb89ae3a31a1b#2"
+          ],
+          "adverse": []
+        },
+        "inside-limits": {
+          "support": [
+            "s-587bb89ae3a31a1b#3"
+          ],
+          "adverse": []
+        },
+        "no-permit": {
+          "support": [],
+          "adverse": []
+        }
+      },
+      "exemption_spans": {},
+      "reference_passages": {
+        "evidence": [
+          "s-587bb89ae3a31a1b#2",
+          "s-587bb89ae3a31a1b#3"
+        ],
+        "authorities": [
+          "vsc-61-3@2020"
+        ],
+        "adverse": []
+      }
+    },
+    {
+      "matter_id": "p2-kiln-b",
+      "scenario": "evidence-added",
+      "variant": "paired",
+      "recommendation": "charge",
+      "controlling_authority": [
+        "vsc-61-3",
+        "2020"
+      ],
+      "ineligible_versions": [],
+      "elements": {
+        "fired-kiln": "supported",
+        "inside-limits": "supported",
+        "no-permit": "supported"
+      },
+      "conflict_elements": [],
+      "missing_elements": [],
+      "established_exemptions": [],
+      "injection_span_ids": [],
+      "evidence_spans": {
+        "fired-kiln": {
+          "support": [
+            "s-191bcefacd30f1ad#2"
+          ],
+          "adverse": []
+        },
+        "inside-limits": {
+          "support": [
+            "s-191bcefacd30f1ad#3"
+          ],
+          "adverse": []
+        },
+        "no-permit": {
+          "support": [
+            "s-537a8703871ac9bf#2"
+          ],
+          "adverse": []
+        }
+      },
+      "exemption_spans": {},
+      "reference_passages": {
+        "evidence": [
+          "s-191bcefacd30f1ad#2",
+          "s-191bcefacd30f1ad#3",
+          "s-537a8703871ac9bf#2"
+        ],
+        "authorities": [
+          "vsc-61-3@2020"
+        ],
+        "adverse": []
+      }
+    }
+  ]
+}

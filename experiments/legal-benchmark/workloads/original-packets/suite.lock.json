@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "legal-original-packets",
+  "revision": "2026-11-11.1",
+  "split_id": "calibration",
+  "data_class": "public-synthetic",
+  "jurisdiction_profile": "veld-fictional-v1",
+  "matter_manifest": "matters.json",
+  "corpus_manifest": "corpus.json",
+  "rubric_manifest": "rubric.json",
+  "source_files": [
+    {
+      "path": "matters.json",
+      "size": 22912,
+      "sha256": "97179e8fab0aa3ea27a32d2d811278c069fbdd2b7aec2a258b8663513fef9240",
+      "purpose": "matters"
+    },
+    {
+      "path": "corpus.json",
+      "size": 6560,
+      "sha256": "fb07f84c2141b9b44d4309d163cd7897990ac0f69d91c81b59af0c1b39fc0135",
+      "purpose": "corpus"
+    },
+    {
+      "path": "rubric.json",
+      "size": 5014,
+      "sha256": "5f9debb9fe2ef938127844766741d0b281ec8de890ab2bd3eabc33e77f719fd6",
+      "purpose": "rubric"
+    },
+    {
+      "path": "collection.json",
+      "size": 9286,
+      "sha256": "6cd4a86b37634bc38d235d414c3691b9153f4866b4384840ace280fa5bf97579",
+      "purpose": "collection"
+    },
+    {
+      "path": "visibility.json",
+      "size": 1469,
+      "sha256": "93901339318c90e01393e78ac222dc1ef5e94c5308b4c546fa3f0b6e13c26f20",
+      "purpose": "visibility"
+    },
+    {
+      "path": "review.json",
+      "size": 1559,
+      "sha256": "05f5fd14e4546e415f3d6bf9eab5f8c9a30029647ab027b6c250fa372df9a07e",
+      "purpose": "review"
+    },
+    {
+      "path": "raw/authority/vho-9-2-2021.txt",
+      "size": 140,
+      "sha256": "7a48c3556e9f7f9b53c8e817bb413d5a473b722bfd9490fa7bd8a1e77a9a1ed8",
+      "purpose": "source"
+    },
+    {
+      "path": "raw/authority/vho-9-2-2025.txt",
+      "size": 91,
+      "sha256": "42be4054cfe66a77e97bf0f8ad91bed97b7d498ba11c9a1198196b5a0e6791eb",
+      "purpose": "source"
+    },
+    {
+      "path": "raw/authority/vho-9-4-2020.txt",
+      "size": 124,
+      "sha256": "805dde0aeb493fa1d6ab8968b4653f38bd338ba76419f236df9b9124393ecb99",
+      "purpose": "source"
+    },
+    {
+      "path": "raw/authority/vsc-61-3-2020.txt",
+      "size": 92,
+      "sha256": "9baf6ad21cc8b3c8e8c5fb5f68fe57ce095377f38c7eba7555bc965e364350c4",
+      "purpose": "source"
+    },
+    {
+      "path": "raw/p1-a/patrol-report.txt",
+      "size": 208,
+      "sha256": "bd2e2f71c9f10d7d2d47ba7384c746568ab8d24b8066c290a1670ca6765c14ea",
+      "purpose": "source"
+    },
+    {
+      "path": "raw/p1-a/thread.eml",
+      "size": 777,
+      "sha256": "42f809235fbc560c6dc8b1533ce6c93742000f4aee63942978b793ce8fefaa7d",
+      "purpose": "source"
+    },
+    {
+      "path": "raw/p1-b/patrol-report.txt",
+      "size": 208,
+      "sha256": "bd2e2f71c9f10d7d2d47ba7384c746568ab8d24b8066c290a1670ca6765c14ea",
+      "purpose": "source"
+    },
+    {
+      "path": "raw/p1-b/thread.eml",
+      "size": 777,
+      "sha256": "be7c86e59b9af396b20a347e47eba2c6981153881c7e7f1bc2e5e5fd3b5516c6",
+      "purpose": "source"
+    },
+    {
+      "path": "raw/p1/prior-brief.txt",
+      "size": 152,
+      "sha256": "6b1e973fe7698f5ffcc6c4a56ac62c2dc0a83b7ac851c635547f71d60f25e742",
+      "purpose": "source"
+    },
+    {
+      "path": "raw/p2-a/inspection-report.txt",
+      "size": 225,
+      "sha256": "243b347dcc162637046cdd5c8fd07291559457ff287d7e2d44dcb8fa3a680dcc",
+      "purpose": "source"
+    },
+    {
+      "path": "raw/p2-a/neighbour-statement.txt",
+      "size": 107,
+      "sha256": "80a7f975b614fe6acaa04048a25a71c216a33bdd853057003dfe44d556157a4f",
+      "purpose": "source"
+    },
+    {
+      "path": "raw/p2-b/inspection-report.txt",
+      "size": 225,
+      "sha256": "243b347dcc162637046cdd5c8fd07291559457ff287d7e2d44dcb8fa3a680dcc",
+      "purpose": "source"
+    },
+    {
+      "path": "raw/p2-b/permit-thread.eml",
+      "size": 841,
+      "sha256": "927966c8cd99cca45e1aaf4418b4d1e084aa11c07430680738288def6d173876",
+      "purpose": "source"
+    },
+    {
+      "path": "raw/p2/review-note.txt",
+      "size": 175,
+      "sha256": "fe2c458d1e57d5deed55a28dad52f4b85c01a7a4d38c37903e99c0cb8d936fd5",
+      "purpose": "source"
+    },
+    {
+      "path": "raw/shared/screening-template.txt",
+      "size": 167,
+      "sha256": "af979d63d25d8c1d179fdcef3f6ba7b5b7520d3e5b3089a7599f5240739ba437",
+      "purpose": "source"
+    }
+  ]
+}

@@ -1,0 +1,651 @@
+{
+  "schema_version": 1,
+  "data_class": "public-synthetic",
+  "jurisdiction_profile": "veld-fictional-v1",
+  "source_set": "candidate",
+  "matters": [
+    {
+      "matter_id": "p1-quay-a",
+      "family_id": "p1-quay",
+      "operative_date": "2025-05-02",
+      "venue": "veld-harbor",
+      "posture": "screening",
+      "question": "Does mooring a vessel at the public quay without a licence support a charge?",
+      "output_schema": "candidate-output-v1",
+      "sources": [
+        {
+          "source_id": "s-3b4d5fb6d712d5ef",
+          "role": "evidence",
+          "version": "1",
+          "kind": "report",
+          "original_sha256": "bd2e2f71c9f10d7d2d47ba7384c746568ab8d24b8066c290a1670ca6765c14ea",
+          "original_bytes": 208,
+          "media_type": "text/plain",
+          "parent_source_id": null,
+          "parse": {
+            "status": "ok",
+            "confidence": 1.0,
+            "missing_pages": [],
+            "ocr_required_pages": [],
+            "reason_codes": []
+          },
+          "source_set": "candidate",
+          "excluded_matters": [],
+          "spans": [
+            {
+              "span_id": "s-3b4d5fb6d712d5ef#1",
+              "text": "Harbor patrol report, east quay.",
+              "text_sha256": "0f945d3e8a64025066201b351ff318e4293fb92c27d049a4b10433986f79f69e",
+              "locator": {
+                "kind": "text",
+                "paragraph": 1,
+                "start": 0,
+                "end": 32
+              }
+            },
+            {
+              "span_id": "s-3b4d5fb6d712d5ef#2",
+              "text": "At first light the respondent moored the cutter Grey Tern alongside the east public quay.",
+              "text_sha256": "52413ad97590376ea5845e95e351edeb485b89a35962e331a867d4403880b46e",
+              "locator": {
+                "kind": "text",
+                "paragraph": 2,
+                "start": 34,
+                "end": 123
+              }
+            },
+            {
+              "span_id": "s-3b4d5fb6d712d5ef#3",
+              "text": "The vessel stayed alongside for four hours while the crew mended nets on the quay.",
+              "text_sha256": "2c5265828cc63a2603ff4b42b75ecf45b4333761a7000e1ec5477e8ac3a44c95",
+              "locator": {
+                "kind": "text",
+                "paragraph": 3,
+                "start": 125,
+                "end": 207
+              }
+            }
+          ]
+        },
+        {
+          "source_id": "s-7adb9faa85648f58",
+          "role": "evidence",
+          "version": "1",
+          "kind": "message",
+          "original_sha256": "42f809235fbc560c6dc8b1533ce6c93742000f4aee63942978b793ce8fefaa7d",
+          "original_bytes": 777,
+          "media_type": "message/rfc822",
+          "parent_source_id": null,
+          "attachments": [],
+          "email": {
+            "message_id": "<p1-reply@harbor.veld.example>",
+            "thread_id": "t-827faa5e1663",
+            "sender_role": "witness",
+            "date": "2025-05-02T07:15:00+00:00"
+          },
+          "parse": {
+            "status": "ok",
+            "confidence": 1.0,
+            "missing_pages": [],
+            "ocr_required_pages": [],
+            "reason_codes": []
+          },
+          "source_set": "candidate",
+          "excluded_matters": [],
+          "spans": [
+            {
+              "span_id": "s-7adb9faa85648f58#1",
+              "text": "Re: Licence check for the Grey Tern",
+              "text_sha256": "1d2a6f1bc76535179349b9568ae01abfd5f9ddc04696ca2da6659accf2572206",
+              "locator": {
+                "kind": "email-body",
+                "part": "subject",
+                "start": 0,
+                "end": 35
+              },
+              "quoted": false
+            },
+            {
+              "span_id": "s-7adb9faa85648f58#2",
+              "text": "The licence registry shows that the Grey Tern was moored without a mooring licence on the day of the patrol.",
+              "text_sha256": "ffa7b2f1af6d1ac3d1ac96de092289f75a9afe730dd20e3c54a0dae79f7863b8",
+              "locator": {
+                "kind": "email-body",
+                "part": "1",
+                "start": 0,
+                "end": 108
+              },
+              "quoted": false
+            },
+            {
+              "span_id": "s-7adb9faa85648f58#3",
+              "text": "The registry has no record of any licence application for that cutter.",
+              "text_sha256": "ba6b08aa019e94182734c87ff2989e841d5045eb8fe533a623a033efb917b389",
+              "locator": {
+                "kind": "email-body",
+                "part": "1",
+                "start": 110,
+                "end": 180
+              },
+              "quoted": false
+            },
+            {
+              "span_id": "s-7adb9faa85648f58#4",
+              "text": "On Fri, 02 May 2025 at 07:40, Patrol Office wrote:\n> Please check the licence position of the Grey Tern for the east quay.\n> The master told the officer that the paperwork was on board.",
+              "text_sha256": "ae0682dafb654e5b59fc14d2282d7f8febbc415d23817ecd12568b19ae7c35be",
+              "locator": {
+                "kind": "email-body",
+                "part": "1",
+                "start": 182,
+                "end": 367
+              },
+              "quoted": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "matter_id": "p1-quay-b",
+      "family_id": "p1-quay",
+      "operative_date": "2024-08-14",
+      "venue": "veld-harbor",
+      "posture": "screening",
+      "question": "Does mooring a vessel at the public quay without a licence support a charge?",
+      "output_schema": "candidate-output-v1",
+      "sources": [
+        {
+          "source_id": "s-55afb8e570048734",
+          "role": "evidence",
+          "version": "1",
+          "kind": "report",
+          "original_sha256": "bd2e2f71c9f10d7d2d47ba7384c746568ab8d24b8066c290a1670ca6765c14ea",
+          "original_bytes": 208,
+          "media_type": "text/plain",
+          "parent_source_id": null,
+          "parse": {
+            "status": "ok",
+            "confidence": 1.0,
+            "missing_pages": [],
+            "ocr_required_pages": [],
+            "reason_codes": []
+          },
+          "source_set": "candidate",
+          "excluded_matters": [],
+          "spans": [
+            {
+              "span_id": "s-55afb8e570048734#1",
+              "text": "Harbor patrol report, east quay.",
+              "text_sha256": "0f945d3e8a64025066201b351ff318e4293fb92c27d049a4b10433986f79f69e",
+              "locator": {
+                "kind": "text",
+                "paragraph": 1,
+                "start": 0,
+                "end": 32
+              }
+            },
+            {
+              "span_id": "s-55afb8e570048734#2",
+              "text": "At first light the respondent moored the cutter Grey Tern alongside the east public quay.",
+              "text_sha256": "52413ad97590376ea5845e95e351edeb485b89a35962e331a867d4403880b46e",
+              "locator": {
+                "kind": "text",
+                "paragraph": 2,
+                "start": 34,
+                "end": 123
+              }
+            },
+            {
+              "span_id": "s-55afb8e570048734#3",
+              "text": "The vessel stayed alongside for four hours while the crew mended nets on the quay.",
+              "text_sha256": "2c5265828cc63a2603ff4b42b75ecf45b4333761a7000e1ec5477e8ac3a44c95",
+              "locator": {
+                "kind": "text",
+                "paragraph": 3,
+                "start": 125,
+                "end": 207
+              }
+            }
+          ]
+        },
+        {
+          "source_id": "s-6b5e8425ba98edac",
+          "role": "evidence",
+          "version": "1",
+          "kind": "message",
+          "original_sha256": "be7c86e59b9af396b20a347e47eba2c6981153881c7e7f1bc2e5e5fd3b5516c6",
+          "original_bytes": 777,
+          "media_type": "message/rfc822",
+          "parent_source_id": null,
+          "attachments": [],
+          "email": {
+            "message_id": "<p1-reply@harbor.veld.example>",
+            "thread_id": "t-827faa5e1663",
+            "sender_role": "witness",
+            "date": "2024-08-14T07:15:00+00:00"
+          },
+          "parse": {
+            "status": "ok",
+            "confidence": 1.0,
+            "missing_pages": [],
+            "ocr_required_pages": [],
+            "reason_codes": []
+          },
+          "source_set": "candidate",
+          "excluded_matters": [],
+          "spans": [
+            {
+              "span_id": "s-6b5e8425ba98edac#1",
+              "text": "Re: Licence check for the Grey Tern",
+              "text_sha256": "1d2a6f1bc76535179349b9568ae01abfd5f9ddc04696ca2da6659accf2572206",
+              "locator": {
+                "kind": "email-body",
+                "part": "subject",
+                "start": 0,
+                "end": 35
+              },
+              "quoted": false
+            },
+            {
+              "span_id": "s-6b5e8425ba98edac#2",
+              "text": "The licence registry shows that the Grey Tern was moored without a mooring licence on the day of the patrol.",
+              "text_sha256": "ffa7b2f1af6d1ac3d1ac96de092289f75a9afe730dd20e3c54a0dae79f7863b8",
+              "locator": {
+                "kind": "email-body",
+                "part": "1",
+                "start": 0,
+                "end": 108
+              },
+              "quoted": false
+            },
+            {
+              "span_id": "s-6b5e8425ba98edac#3",
+              "text": "The registry has no record of any licence application for that cutter.",
+              "text_sha256": "ba6b08aa019e94182734c87ff2989e841d5045eb8fe533a623a033efb917b389",
+              "locator": {
+                "kind": "email-body",
+                "part": "1",
+                "start": 110,
+                "end": 180
+              },
+              "quoted": false
+            },
+            {
+              "span_id": "s-6b5e8425ba98edac#4",
+              "text": "On Wed, 14 Aug 2024 at 07:40, Patrol Office wrote:\n> Please check the licence position of the Grey Tern for the east quay.\n> The master told the officer that the paperwork was on board.",
+              "text_sha256": "135ec82d7c5482802d4180df4d641f38cfc494983058397178c066551f2ad55e",
+              "locator": {
+                "kind": "email-body",
+                "part": "1",
+                "start": 182,
+                "end": 367
+              },
+              "quoted": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "matter_id": "p2-kiln-a",
+      "family_id": "p2-kiln",
+      "operative_date": "2025-09-03",
+      "venue": "veld-central",
+      "posture": "screening",
+      "question": "Does firing a kiln inside the town limits without a smoke permit support a charge?",
+      "output_schema": "candidate-output-v1",
+      "sources": [
+        {
+          "source_id": "s-587bb89ae3a31a1b",
+          "role": "evidence",
+          "version": "1",
+          "kind": "report",
+          "original_sha256": "243b347dcc162637046cdd5c8fd07291559457ff287d7e2d44dcb8fa3a680dcc",
+          "original_bytes": 225,
+          "media_type": "text/plain",
+          "parent_source_id": null,
+          "parse": {
+            "status": "ok",
+            "confidence": 1.0,
+            "missing_pages": [],
+            "ocr_required_pages": [],
+            "reason_codes": []
+          },
+          "source_set": "candidate",
+          "excluded_matters": [],
+          "spans": [
+            {
+              "span_id": "s-587bb89ae3a31a1b#1",
+              "text": "Town inspection report, Hollin Lane yard.",
+              "text_sha256": "8e3be6670ed37b4feab81f566576e59e324bca4b3bbeba08285e5575ad35d293",
+              "locator": {
+                "kind": "text",
+                "paragraph": 1,
+                "start": 0,
+                "end": 41
+              }
+            },
+            {
+              "span_id": "s-587bb89ae3a31a1b#2",
+              "text": "The inspector saw that the respondent fired the kiln at the Hollin Lane yard after dusk.",
+              "text_sha256": "3154679250be6983883d5496a275bbcbef4ccaa93249a1b27fab003cacd24d40",
+              "locator": {
+                "kind": "text",
+                "paragraph": 2,
+                "start": 43,
+                "end": 131
+              }
+            },
+            {
+              "span_id": "s-587bb89ae3a31a1b#3",
+              "text": "The yard lies inside the town limits according to the boundary map of the central district.",
+              "text_sha256": "26bfee54060b7649852f1688dc06c67904022965f2b1963cdab9088e427369c1",
+              "locator": {
+                "kind": "text",
+                "paragraph": 3,
+                "start": 133,
+                "end": 224
+              }
+            }
+          ]
+        },
+        {
+          "source_id": "s-c9d017744492c9df",
+          "role": "evidence",
+          "version": "1",
+          "kind": "statement",
+          "original_sha256": "80a7f975b614fe6acaa04048a25a71c216a33bdd853057003dfe44d556157a4f",
+          "original_bytes": 107,
+          "media_type": "text/plain",
+          "parent_source_id": null,
+          "parse": {
+            "status": "ok",
+            "confidence": 1.0,
+            "missing_pages": [],
+            "ocr_required_pages": [],
+            "reason_codes": []
+          },
+          "source_set": "candidate",
+          "excluded_matters": [],
+          "spans": [
+            {
+              "span_id": "s-c9d017744492c9df#1",
+              "text": "Statement of a neighbour.",
+              "text_sha256": "7751ae6845f824e79f8a37b64cca99da5a38fadd4fb3de1a444b376c0c7b4f5b",
+              "locator": {
+                "kind": "text",
+                "paragraph": 1,
+                "start": 0,
+                "end": 25
+              }
+            },
+            {
+              "span_id": "s-c9d017744492c9df#2",
+              "text": "The neighbour describes thick grey smoke over the lane for most of the evening.",
+              "text_sha256": "c8f00802162447cce3a2127ddf00ea5c14afbb1dc3b93950deb7c2522a74a591",
+              "locator": {
+                "kind": "text",
+                "paragraph": 2,
+                "start": 27,
+                "end": 106
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "matter_id": "p2-kiln-b",
+      "family_id": "p2-kiln",
+      "operative_date": "2025-09-03",
+      "venue": "veld-central",
+      "posture": "screening",
+      "question": "Does firing a kiln inside the town limits without a smoke permit support a charge?",
+      "output_schema": "candidate-output-v1",
+      "sources": [
+        {
+          "source_id": "s-191bcefacd30f1ad",
+          "role": "evidence",
+          "version": "1",
+          "kind": "report",
+          "original_sha256": "243b347dcc162637046cdd5c8fd07291559457ff287d7e2d44dcb8fa3a680dcc",
+          "original_bytes": 225,
+          "media_type": "text/plain",
+          "parent_source_id": null,
+          "parse": {
+            "status": "ok",
+            "confidence": 1.0,
+            "missing_pages": [],
+            "ocr_required_pages": [],
+            "reason_codes": []
+          },
+          "source_set": "candidate",
+          "excluded_matters": [],
+          "spans": [
+            {
+              "span_id": "s-191bcefacd30f1ad#1",
+              "text": "Town inspection report, Hollin Lane yard.",
+              "text_sha256": "8e3be6670ed37b4feab81f566576e59e324bca4b3bbeba08285e5575ad35d293",
+              "locator": {
+                "kind": "text",
+                "paragraph": 1,
+                "start": 0,
+                "end": 41
+              }
+            },
+            {
+              "span_id": "s-191bcefacd30f1ad#2",
+              "text": "The inspector saw that the respondent fired the kiln at the Hollin Lane yard after dusk.",
+              "text_sha256": "3154679250be6983883d5496a275bbcbef4ccaa93249a1b27fab003cacd24d40",
+              "locator": {
+                "kind": "text",
+                "paragraph": 2,
+                "start": 43,
+                "end": 131
+              }
+            },
+            {
+              "span_id": "s-191bcefacd30f1ad#3",
+              "text": "The yard lies inside the town limits according to the boundary map of the central district.",
+              "text_sha256": "26bfee54060b7649852f1688dc06c67904022965f2b1963cdab9088e427369c1",
+              "locator": {
+                "kind": "text",
+                "paragraph": 3,
+                "start": 133,
+                "end": 224
+              }
+            }
+          ]
+        },
+        {
+          "source_id": "s-fa0f869201e06f42",
+          "role": "evidence",
+          "version": "1",
+          "kind": "message",
+          "original_sha256": "927966c8cd99cca45e1aaf4418b4d1e084aa11c07430680738288def6d173876",
+          "original_bytes": 841,
+          "media_type": "message/rfc822",
+          "parent_source_id": null,
+          "attachments": [
+            "s-537a8703871ac9bf"
+          ],
+          "email": {
+            "message_id": "<p2-extract@central.veld.example>",
+            "thread_id": "t-af6fa926955d",
+            "sender_role": "records-officer",
+            "date": "2025-09-02T13:05:00+00:00"
+          },
+          "parse": {
+            "status": "ok",
+            "confidence": 1.0,
+            "missing_pages": [],
+            "ocr_required_pages": [],
+            "reason_codes": []
+          },
+          "source_set": "candidate",
+          "excluded_matters": [],
+          "spans": [
+            {
+              "span_id": "s-fa0f869201e06f42#1",
+              "text": "Register extract for the Hollin Lane yard",
+              "text_sha256": "3c16e66385e8c9bbf3c9613ab7c18ac1b8a12131cfceac0fda3cb6c0d5a813e3",
+              "locator": {
+                "kind": "email-body",
+                "part": "subject",
+                "start": 0,
+                "end": 41
+              },
+              "quoted": false
+            },
+            {
+              "span_id": "s-fa0f869201e06f42#2",
+              "text": "The register extract for the Hollin Lane yard is attached, as requested by the screening office.",
+              "text_sha256": "113965d0f1cf90c247c8202c8474357a287e45d83923542bf7f762f6c35546d3",
+              "locator": {
+                "kind": "email-body",
+                "part": "2",
+                "start": 0,
+                "end": 96
+              },
+              "quoted": false
+            }
+          ]
+        },
+        {
+          "source_id": "s-537a8703871ac9bf",
+          "role": "evidence",
+          "version": "1",
+          "kind": "attachment",
+          "original_sha256": "71f3ba04af22674d83c07fdcfbe3cdffa5096388f5c587abd6875fa75b50f4ed",
+          "original_bytes": 159,
+          "media_type": "text/plain",
+          "parent_source_id": "s-fa0f869201e06f42",
+          "parse": {
+            "status": "ok",
+            "confidence": 1.0,
+            "missing_pages": [],
+            "ocr_required_pages": [],
+            "reason_codes": []
+          },
+          "source_set": "candidate",
+          "excluded_matters": [],
+          "spans": [
+            {
+              "span_id": "s-537a8703871ac9bf#1",
+              "text": "Smoke permit register, central district.",
+              "text_sha256": "73c7d6d895623d6940ea9b8d4bc4ece4c111462a23a38709bb8ea7defd608651",
+              "locator": {
+                "kind": "text",
+                "paragraph": 1,
+                "start": 0,
+                "end": 40
+              }
+            },
+            {
+              "span_id": "s-537a8703871ac9bf#2",
+              "text": "The register lists the kiln at the Hollin Lane yard without a smoke permit; no permit has been issued for that yard.",
+              "text_sha256": "e3e5f07f26afbd83daf8222a58e67b3a0b01fd13b6345956a2e0ca6a3ec9a55d",
+              "locator": {
+                "kind": "text",
+                "paragraph": 2,
+                "start": 42,
+                "end": 158
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "shared_sources": [
+    {
+      "source_id": "s-0f39d758f726c804",
+      "role": "prior_brief",
+      "version": "1",
+      "kind": "brief",
+      "original_sha256": "6b1e973fe7698f5ffcc6c4a56ac62c2dc0a83b7ac851c635547f71d60f25e742",
+      "original_bytes": 152,
+      "media_type": "text/plain",
+      "parent_source_id": null,
+      "parse": {
+        "status": "ok",
+        "confidence": 1.0,
+        "missing_pages": [],
+        "ocr_required_pages": [],
+        "reason_codes": []
+      },
+      "source_set": "candidate",
+      "excluded_matters": [
+        "p1-quay-a",
+        "p1-quay-b"
+      ],
+      "spans": [
+        {
+          "span_id": "s-0f39d758f726c804#1",
+          "text": "Earlier screening memo on a mooring at the east quay.",
+          "text_sha256": "0feccc9176433cad3def4242a283f362e57b34449d7b5ad34af4aabfd69c1719",
+          "locator": {
+            "kind": "text",
+            "paragraph": 1,
+            "start": 0,
+            "end": 53
+          }
+        },
+        {
+          "span_id": "s-0f39d758f726c804#2",
+          "text": "The memo applied the amended mooring text and recorded a charge recommendation for human review.",
+          "text_sha256": "ab7b49628ba598e961feaeb654c4ebce3baf7355d7554c47bc052cc9ea27d19e",
+          "locator": {
+            "kind": "text",
+            "paragraph": 2,
+            "start": 55,
+            "end": 151
+          }
+        }
+      ]
+    },
+    {
+      "source_id": "s-49d69aa3c2092075",
+      "role": "template",
+      "version": "1",
+      "kind": "template",
+      "original_sha256": "af979d63d25d8c1d179fdcef3f6ba7b5b7520d3e5b3089a7599f5240739ba437",
+      "original_bytes": 167,
+      "media_type": "text/plain",
+      "parent_source_id": null,
+      "parse": {
+        "status": "ok",
+        "confidence": 1.0,
+        "missing_pages": [],
+        "ocr_required_pages": [],
+        "reason_codes": []
+      },
+      "source_set": "candidate",
+      "excluded_matters": [],
+      "spans": [
+        {
+          "span_id": "s-49d69aa3c2092075#1",
+          "text": "Screening memo template.",
+          "text_sha256": "75e15b13f88ca166b6cdd6b8ab3f4cea9c6a313609b632a7f8b511d59ff814bb",
+          "locator": {
+            "kind": "text",
+            "paragraph": 1,
+            "start": 0,
+            "end": 24
+          }
+        },
+        {
+          "span_id": "s-49d69aa3c2092075#2",
+          "text": "State the question, the controlling authority version, each element with its evidence anchors, and the open points for the reviewing lawyer.",
+          "text_sha256": "5f581d3d3f3d12ad7b56150137baf2a51de6bcebf9174e291aade1e82a441e0e",
+          "locator": {
+            "kind": "text",
+            "paragraph": 2,
+            "start": 26,
+            "end": 166
+          }
+        }
+      ]
+    }
+  ]
+}

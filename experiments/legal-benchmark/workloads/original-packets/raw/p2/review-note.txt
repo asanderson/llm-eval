@@ -1,0 +1,3 @@
+Reviewer note for the calibration fixture.
+
+The permit register for this yard is not in this packet; the paired packet includes it, so the two packets are expected to differ.
