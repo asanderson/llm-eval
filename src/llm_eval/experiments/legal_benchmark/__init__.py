@@ -91,8 +91,10 @@ def input_files(parameters, root, mode):
 
 
 def setup_platforms(parameters, mode):
-    """Serving platforms to install before a run. The fixture pipeline needs none."""
-    return []
+    """Serving platforms to install before a run, derived from the roles: only a role with `serving: managed` needs one.
+    Managed serving is gated at plan time, so a legal campaign installs nothing and never infers an Ollama install."""
+    roles = parameters.get('roles') if isinstance(parameters.get('roles'), dict) else {}
+    return sorted({p['platform'] for p in roles.values() if isinstance(p, dict) and p.get('serving') == 'managed' and isinstance(p.get('platform'), str)})
 
 
 def _planned_suite(job):

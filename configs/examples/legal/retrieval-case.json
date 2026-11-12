@@ -1,0 +1,15 @@
+{
+  "id": "legal-retrieval",
+  "parameters": {
+    "suite": "../../../experiments/legal-benchmark/workloads/original-smoke/suite.lock.json",
+    "synthetic": true,
+    "arms": [
+      "no-context",
+      "filters-only",
+      "lexical",
+      "lexical-eligible"
+    ],
+    "top_k": 5,
+    "token_budget": 1200
+  }
+}

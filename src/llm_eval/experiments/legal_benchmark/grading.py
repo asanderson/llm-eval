@@ -337,6 +337,24 @@ def detail(matter, arm, repetition, status, graded, verified, choice, author_cho
             'gold_recommendation': graded['gold_recommendation'], 'complete': graded['complete']}
 
 
+def deferral_fields() -> dict:
+    """The status and grading keys of a selector-deferral row (design 3.8, last row): no request was sent, and the row is
+    scored with nothing passed, so a selector cannot raise its pass rate by removing matters from the denominator."""
+    return {'status': 'ok', 'retrieval_status': 'not_applicable', 'inference_status': 'not_applicable', 'parse_status': 'not_applicable',
+            'verification_status': 'not_applicable', 'grading_status': 'scored', 'review_status': 'not_applicable',
+            'quality_check_applicable': True, 'quality_pass': False, 'criteria_passed': 0, 'critical_errors': 0, 'pending_dimensions': []}
+
+
+def deferral_detail(matter, arm, repetition, gold, reason) -> dict:
+    """Score-detail record of a selector deferral: every criterion False, no error, the workflow choice `defer`, and the
+    route reason under `selector_deferral` (an insufficiency label or `no_eligible_candidate`)."""
+    return {'matter_id': matter['matter_id'], 'family_id': matter['family_id'], 'arm': arm, 'repetition': repetition, 'status': 'ok',
+            'verifier_codes': [], 'choice': 'defer', 'author_choice': None, 'grading_status': 'scored',
+            'criteria': {name: False for name in fixture.CRITERIA}, 'errors': [], 'pending_dimensions': [], 'reviewed_dimensions': {},
+            'adjudicated': [], 'dismissed': [], 'gold_recommendation': gold['recommendation'] if gold else None,
+            'complete': (not gold['missing_elements'] and not gold['conflict_elements']) if gold else None, 'selector_deferral': reason}
+
+
 # Aggregate metrics ----------------------------------------------------------------------------------------------------
 
 _CHOICES = contracts.RECOMMENDATIONS
@@ -366,6 +384,17 @@ def _union(d):
 def _clean(d):
     """No critical code stands: each is absent or was dismissed by a review."""
     return not _union(d) - set(d.get('dismissed', []))
+
+
+def all_pass(d) -> bool:
+    """The pass rule of `aggregate` for one score-detail record: every criterion, no standing critical code, no failed
+    reviewed dimension."""
+    return bool(_indicator(d, 'all_pass'))
+
+
+def standing_critical(d) -> list:
+    """The critical codes of a score-detail record that stand (grader and verifier together, minus dismissed ones)."""
+    return _ordered(_union(d) - set(d.get('dismissed', [])))
 
 
 def _indicator(d, metric):
@@ -638,7 +667,7 @@ def host(parameters, mode):
 
 
 def _lines(path):
-    return [json.loads(line) for line in Path(path).read_text(encoding='utf-8').splitlines() if line.strip()]
+    return contracts.read_jsonl(path)
 
 
 def _source(attempt):
@@ -657,7 +686,7 @@ def _source(attempt):
 def _manifest(path, suite):
     """(manifest, source attempt directory, source job, manifest sha256) after the identity, lineage and byte checks.
     Only the manifest, `result.json`, `job.json` and the listed files are opened, and nothing is written."""
-    from .workflow import MANIFEST_FILES
+    from .workflow import MANIFEST_FILES, ROUTED_FILES, manifest_files
     if not isinstance(path, str):
         raise ValueError('output_manifest must be a path string')
     path = Path(path)
@@ -680,7 +709,8 @@ def _manifest(path, suite):
     if manifest['experiment'] != 'legal-benchmark' or manifest['execution_kind'] != 'model-run':
         wrong('experiment')
     files = manifest['files']
-    if not isinstance(files, list) or [f.get('path') if isinstance(f, dict) else None for f in files] != list(MANIFEST_FILES):
+    listed = [f.get('path') if isinstance(f, dict) else None for f in files] if isinstance(files, list) else None
+    if listed not in (list(MANIFEST_FILES), list(ROUTED_FILES)):
         raise ValueError('Output manifest does not list the expected files')
     for f in files:
         fields(f, ['path', 'size', 'sha256'], ['path', 'size', 'sha256'])
@@ -709,6 +739,8 @@ def _manifest(path, suite):
     if job.get('mode') != manifest['mode'] or manifest['mode'] not in SOURCE_MODES:
         wrong('mode')
     parameters, inputs = job.get('parameters') or {}, job.get('input_files') or []
+    if listed != list(manifest_files(parameters)):      # a routed job lists its route decisions, and only a routed job does
+        raise ValueError('Output manifest does not list the expected files')
     if {f['path']: f['sha256'] for f in inputs}.get(parameters.get('suite')) != manifest['suite_lock_sha256']:
         wrong('suite')
     roles = parameters.get('roles') if isinstance(parameters.get('roles'), dict) else {}
@@ -724,10 +756,11 @@ def _manifest(path, suite):
     arms, repeats = parameters.get('arms'), parameters.get('repeats', 1)
     if not isinstance(arms, list) or manifest['arms'] != arms or metadata.get('arms') != arms or type(repeats) is not int:
         wrong('arms')
-    expected_rows = {(m['matter_id'], a, r) for m in suite['matters']['matters'] for a in arms for r in range(repeats)}
+    filed = ['routed'] if parameters.get('selector') is not None else arms      # rows of a routed job are filed under `routed`
+    expected_rows = {(m['matter_id'], a, r) for m in suite['matters']['matters'] for a in filed for r in range(repeats)}
     if {(row['task_id'], row['arm'], row['repetition']) for row in rows} != expected_rows or len(rows) != len(expected_rows):
         wrong('rows')
-    if metadata.get('roles') != {name: profiles.public_role(p) for name, p in roles.items()}:
+    if metadata.get('roles') != {name: profiles.public_role(p, inputs) for name, p in roles.items()}:
         wrong('roles')
     if manifest['template_sha256'] != metadata.get('template_sha256'):
         wrong('template_sha256')
@@ -743,7 +776,7 @@ def _packet_outputs(attempt, suite, source=None):
     gold = {g['matter_id']: g for g in suite['rubric']['matters']}
     found = {}
     for row, stored, result, verified in zip(rows, outputs, results, verifications):
-        if row['status'] != 'ok' or stored['output'] is None:
+        if row['status'] != 'ok' or stored['output'] is None:      # a selector deferral has no output to review
             continue
         graded = grade(stored['output'], matters[row['task_id']], gold.get(row['task_id']), suite['corpus'], result['result'])
         found[(row['task_id'], row['arm'], row['repetition'])] = {
@@ -784,16 +817,13 @@ def inputs(parameters, suite, root, mode):
     return [attempt / f['path'] for f in manifest['files']] + [attempt / 'result.json']
 
 
-def run(job, suite, output, root):
-    """Grade the stored outputs of one inference attempt into a new attempt. Verification is copied, not re-run: the
-    verifier is part of the evaluated workflow and its verdicts are observations of the inference attempt."""
-    from . import MANIFEST, job_status
+def score_records(parameters, suite):
+    """(manifest, source attempt, manifest sha256, metadata, lineage, rows, score-detail records) of the outputs an output
+    manifest pins, graded exactly as the `score` mode grades them. Every input is a file the manifest lists (after
+    `_manifest` checked their digests), never the attempt's own score detail."""
+    from .routing import DEFERRALS
     from .workflow import ROW_TIMING, withhold
-    parameters = job['parameters']
     manifest, attempt, source_job, manifest_sha = _manifest(parameters['output_manifest'], suite)
-    output = Path(output)
-    if output.resolve() == attempt.resolve() or output.resolve().is_relative_to(attempt.resolve()):
-        raise ValueError('A score attempt is never written into its source attempt')
     source = _source(attempt)
     review = _review(parameters, suite, attempt, manifest_sha, source)
     rows, outputs, results, verifications, metadata = source
@@ -804,6 +834,17 @@ def run(job, suite, output, root):
     new_rows, details = [], []
     for row, stored, result, verified in zip(rows, outputs, results, verifications):
         matter, entry = matters[row['task_id']], gold.get(row['task_id'])
+        if stored.get('selector_deferral') is True:
+            # Not graded (a missing output would be `schema_invalid`): the row and the record keep the deferral state, and
+            # `category` and the route keys of a routed source row are copied with the row.
+            reason = next((c for c in stored.get('reason_codes') or [] if c in DEFERRALS), None)
+            if reason is None or stored.get('output') is not None:
+                raise ValueError('Malformed selector deferral record: ' + str(row['task_id']))
+            new_rows.append({**row, 'synthetic': False, 'execution_kind': 'score-only', **deferral_fields(), 'reason_codes': stored['reason_codes'],
+                             'choice': 'defer', 'author_choice': None, 'abstained': False, 'forced_defer': True, 'insufficiency_flags': None,
+                             'criteria_total': len(fixture.CRITERIA), **{k: None for k in ROW_TIMING}, **lineage})
+            details.append(deferral_detail(matter, row['arm'], row['repetition'], entry, reason))
+            continue
         item = review['items'].get((row['task_id'], row['arm'], row['repetition'])) if review else None
         status, verification = row['status'], verified['verification']
         critical = verification['critical'] if verification else []
@@ -819,6 +860,19 @@ def run(job, suite, output, root):
                'insufficiency_flags': flags, 'criteria_total': len(fixture.CRITERIA), **{k: None for k in ROW_TIMING}, **lineage}
         new_rows.append(withhold(new, row['reason_codes']) if row['arm'] == 'reference' else new)
         details.append(detail(matter, row['arm'], row['repetition'], status, graded, critical, choice, author, entry, item))
+    return manifest, attempt, manifest_sha, metadata, lineage, new_rows, details
+
+
+def run(job, suite, output, root):
+    """Grade the stored outputs of one inference attempt into a new attempt. Verification is copied, not re-run: the
+    verifier is part of the evaluated workflow and its verdicts are observations of the inference attempt."""
+    from . import MANIFEST, job_status
+    parameters = job['parameters']
+    _, attempt, _, _ = _manifest(parameters['output_manifest'], suite)
+    output = Path(output)
+    if output.resolve() == attempt.resolve() or output.resolve().is_relative_to(attempt.resolve()):
+        raise ValueError('A score attempt is never written into its source attempt')
+    manifest, attempt, manifest_sha, metadata, lineage, new_rows, details = score_records(parameters, suite)
     output.mkdir(parents=True, exist_ok=True)
     (output / 'requests.jsonl').write_text(''.join(json.dumps(r, sort_keys=True) + '\n' for r in new_rows), encoding='utf-8', newline='\n')
     contracts.private_file(output, 'score-detail.jsonl').write_text(''.join(json.dumps(d, sort_keys=True) + '\n' for d in details),
@@ -837,17 +891,13 @@ def run(job, suite, output, root):
     return {'status': job_status(new_rows), 'result_path': '.', 'benchmark': lock['benchmark_id']}
 
 
-SCANNED = ('model_judgment', 'reports')      # directory names the generic report builder scans (legal_benchmark.SCANNED_DIRECTORIES)
-
-
-def _inside_attempt(directory):
-    return any((d / 'job.json').exists() or (d / 'result.json').exists() or (d / 'requests.jsonl').exists() for d in [directory, *directory.parents])
+SCANNED = contracts.SCANNED_NAMES      # directory names the generic report builder scans (legal_benchmark.SCANNED_DIRECTORIES)
+_inside_attempt = contracts.inside_attempt
 
 
 def main(argv=None):
     """`packet --output-manifest FILE --output DIR`: the blind review packet and its private key table, written outside
     any attempt directory, outside the repository and outside any directory the report builder scans."""
-    from .ingest import ROOT
     parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_benchmark.grading')
     commands = parser.add_subparsers(dest='command', required=True)
     packet = commands.add_parser('packet', help='write review-packet.json and review-key.json for one output manifest')
@@ -862,12 +912,9 @@ def main(argv=None):
     suite = contracts.load_suite(source_job['parameters']['suite'])
     _, attempt, _, sha = _manifest(str(path), suite)
     out = Path(args.output).resolve()
-    if out.is_relative_to(attempt.resolve()) or _inside_attempt(out):
+    if out.is_relative_to(attempt.resolve()):
         raise ValueError('The review packet must not be written inside an attempt directory')
-    if set(SCANNED) & set(out.parts):
-        raise ValueError('The review packet must not be written under a directory the report builder scans')
-    if out.is_relative_to(ROOT.resolve()):
-        raise ValueError('The review packet must not be written inside the repository')
+    contracts.check_output(out / 'review-packet.json', 'The review packet')      # the one rule of every operator command
     outputs = _packet_outputs(attempt, suite)
     review_packet_, key = review_packet([{'matter_id': m, 'arm': a, 'repetition': r, **v} for (m, a, r), v in outputs.items()], sha)
     atomic_json(out / 'review-packet.json', review_packet_)

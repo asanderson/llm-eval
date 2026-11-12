@@ -1,0 +1,41 @@
+{
+  "id": "legal-generation",
+  "parameters": {
+    "suite": "../../../experiments/legal-benchmark/workloads/original-smoke/suite.lock.json",
+    "arms": [
+      "no-context",
+      "lexical-eligible"
+    ],
+    "top_k": 5,
+    "token_budget": 1200,
+    "max_output_tokens": 1024,
+    "seed": 1,
+    "temperature": 0,
+    "parse_retries": 1,
+    "repeats": 1,
+    "roles": {
+      "generator": {
+        "role": "generator",
+        "serving": "external",
+        "deployment_id": "local-generator",
+        "platform": "ollama",
+        "backend_version": "REPLACE_WITH_BACKEND_VERSION",
+        "model": "REPLACE_WITH_MODEL_ID",
+        "model_revision": "REPLACE_WITH_EXACT_REVISION",
+        "artifact_sha256": null,
+        "quantization": null,
+        "template_sha256": null,
+        "tokenizer_revision": null,
+        "protocol": "ollama",
+        "endpoint": "http://127.0.0.1:11435/api/chat",
+        "capability": "chat",
+        "context_tokens": 4096,
+        "max_output_tokens": 1024,
+        "timeout_s": 600,
+        "connect_timeout_s": 10,
+        "accelerator": "gpu",
+        "qualification": null
+      }
+    }
+  }
+}

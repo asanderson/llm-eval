@@ -645,6 +645,7 @@ def run(job, suite, output, root):
     parameters = job['parameters']
     roles = _served(parameters)      # only the roles a requested arm uses: an unused role is neither recorded nor allowed
     profiles.check_revisions(roles)
+    profiles.check_job(roles, job)
     allowed = profiles.allowed_endpoints(roles)
     view = contracts.candidate_view(suite)
     backend, backend_codes = resolve_backend(suite, parameters.get('backend', 'auto'))
@@ -701,9 +702,9 @@ def run(job, suite, output, root):
         'arms': list(parameters['arms']),
         'retrieval': {'backend': backend, 'top_k': settings['top_k'], 'token_budget': settings['token_budget'], 'tokenizer': TOKENIZER,
                       'chunking': CHUNKING, 'index_fingerprint': digest(sorted(fingerprints)),
-                      'embedder_sha256': profiles.profile_digest(embedder_profile) if embedder_profile else None,
-                      'reranker_sha256': profiles.profile_digest(reranker_profile) if reranker_profile else None},
-        'roles': {name: profiles.public_role(profile) for name, profile in sorted(roles.items())},
+                      'embedder_sha256': profiles.profile_digest(embedder_profile, job.get('input_files', ())) if embedder_profile else None,
+                      'reranker_sha256': profiles.profile_digest(reranker_profile, job.get('input_files', ())) if reranker_profile else None},
+        'roles': {name: profiles.public_role(profile, job.get('input_files', ())) for name, profile in sorted(roles.items())},
         'matters': len({r['task_id'] for r in rows}), 'families': len({r['family_id'] for r in rows}), 'rows': len(rows),
         'review_required': True})
     return {'status': job_status(rows), 'result_path': '.', 'benchmark': lock['benchmark_id']}

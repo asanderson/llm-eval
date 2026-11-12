@@ -10,7 +10,7 @@ from llm_eval.core.contracts import fields, identifier, integer, no_credentials,
 from llm_eval.experiments import get_experiment, reporting_policy
 
 PATH_KEYS = {'suite', 'artifact_root', 'artifact_lock', 'offload_dir', 'installation_state', 'replay', 'data', 'benchmark_registry',
-             'output_manifest', 'review_file', 'review_key'}
+             'output_manifest', 'review_file', 'review_key', 'serving_profile', 'calibration_file'}
 
 
 def resolve_paths(value, directory):

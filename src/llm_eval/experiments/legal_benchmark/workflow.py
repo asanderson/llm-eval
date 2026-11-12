@@ -18,7 +18,7 @@ from llm_eval import adapters, telemetry
 from llm_eval.common import digest, finite_number, sha256_file
 from llm_eval.core.contracts import atomic_json, fields, integer
 
-from . import authority, contracts, fixture, grading, profiles, render, retrieval
+from . import authority, contracts, fixture, grading, profiles, render, retrieval, routing
 
 TEMPLATE_VERSION = 'legal-screening-1'
 MAX_REPLY_BYTES = 2 * contracts.MAX_OUTPUT_BYTES       # bound of a reply text, before parsing
@@ -26,12 +26,13 @@ MARKERS = ('<<<BEGIN ', '<<<END ')
 REASONS = ('incomplete_response', 'truncated_response', 'truncation_unknown', 'invalid_output', 'invalid_analysis', 'integrity_failure',
            'first_attempt_invalid', 'revision_failed', 'context_overflow', 'tool_call_refused', 'repair_not_sent',
            'oversize', 'empty_response', 'not_json')
-ROLE_SET = ('generator', 'analyst', 'embedder', 'reranker')      # package E adds `selector` here
+ROLE_SET = ('generator', 'analyst', 'embedder', 'reranker', 'selector')      # `selector`: only with a served (systemone) selector
 CHAT_ROLES = ('generator', 'analyst')
 STEPS = ('analyze', 'draft', 'revise')
 INFERENCE_ORDER = ('error', 'timeout', 'incomplete', 'truncated', 'ok')      # worst first
 PASSAGE_KEYS = ('authorities', 'adverse', 'evidence', 'prior_briefs')
-_GENERATION_KEYS = {'arms', 'top_k', 'token_budget', 'backend', 'roles', 'max_output_tokens', 'seed', 'temperature', 'parse_retries', 'repeats'}
+_GENERATION_KEYS = {'arms', 'top_k', 'token_budget', 'backend', 'roles', 'max_output_tokens', 'seed', 'temperature', 'parse_retries', 'repeats',
+                    'selector'}
 PARAMETERS = {'generation': (_GENERATION_KEYS, ('arms', 'roles')), 'workflow': (_GENERATION_KEYS, ('arms', 'roles'))}
 
 SYSTEM_DRAFT = (
@@ -78,12 +79,12 @@ FENCE = re.compile(r'```[A-Za-z0-9_-]*[ \t]*\n(.*)\n[ \t]*```', re.S)
 BYTES_PER_TOKEN = 3      # the byte bound of the run-time context guard
 TIMING = ('first_output_s', 'first_visible_s', 'prompt_tokens', 'completion_tokens', 'reasoning_chars', 'token_count_source',
           'output_tokens_per_wall_second', 'backend_prefill_tps', 'backend_decode_tps', 'backend_load_s')
-_ORDER = REASONS + grading.REASONS + retrieval.REASONS + authority.REASONS
+_ORDER = REASONS + grading.REASONS + retrieval.REASONS + authority.REASONS + routing.REASONS
 
 
 def reason_codes(*items):
     """The one builder of every `reason_codes` list: codes in the order of `workflow.REASONS`, `grading.REASONS`,
-    `retrieval.REASONS` and `authority.REASONS`; a code outside them raises."""
+    `retrieval.REASONS`, `authority.REASONS` and `routing.REASONS`; a code outside them raises."""
     found = set()
     for item in items:
         for code in ([item] if isinstance(item, str) else item):
@@ -441,6 +442,10 @@ def check(parameters, suite, root, mode):
     if not isinstance(roles, dict) or 'generator' not in roles or set(roles) - set(ROLE_SET):
         raise ValueError('roles must hold the generator role and may hold only: ' + ', '.join(ROLE_SET))
     validated = {name: profiles.validate_role(profile, name) for name, profile in sorted(roles.items())}
+    if 'selector' in parameters:
+        routing.validate_selector(parameters['selector'], parameters['arms'], validated, suite)
+    elif 'selector' in validated:
+        raise ValueError('Only a served selector has a selector role')
     for name in CHAT_ROLES:
         if name in validated and validated[name]['serving'] != 'external':
             raise ValueError('A chat role must declare serving: external')
@@ -466,6 +471,20 @@ def check(parameters, suite, root, mode):
             if any(line.startswith(MARKERS) for line in p['text'].split('\n')):
                 raise ValueError('A passage contains a prompt marker line: ' + p['passage_id'])
     return None
+
+
+def inputs(parameters, suite, root, mode):
+    """The inputs of a selector threshold: every file the calibration suite pins, and every file the output manifests of the
+    two calibration attempts list (with their `result.json`), so planner, coordinator and worker check the same bytes."""
+    calibration = (parameters.get('selector') or {}).get('calibration')
+    if not calibration:
+        return []
+    files = list(contracts.pinned_files(calibration['suite']))
+    calibration_suite = contracts.load_suite(calibration['suite'])
+    for side in ('routed', 'fallback'):
+        manifest, attempt, _, _ = grading._manifest(calibration[side]['output_manifest'], calibration_suite)
+        files += [attempt / f['path'] for f in manifest['files']] + [attempt / 'result.json']
+    return [str(p) for p in files]
 
 
 def _peak(values):
@@ -507,6 +526,12 @@ ORACLE_KEPT = ('task_id', 'family_id', 'category', 'benchmark', 'arm', 'repetiti
                'reviewer_fingerprint')
 
 
+def _route_keys(route):
+    return {'routed': True, 'route_choice': route['choice'], 'route_selected': route['selected'] if route['action'] == 'route' else None,
+            'route_fallback': route['fallback_used'], 'route_confidence': None if route['confidence'] is None else round(float(route['confidence']), 6),
+            'router_s': None if route['router_s'] is None else round(float(route['router_s']), 6), 'route_error_type': route.get('error_type')}
+
+
 def withhold(row, backend_codes):
     """A reference-arm row publishes no number, digest, reason code or decision: the real values stay in local/."""
     kept = {k: (v if k in ORACLE_KEPT else None) for k, v in row.items()}
@@ -520,6 +545,12 @@ def _jsonl(path, items):
 
 MANIFEST_FILES = ('job.json', 'local/attempts.jsonl', 'local/candidate-outputs.jsonl', 'local/retrieval-results.jsonl',
                   'local/verification.jsonl', 'metadata.json', 'requests.jsonl')
+ROUTED_FILES = tuple(sorted(MANIFEST_FILES + ('local/route-decisions.jsonl',)))      # a routed job also lists its route decisions
+
+
+def manifest_files(parameters):
+    """The files an output manifest lists, in order: a routed job (a case with `selector`) adds its route decisions."""
+    return ROUTED_FILES if parameters.get('selector') is not None else MANIFEST_FILES
 
 
 def run(job, suite, output, root):
@@ -532,6 +563,7 @@ def run(job, suite, output, root):
     parameters, mode = job['parameters'], job['mode']
     roles = {name: profiles.validate_role(p, name) for name, p in sorted(parameters['roles'].items())}
     profiles.check_revisions(roles)
+    profiles.check_job(roles, job)
     allowed = profiles.allowed_endpoints(roles)
     view = contracts.candidate_view(suite)
     backend, backend_codes = retrieval.resolve_backend(suite, parameters.get('backend', 'auto'))
@@ -543,52 +575,98 @@ def run(job, suite, output, root):
     policy_id, policy_version = (policy['policy_id'], policy['version']) if policy else (None, None)
     lock = suite['lock']
     gold = {g_['matter_id']: g_ for g_ in suite['rubric']['matters']}
-    rows, outputs, raws, attempts, verifications, details, results, fingerprints, telemetry_ = [], [], [], [], [], [], [], [], {}
-    for arm in parameters['arms']:
+    rows, outputs, raws, attempts, verifications, details, results, fingerprints, decisions, telemetry_ = [], [], [], [], [], [], [], [], [], {}
+    matters = sorted(view['matters']['matters'], key=lambda m: m['matter_id'])
+    selector = parameters.get('selector')
+
+    def one(matter, arm, r, route=None):
+        """One matter, arm and repetition. With `route`, the arm the selector chose, filed under `routed`: rows of a routed
+        job never carry the selected arm as `arm`, so a selected subset is never filed under a fixed-arm cohort."""
+        entry = gold.get(matter['matter_id'])
+        targets = retrieval.gold_targets(suite, matter, entry) if entry is not None else None
+        reference = retrieval.reference_passages(suite, matter) if arm == 'reference' else None
+        record = run_matter(view, matter, arm, roles, {**settings, 'seed': g['seed'] + r, 'repetition': r}, mode, reference)
+        result = record['evidence']
+        result['reason_codes'] = reason_codes(result['reason_codes'], backend_codes)
+        record['reason_codes'] = reason_codes(record['reason_codes'], backend_codes, route['reason_codes'] if route else [])
+        values = retrieval.metrics(result, targets) if targets is not None else {k: None for k in retrieval.METRICS}
+        graded = grading.grade(record['output'], matter, entry, suite['corpus'], result) \
+            if record['status'] in ('ok', 'invalid') else None
+        critical = record['verification']['critical'] if record['verification'] else []
+        name = 'routed' if route else arm
+        row = {'task_id': matter['matter_id'], 'family_id': matter['family_id'], 'category': name, 'benchmark': lock['benchmark_id'],
+               'arm': name, 'repetition': r, 'warmup': False, 'synthetic': False, 'execution_kind': 'model-run',
+               'data_class': lock['data_class'], 'status': record['status'], 'retrieval_status': record['retrieval_status'],
+               'inference_status': record['inference_status'], 'parse_status': record['parse_status'],
+               'verification_status': record['verification_status'],
+               **grading.decision_fields(record['status'], graded, critical, record['choice']),
+               'reason_codes': record['reason_codes'], 'error_type': record['error_type'],
+               'choice': record['choice'], 'author_choice': record['author_choice'], 'abstained': record['abstained'],
+               'forced_defer': record['forced_defer'], 'insufficiency_flags': record['insufficiency_flags'], 'criteria_total': len(fixture.CRITERIA),
+               **{k: record[k] for k in ROW_TIMING}, 'finish_reason': record['finish_reason'], 'truncated': record['truncated'],
+               'request_attempts': record['request_attempts'], 'parse_attempts': record['parse_attempts'],
+               'first_parse_status': record['first_parse_status'], 'revised': record['revised'],
+               'output_sha256': record['output_sha256'],
+               **{k: values[k] for k in retrieval.PUBLIC_METRICS}, **(_route_keys(route) if route else {})}
+        rows.append(withhold(row, backend_codes) if arm == 'reference' else row)
+        key = {'matter_id': matter['matter_id'], 'arm': name, 'repetition': r}
+        outputs.append({**key, 'output': record['output'], 'author_choice': record['author_choice'], 'choice': record['choice'],
+                        'reason_codes': record['reason_codes']})
+        for a in record['attempts']:
+            raws.append({**key, 'step': a['step'], 'attempt': a['attempt'], 'text': a['text']})
+            attempts.append({**key, **{k: v for k, v in a.items() if k != 'text'}})
+        verifications.append({**key, 'verification': record['verification']})
+        details.append(grading.detail(matter, name, r, record['status'], graded, critical, record['choice'],
+                                      record['author_choice'], entry))
+        shown = [p['passage_id'] for k in PASSAGE_KEYS for p in result[k]]
+        fingerprints.append(result['index_fingerprint'])
+        results.append({**key, 'result': {**retrieval._private(result, values), 'evidence_sha256': digest(shown),
+                                          'policy_id': policy_id, 'policy_version': policy_version}})
+
+    def defer(matter, r, route):
+        """A selector deferral: no generation request, and a scored row, so deferring never removes a matter from the
+        denominator. Its correctness stays in the private score detail: with `choice` it would publish the gold label."""
+        reason = next(c for c in route['reason_codes'] if c in routing.DEFERRALS)
+        codes = reason_codes(route['reason_codes'])
+        rows.append({'task_id': matter['matter_id'], 'family_id': matter['family_id'], 'category': 'routed-defer', 'benchmark': lock['benchmark_id'],
+                     'arm': 'routed', 'repetition': r, 'warmup': False, 'synthetic': False, 'execution_kind': 'model-run',
+                     'data_class': lock['data_class'], **grading.deferral_fields(), 'reason_codes': codes, 'error_type': None,
+                     'choice': 'defer', 'author_choice': None, 'abstained': False, 'forced_defer': True, 'insufficiency_flags': None,
+                     'criteria_total': len(fixture.CRITERIA), **{k: None for k in ROW_TIMING}, 'finish_reason': None, 'truncated': None,
+                     'request_attempts': 0, 'parse_attempts': 0, 'first_parse_status': None, 'revised': False, 'output_sha256': None,
+                     **{k: None for k in retrieval.PUBLIC_METRICS}, **_route_keys(route)})
+        key = {'matter_id': matter['matter_id'], 'arm': 'routed', 'repetition': r}
+        outputs.append({**key, 'output': None, 'author_choice': None, 'choice': 'defer', 'reason_codes': codes, 'selector_deferral': True})
+        verifications.append({**key, 'verification': None})
+        results.append({**key, 'result': None})
+        details.append(grading.deferral_detail(matter, 'routed', r, gold.get(matter['matter_id']), reason))
+
+    if selector is None:
+        for arm in parameters['arms']:
+            scope = telemetry.host_snapshot()['memory_scope']
+            with telemetry.Sampler(interval=1.0) as sampler:
+                for matter in matters:
+                    for r in range(g['repeats']):
+                        one(matter, arm, r)
+            telemetry_[arm] = _telemetry(sampler.samples, scope)
+    else:
+        router = routing.router_for(selector, roles)
+        pool = {arm: {} for arm in parameters['arms']}
+        served = {name: roles[name] for name in ('embedder', 'reranker') if name in roles}
+        eligible = [arm for arm, reason in retrieval.available_arms(parameters['arms'], {'backend': backend, 'roles': served}).items() if reason is None]
         scope = telemetry.host_snapshot()['memory_scope']
-        with telemetry.Sampler(interval=1.0) as sampler:
-            for matter in sorted(suite['matters']['matters'], key=lambda m: m['matter_id']):
-                entry = gold.get(matter['matter_id'])
-                targets = retrieval.gold_targets(suite, matter, entry) if entry is not None else None
+        with telemetry.Sampler(interval=1.0) as sampler:      # one sampler around the routed run
+            for matter in matters:
+                messages = routing.route_messages(matter)
                 for r in range(g['repeats']):
-                    reference = retrieval.reference_passages(suite, matter) if arm == 'reference' else None
-                    record = run_matter(view, matter, arm, roles, {**settings, 'seed': g['seed'] + r, 'repetition': r}, mode, reference)
-                    result = record['evidence']
-                    result['reason_codes'] = reason_codes(result['reason_codes'], backend_codes)
-                    record['reason_codes'] = reason_codes(record['reason_codes'], backend_codes)
-                    values = retrieval.metrics(result, targets) if targets is not None else {k: None for k in retrieval.METRICS}
-                    graded = grading.grade(record['output'], matter, entry, suite['corpus'], result) \
-                        if record['status'] in ('ok', 'invalid') else None
-                    critical = record['verification']['critical'] if record['verification'] else []
-                    row = {'task_id': matter['matter_id'], 'family_id': matter['family_id'], 'category': arm, 'benchmark': lock['benchmark_id'],
-                           'arm': arm, 'repetition': r, 'warmup': False, 'synthetic': False, 'execution_kind': 'model-run',
-                           'data_class': lock['data_class'], 'status': record['status'], 'retrieval_status': record['retrieval_status'],
-                           'inference_status': record['inference_status'], 'parse_status': record['parse_status'],
-                           'verification_status': record['verification_status'],
-                           **grading.decision_fields(record['status'], graded, critical, record['choice']),
-                           'reason_codes': record['reason_codes'], 'error_type': record['error_type'], 'choice': record['choice'],
-                           'author_choice': record['author_choice'], 'abstained': record['abstained'], 'forced_defer': record['forced_defer'],
-                           'insufficiency_flags': record['insufficiency_flags'], 'criteria_total': len(fixture.CRITERIA),
-                           **{k: record[k] for k in ROW_TIMING}, 'finish_reason': record['finish_reason'], 'truncated': record['truncated'],
-                           'request_attempts': record['request_attempts'], 'parse_attempts': record['parse_attempts'],
-                           'first_parse_status': record['first_parse_status'], 'revised': record['revised'],
-                           'output_sha256': record['output_sha256'],
-                           **{k: values[k] for k in retrieval.PUBLIC_METRICS}}
-                    rows.append(withhold(row, backend_codes) if arm == 'reference' else row)
-                    key = {'matter_id': matter['matter_id'], 'arm': arm, 'repetition': r}
-                    outputs.append({**key, 'output': record['output'], 'author_choice': record['author_choice'], 'choice': record['choice'],
-                                    'reason_codes': record['reason_codes']})
-                    for a in record['attempts']:
-                        raws.append({**key, 'step': a['step'], 'attempt': a['attempt'], 'text': a['text']})
-                        attempts.append({**key, **{k: v for k, v in a.items() if k != 'text'}})
-                    verifications.append({**key, 'verification': record['verification']})
-                    details.append(grading.detail(matter, arm, r, record['status'], graded, critical, record['choice'],
-                                                  record['author_choice'], entry))
-                    shown = [p['passage_id'] for k in PASSAGE_KEYS for p in result[k]]
-                    fingerprints.append(result['index_fingerprint'])
-                    results.append({**key, 'result': {**retrieval._private(result, values), 'evidence_sha256': digest(shown),
-                                                      'policy_id': policy_id, 'policy_version': policy_version}})
-        telemetry_[arm] = _telemetry(sampler.samples, scope)
+                    decision = routing.route(router, messages, selector['policy'], pool, eligible, allowed)
+                    decisions.append(routing.decision_record(matter, r, messages, decision))
+                    if decision['action'] == 'route':
+                        one(matter, decision['selected'], r, decision)
+                    else:
+                        defer(matter, r, decision)
+        telemetry_['routed'] = _telemetry(sampler.samples, scope)
+        _jsonl(contracts.private_file(output, 'route-decisions.jsonl'), decisions)
     for name, items in (('candidate-outputs.jsonl', outputs), ('raw-responses.jsonl', raws), ('attempts.jsonl', attempts),
                         ('verification.jsonl', verifications), ('score-detail.jsonl', details), ('retrieval-results.jsonl', results)):
         _jsonl(contracts.private_file(output, name), items)
@@ -602,15 +680,19 @@ def run(job, suite, output, root):
         'policy_version': policy_version, 'template_sha256': template_sha256(), 'arms': list(parameters['arms']),
         'retrieval': {'backend': backend, 'top_k': settings['top_k'], 'token_budget': settings['token_budget'], 'tokenizer': retrieval.TOKENIZER,
                       'chunking': retrieval.CHUNKING, 'index_fingerprint': digest(sorted(fingerprints)),
-                      'embedder_sha256': profiles.profile_digest(embedder) if embedder else None,
-                      'reranker_sha256': profiles.profile_digest(reranker) if reranker else None},
-        'generation': {k: g[k] for k in ('seed', 'temperature', 'parse_retries', 'repeats', 'max_output_tokens')}, 'selector': None,
-        'roles': {name: profiles.public_role(p) for name, p in roles.items()},
+                      'embedder_sha256': profiles.profile_digest(embedder, job['input_files']) if embedder else None,
+                      'reranker_sha256': profiles.profile_digest(reranker, job['input_files']) if reranker else None},
+        'generation': {k: g[k] for k in ('seed', 'temperature', 'parse_retries', 'repeats', 'max_output_tokens')},
+        'selector': None if selector is None else {
+            'selector_sha256': routing.selector_digest(selector, roles, job['input_files']), 'router_kind': selector['router']['kind'],
+            'calibration_sha256': {f['path']: f['sha256'] for f in job['input_files']}.get(selector['calibration']['calibration_file'])
+            if selector.get('calibration') else None},
+        'roles': {name: profiles.public_role(p, job['input_files']) for name, p in roles.items()},
         'matters': len({r['task_id'] for r in rows}), 'families': len({r['family_id'] for r in rows}), 'rows': len(rows),
         'all_pass': sum(r['quality_pass'] is True for r in rows), 'review_required': True,
         'scorer_fingerprint': grading.scorer_fingerprint(suite), 'reviewer_fingerprint': None,
         'telemetry': telemetry_, 'unavailable': _unavailable(telemetry_)})
-    files = [{'path': path, 'size': (output / path).stat().st_size, 'sha256': sha256_file(output / path)} for path in sorted(MANIFEST_FILES)]
+    files = [{'path': path, 'size': (output / path).stat().st_size, 'sha256': sha256_file(output / path)} for path in manifest_files(parameters)]
     manifest = {'schema_version': 1, 'kind': 'legal-output-manifest', 'experiment': MANIFEST['id'], 'mode': mode, 'job_id': job['job_id'],
                 'attempt_id': output.name, 'suite_lock_sha256': suite['lock_sha256'], 'data_class': lock['data_class'],
                 'execution_kind': 'model-run', 'template_sha256': template_sha256(),

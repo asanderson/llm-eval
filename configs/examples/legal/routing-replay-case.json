@@ -1,0 +1,45 @@
+{
+  "id": "legal-routing-replay",
+  "parameters": {
+    "suite": "REPLACE_WITH_EXPORTED_ROUTING_SUITE.json",
+    "replay": "REPLACE_WITH_VERIFIED_REPLAY_MANIFEST.json",
+    "router": {
+      "kind": "category",
+      "default_category": "lexical",
+      "keywords": {
+        "none": [
+          "REPLACE_WITH_KEYWORD"
+        ]
+      }
+    },
+    "candidates": {
+      "no-context": {
+        "model": "REPLACE_WITH_MODEL_ID",
+        "model_revision": "REPLACE_WITH_EXACT_REVISION",
+        "platform": "ollama",
+        "backend_version": "REPLACE_WITH_BACKEND_VERSION",
+        "protocol": "ollama",
+        "quantization": null,
+        "template_sha256": null,
+        "context_tokens": 4096
+      },
+      "lexical-eligible": {
+        "model": "REPLACE_WITH_MODEL_ID",
+        "model_revision": "REPLACE_WITH_EXACT_REVISION",
+        "platform": "ollama",
+        "backend_version": "REPLACE_WITH_BACKEND_VERSION",
+        "protocol": "ollama",
+        "quantization": null,
+        "template_sha256": null,
+        "context_tokens": 4096
+      }
+    },
+    "policy": {
+      "category_models": {
+        "lexical": "lexical-eligible",
+        "none": "no-context"
+      },
+      "fallback": "lexical-eligible"
+    }
+  }
+}

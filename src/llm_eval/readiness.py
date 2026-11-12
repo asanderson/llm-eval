@@ -183,8 +183,13 @@ def select(args, root):
     if args.lock_root: target = {**target, 'lock_root': str(args.lock_root)}
     if chosen_os not in OS_IDS: raise ValueError('Supported hosts: native Windows 11, native Ubuntu 26.04, and WSL2 Ubuntu 26.04')
     identifier(hardware)
+    from .experiments import get_experiment
+
+    def gpu(job):      # a plugin's explicit host requirement decides; every other non-synthetic job counts as before
+        need = getattr(get_experiment(job['experiment_id']), 'host_requirements', None)
+        return need(job['parameters'], job['mode']).get('gpu', True) if need else True
     return {'os_id': chosen_os, 'hardware_profile': hardware, 'runtimes': runtimes, 'target': target,
-            'needs_gpu': bool(runtimes) or any(not j['parameters'].get('synthetic') for j in jobs)}
+            'needs_gpu': bool(runtimes) or any(not j['parameters'].get('synthetic') and gpu(j) for j in jobs)}
 
 
 def gpu_probe(hardware):

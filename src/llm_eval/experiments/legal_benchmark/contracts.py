@@ -1,15 +1,17 @@
 """Shared contracts of the legal benchmark: suite lock v1, matter and authority manifests, candidate output v1.
 
-Everything here reads, validates and hashes local files only. Nothing is written, fetched or executed, so the
-planner can call it freely. Documents are untrusted content: they are data to quote and anchor, never instructions.
+Everything here reads, validates and hashes local files only; the one writer, `write_text_atomic`, is used by the
+operator commands and never by the planner. Nothing is fetched or executed, so the planner can call it freely. Documents are untrusted content: they are data to quote and anchor, never instructions.
 """
 from __future__ import annotations
 
 import datetime
 import hashlib
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
+import tempfile
 
 from llm_eval.common import sha256_file
 from llm_eval.core.contracts import fields, identifier
@@ -229,6 +231,88 @@ def _read_lock(lock_path):
     Original files (purpose `source`) are verified too but are not in the purpose map. Raises when the lock is
     malformed, unsafe or stale."""
     return _verify_lock(lock_path)[:3]
+
+
+APPROVED_SUITES = 'experiments/legal-benchmark/approved-suites.json'
+APPROVED_KEYS = ('benchmark_id', 'fixture_export')
+HEX64 = re.compile(r'[0-9a-f]{64}')
+
+
+def approved_suites(root=None) -> dict:
+    """{lock sha256: {'benchmark_id', 'fixture_export'}} from the reviewed list of suites whose legal text or grader
+    outcomes may leave the plugin. The suite lock's own `data_class` authorises local execution and nothing else."""
+    root = Path(root) if root is not None else Path(__file__).resolve().parents[4]
+    try:
+        value, _ = read_json_strict(root / APPROVED_SUITES)
+    except OSError:      # an installed package has no experiments/ directory beside it
+        raise ValueError('Approved suites file not found: ' + APPROVED_SUITES) from None
+    fields(value, ['schema_version', 'suites'], ['schema_version', 'suites'])
+    _version(value['schema_version'], 'Approved suites schema_version must be 1')
+    if not isinstance(value['suites'], dict):
+        raise ValueError('Approved suites must map lock digests to entries')
+    found = {}
+    for key, entry in sorted(value['suites'].items()):
+        if not isinstance(key, str) or not HEX64.fullmatch(key):
+            raise ValueError('An approved suite is named by the SHA-256 of its lock')
+        fields(entry, APPROVED_KEYS, APPROVED_KEYS)
+        identifier(entry['benchmark_id'])
+        if type(entry['fixture_export']) is not bool:
+            raise ValueError('fixture_export must be true or false')
+        found[key] = {'benchmark_id': entry['benchmark_id'], 'fixture_export': entry['fixture_export']}
+    return found
+
+
+def export_allowed(lock_path) -> str:
+    """The lock digest of a suite whose fixture text may be exported to another experiment; else ValueError. The digest
+    is that of the lock bytes parsed after every pinned file verified, so a relocked copy is refused whatever its label."""
+    lock, _, lock_sha256 = _read_lock(lock_path)
+    entry = approved_suites().get(lock_sha256)
+    if entry is None or entry['benchmark_id'] != lock['benchmark_id'] or entry['fixture_export'] is not True:
+        raise ValueError('Export is limited to approved fixture suites')
+    return lock_sha256
+
+
+def read_jsonl(path) -> list:
+    """The one JSON-lines reader of the plugin: one object per nonempty line."""
+    return [json.loads(line) for line in Path(path).read_text(encoding='utf-8').splitlines() if line.strip()]
+
+
+def write_text_atomic(path, text) -> None:
+    """Write UTF-8 text with LF line endings through a temporary file in the same directory, then replace."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, name = tempfile.mkstemp(prefix='.' + path.name, dir=path.parent)
+    try:
+        with os.fdopen(fd, 'wb') as handle:
+            handle.write(text.encode('utf-8'))
+        os.replace(name, path)
+    except BaseException:
+        if os.path.exists(name):
+            os.unlink(name)
+        raise
+
+
+SCANNED_NAMES = ('model_judgment', 'reports')      # directory names the generic report builder scans
+
+
+def inside_attempt(directory) -> bool:
+    directory = Path(directory)
+    return any((d / 'job.json').exists() or (d / 'result.json').exists() or (d / 'requests.jsonl').exists() for d in [directory, *directory.parents])
+
+
+def check_output(path, what='The output') -> Path:
+    """The one output-location rule of the operator commands: never inside an attempt directory, never under a directory
+    the report builder scans, never inside the repository. Returns the resolved path."""
+    out = Path(path).resolve()
+    if inside_attempt(out.parent):
+        raise ValueError(what + ' must not be written inside an attempt directory')
+    if set(SCANNED_NAMES) & {part.casefold() for part in out.parts}:
+        raise ValueError(what + ' must not be written under a directory the report builder scans')
+    # Any repository, not only this checkout: a worktree nested in another checkout, or an installed package, has its
+    # repository marker (a `.git` directory, or the `.git` file of a worktree) somewhere above the path.
+    if out.is_relative_to(Path(__file__).resolve().parents[4]) or any((d / '.git').exists() for d in out.parents):
+        raise ValueError(what + ' must not be written inside the repository')
+    return out
 
 
 def lock_files(lock_path):
