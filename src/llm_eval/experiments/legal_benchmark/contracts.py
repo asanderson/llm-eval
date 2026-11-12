@@ -267,6 +267,7 @@ def _optional_authority_keys(a):
 
 
 def validate_corpus(corpus, lock):
+    from . import authority      # authority imports this module; the optional keys get their meaning there
     names = ['schema_version', 'data_class', 'jurisdiction_profile', 'source_set', 'venues', 'authorities']
     fields(corpus, names + list(OPTIONAL_CORPUS_KEYS), names)
     _version(corpus['schema_version'], 'Unsupported corpus manifest version')
@@ -289,6 +290,7 @@ def validate_corpus(corpus, lock):
             _text(a[key], 'Authority ' + key)
         _text(a['pinpoint'], 'Authority pinpoint', 100)      # the output cites a pinpoint as an identifier of at most 100 characters
         _optional_authority_keys(a)
+        authority.validate_record(a, corpus)
         if (a['authority_id'], a['version']) in keys:
             raise ValueError('Duplicate authority version: ' + a['authority_id'] + '@' + a['version'])
         keys.add((a['authority_id'], a['version']))
@@ -313,6 +315,8 @@ def validate_corpus(corpus, lock):
     for a in corpus['authorities']:
         if a['authority_type'] == 'exemption' and a.get('relates_to') not in {k[0] for k in keys}:
             raise ValueError('An exemption must relate to a known authority')
+    if corpus['data_class'] != 'private-matter':      # loading only: every mode refuses that class before any decision
+        authority.policy_or_none(corpus)      # validates a corpus policy; raises when a policy is required and absent
     return keys
 
 

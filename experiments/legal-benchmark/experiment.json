@@ -2,9 +2,11 @@
   "id": "legal-benchmark",
   "version": 1,
   "modes": [
-    "smoke"
+    "smoke",
+    "retrieval"
   ],
   "cases": {
-    "smoke": "cases/smoke.json"
+    "smoke": "cases/smoke.json",
+    "retrieval": "cases/retrieval.json"
   }
 }
