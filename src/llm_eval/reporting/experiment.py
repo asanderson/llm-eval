@@ -96,7 +96,8 @@ def build_report(experiment_dir):
     experiment_dir=Path(experiment_dir).resolve();campaign_dir=experiment_dir.parents[1]
     exp=read_json(experiment_dir/'experiment.json');plan=read_json(campaign_dir/'plan.json');state=read_json(campaign_dir/'campaign.json')
     config=plan['reporting'];removed=set();records=[];coverage=[]
-    policy=reporting_policy(exp['experiment_id'],[j for j in plan['jobs'] if j['job_id'] in exp['job_ids']])
+    selected=[j for j in plan['jobs'] if j['job_id'] in exp['job_ids']];policy=reporting_policy(exp['experiment_id'],selected)
+    if any(j.get('experiment_id',exp['experiment_id'])!=exp['experiment_id'] for j in selected):raise ValueError('Experiment identity does not match its planned jobs')
     if not policy['report']:raise ValueError('Report generation is disabled: '+policy['reason'])
     for jid in exp['job_ids']:
         job_state=state['jobs'][jid]

@@ -1,5 +1,6 @@
 """Publish an immutable result bundle through a GitHub pull request."""
 from __future__ import annotations
+import gzip
 import http.client
 import json
 import os
@@ -80,11 +81,37 @@ def publish_report(report,root,dry_run=False,api=None):
     report=Path(report).resolve();root=Path(root).resolve()
     spec,manifest,size=validate_bundle(report)
     # Decided from every experiment identity the bundle carries, not from one label a caller could edit.
-    from llm_eval.experiments import reporting_policy
-    resolved=read_json(report/'bundle'/spec['report_path']/'resolved-config.json')
-    for name in {spec['experiment_id'],manifest['experiment_id'],resolved['experiment']['experiment_id'],*(j['experiment_id'] for j in resolved['jobs'])}:
+    from llm_eval.experiments import REGISTRY, get_experiment, reporting_policy
+    dest=report/'bundle'/spec['report_path'];raw=dest/'raw/measurements.jsonl.gz'
+    if not raw.is_file():raise ValueError('Publication needs the raw measurements archive')
+    for file in ('summary.json','benchmark-summary.json'): # build_report always writes both
+        if not (dest/file).is_file():raise ValueError('Publication needs the report summary: '+file)
+    try:records=[json.loads(line) for line in gzip.decompress(raw.read_bytes()).decode('utf-8').splitlines() if line]
+    except (OSError,EOFError,UnicodeDecodeError,ValueError,RecursionError):raise ValueError('Malformed raw measurements archive') from None
+    if not all(isinstance(r,dict) and isinstance(r.get('data',{}),dict) for r in records):raise ValueError('Malformed raw measurements archive')
+    try:
+        resolved=read_json(dest/'resolved-config.json');jobs=resolved['jobs']
+        names={spec['experiment_id'],manifest['experiment_id'],resolved['experiment']['experiment_id'],*(j['experiment_id'] for j in jobs),
+               Path(spec['report_path']).parts[2],Path(spec['chart_path']).parts[2]}
+        benchmarks=[r.get('data',{}).get('benchmark') for r in records if r.get('record_type') in {'request','metadata'}]
+        for file in ('summary.json','benchmark-summary.json'):
+            rows=read_json(dest/file)
+            benchmarks+=[v for row in rows for v in (row.get('benchmark'),(row.get('data') if isinstance(row.get('data'),dict) else {}).get('benchmark'))]
+        for r in records:
+            if r.get('record_type')=='metadata':names|={v for v in (r.get('data',{}).get('experiment_id'),r.get('data',{}).get('experiment')) if isinstance(v,str)}
+        if not all(isinstance(j,dict) and isinstance(j.get('experiment_id'),str) for j in jobs):raise TypeError
+    except (IndexError,TypeError,KeyError,AttributeError):raise ValueError('Malformed publication bundle') from None
+    for name in sorted(names,key=str):
+        if name not in REGISTRY:raise ValueError('Publication is not available for an unregistered experiment: '+str(name))
+    claims={e:getattr(get_experiment(e),'claims_benchmark',None) for e in REGISTRY}
+    names|={e for e,claim in claims.items() if claim for b in benchmarks if isinstance(b,str) and claim(b)}
+    for name in sorted(names,key=str):
         policy=reporting_policy(name,[])
         if not policy['publish']:raise ValueError('Publication is not available for '+name+': '+policy['reason'])
+    for j in jobs:      # a planned job's mode belongs to its experiment: a relabelled job keeps the mode it ran in
+        if j.get('mode') not in get_experiment(j['experiment_id']).MANIFEST['modes']:
+            raise ValueError('Publication identity mismatch: mode '+str(j.get('mode'))+' is not a mode of '+j['experiment_id'])
+    if len(names)>1:raise ValueError('Publication identity mismatch')
     branch='results/'+spec['experiment_id']+'/'+spec['publication_id']
     if dry_run:return {'branch':branch,'bytes':size,'files':list(manifest['files']),'dry_run':True}
     lock=ProcessLock(report/'.publish.lock');lock.acquire()
