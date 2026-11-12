@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_on": "2026-11-11",
+  "checked_on": "2026-11-12",
   "qualification": "Recipe pins, not verified laptop installations. Transitive Python dependencies are captured with pip freeze after installation; not a fully hashed dependency lock.",
   "harness_packages": [
     "psutil==7.2.2"
@@ -22,7 +22,7 @@
     "ik_llama.cpp": {
       "kind": "cmake",
       "repository": "https://github.com/ikawrakow/ik_llama.cpp.git",
-      "revision": "4e24d0b2122fd34e5817978b00ddefde314df5d9"
+      "revision": "883789c25ba93e625bb5266f41f9b73150cf6fa6"
     },
     "ktransformers": {
       "kind": "pip",
