@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "data_class": "public-synthetic",
+  "jurisdiction_profile": "veld-fictional-v1",
+  "source_set": "review",
+  "sources": [
+    {
+      "source_id": "s-f8ba621d84cd372b",
+      "role": "evidence",
+      "version": "1",
+      "kind": "note",
+      "original_sha256": "fe2c458d1e57d5deed55a28dad52f4b85c01a7a4d38c37903e99c0cb8d936fd5",
+      "original_bytes": 175,
+      "media_type": "text/plain",
+      "parent_source_id": null,
+      "parse": {
+        "status": "ok",
+        "confidence": 1.0,
+        "missing_pages": [],
+        "ocr_required_pages": [],
+        "reason_codes": []
+      },
+      "source_set": "review",
+      "excluded_matters": [],
+      "spans": [
+        {
+          "span_id": "s-f8ba621d84cd372b#1",
+          "text": "Reviewer note for the calibration fixture.",
+          "text_sha256": "6e39e1c934754228a2899a64576c428716f76f57c38e161e289be20c05901bd9",
+          "locator": {
+            "kind": "text",
+            "paragraph": 1,
+            "start": 0,
+            "end": 42
+          }
+        },
+        {
+          "span_id": "s-f8ba621d84cd372b#2",
+          "text": "The permit register for this yard is not in this packet; the paired packet includes it, so the two packets are expected to differ.",
+          "text_sha256": "e37782997688a04cd43bae8f790b314c145d2e30d1d36f2a360896faa733b0f0",
+          "locator": {
+            "kind": "text",
+            "paragraph": 2,
+            "start": 44,
+            "end": 174
+          }
+        }
+      ],
+      "matter_id": "p2-kiln-a"
+    }
+  ]
+}

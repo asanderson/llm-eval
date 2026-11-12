@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "capabilities_sha256": "8498b95309dce1e9834b2c42235d1e10bb2e2592c94fdb8fa44b1b3a5e623f66",
+  "files": [
+    {
+      "path": "raw/p1-a/patrol-report.txt",
+      "part": "",
+      "sha256": "bd2e2f71c9f10d7d2d47ba7384c746568ab8d24b8066c290a1670ca6765c14ea",
+      "bytes": 208,
+      "media_type": "text/plain",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    },
+    {
+      "path": "raw/p1-a/thread.eml",
+      "part": "",
+      "sha256": "42f809235fbc560c6dc8b1533ce6c93742000f4aee63942978b793ce8fefaa7d",
+      "bytes": 777,
+      "media_type": "message/rfc822",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    },
+    {
+      "path": "raw/p1-b/patrol-report.txt",
+      "part": "",
+      "sha256": "bd2e2f71c9f10d7d2d47ba7384c746568ab8d24b8066c290a1670ca6765c14ea",
+      "bytes": 208,
+      "media_type": "text/plain",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    },
+    {
+      "path": "raw/p1-b/thread.eml",
+      "part": "",
+      "sha256": "be7c86e59b9af396b20a347e47eba2c6981153881c7e7f1bc2e5e5fd3b5516c6",
+      "bytes": 777,
+      "media_type": "message/rfc822",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    },
+    {
+      "path": "raw/p1/prior-brief.txt",
+      "part": "",
+      "sha256": "6b1e973fe7698f5ffcc6c4a56ac62c2dc0a83b7ac851c635547f71d60f25e742",
+      "bytes": 152,
+      "media_type": "text/plain",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    },
+    {
+      "path": "raw/p2-a/inspection-report.txt",
+      "part": "",
+      "sha256": "243b347dcc162637046cdd5c8fd07291559457ff287d7e2d44dcb8fa3a680dcc",
+      "bytes": 225,
+      "media_type": "text/plain",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    },
+    {
+      "path": "raw/p2-a/neighbour-statement.txt",
+      "part": "",
+      "sha256": "80a7f975b614fe6acaa04048a25a71c216a33bdd853057003dfe44d556157a4f",
+      "bytes": 107,
+      "media_type": "text/plain",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    },
+    {
+      "path": "raw/p2-b/inspection-report.txt",
+      "part": "",
+      "sha256": "243b347dcc162637046cdd5c8fd07291559457ff287d7e2d44dcb8fa3a680dcc",
+      "bytes": 225,
+      "media_type": "text/plain",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    },
+    {
+      "path": "raw/p2-b/permit-thread.eml",
+      "part": "",
+      "sha256": "927966c8cd99cca45e1aaf4418b4d1e084aa11c07430680738288def6d173876",
+      "bytes": 841,
+      "media_type": "message/rfc822",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    },
+    {
+      "path": "raw/p2-b/permit-thread.eml",
+      "part": "3",
+      "sha256": "71f3ba04af22674d83c07fdcfbe3cdffa5096388f5c587abd6875fa75b50f4ed",
+      "bytes": 159,
+      "media_type": "text/plain",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    },
+    {
+      "path": "raw/p2/review-note.txt",
+      "part": "",
+      "sha256": "fe2c458d1e57d5deed55a28dad52f4b85c01a7a4d38c37903e99c0cb8d936fd5",
+      "bytes": 175,
+      "media_type": "text/plain",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    },
+    {
+      "path": "raw/shared/screening-template.txt",
+      "part": "",
+      "sha256": "af979d63d25d8c1d179fdcef3f6ba7b5b7520d3e5b3089a7599f5240739ba437",
+      "bytes": 167,
+      "media_type": "text/plain",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    },
+    {
+      "path": "raw/authority/vho-9-2-2021.txt",
+      "part": "",
+      "sha256": "7a48c3556e9f7f9b53c8e817bb413d5a473b722bfd9490fa7bd8a1e77a9a1ed8",
+      "bytes": 140,
+      "media_type": "text/plain",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    },
+    {
+      "path": "raw/authority/vho-9-2-2025.txt",
+      "part": "",
+      "sha256": "42be4054cfe66a77e97bf0f8ad91bed97b7d498ba11c9a1198196b5a0e6791eb",
+      "bytes": 91,
+      "media_type": "text/plain",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    },
+    {
+      "path": "raw/authority/vho-9-4-2020.txt",
+      "part": "",
+      "sha256": "805dde0aeb493fa1d6ab8968b4653f38bd338ba76419f236df9b9124393ecb99",
+      "bytes": 124,
+      "media_type": "text/plain",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    },
+    {
+      "path": "raw/authority/vsc-61-3-2020.txt",
+      "part": "",
+      "sha256": "9baf6ad21cc8b3c8e8c5fb5f68fe57ce095377f38c7eba7555bc965e364350c4",
+      "bytes": 92,
+      "media_type": "text/plain",
+      "status": "ok",
+      "reason_codes": [],
+      "duplicate_of": null
+    }
+  ]
+}

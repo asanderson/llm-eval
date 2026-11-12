@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "data_class": "public-synthetic",
+  "jurisdiction_profile": "veld-fictional-v1",
+  "source_set": "candidate",
+  "venues": [
+    "veld-central",
+    "veld-harbor"
+  ],
+  "policy": {
+    "policy_id": "veld-packets",
+    "version": "1",
+    "jurisdiction": null,
+    "effective_from_inclusive": true,
+    "effective_to_inclusive": false,
+    "require_status_as_of": false,
+    "postures": {
+      "screening": {
+        "persuasive_eligible": true
+      },
+      "retrieval": {
+        "persuasive_eligible": true
+      }
+    },
+    "binding_courts": {},
+    "review": null
+  },
+  "availability_cutoff": "2026-01-01",
+  "authorities": [
+    {
+      "authority_id": "vho-9-2",
+      "version": "2021",
+      "citation": "Veld Harbor Ordinance s9.2",
+      "title": "Mooring at a public quay without a licence",
+      "issuer": "Assembly of Veld (fictional)",
+      "authority_type": "offence",
+      "venues": [
+        "veld-harbor"
+      ],
+      "effective_from": "2021-01-01",
+      "effective_to": "2025-03-01",
+      "status": "superseded",
+      "pinpoint": "s9.2(1)",
+      "elements": [
+        {
+          "element_id": "moored-at-quay",
+          "description": "Evidence that the vessel was moored at a public quay.",
+          "terms": [
+            "moored the"
+          ]
+        },
+        {
+          "element_id": "no-licence",
+          "description": "Evidence on whether the vessel held a mooring licence.",
+          "terms": [
+            "without a mooring licence"
+          ],
+          "negating_terms": [
+            "holding a valid mooring licence"
+          ]
+        },
+        {
+          "element_id": "prior-warning",
+          "description": "Evidence that the harbor office gave a written warning first.",
+          "terms": [
+            "written warning"
+          ]
+        }
+      ],
+      "weight": "controlling",
+      "snapshot": {
+        "id": "veld-gazette-2025-12",
+        "published": "2025-12-01"
+      },
+      "status_as_of": "2025-12-01",
+      "text": "A master who moors a vessel at a public quay without a mooring licence, after a written warning from the harbor office, commits an offence.",
+      "text_sha256": "cfc41cc65ecd612c03bad3fa51718592eb53c0e72a056cfbbb4d726040ef1c52",
+      "original_sha256": "7a48c3556e9f7f9b53c8e817bb413d5a473b722bfd9490fa7bd8a1e77a9a1ed8"
+    },
+    {
+      "authority_id": "vho-9-2",
+      "version": "2025",
+      "citation": "Veld Harbor Ordinance s9.2",
+      "title": "Mooring at a public quay without a licence",
+      "issuer": "Assembly of Veld (fictional)",
+      "authority_type": "offence",
+      "venues": [
+        "veld-harbor"
+      ],
+      "effective_from": "2025-03-01",
+      "effective_to": null,
+      "status": "in_force",
+      "pinpoint": "s9.2(1)",
+      "elements": [
+        {
+          "element_id": "moored-at-quay",
+          "description": "Evidence that the vessel was moored at a public quay.",
+          "terms": [
+            "moored the"
+          ]
+        },
+        {
+          "element_id": "no-licence",
+          "description": "Evidence on whether the vessel held a mooring licence.",
+          "terms": [
+            "without a mooring licence"
+          ],
+          "negating_terms": [
+            "holding a valid mooring licence"
+          ]
+        }
+      ],
+      "weight": "controlling",
+      "snapshot": {
+        "id": "veld-gazette-2025-12",
+        "published": "2025-12-01"
+      },
+      "status_as_of": "2025-12-01",
+      "text": "A master who moors a vessel at a public quay without a mooring licence commits an offence.",
+      "text_sha256": "6a37a5a9254c0ca843ccd37e65f8f85b3d81221742aa1b09ea755fa55d2e6a9c",
+      "original_sha256": "42be4054cfe66a77e97bf0f8ad91bed97b7d498ba11c9a1198196b5a0e6791eb"
+    },
+    {
+      "authority_id": "vho-9-4",
+      "version": "2020",
+      "citation": "Veld Harbor Ordinance s9.4",
+      "title": "Storm shelter at a public quay",
+      "issuer": "Assembly of Veld (fictional)",
+      "authority_type": "exemption",
+      "relates_to": "vho-9-2",
+      "venues": [
+        "veld-harbor"
+      ],
+      "effective_from": "2020-01-01",
+      "effective_to": null,
+      "status": "in_force",
+      "pinpoint": "s9.4",
+      "elements": [
+        {
+          "element_id": "declared-storm",
+          "description": "Evidence that a storm had been declared.",
+          "terms": [
+            "declared storm"
+          ]
+        }
+      ],
+      "weight": "persuasive",
+      "snapshot": {
+        "id": "veld-gazette-2025-12",
+        "published": "2025-12-01"
+      },
+      "status_as_of": "2025-12-01",
+      "text": "A master who moors a vessel at a public quay to shelter from a declared storm does not commit an offence under section 9.2.",
+      "text_sha256": "12fc5a301c4b4f0cbe6dd864c8d0ce55fa2988dd26ff117a620f7c559508154c",
+      "original_sha256": "805dde0aeb493fa1d6ab8968b4653f38bd338ba76419f236df9b9124393ecb99"
+    },
+    {
+      "authority_id": "vsc-61-3",
+      "version": "2020",
+      "citation": "Veld Statutes Consolidated s61.3",
+      "title": "Firing a kiln without a smoke permit",
+      "issuer": "Assembly of Veld (fictional)",
+      "authority_type": "offence",
+      "venues": [
+        "veld-central"
+      ],
+      "effective_from": "2020-07-01",
+      "effective_to": null,
+      "status": "in_force",
+      "pinpoint": "s61.3(2)",
+      "elements": [
+        {
+          "element_id": "fired-kiln",
+          "description": "Evidence that the kiln was fired.",
+          "terms": [
+            "fired the kiln"
+          ]
+        },
+        {
+          "element_id": "inside-limits",
+          "description": "Evidence that the kiln stands inside the town limits.",
+          "terms": [
+            "inside the town limits"
+          ]
+        },
+        {
+          "element_id": "no-permit",
+          "description": "Evidence on whether a smoke permit was held.",
+          "terms": [
+            "without a smoke permit"
+          ],
+          "negating_terms": [
+            "holding a smoke permit"
+          ]
+        }
+      ],
+      "weight": "controlling",
+      "snapshot": {
+        "id": "veld-gazette-2025-12",
+        "published": "2025-12-01"
+      },
+      "status_as_of": "2025-12-01",
+      "text": "A person who fires a kiln inside the town limits without a smoke permit commits an offence.",
+      "text_sha256": "422c858afbe64e8f79976a8adaaa8f419d2832eb1362dad64566ca6f9d4b990d",
+      "original_sha256": "9baf6ad21cc8b3c8e8c5fb5f68fe57ce095377f38c7eba7555bc965e364350c4"
+    }
+  ]
+}

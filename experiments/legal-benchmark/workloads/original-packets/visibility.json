@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "rules": [
+    {
+      "path": "raw/p1-a/patrol-report.txt",
+      "source_set": "candidate"
+    },
+    {
+      "path": "raw/p1-a/thread.eml",
+      "source_set": "candidate"
+    },
+    {
+      "path": "raw/p1-b/patrol-report.txt",
+      "source_set": "candidate"
+    },
+    {
+      "path": "raw/p1-b/thread.eml",
+      "source_set": "candidate"
+    },
+    {
+      "path": "raw/p1/prior-brief.txt",
+      "source_set": "candidate",
+      "excluded_matters": [
+        "p1-quay-a",
+        "p1-quay-b"
+      ]
+    },
+    {
+      "path": "raw/p2-a/inspection-report.txt",
+      "source_set": "candidate"
+    },
+    {
+      "path": "raw/p2-a/neighbour-statement.txt",
+      "source_set": "candidate"
+    },
+    {
+      "path": "raw/p2-b/inspection-report.txt",
+      "source_set": "candidate"
+    },
+    {
+      "path": "raw/p2-b/permit-thread.eml",
+      "source_set": "candidate"
+    },
+    {
+      "path": "raw/p2/review-note.txt",
+      "source_set": "review"
+    },
+    {
+      "path": "raw/shared/screening-template.txt",
+      "source_set": "candidate"
+    },
+    {
+      "path": "raw/authority/vho-9-2-2021.txt",
+      "source_set": "candidate"
+    },
+    {
+      "path": "raw/authority/vho-9-2-2025.txt",
+      "source_set": "candidate"
+    },
+    {
+      "path": "raw/authority/vho-9-4-2020.txt",
+      "source_set": "candidate"
+    },
+    {
+      "path": "raw/authority/vsc-61-3-2020.txt",
+      "source_set": "candidate"
+    }
+  ]
+}

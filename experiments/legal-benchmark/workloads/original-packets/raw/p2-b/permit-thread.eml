@@ -1,0 +1,24 @@
+From: Permits Desk <permits.desk@veld.example>
+To: Screening Office <screening.office@veld.example>
+Subject: Register extract for the Hollin Lane yard
+Date: Tue, 02 Sep 2025 14:05:00 +0100
+Message-ID: <p2-extract@central.veld.example>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="veld-boundary-1"
+
+--veld-boundary-1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+The register extract for the Hollin Lane yard is attached, as requested by the screening office.
+
+--veld-boundary-1
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: attachment; filename="register-extract.txt"
+Content-Transfer-Encoding: 7bit
+
+Smoke permit register, central district.
+
+The register lists the kiln at the Hollin Lane yard without a smoke permit; no permit has been issued for that yard.
+
+--veld-boundary-1--

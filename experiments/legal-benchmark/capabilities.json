@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "capabilities": {
+    "pdf": {
+      "module": null,
+      "distribution": null,
+      "version": null,
+      "callable": null
+    },
+    "docx": {
+      "module": null,
+      "distribution": null,
+      "version": null,
+      "callable": null
+    },
+    "ocr": {
+      "module": null,
+      "distribution": null,
+      "version": null,
+      "callable": null
+    }
+  }
+}
