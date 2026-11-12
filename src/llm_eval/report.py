@@ -24,6 +24,7 @@ def summarize(root, include_synthetic=False, group_by="task"):
     descriptions = {}
     for path in sorted(Path(root).rglob("metadata.json")):
         meta = read_json(path)
+        if meta.get("experiment") or not isinstance(meta.get("config"), dict): continue
         if meta.get("synthetic") and not include_synthetic:
             continue
         requests = path.parent / "requests.jsonl"
