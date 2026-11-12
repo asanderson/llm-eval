@@ -1,0 +1,7 @@
+{
+  "id": "score",
+  "parameters": {
+    "suite": "../workloads/original-smoke/suite.lock.json",
+    "output_manifest": "REPLACE_WITH_ATTEMPT_DIR/local/output-manifest.json"
+  }
+}

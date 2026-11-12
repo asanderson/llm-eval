@@ -119,7 +119,10 @@ def handle(p):
         if subprocess.run(['git','-C',str(root),'diff','--quiet','HEAD']).returncode:
             raise ValueError('Worker checkout contains uncommitted code changes')
         from llm_eval.runner import validate_host
-        validate_host({'hardware_profile':job['hardware']['hardware_profile']},root)
+        from llm_eval.experiments import get_experiment
+        need=getattr(get_experiment(job['experiment_id']),'host_requirements',None)
+        gpu=need(job['parameters'],job['mode']).get('gpu',True) if need else True
+        validate_host({'hardware_profile':job['hardware']['hardware_profile']},root,require_gpu=gpu)
         if environment_kind()!=job['hardware']['os_id']:raise ValueError('Worker OS does not match selected hardware configuration')
         if 'wsl2' in environment_kind() and not target.get('lock_root'):
             raise ValueError('WSL requires a lock_root shared with the Windows host worker')

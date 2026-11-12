@@ -9,7 +9,8 @@ from llm_eval.common import read_json, sha256_file
 from llm_eval.core.contracts import fields, identifier, integer, no_credentials, config_hash
 from llm_eval.experiments import get_experiment, reporting_policy
 
-PATH_KEYS = {'suite', 'artifact_root', 'artifact_lock', 'offload_dir', 'installation_state', 'replay', 'data', 'benchmark_registry'}
+PATH_KEYS = {'suite', 'artifact_root', 'artifact_lock', 'offload_dir', 'installation_state', 'replay', 'data', 'benchmark_registry',
+             'output_manifest', 'review_file', 'review_key'}
 
 
 def resolve_paths(value, directory):

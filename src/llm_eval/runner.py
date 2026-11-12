@@ -105,12 +105,12 @@ def load_suite(path):
     return suite
 
 
-def validate_host(c, root, host=None):
+def validate_host(c, root, host=None, require_gpu=True):
     host = host if host is not None else host_snapshot()
     hardware = read_json(Path(root) / ('configs/hardware/' + c.get('hardware_profile', 'msi-raider-18-hx-ai') + '.json'))
     if not host['psutil_available']:
         raise ValueError('Install the telemetry extra for real hardware runs')
-    if hardware.get('gpu') and not any(hardware['gpu']['name'] in g['name'] for g in host['gpus']):
+    if require_gpu and hardware.get('gpu') and not any(hardware['gpu']['name'] in g['name'] for g in host['gpus']):
         raise ValueError('Expected hardware-profile NVIDIA GPU was not detected')
     if hardware.get('require_ac', True) and host.get('ac_connected') is False:
         raise ValueError('Connect AC power before a performance run')

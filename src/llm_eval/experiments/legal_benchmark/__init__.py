@@ -1,8 +1,9 @@
 """Legal benchmark experiment: retrieval, evidence-grounded analysis and draft screening memos for human review.
 
-Registered modes: `smoke` (a deterministic fixture pipeline over fictional matters with no model, network or GPU) and
-`retrieval` (the retrieval arms and their metrics). Later modes (generation, workflow, score) are added as they are
-implemented. Each mode is a module that exports `PARAMETERS`, `execution_kind`, `check`, optionally `inputs`, and `run`.
+Registered modes: `smoke` (a deterministic fixture pipeline over fictional matters with no model, network or GPU),
+`retrieval` (the retrieval arms and their metrics), `generation` (one direct draft request per matter and arm),
+`workflow` (analyse, draft, verify and at most one bounded revision) and `score` (grade the stored outputs of an
+earlier attempt into a new attempt, CPU only). Each mode is a module that exports `PARAMETERS`, `execution_kind`, `check`, optionally `inputs`, and `run`.
 """
 from __future__ import annotations
 
@@ -16,7 +17,7 @@ from llm_eval.core.contracts import fields
 from . import fixture
 from .contracts import load_suite, pinned_files
 
-MODE_MODULES = {'smoke': 'fixture', 'retrieval': 'retrieval'}
+MODE_MODULES = {'smoke': 'fixture', 'retrieval': 'retrieval', 'generation': 'workflow', 'workflow': 'workflow', 'score': 'grading'}
 MANIFEST = {'id': 'legal-benchmark', 'version': 1, 'modes': list(MODE_MODULES),
             'description': 'Legal retrieval, evidence-grounded analysis and draft screening memos for human review'}
 BENCHMARK = 'legal-smoke'
@@ -32,6 +33,12 @@ SCANNED_DIRECTORIES = ('model_judgment', 'reports')
 def _module(mode):
     """The module that implements `mode`."""
     return import_module('.' + MODE_MODULES[mode], __name__)
+
+
+def host_requirements(parameters, mode):
+    """Explicit host requirement of a job that is not a fixture. Read by the worker (and by readiness after package E)."""
+    module = _module(mode)
+    return module.host(parameters, mode) if hasattr(module, 'host') else {'gpu': True}
 
 
 def job_status(rows):

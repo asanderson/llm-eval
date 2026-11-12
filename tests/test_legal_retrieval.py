@@ -1276,8 +1276,9 @@ class RetrievalCampaignTests(unittest.TestCase):
         return relock(self.suite, data_class='private-matter')
 
     def test_retrieval_mode_plans_runs_and_writes_only_public_row_keys(self):
-        self.assertEqual(legal.MANIFEST['modes'], ['smoke', 'retrieval'])
-        self.assertEqual(legal.MODE_MODULES, {'smoke': 'fixture', 'retrieval': 'retrieval'})
+        self.assertEqual(legal.MANIFEST['modes'], ['smoke', 'retrieval', 'generation', 'workflow', 'score'])
+        self.assertEqual(legal.MODE_MODULES, {'smoke': 'fixture', 'retrieval': 'retrieval', 'generation': 'workflow', 'workflow': 'workflow',
+                                              'score': 'grading'})
         self.assertIs(legal._module('retrieval'), retrieval)
         shipped = read_json(ROOT / 'experiments/legal-benchmark/cases/retrieval.json')
         self.assertEqual(shipped, {'id': 'retrieval', 'parameters': {'suite': '../workloads/original-smoke/suite.lock.json', 'synthetic': True,

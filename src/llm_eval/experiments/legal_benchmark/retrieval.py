@@ -583,6 +583,12 @@ def _served(parameters):
     return {r: roles[r] for r in sorted(used) if isinstance(roles.get(r), dict)}
 
 
+def host(parameters, mode):
+    """The explicit host requirement: the hardware-profile GPU only when a role of the job is GPU-served."""
+    roles = parameters.get('roles') if isinstance(parameters.get('roles'), dict) else {}
+    return {'gpu': any(isinstance(r, dict) and r.get('accelerator') == 'gpu' for r in roles.values())}
+
+
 def execution_kind(parameters, mode):
     """`model-run` when a requested arm uses a served role (anything but the in-process fixtures); else `fixture`.
     The profiles are validated first, so a profile without `serving` is refused, not counted as a model run."""

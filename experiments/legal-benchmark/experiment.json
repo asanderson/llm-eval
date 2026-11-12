@@ -3,10 +3,16 @@
   "version": 1,
   "modes": [
     "smoke",
-    "retrieval"
+    "retrieval",
+    "generation",
+    "workflow",
+    "score"
   ],
   "cases": {
     "smoke": "cases/smoke.json",
-    "retrieval": "cases/retrieval.json"
+    "retrieval": "cases/retrieval.json",
+    "generation": "cases/generation.json",
+    "workflow": "cases/workflow.json",
+    "score": "cases/score.json"
   }
 }
