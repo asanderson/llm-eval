@@ -6,9 +6,14 @@ at law. Gold labels live only in the grader source set and are read by `score`, 
 """
 from __future__ import annotations
 
+import json
 import re
+import time
 
-from .contracts import INSUFFICIENCY_FLAGS, OUTPUT_VERSION, iso_date, reference_errors, validate_output, validate_structure
+from llm_eval.core.contracts import atomic_json, integer
+
+from . import authority
+from .contracts import INSUFFICIENCY_FLAGS, OUTPUT_VERSION, private_file, reference_errors, validate_output, validate_structure
 
 STOPWORDS = frozenset('a an and are as at be by for from in is it of on or that the this to was were whether with under'.split())
 # Phrases that address the reader of a document instead of describing facts. A source carrying one is flagged;
@@ -21,23 +26,12 @@ def tokens(text):
     return {t for t in re.findall(r'[a-z0-9]+', text.lower()) if t not in STOPWORDS and len(t) > 1}
 
 
-def eligible(authority, matter):
-    """(decision, reason_codes) for citing `authority` in `matter`: 'eligible', 'ineligible' or 'unknown'."""
-    reasons = []
-    day = iso_date(matter['operative_date'], 'operative_date')
-    if matter['venue'] not in authority['venues']:
-        reasons.append('wrong_venue')
-    if day < iso_date(authority['effective_from'], 'effective_from'):
-        reasons.append('not_yet_effective')
-    if authority['effective_to'] is not None and day >= iso_date(authority['effective_to'], 'effective_to'):
-        reasons.append('no_longer_effective')      # effective_to is the first day the version no longer applies
-    if authority['status'] == 'invalidated':
-        reasons.append('obsolete_status')          # unusable whatever the date, for example overruled
-    if reasons:
-        return 'ineligible', reasons
-    if authority['status'] == 'unknown':
-        return 'unknown', ['validity_unknown']
-    return 'eligible', []
+def eligible(record, matter):
+    """(decision, reason_codes) for citing `record` in `matter` under the default policy, with no jurisdiction and no
+    availability cutoff: the Task A rule. Only a compatibility shim; everything else calls `decide`."""
+    query = {'operative_date': matter['operative_date'], 'venue': matter['venue'], 'jurisdiction': None,
+             'posture': matter.get('posture', 'screening'), 'availability_cutoff': None}
+    return authority.eligible(record, query, authority.DEFAULT_POLICY)
 
 
 def retrieve(matter, corpus, top_k):
@@ -62,9 +56,9 @@ def _matches(spans, terms):
 
 
 def decide(record, matter, corpus):
-    """The one eligibility decision of the scorer, `check_gold` and the drafter, so they can never apply different rules.
-    The fixture rule ignores the corpus; a policy-aware rule replaces this one function."""
-    return eligible(record, matter)
+    """The one eligibility decision of the scorer, `check_gold` and the drafter: `authority.decide`, which retrieval,
+    citation resolution and every later verifier also call, so they can never apply different rules."""
+    return authority.decide(record, matter, corpus)
 
 
 def _governs(authority, controlling):
@@ -235,6 +229,8 @@ def check_gold(suite):
     matters = {m['matter_id']: m for m in suite['matters']['matters']}
     for g in suite['rubric']['matters']:
         matter = matters[g['matter_id']]
+        if matter.get('posture') == 'retrieval':      # a retrieval entry has no screening gold; `validate_rubric` checks it
+            continue
 
         def decision(pair):
             return decide(versions[tuple(pair)], matter, corpus)[0]
@@ -248,3 +244,59 @@ def check_gold(suite):
                          if a['authority_type'] == 'exemption' and _governs(a, controlling) and decide(a, matter, corpus)[0] == 'eligible')
         if g['reference_passages']['adverse'] != adverse:
             raise ValueError('Reference adverse authorities must be every eligible exemption of the controlling authority: ' + g['matter_id'])
+
+
+# Smoke mode hooks (the mode-module interface of `legal_benchmark`) ---------------------------------------------------
+
+PARAMETERS = {'smoke': ({'top_k'}, ('synthetic',))}
+
+
+def execution_kind(parameters, mode):
+    """The smoke runs the fixture pipeline: the only kind that maps to legacy `synthetic: true`."""
+    return 'fixture'
+
+
+def check(parameters, suite, root, mode):
+    integer(parameters.get('top_k', 3), 'top_k', high=50)
+    if any(m.get('posture', 'screening') != 'screening' for m in suite['matters']['matters']):
+        raise ValueError('The smoke mode needs screening matters')      # the reference drafter drafts screening matters only
+    return None
+
+
+def run(job, suite, output, root):
+    from . import BENCHMARK, MANIFEST
+    parameters = job['parameters']
+    gold = {g['matter_id']: g for g in suite['rubric']['matters']}
+    rows, drafts, details = [], [], []
+    for matter in suite['matters']['matters']:
+        entry = gold[matter['matter_id']]
+        started = time.perf_counter()
+        candidate = draft(matter, suite['corpus'], parameters.get('top_k', 3))
+        elapsed = time.perf_counter() - started
+        criteria = score(candidate, matter, entry, suite['corpus'])
+        expected = entry['recommendation']
+        rows.append({'task_id': matter['matter_id'], 'family_id': matter['family_id'], 'category': entry['scenario'], 'arm': 'smoke',
+                     'benchmark': BENCHMARK, 'status': 'ok', 'repetition': 0, 'warmup': False, 'synthetic': True,
+                     'execution_kind': 'fixture', 'data_class': suite['lock']['data_class'], 'elapsed_s': elapsed,
+                     'parse_status': 'valid' if criteria['schema_valid'] else 'invalid', 'review_status': 'pending_human_review',
+                     'expected_choice': expected, 'choice': candidate['recommendation'], 'decision_correct': candidate['recommendation'] == expected,
+                     'quality_check_applicable': True, 'quality_pass': all(criteria.values()),
+                     'criteria_passed': sum(criteria.values()), 'criteria_total': len(CRITERIA)})
+        drafts.append(candidate)
+        details.append({'matter_id': matter['matter_id'], 'family_id': matter['family_id'], 'arm': 'smoke', 'repetition': 0, 'status': 'ok',
+                        'grading_status': 'scored', 'criteria': criteria, 'errors': [], 'pending_dimensions': [], 'reviewed_dimensions': {},
+                        'adjudicated': [], 'gold_recommendation': expected, 'choice': candidate['recommendation'],
+                        'author_choice': candidate['recommendation'], 'complete': not entry['missing_elements'] and not entry['conflict_elements']})
+    # Candidate drafts and grader detail stay under local/. The generic report builder exports files by name at any depth,
+    # so local/ is private only because `private_file` never gives a file a name that builder scans.
+    private = private_file(output, 'candidate-outputs.jsonl'), private_file(output, 'score-detail.jsonl')
+    for path, items in ((output / 'requests.jsonl', rows), (private[0], drafts), (private[1], details)):
+        path.write_text(''.join(json.dumps(item, sort_keys=True) + '\n' for item in items), encoding='utf-8', newline='\n')
+    lock = suite['lock']
+    atomic_json(output / 'metadata.json', {
+        'schema_version': 1, 'experiment': MANIFEST['id'], 'mode': job['mode'], 'execution_kind': 'fixture', 'synthetic': True,
+        'data_class': lock['data_class'], 'benchmark_id': lock['benchmark_id'], 'suite_revision': lock['revision'],
+        'split_id': lock['split_id'], 'jurisdiction_profile': lock['jurisdiction_profile'], 'suite_lock_sha256': suite['lock_sha256'],
+        'rubric_version': suite['rubric']['rubric_version'], 'matters': len(rows), 'families': len({r['family_id'] for r in rows}),
+        'all_pass': sum(r['quality_pass'] for r in rows), 'review_required': True})
+    return {'status': 'succeeded', 'result_path': '.', 'benchmark': BENCHMARK}

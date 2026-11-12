@@ -50,12 +50,12 @@ class LegalFixtureTests(unittest.TestCase):
     def score(self, output, matter_id):
         return fixture.score(output, self.matters[matter_id], self.gold[matter_id], self.suite['corpus'])
 
-    def test_registered_with_the_smoke_mode_only(self):
+    def test_registered_with_the_smoke_and_retrieval_modes(self):
         self.assertEqual(REGISTRY['legal-benchmark'], 'llm_eval.experiments.legal_benchmark')
         self.assertIn(legal.MANIFEST, list_experiments())
         bundled = read_json(ROOT / 'experiments/legal-benchmark/experiment.json')
-        self.assertEqual((bundled['id'], bundled['version'], bundled['modes']), ('legal-benchmark', 1, ['smoke']))
-        self.assertEqual(legal.MANIFEST['modes'], ['smoke'])
+        self.assertEqual((bundled['id'], bundled['version'], bundled['modes']), ('legal-benchmark', 1, ['smoke', 'retrieval']))
+        self.assertEqual(legal.MANIFEST['modes'], ['smoke', 'retrieval'])
         # The digest that admits a suite to generic reporting is the shipped lock, which pins every suite file.
         self.assertEqual(sha256_file(LOCK), legal.SMOKE_SUITE_SHA256)
         self.assertEqual((self.suite['lock']['revision'], self.suite['rubric']['rubric_version']), ('2026-11-11.1', 'original-smoke-rubric-2'))
@@ -516,12 +516,13 @@ class SuiteLockTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Duplicate JSON key: split_id'):
                 contracts.load_suite(self.lock)
 
-    def test_optional_corpus_keys_are_type_checked_and_ignored(self):
+    def test_optional_corpus_keys_are_type_checked_and_given_meaning(self):
         optional = {'original_sha256': 'a' * 64, 'jurisdiction': 'veld-fictional-v1', 'court': None, 'weight': 'controlling',
-                    'aliases': ['VSC 18.7', 'Measures Act'], 'snapshot': None, 'review': {'reviewer_role': 'fixture'}, 'status_as_of': '2025-01-01'}
+                    'aliases': ['VSC 18.7', 'Measures Act'], 'snapshot': {'id': 's1', 'published': '2025-01-01'}, 'review': {'reviewer_role': 'fixture', 'reviewed_on': '2025-01-01'},
+                    'status_as_of': '2025-01-01'}
 
         def everything(c):
-            c.update(policy={'effective_to_inclusive': False}, availability_cutoff='2026-01-01')
+            c.update(policy={'policy_id': 'fixture-test', 'version': '1', 'effective_to_inclusive': False}, availability_cutoff='2026-01-01')
             for a in c['authorities']:
                 a.update(optional)
 
@@ -529,12 +530,13 @@ class SuiteLockTests(unittest.TestCase):
         suite, shipped = contracts.load_suite(relock(self.dir)), contracts.load_suite(LOCK)
         for matter in shipped['matters']['matters']:
             self.assertEqual(fixture.draft(matter, suite['corpus']), fixture.draft(matter, shipped['corpus']))
-        self.edit('corpus.json', lambda c: self.authority(c).update(court='veld-high-court', weight='persuasive', snapshot={'id': 's1'},
+        self.edit('corpus.json', lambda c: self.authority(c).update(court='veld-high-court', weight='persuasive', snapshot={'id': 's2', 'published': '2025-06-01'},
                                                                      review=None, status_as_of=None))
         contracts.load_suite(relock(self.dir))
         wrong = [('policy', []), ('availability_cutoff', 'soon'), ('original_sha256', 'A' * 64), ('original_sha256', 'a' * 63),
                  ('jurisdiction', 'Veld'), ('court', 5), ('weight', 'binding'), ('aliases', ['x', 'x']), ('aliases', ['']),
-                 ('aliases', 'x'), ('snapshot', 'x'), ('review', []), ('status_as_of', '2025-13-01')]
+                 ('aliases', 'x'), ('snapshot', 'x'), ('review', []), ('status_as_of', '2025-13-01'),
+                 ('snapshot', {'id': 's1'}), ('snapshot', {'id': 's1', 'published': 'soon'}), ('review', {'reviewer_role': 'fixture'})]
         for key, value in wrong:
             with self.subTest(key=key, value=value):
                 self.fresh()

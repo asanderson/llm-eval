@@ -1,0 +1,16 @@
+{
+  "id": "retrieval",
+  "parameters": {
+    "suite": "../workloads/original-smoke/suite.lock.json",
+    "synthetic": true,
+    "arms": [
+      "no-context",
+      "filters-only",
+      "lexical",
+      "lexical-eligible",
+      "reference"
+    ],
+    "top_k": 5,
+    "token_budget": 1200
+  }
+}

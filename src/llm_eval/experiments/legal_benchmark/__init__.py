@@ -1,21 +1,23 @@
 """Legal benchmark experiment: retrieval, evidence-grounded analysis and draft screening memos for human review.
 
-Only the offline `smoke` mode is registered so far: a deterministic fixture pipeline over fictional matters with
-no model, network or GPU. Later modes (retrieval, generation, workflow, score) are added as they are implemented.
+Registered modes: `smoke` (a deterministic fixture pipeline over fictional matters with no model, network or GPU) and
+`retrieval` (the retrieval arms and their metrics). Later modes (generation, workflow, score) are added as they are
+implemented. Each mode is a module that exports `PARAMETERS`, `execution_kind`, `check`, optionally `inputs`, and `run`.
 """
 from __future__ import annotations
 
+from importlib import import_module
 import json
 from pathlib import Path
-import time
 
 from llm_eval.common import sha256_file
-from llm_eval.core.contracts import atomic_json, fields, integer
+from llm_eval.core.contracts import fields
 
 from . import fixture
-from .contracts import load_suite, pinned_files, private_file
+from .contracts import load_suite, pinned_files
 
-MANIFEST = {'id': 'legal-benchmark', 'version': 1, 'modes': ['smoke'],
+MODE_MODULES = {'smoke': 'fixture', 'retrieval': 'retrieval'}
+MANIFEST = {'id': 'legal-benchmark', 'version': 1, 'modes': list(MODE_MODULES),
             'description': 'Legal retrieval, evidence-grounded analysis and draft screening memos for human review'}
 BENCHMARK = 'legal-smoke'
 # SHA-256 of experiments/legal-benchmark/workloads/original-smoke/suite.lock.json. The lock pins every suite file,
@@ -27,35 +29,58 @@ REPORTING_DISABLED = ('legal-benchmark reports are limited to the public-origina
 SCANNED_DIRECTORIES = ('model_judgment', 'reports')
 
 
+def _module(mode):
+    """The module that implements `mode`."""
+    return import_module('.' + MODE_MODULES[mode], __name__)
+
+
+def job_status(rows):
+    """One rule for every mode: a job fails only when it has no row or every row is an error. Rows with status
+    `error` or `missing` are results."""
+    return 'failed' if not rows or all(r.get('status') == 'error' for r in rows) else 'succeeded'
+
+
 def _parameters(case, mode):
-    if mode not in MANIFEST['modes']:
+    if not isinstance(mode, str) or mode not in MODE_MODULES:
         raise ValueError('Unsupported legal-benchmark mode: ' + str(mode))
-    fields(case, {'suite', 'synthetic', 'top_k'}, ['suite', 'synthetic'])
+    allowed, required = _module(mode).PARAMETERS[mode]
+    fields(case, {'suite', 'synthetic', *allowed}, ['suite', *required])
     if not isinstance(case['suite'], str):
         raise ValueError('The legal-benchmark suite must be a path string')
-    integer(case.get('top_k', 3), 'top_k', high=50)
 
 
-def _admit(case, suite):
+def _admit(case, suite, root, mode):
     """The checks of a loaded suite that `validate` and `execute` share."""
-    # smoke runs the fixture pipeline: execution_kind `fixture`, the only kind that maps to legacy `synthetic: true`.
-    if case['synthetic'] is not True:
-        raise ValueError('The smoke mode is a fixture run and must declare synthetic: true')
-    if suite['lock']['data_class'] != 'public-synthetic':
+    module = _module(mode)
+    # Only execution_kind `fixture` maps to legacy `synthetic: true`; a model run over fictional facts is a measurement.
+    if module.execution_kind(case, mode) == 'fixture':
+        if case.get('synthetic') is not True:
+            raise ValueError('The smoke mode is a fixture run and must declare synthetic: true' if mode == 'smoke'
+                             else 'A fixture run must declare synthetic: true')
+    elif case.get('synthetic', False) is not False:
+        raise ValueError('Only fixture runs may declare synthetic: true')
+    data_class = suite['lock']['data_class']
+    if mode == 'smoke' and data_class != 'public-synthetic':
         raise ValueError('The smoke mode accepts public-synthetic suites only')
-    fixture.check_gold(suite)
+    if data_class == 'private-matter':
+        raise ValueError('This mode does not accept private-matter suites')
+    fixture.check_gold(suite)      # every mode: no mode plans on gold that its own eligibility rule contradicts
+    return module.check(case, suite, root, mode)
 
 
 def validate(case, root, mode='smoke'):
     """Side-effect-free: reads and hashes the declared suite, nothing else."""
     _parameters(case, mode)
-    _admit(case, load_suite(case['suite']))
-    return None
+    return _admit(case, load_suite(case['suite']), root, mode)
 
 
 def input_files(parameters, root, mode):
-    """Every file the suite lock pins, so planner, resume and worker all check the same bytes."""
-    return [str(path) for path in pinned_files(parameters['suite'])]
+    """Every file the suite lock pins, plus the mode's own inputs, so planner, resume and worker check the same bytes."""
+    files = [str(path) for path in pinned_files(parameters['suite'])]
+    module = _module(mode)
+    if hasattr(module, 'inputs'):
+        files += [str(path) for path in module.inputs(parameters, load_suite(parameters['suite']), root, mode)]
+    return files
 
 
 def setup_platforms(parameters, mode):
@@ -101,47 +126,17 @@ def claims_benchmark(name):
 
 
 def execute(job, output, root):
-    parameters = job['parameters']
-    _parameters(parameters, job['mode'])
+    parameters, mode = job['parameters'], job['mode']
+    _parameters(parameters, mode)
     suite = _planned_suite(job)      # the only load of the run: a suite changed after planning, even relocked, fails here
-    _admit(parameters, suite)
+    _admit(parameters, suite, root, mode)
     output = Path(output)
     scanned = sorted(set(SCANNED_DIRECTORIES) & set(output.resolve().parts))
     if scanned:
         raise ValueError('Attempt path has a directory name the generic report scans: ' + scanned[0])
     if (output / 'requests.jsonl').exists():
         raise ValueError('This attempt already has request records')
-    gold = {g['matter_id']: g for g in suite['rubric']['matters']}
-    rows, drafts, details = [], [], []
-    for matter in suite['matters']['matters']:
-        entry = gold[matter['matter_id']]
-        started = time.perf_counter()
-        candidate = fixture.draft(matter, suite['corpus'], parameters.get('top_k', 3))
-        elapsed = time.perf_counter() - started
-        criteria = fixture.score(candidate, matter, entry, suite['corpus'])
-        expected = entry['recommendation']
-        rows.append({'task_id': matter['matter_id'], 'family_id': matter['family_id'], 'category': entry['scenario'], 'arm': 'smoke',
-                     'benchmark': BENCHMARK, 'status': 'ok', 'repetition': 0, 'warmup': False, 'synthetic': True,
-                     'execution_kind': 'fixture', 'data_class': suite['lock']['data_class'], 'elapsed_s': elapsed,
-                     'parse_status': 'valid' if criteria['schema_valid'] else 'invalid', 'review_status': 'pending_human_review',
-                     'expected_choice': expected, 'choice': candidate['recommendation'], 'decision_correct': candidate['recommendation'] == expected,
-                     'quality_check_applicable': True, 'quality_pass': all(criteria.values()),
-                     'criteria_passed': sum(criteria.values()), 'criteria_total': len(fixture.CRITERIA)})
-        drafts.append(candidate)
-        details.append({'matter_id': matter['matter_id'], 'family_id': matter['family_id'], 'arm': 'smoke', 'repetition': 0, 'status': 'ok',
-                        'grading_status': 'scored', 'criteria': criteria, 'errors': [], 'pending_dimensions': [], 'reviewed_dimensions': {},
-                        'adjudicated': [], 'gold_recommendation': expected, 'choice': candidate['recommendation'],
-                        'author_choice': candidate['recommendation'], 'complete': not entry['missing_elements'] and not entry['conflict_elements']})
-    # Candidate drafts and grader detail stay under local/. The generic report builder exports files by name at any depth,
-    # so local/ is private only because `private_file` never gives a file a name that builder scans.
-    private = private_file(output, 'candidate-outputs.jsonl'), private_file(output, 'score-detail.jsonl')
-    for path, items in ((output / 'requests.jsonl', rows), (private[0], drafts), (private[1], details)):
-        path.write_text(''.join(json.dumps(item, sort_keys=True) + '\n' for item in items), encoding='utf-8', newline='\n')
-    lock = suite['lock']
-    atomic_json(output / 'metadata.json', {
-        'schema_version': 1, 'experiment': MANIFEST['id'], 'mode': job['mode'], 'execution_kind': 'fixture', 'synthetic': True,
-        'data_class': lock['data_class'], 'benchmark_id': lock['benchmark_id'], 'suite_revision': lock['revision'],
-        'split_id': lock['split_id'], 'jurisdiction_profile': lock['jurisdiction_profile'], 'suite_lock_sha256': suite['lock_sha256'],
-        'rubric_version': suite['rubric']['rubric_version'], 'matters': len(rows), 'families': len({r['family_id'] for r in rows}),
-        'all_pass': sum(r['quality_pass'] for r in rows), 'review_required': True})
-    return {'status': 'succeeded', 'result_path': '.', 'benchmark': BENCHMARK}
+    output.mkdir(parents=True, exist_ok=True)
+    result = _module(mode).run(job, suite, output, root)
+    rows = [json.loads(line) for line in (output / 'requests.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+    return {**result, 'status': job_status(rows)}
