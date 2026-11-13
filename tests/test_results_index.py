@@ -270,6 +270,20 @@ class LegalIndexTests(unittest.TestCase):
                                          'decisions', 'score', 'wall_mid', 'tokens_mid', 'backend_rss_gib', 'gpu_gib', 'report',
                                          'execution_kind', 'data_class', 'cohorts', 'class', 'ranked'])
 
+    def test_a_job_with_several_cohorts_gets_one_row_with_the_job_total(self):
+        # The summary rows are per arm and name no cohort, so the count beside a cohort digest would not be that cohort's.
+        from llm_eval.reporting.index import cohort_results
+        job = legal_job('m1', 'model-run', 'ollama', 'deepseek-r1-32b', mode='retrieval')
+        job['parameters']['cohorts'] = ['1' * 64, '2' * 64]
+        legal_bundle(self.root, 'campaign-m-legal', '2026-11-11T09:00:00+00:00', [job],
+                     [row('m1', 'lexical-eligible', 5.0, 30.0, quality=1.0), row('m1', 'no-context', 5.0, 30.0, quality=0.0)])
+        text = cohort_results(collect(self.root), '', '../')
+        rows = [line for line in text.splitlines() if 'retrieval' in line]
+        self.assertEqual(len(rows), 1)
+        self.assertIn('1' * 12 + ', ' + '2' * 12, rows[0])
+        self.assertIn('| 9/18 |', rows[0])
+        self.assertIn('| Checks passed, all cohorts of the job |', text)
+
     def test_legal_results_are_listed_by_class_cohort_os_and_runtime(self):
         from llm_eval.reporting.index import cohort_results
         self.assertEqual(cohort_results(collect(self.root), '', '../'), '')

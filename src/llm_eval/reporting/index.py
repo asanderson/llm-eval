@@ -300,7 +300,8 @@ def navigation(records, index_prefix, report_prefix):
 
 def cohort_results(records, index_prefix, report_prefix):
     """Results of experiments with a report projection, one table per class (fixture, measured, score-only, then invalid and
-    legacy bundles), one row per job and cohort. Empty when no record has a class."""
+    legacy bundles), one row per job with every cohort of the job. The summary rows of a job name no cohort, so the count
+    is the job's total and is shown once, not beside each cohort. Empty when no record has a class."""
     classed = [r for r in records if r.get('class')]
     if not classed:
         return ''
@@ -310,14 +311,14 @@ def cohort_results(records, index_prefix, report_prefix):
         chosen = [r for r in classed if r['class'] == name]
         if not chosen:
             continue
-        lines += ['', f'**{title}** ({name})', '', '| Experiment | Cohort | Mode | OS | Harness | Model | Status | Checks passed | Run |',
+        lines += ['', f'**{title}** ({name})', '',
+                  '| Experiment | Cohorts | Mode | OS | Harness | Model | Status | Checks passed, all cohorts of the job | Run |',
                   '|---|---|---|---|---|---|---|---:|---|']
         for r in chosen:
-            for cohort in r['cohorts'] or [None]:
-                lines.append('| ' + ' | '.join([
-                    _link('experiment', r['experiment'], index_prefix), _cell(None if cohort is None else str(cohort)[:12]), _cell(r['mode']),
-                    _cell(r['os']), _link('harness', r['harness'], index_prefix), _link('model', r['model'], index_prefix),
-                    f"{_cell(r['status'])} ({name})", _cell(r['quality']), f"[{r['date']}]({report_prefix}{r['report']})"]) + ' |')
+            lines.append('| ' + ' | '.join([
+                _link('experiment', r['experiment'], index_prefix), _cell(', '.join(str(c)[:12] for c in r['cohorts']) or None), _cell(r['mode']),
+                _cell(r['os']), _link('harness', r['harness'], index_prefix), _link('model', r['model'], index_prefix),
+                f"{_cell(r['status'])} ({name})", _cell(r['quality']), f"[{r['date']}]({report_prefix}{r['report']})"]) + ' |')
     return '\n'.join(lines)
 
 
