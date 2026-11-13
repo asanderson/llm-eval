@@ -131,3 +131,17 @@ class ProtocolTests(unittest.TestCase):
             with self.subTest(url=url), self.assertRaises(ValueError):
                 endpoint_parts(url)
         self.assertEqual(endpoint_parts("http://[::1]:8000/v1").hostname, "::1")
+
+    def test_endpoint_has_one_spelling(self):
+        # urlsplit forgives every one of these, and each used to pass as a loopback endpoint.
+        for url in [" http://127.0.0.1:8000/v1", "http://127.0.0.1:8000/v1\n", "ht\ttp://127.0.0.1:8000/v1",
+                    "http://127.0.0.1:8000/v1 x", "HTTP://127.0.0.1:8000/v1",
+                    "http://127.0.0.1:99999/v1", "http://127.0.0.1:0/v1", "http://127.0.0.1:/v1", "http://127.0.0.1:080/v1",
+                    "http://[::ffff:127.0.0.1]:8000/v1", "http://[::1%25eth0]:8000/v1", "http://[0:0:0:0:0:0:0:1]:8000/v1",
+                    b"http://127.0.0.1:8000/v1", None]:
+            with self.subTest(url=url), self.assertRaises(ValueError):
+                endpoint_parts(url)
+        for url, port in [("http://127.0.0.1/v1", None), ("http://127.0.0.1:8000/v1", 8000), ("http://127.0.0.2:65535", 65535),
+                          ("http://[::1]/v1", None), ("http://[::1]:8000/v1", 8000)]:
+            with self.subTest(url=url):
+                self.assertEqual(endpoint_parts(url).port, port)
