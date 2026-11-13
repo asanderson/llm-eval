@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "id": "legal-evaluation-windows",
+  "inventory": "inventory.json",
+  "execution": {
+    "max_parallel_jobs": 1,
+    "measurement_isolation": "physical-host",
+    "on_failure": "continue-independent"
+  },
+  "phases": [
+    {
+      "id": "retrieval",
+      "experiments": [
+        {
+          "id": "legal-benchmark",
+          "version": 1,
+          "mode": "retrieval",
+          "cases": [
+            "../retrieval-case.json"
+          ],
+          "hardware_configs": [
+            "raider-windows"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generation",
+      "depends_on": [
+        "retrieval"
+      ],
+      "experiments": [
+        {
+          "id": "legal-benchmark",
+          "version": 1,
+          "mode": "generation",
+          "cases": [
+            "../generation-case.json"
+          ],
+          "hardware_configs": [
+            "raider-windows"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "workflow",
+      "depends_on": [
+        "generation"
+      ],
+      "experiments": [
+        {
+          "id": "legal-benchmark",
+          "version": 1,
+          "mode": "workflow",
+          "cases": [
+            "../workflow-case.json"
+          ],
+          "hardware_configs": [
+            "raider-windows"
+          ]
+        }
+      ]
+    }
+  ],
+  "reporting": {
+    "on_experiment_end": true,
+    "raw_format": "jsonl.gz",
+    "summary_formats": [
+      "markdown",
+      "json",
+      "csv"
+    ],
+    "publish": {
+      "mode": "none",
+      "repository": "asanderson/llm-eval",
+      "base_branch": "main",
+      "docs_root": "docs/results"
+    }
+  }
+}
