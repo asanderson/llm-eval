@@ -89,7 +89,8 @@ def launch_spec(config, state, workdir):
             raise ValueError('Strata config.exe must point to the executable in installation state')
         if not config.get('reviewed_strata_config'):
             raise ValueError('Review prepared Strata engine arguments and set reviewed_strata_config=true')
-        argv=[py,str(Path(state['source'])/'serve/server.py'),'--config',engine_config,'--host',host,'--port',str(port)]
+        # Upstream defaults --engine to its scripted mock engine, which answers without loading the model.
+        argv=[py,str(Path(state['source'])/'serve/server.py'),'--engine','strata','--config',engine_config,'--host',host,'--port',str(port)]
         if config.get('api_key_env'):
             key=os.environ.get(config['api_key_env'])
             if not key:raise ValueError('Strata API key environment variable is unset')
@@ -119,7 +120,7 @@ def launch_spec(config, state, workdir):
     protected={'--host','--port','--listen','--bind','--model','--model-path','--model_path','-m',
                '--served-model-name','--alias','--api-key','--api_key','--trust-remote-code','--config','--script',
                '--mcp-config','--before-load','--open','--websearch','--identifier','--context-length','--bind',
-               '--ttl','--lms','--state','--artifact-id','--expected-version','--import-mode'}
+               '--ttl','--lms','--state','--artifact-id','--expected-version','--import-mode','--engine'}
     if any(v.split('=',1)[0] in protected for v in extra):
         raise ValueError('Extra engine arguments cannot override controlled model, network, or execution options')
     argv.extend(extra)
