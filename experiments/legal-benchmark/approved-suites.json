@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "suites": {
+    "0eafda8e9989c52ba78fda83e5c487baf350bf7e29e602578de7a80fa9b67c33": {
+      "benchmark_id": "legal-original-packets",
+      "fixture_export": true
+    },
+    "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae": {
+      "benchmark_id": "legal-original-smoke",
+      "fixture_export": true
+    }
+  }
+}

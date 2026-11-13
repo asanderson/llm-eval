@@ -1,0 +1,7 @@
+{
+  "id": "legal-offload",
+  "parameters": {
+    "config": "legal-offload-run.json",
+    "server_mode": "external"
+  }
+}

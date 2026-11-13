@@ -1,0 +1,27 @@
+{
+  "targets": {
+    "raider": {
+      "transport": "local",
+      "physical_host_id": "raider",
+      "resource_hosts": [
+        "legal-service-host"
+      ]
+    },
+    "legal-service-host": {
+      "transport": "ssh",
+      "physical_host_id": "legal-service-host",
+      "host": "REPLACE_WITH_SSH_HOST",
+      "python": "REPLACE_WITH_REMOTE_PYTHON",
+      "repo_root": "REPLACE_WITH_REMOTE_REPO_ROOT",
+      "work_root": "REPLACE_WITH_REMOTE_WORK_ROOT",
+      "available": false
+    }
+  },
+  "hardware_configs": {
+    "raider-windows": {
+      "target": "raider",
+      "hardware_profile": "msi-raider-18-hx-ai",
+      "os_id": "windows-11-native"
+    }
+  }
+}

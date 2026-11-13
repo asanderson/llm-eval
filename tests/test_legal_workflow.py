@@ -226,7 +226,10 @@ def subset_suite(directory, matter_ids, edit=None):
 
 def job_for(lock, parameters, mode='generation', job_id='legal-job-1'):
     lock = str(lock)
+    # A planned job reserves the physical host of its target; served roles run on that host (package E's `check_job`).
     return {'job_id': job_id, 'experiment_id': 'legal-benchmark', 'mode': mode, 'parameters': {'suite': lock, **parameters},
+            'target': {'transport': 'local', 'physical_host_id': 'legal-test-host'}, 'resources': ['legal-test-host'],
+            'hardware': {'hardware_profile': 'msi-raider-18-hx-ai', 'os_id': 'ubuntu-26.04-native'},
             'input_files': [{'path': lock, 'sha256': sha256_file(lock)}]}
 
 

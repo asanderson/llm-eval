@@ -1,0 +1,7 @@
+{
+  "id": "legal-score",
+  "parameters": {
+    "suite": "../../../experiments/legal-benchmark/workloads/original-smoke/suite.lock.json",
+    "output_manifest": "REPLACE_WITH_ATTEMPT_DIR/local/output-manifest.json"
+  }
+}

@@ -115,7 +115,9 @@ def relock(directory, **changes):
 
 
 def job_for(lock, parameters, mode='retrieval'):
-    return {'mode': mode, 'parameters': {'suite': str(lock), **parameters},
+    # A planned job reserves the physical host of its target; served roles run on that host (package E's `check_job`).
+    return {'mode': mode, 'parameters': {'suite': str(lock), **parameters}, 'target': {'transport': 'local', 'physical_host_id': 'legal-test-host'},
+            'resources': ['legal-test-host'], 'hardware': {'hardware_profile': 'msi-raider-18-hx-ai', 'os_id': 'ubuntu-26.04-native'},
             'input_files': [{'path': str(lock), 'sha256': sha256_file(lock)}]}
 
 
@@ -803,7 +805,7 @@ class ArmTests(unittest.TestCase):
         self.assertEqual(roles['embedder']['profile_sha256'], profiles.profile_digest(EMBEDDER))
         self.assertEqual(set(roles['embedder']), {'profile_sha256', 'role', 'serving', 'capability', 'platform', 'backend_version', 'model', 'model_revision',
                                                   'artifact_sha256', 'quantization', 'protocol', 'accelerator', 'context_tokens', 'max_output_tokens',
-                                                  'dimensions', 'qualified', 'serving_profile_sha256'})
+                                                  'dimensions', 'qualified', 'qualified_by_attestation', 'serving_profile_sha256'})
         self.assertEqual(metadata['retrieval'], {**metadata['retrieval'], 'backend': 'memory', 'top_k': 4, 'token_budget': 1200, 'tokenizer': 'legal-terms-1',
                                                  'chunking': 'span', 'embedder_sha256': profiles.profile_digest(EMBEDDER),
                                                  'reranker_sha256': profiles.profile_digest(RERANKER)})
@@ -956,7 +958,8 @@ class ProfileTests(unittest.TestCase):
             profiles.validate_role({**profile, 'max_output_tokens': 8192}, 'generator')      # must be below the context
         with self.assertRaises(ValueError):
             profiles.validate_role({k: v for k, v in profile.items() if k != 'accelerator'}, 'generator')
-        with self.assertRaisesRegex(ValueError, 'Role qualification is not available yet'):
+        # Package E: a qualification names a locked serving profile, which is loaded and bound (tests/test_legal_routing.py).
+        with self.assertRaisesRegex(ValueError, 'Locked serving profile not found'):
             profiles.validate_role({**profile, 'qualification': {'serving_profile': 'q.json'}}, 'generator')
         self.assertEqual(profiles.validate_role({**profile, 'qualification': None}, 'generator')['qualification'], None)
         managed = {'suite': str(LOCK), 'arms': ['dense'], 'roles': {'embedder': {**external('embedder'), 'serving': 'managed'}}}

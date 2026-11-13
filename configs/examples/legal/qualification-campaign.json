@@ -1,0 +1,43 @@
+{
+  "schema_version": 2,
+  "id": "legal-qualification",
+  "inventory": "inventory.json",
+  "execution": {
+    "max_parallel_jobs": 1,
+    "measurement_isolation": "physical-host",
+    "on_failure": "continue-independent"
+  },
+  "phases": [
+    {
+      "id": "qualify",
+      "experiments": [
+        {
+          "id": "model-offloading",
+          "version": 1,
+          "mode": "category-smoke",
+          "cases": [
+            "legal-offload-case.json"
+          ],
+          "hardware_configs": [
+            "raider-windows"
+          ]
+        }
+      ]
+    }
+  ],
+  "reporting": {
+    "on_experiment_end": true,
+    "raw_format": "jsonl.gz",
+    "summary_formats": [
+      "markdown",
+      "json",
+      "csv"
+    ],
+    "publish": {
+      "mode": "none",
+      "repository": "asanderson/llm-eval",
+      "base_branch": "main",
+      "docs_root": "docs/results"
+    }
+  }
+}
