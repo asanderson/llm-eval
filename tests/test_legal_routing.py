@@ -721,7 +721,8 @@ class RoutingTests(RoutedCase):
         self.assertEqual([f['path'] for f in manifest['files']], sorted(f['path'] for f in manifest['files']))
         plan = self.plan('score', 'score', {'suite': 'suite/suite.lock.json', 'output_manifest': str(attempt / 'local/output-manifest.json')})
         (job,) = plan['jobs']
-        self.assertIn(str(attempt / 'local/route-decisions.jsonl'), {f['path'] for f in job['input_files']})
+        # The plan records resolved paths; the temporary directory can be an 8.3 short name on Windows.
+        self.assertIn(str((attempt / 'local/route-decisions.jsonl').resolve()), {f['path'] for f in job['input_files']})
         scored = self.run_job(job, 'score')
         source, rows = lines(attempt / 'requests.jsonl'), lines(scored / 'requests.jsonl')
         self.assertEqual(len(rows), len(source))
@@ -846,12 +847,13 @@ class RoutingTests(RoutedCase):
             return self.plan(name, 'generation', {'suite': str(SMOKE), 'arms': ['no-context', 'lexical-eligible'], 'roles': plan_roles, 'selector': selector})
         (job,) = plan({**served(abstain_threshold=threshold), 'calibration': calibration})['jobs']
         recorded = {f['path'] for f in job['input_files']}
-        self.assertIn(str(self.path / 'calibration.json'), recorded)
+        self.assertIn(str((self.path / 'calibration.json').resolve()), recorded)
         self.assertTrue({str(p) for p in contracts.pinned_files(PACKETS)} <= recorded)
         pinned = workflow().inputs(job['parameters'], smoke, ROOT, 'generation')
         self.assertEqual(pinned[:len(contracts.pinned_files(PACKETS))], [str(p) for p in contracts.pinned_files(PACKETS)])
         for attempt in calibration_attempts():      # both calibration attempts: every file their manifests list, and result.json
-            listed = {str(attempt / f['path']) for f in read_json(attempt / 'local/output-manifest.json')['files']} | {str(attempt / 'result.json')}
+            attempt = attempt.resolve()
+            listed ={str(attempt / f['path']) for f in read_json(attempt / 'local/output-manifest.json')['files']} | {str(attempt / 'result.json')}
             self.assertTrue(listed <= set(pinned))
             self.assertTrue(listed | {str(attempt / 'local/output-manifest.json')} <= recorded)
         self.assertEqual(workflow().inputs({**job['parameters'], 'selector': CATEGORY}, None, ROOT, 'generation'), [])
@@ -2075,7 +2077,7 @@ class ReReviewTests(TempCase):
         roles = {'generator': generator(), 'selector': selector_role()}
         (job,) = self.plan('honest', 'generation', {'suite': str(SMOKE), 'arms': ['no-context', 'lexical-eligible'], 'roles': roles,
                                                     'selector': {**served(abstain_threshold=record['abstain_threshold']), 'calibration': block}})['jobs']
-        self.assertIn(str(Path(block['routed']['output_manifest'])), {f['path'] for f in job['input_files']})
+        self.assertIn(str(Path(block['routed']['output_manifest']).resolve()), {f['path'] for f in job['input_files']})
         # Item 4: the routed calibration attempt must have run without a threshold or required confidence.
         routed, fallback = calibration_attempts()
         with FakeSelector(lambda body: by_question(body, {'kiln': 'none'}, 0.8)) as selector, FakeGenerator('{}') as fake, NO_GPU:
