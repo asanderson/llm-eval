@@ -50,12 +50,12 @@ class LegalFixtureTests(unittest.TestCase):
     def score(self, output, matter_id):
         return fixture.score(output, self.matters[matter_id], self.gold[matter_id], self.suite['corpus'])
 
-    def test_registered_with_the_smoke_and_retrieval_modes(self):
+    def test_registered_with_the_five_modes(self):
         self.assertEqual(REGISTRY['legal-benchmark'], 'llm_eval.experiments.legal_benchmark')
         self.assertIn(legal.MANIFEST, list_experiments())
         bundled = read_json(ROOT / 'experiments/legal-benchmark/experiment.json')
-        self.assertEqual((bundled['id'], bundled['version'], bundled['modes']), ('legal-benchmark', 1, ['smoke', 'retrieval']))
-        self.assertEqual(legal.MANIFEST['modes'], ['smoke', 'retrieval'])
+        self.assertEqual((bundled['id'], bundled['version'], bundled['modes']), ('legal-benchmark', 1, ['smoke', 'retrieval', 'generation', 'workflow', 'score']))
+        self.assertEqual(legal.MANIFEST['modes'], ['smoke', 'retrieval', 'generation', 'workflow', 'score'])
         # The digest that admits a suite to generic reporting is the shipped lock, which pins every suite file.
         self.assertEqual(sha256_file(LOCK), legal.SMOKE_SUITE_SHA256)
         self.assertEqual((self.suite['lock']['revision'], self.suite['rubric']['rubric_version']), ('2026-11-11.1', 'original-smoke-rubric-2'))
@@ -699,12 +699,12 @@ class LegalCampaignTests(unittest.TestCase):
         self.assertEqual(sorted(p.name for p in self.path.iterdir()), ['campaign.json', 'case.json', 'inventory.json', 'suite'])
 
     def test_invalid_cases_modes_and_private_data_are_rejected_at_plan(self):
-        self.campaign['phases'][0]['experiments'][0]['mode'] = 'generation'
+        self.campaign['phases'][0]['experiments'][0]['mode'] = 'live-review'
         with self.assertRaisesRegex(ValueError, 'Unsupported experiment version or mode'):
             self.plan()
         self.campaign['phases'][0]['experiments'][0]['mode'] = 'smoke'
         with self.assertRaisesRegex(ValueError, 'Unsupported legal-benchmark mode'):
-            legal.validate(self.case['parameters'], ROOT, 'workflow')
+            legal.validate(self.case['parameters'], ROOT, 'draft')
         for parameters, message in (({'suite': 'suite/suite.lock.json', 'synthetic': False}, 'synthetic: true'),
                                     ({'suite': 'suite/suite.lock.json'}, 'Missing fields'),
                                     ({'suite': 'suite/suite.lock.json', 'synthetic': True, 'endpoint': 'http://127.0.0.1:1'}, 'Unknown fields'),

@@ -43,10 +43,19 @@ def configured_endpoint(url, network=None):
 CONNECT_TIMEOUT_S = 30
 
 
-def request_events(url, payload, protocol, timeout_s, api_key_env=None, network=None):
+class IncompleteStream(RuntimeError):
+    """The stream ended without a completion marker or finish reason."""
+
+
+class ToolCallRefused(ValueError):
+    """A reply carried a tool call while the config sets `refuse_tool_calls`."""
+
+
+def request_events(url, payload, protocol, timeout_s, api_key_env=None, network=None, connect_timeout_s=None):
     parts = configured_endpoint(url, network)
     connection = http.client.HTTPSConnection if parts.scheme == 'https' else http.client.HTTPConnection
-    conn = connection(parts.hostname, parts.port or (443 if parts.scheme == 'https' else 80), timeout=min(timeout_s, CONNECT_TIMEOUT_S))
+    conn = connection(parts.hostname, parts.port or (443 if parts.scheme == 'https' else 80),
+                      timeout=min(timeout_s, connect_timeout_s or CONNECT_TIMEOUT_S))
     headers = {"Content-Type": "application/json", "Accept": "text/event-stream"}
     if api_key_env:
         key = os.environ.get(api_key_env)
@@ -160,12 +169,16 @@ class HTTPAdapter:
         backend_decode_tps = backend_prefill_tps = backend_load_s = None
         done = False
         finish_reason = None
-        for event in request_events(c["endpoint"], payload, self.protocol, c["timeout_s"], c.get("api_key_env"), c.get("network")):
+        refuse = c.get("refuse_tool_calls")
+        for event in request_events(c["endpoint"], payload, self.protocol, c["timeout_s"], c.get("api_key_env"), c.get("network"),
+                                    connect_timeout_s=c.get("connect_timeout_s")):
             if event.get("error"):
                 raise RuntimeError("Backend reported an error (body omitted)")
             now = time.perf_counter()
             if self.protocol == "ollama":
                 delta = event.get("message", {})
+                if refuse and delta.get("tool_calls"):
+                    raise ToolCallRefused("Reply carried a tool call")
                 visible = delta.get("content", "") or ""
                 hidden = delta.get("thinking", "") or ""
                 done = done or event.get("done", False)
@@ -183,6 +196,8 @@ class HTTPAdapter:
                 choices = event.get("choices", [])
                 choice = choices[0] if choices else {}
                 delta = choice.get("delta", {})
+                if refuse and (delta.get("tool_calls") or delta.get("function_call")):
+                    raise ToolCallRefused("Reply carried a tool call")
                 visible = delta.get("content", "") or ""
                 hidden = delta.get("reasoning_content", delta.get("reasoning", "")) or ""
                 finish_reason = choice.get("finish_reason") or finish_reason
@@ -211,7 +226,7 @@ class HTTPAdapter:
             content.append(visible)
             reasoning.append(hidden)
         if not done:
-            raise RuntimeError("Incomplete stream: no completion marker or finish reason")
+            raise IncompleteStream("Incomplete stream: no completion marker or finish reason")
         elapsed = time.perf_counter() - start
         return {"text": "".join(content), "reasoning_chars": sum(map(len, reasoning)),
                 "elapsed_s": elapsed, "first_output_s": first, "first_visible_s": first_visible,

@@ -153,6 +153,17 @@ def json_request(profile, payload, allowed) -> object:
         events.close()
 
 
+TOKEN_SAFETY = 1.5        # model tokens per whitespace token, used by the context guards
+
+
+def adapter_config(profile) -> dict:
+    """The shared `adapters.HTTPAdapter` config of a chat role: both deadlines, usage requested, tool calls refused. No
+    `network` key (legal roles are local) and no `request_options` (the payload is the adapter's)."""
+    return {'protocol': profile['protocol'], 'endpoint': profile['endpoint'], 'api_key_env': profile.get('api_key_env'),
+            'served_model': profile['model'], 'timeout_s': profile['timeout_s'], 'connect_timeout_s': profile.get('connect_timeout_s', 10),
+            'context_tokens': profile['context_tokens'], 'request_usage': True, 'refuse_tool_calls': True}
+
+
 def check_revisions(roles) -> None:
     for profile in (roles or {}).values():
         for key in ('model_revision', 'backend_version'):

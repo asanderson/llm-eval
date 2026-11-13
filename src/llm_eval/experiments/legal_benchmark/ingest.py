@@ -60,7 +60,8 @@ QUOTE_START = re.compile(r'On .+ wrote:|-----Original Message-----')
 MARKDOWN = frozenset('\\`*_{}[]()#+-!|~@')      # `@`: GFM turns an email address or mailto: into a link
 # Line and paragraph separators, bidirectional marks, embeddings, overrides and isolates, the byte order mark,
 # next line, vertical tab and form feed.
-INVISIBLE = re.compile('[\u2028\u2029\u202a-\u202e\u2066-\u2069\u200e\u200f\u061c\ufeff\u0085\x0b\x0c]')
+INVISIBLE = re.compile('[\u2028\u2029\u202a-\u202e\u2066-\u2069\u200e\u200f\u061c\ufeff\u0085\x0b\x0c'
+                       '\u200b\u200c\u200d\u2060\u00ad\u180e\u034f\u115f\u3164\U000e0000-\U000e007f]')
 
 
 def _sha(data):

@@ -34,6 +34,7 @@ ELEMENT_STATUSES = ('supported', 'contradicted', 'negated', 'missing')
 CLAIM_STATUSES = ('supported', 'qualified', 'insufficient')
 SOURCE_SETS = ('candidate', 'oracle', 'grader', 'review')
 ADVERSE_STATUSES = ('established', 'not_established')
+ISSUE_KINDS = ('offence', 'defence')
 VARIANTS = ('base', 'paired')
 FLAG_CODES = ('untrusted_instruction_in_source', 'insufficient_authority', 'insufficient_evidence', 'authority_validity_unknown')
 INSUFFICIENCY_FLAGS = FLAG_CODES[1:]
@@ -788,6 +789,21 @@ def validate_structure(output, matter):
         raise ValueError('Malformed candidate output') from None
 
 
+ISSUE_KEYS = ('issue_id', 'question', 'authority_id', 'version', 'kind')
+
+
+def _issue(issue, keys=ISSUE_KEYS):
+    """One issue of candidate output v1 (or of analysis v1, whose issues have no `kind`)."""
+    fields(issue, keys, ['issue_id', 'question'])
+    _identifier(issue['issue_id'], 'issue_id'); _text(issue['question'], 'question')
+    if 'kind' in issue and issue['kind'] not in ISSUE_KINDS:      # optional: keeps defence theories apart from offences
+        raise ValueError('Unknown issue kind')
+    if ('authority_id' in issue) != ('version' in issue):
+        raise ValueError('An issue names authority_id and version together or neither')
+    if 'authority_id' in issue:
+        _identifier(issue['authority_id'], 'authority_id'); _identifier(issue['version'], 'version')
+
+
 def _structure(output, matter):
     names = ['schema_version', 'matter_id', 'recommendation', 'issues', 'elements', 'claims', 'material_conflicts',
              'adverse_authorities', 'missing_information', 'verification_flags', 'review_required']
@@ -803,12 +819,7 @@ def _structure(output, matter):
     for name in names[3:10]:
         _items(output[name], name)
     for issue in output['issues']:
-        fields(issue, ['issue_id', 'question', 'authority_id', 'version'], ['issue_id', 'question'])
-        _identifier(issue['issue_id'], 'issue_id'); _text(issue['question'], 'question')
-        if ('authority_id' in issue) != ('version' in issue):
-            raise ValueError('An issue names authority_id and version together or neither')
-        if 'authority_id' in issue:
-            _identifier(issue['authority_id'], 'authority_id'); _identifier(issue['version'], 'version')
+        _issue(issue)
     elements = set()
     for element in output['elements']:
         fields(element, ['element_id', 'status', 'evidence_span_ids', 'adverse_span_ids'],

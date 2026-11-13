@@ -700,6 +700,9 @@ class VisibilityTests(unittest.TestCase):
         self.assertEqual(ingest.escape('\tx'), '&#9;x')
         self.assertEqual(ingest.escape('a\u200eb\u200fc\u061cd\ufeffe\u0085f\x0bg\x0ch'),
                          'a\ufffdb\ufffdc\ufffdd\ufffde\ufffdf\ufffdg\ufffdh')
+        hidden = '\u200b\u200c\u200d\u2060\u00ad\u180e\u034f\u115f\u3164\U000e0000\U000e0041\U000e007f'
+        self.assertEqual(ingest.escape('x'.join(hidden)), 'x'.join('\ufffd' * len(hidden)))
+        self.assertEqual(ingest.escape('zero\u200bwidth'), 'zero\ufffdwidth')
         samples = ["the respondent's boat", '<b>bold</b> & &amp; \\ `code` [x](y) # h', 'https://e.invalid and <http://e.invalid>',
                    '1. item', 'a | b ~ c * d _ e', '"quoted" & #1', 'mail a@b.example or mailto:a@b.example', '    four spaces first',
                    '1.5 kg delivered to Mr. Smith on 2025-05-02']
