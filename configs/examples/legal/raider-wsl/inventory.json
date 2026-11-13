@@ -1,0 +1,16 @@
+{
+  "targets": {
+    "raider": {
+      "transport": "local",
+      "physical_host_id": "raider",
+      "lock_root": "REPLACE_WITH_SHARED_WINDOWS_LOCK_ROOT"
+    }
+  },
+  "hardware_configs": {
+    "raider-wsl": {
+      "target": "raider",
+      "hardware_profile": "msi-raider-18-hx-ai",
+      "os_id": "windows-11-wsl2-ubuntu-26.04"
+    }
+  }
+}

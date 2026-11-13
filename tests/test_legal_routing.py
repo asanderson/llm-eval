@@ -1589,7 +1589,9 @@ class ReadinessTests(TempCase):
 
 class ExampleTests(TempCase):
     def test_legal_examples_plan_without_publication(self):
-        names = sorted(p.name for p in EXAMPLES.iterdir())
+        # The per-host directories hold the evaluation campaign for each OS (tests/test_legal_examples.py checks them).
+        self.assertEqual(sorted(p.name for p in EXAMPLES.iterdir() if p.is_dir()), ['raider-ubuntu', 'raider-windows', 'raider-wsl'])
+        names = sorted(p.name for p in EXAMPLES.iterdir() if p.is_file())
         self.assertEqual(names, sorted(['README.md', 'inventory.json', 'inventory-separate-service.json', 'qualification-campaign.json', 'legal-offload-case.json',
                                         'legal-offload-run.json', 'evaluation-campaign.json', 'retrieval-case.json', 'generation-case.json', 'workflow-case.json',
                                         'score-campaign.json', 'score-case.json', 'routing-replay-campaign.json', 'routing-replay-case.json']))

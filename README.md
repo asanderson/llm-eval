@@ -6,6 +6,7 @@ A reproducible lab for running **versioned LLM experiments** across hardware con
 |---|---|---|
 | Model offloading | Quality, latency, throughput, and CPU/GPU/disk placement for models exceeding GPU VRAM | [Original experiment and model catalog](experiments/model-offloading/README.md) |
 | LLM routing | Decision accuracy, replay selection quality, and live downstream quality/latency/API cost | [Routing guide](experiments/llm-routing/README.md) |
+| Legal benchmark | Retrieval of applicable law and source-grounded draft screening memos for human review, over a fictional jurisdiction; fixtures only so far, host measurements pending | [Legal benchmark guide](experiments/legal-benchmark/README.md) |
 
 The original target is the MSI Raider 18 HX AI with RTX 5090 Laptop 24 GiB, 64 GiB RAM, and native Ubuntu, native Windows, or WSL. Additional machines use their own profiles and execution targets. **Fixture tests are not real hardware benchmarks.** See the [validation record](docs/VALIDATION.md) for hardware acceptance gates.
 
@@ -66,6 +67,7 @@ llm-eval publish-results --input results/campaign-EXAMPLE/experiments/EXPERIMENT
 - [Campaigns, hardware inventories, SSH execution and recovery](docs/CAMPAIGNS.md)
 - [Report generation and results pull requests](docs/RESULTS.md)
 - [Add a new experiment](docs/NEW_EXPERIMENT.md)
+- [Legal benchmark walkthrough](docs/LEGAL_BENCHMARK_WALKTHROUGH.md): offload calibration, locked serving profile, routing calibration and replay, frozen legal evaluation and local report
 - [Original platform setup/run workflows](docs/WORKFLOWS.md)
 - [LiveBench integration](docs/LIVEBENCH.md) and [nightly LiveBench model discovery](docs/MODEL_DISCOVERY.md)
 - [Model catalog](docs/MODELS.md), [platforms](docs/PLATFORMS.md), [methodology](docs/METHODOLOGY.md), [security](docs/SECURITY.md)

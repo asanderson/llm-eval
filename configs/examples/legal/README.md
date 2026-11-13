@@ -2,7 +2,7 @@
 
 Example campaign files for the three-experiment flow of the `legal-benchmark` experiment. Nothing in this directory is a measurement: every number, revision and endpoint is a placeholder or a fixture default, an example value is not a measurement, and no result produced from these files has been recorded here.
 
-Their physical host id is `raider`. `llm-eval plan --campaign <file>` is read-only and may be run anywhere; `setup`, `run` and `resume` are for the operator on the target host, one campaign at a time.
+Every inventory here names the target `raider` with `physical_host_id: raider`, like the generic Raider examples, so a legal campaign and every other Raider campaign exclude each other: `setup` and `run` of any campaign here reserve the `raider` host lock. What keeps a copied example from measuring by accident: every role's `model_revision` and `backend_version` is a `REPLACE_WITH_` value, so the `generation` and `workflow` jobs stop at `profiles.check_revisions` before any request, and `publish.mode` is `none`; the `retrieval` phase is a fixture run and does run. `qualification-campaign.json` is a real `model-offloading` campaign: `setup` installs the serving runtime its run file names. `llm-eval plan --campaign FILE` is read-only and may be run anywhere; `setup`, `run` and `resume` are for the operator on the target host, one campaign at a time. The [legal benchmark walkthrough](../../../docs/LEGAL_BENCHMARK_WALKTHROUGH.md) runs every stage.
 
 ## Files
 
@@ -14,6 +14,7 @@ Their physical host id is `raider`. `llm-eval plan --campaign <file>` is read-on
 | `evaluation-campaign.json`, `retrieval-case.json`, `generation-case.json`, `workflow-case.json` | The frozen legal evaluation: `retrieval` (a fixture run), then `generation`, then `workflow`. External, GPU-served roles on a loopback endpoint with placeholder revisions and `"qualification": null`. Plans as shipped; a run stops at the placeholder revisions |
 | `score-campaign.json`, `score-case.json` | Template: `score` over the output manifest of an earlier generation or workflow attempt. Does not plan until `REPLACE_WITH_...` is filled |
 | `routing-replay-campaign.json`, `routing-replay-case.json` | Template: an `llm-routing` `replay` over an exported routing suite and a verified replay manifest. Does not plan until `REPLACE_WITH_...` is filled |
+| `raider-windows/`, `raider-wsl/`, `raider-ubuntu/` | Per host OS: `inventory.json` (the hardware configuration of `configs/examples/raider-<os>/inventory.json` with the same target entry: target `raider`, `physical_host_id: raider`, and on WSL the `lock_root` placeholder `REPLACE_WITH_SHARED_WINDOWS_LOCK_ROOT` that [the WSL walkthrough](../../../docs/WSL_RAIDER_WALKTHROUGH.md#share-the-windows-physical-host-reservation) fills) and `legal-evaluation-campaign.json` (the phases of `evaluation-campaign.json` with the cases above, on that host's hardware configuration). Plan as shipped; the generation and workflow jobs of a run stop at the placeholder revisions |
 
 Every campaign file has `"publish": {"mode": "none"}`.
 
@@ -21,20 +22,22 @@ Every campaign file has `"publish": {"mode": "none"}`.
 
 1. **Qualify serving.** Plan, set up and run `qualification-campaign.json` with the exact model, backend build, template and placement filled in `legal-offload-run.json`. Then freeze a locked serving profile from that one attempt, naming every id and attesting the placement you observed:
 
+   ```bash
+   python -m llm_eval.experiments.legal_benchmark.profiles freeze --campaign-dir CAMPAIGN_DIR --job-id JOB_ID --attempt-id ATTEMPT_ID --observed-placement OBSERVED_PLACEMENT --output PRIVATE_DIR/serving-profile.json
    ```
-   python -m llm_eval.experiments.legal_benchmark.profiles freeze --campaign-dir <campaign dir> --job-id <job id> --attempt-id <attempt id> --observed-placement gpu_layers=20 --output serving-profile.json
-   ```
+
+   `PRIVATE_DIR` is a directory outside any repository: the command refuses an output inside one.
 
    Nothing picks "the newest" campaign, job, attempt or measurement. A profile whose probe is not `passed` cannot qualify a role.
 2. **Bind the roles.** Copy the profile next to the case and set `"qualification": {"serving_profile": "serving-profile.json"}` in the role; platform, backend version, artifact, quantization, template, tokenizer, context, output budget and placement of the role must equal the profile's. The planner pins the file by digest; a changed byte stops the coordinator and the worker. The phase dependency only orders jobs; the profile is always passed by name.
-3. **Evaluate.** Plan and run `evaluation-campaign.json`.
+3. **Evaluate.** Plan and run `evaluation-campaign.json`, or the `legal-evaluation-campaign.json` of your host OS copied under `configs/local/` with its host id filled in.
 4. **Score.** Fill `score-case.json` with the attempt's `local/output-manifest.json`, then plan and run `score-campaign.json`.
 5. **Routing replay (optional).** Export the routing suite of an approved fixture suite, build the replay manifest from scored attempts, and verify it:
 
-   ```
-   python -m llm_eval.experiments.legal_benchmark.routing export --suite <suite.lock.json> --output routing-suite.json
-   python -m llm_eval.experiments.legal_benchmark.routing replay --suite <suite.lock.json> --routing-suite routing-suite.json --attempt <attempt dir> --candidates candidates.json --output replay.json
-   python -m llm_eval.experiments.legal_benchmark.routing verify --suite <suite.lock.json> --replay replay.json --routing-suite routing-suite.json --candidates candidates.json --attempt <attempt dir>
+   ```bash
+   python -m llm_eval.experiments.legal_benchmark.routing export --suite SUITE_LOCK --output PRIVATE_DIR/routing-suite.json
+   python -m llm_eval.experiments.legal_benchmark.routing replay --suite SUITE_LOCK --routing-suite PRIVATE_DIR/routing-suite.json --attempt ATTEMPT_DIR --candidates PRIVATE_DIR/candidates.json --output PRIVATE_DIR/replay.json
+   python -m llm_eval.experiments.legal_benchmark.routing verify --suite SUITE_LOCK --replay PRIVATE_DIR/replay.json --routing-suite PRIVATE_DIR/routing-suite.json --candidates PRIVATE_DIR/candidates.json --attempt ATTEMPT_DIR
    ```
 
    `verify` takes the same `--attempt` directories and rebuilds the manifest from their pinned outputs. Run `routing verify` before any replay campaign: the routing experiment itself checks only the suite hash, the candidate fingerprints and duplicates, and would accept a manifest built before a rubric or scorer change. Then fill `routing-replay-case.json` and plan `routing-replay-campaign.json`.
