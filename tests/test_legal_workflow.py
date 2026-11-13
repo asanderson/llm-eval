@@ -765,10 +765,12 @@ class PreflightTests(unittest.TestCase):
         target = {'transport': 'local', 'physical_host_id': 'legal-test-host'}
         if lock_root:
             target['lock_root'] = lock_root
+        parameters = parameters if parameters is not None else {'suite': str(LOCK), 'output_manifest': str(self.input)}
+        # A planned job pins its suite lock (package F: the worker re-derives the data classification from that digest).
+        suite = [{'path': parameters['suite'], 'sha256': sha256_file(parameters['suite'])}] if experiment == 'legal-benchmark' and 'suite' in parameters else []
         return {'job_id': 'job-1', 'experiment_id': experiment, 'mode': mode, 'target': target,
-                'hardware': {'hardware_profile': 'msi-raider-18-hx-ai', 'os_id': os_id},
-                'parameters': parameters if parameters is not None else {'suite': str(LOCK), 'output_manifest': str(self.input)},
-                'input_files': [{'path': str(self.input), 'sha256': sha256_file(self.input)}]}
+                'hardware': {'hardware_profile': 'msi-raider-18-hx-ai', 'os_id': os_id}, 'parameters': parameters,
+                'input_files': [{'path': str(self.input), 'sha256': sha256_file(self.input)}, *suite]}
 
     def handle(self, job, environment='ubuntu-26.04-native', dirty=False, gpus=(), hook=None):
         from llm_eval.orchestration import worker
@@ -2090,7 +2092,10 @@ class WorkflowCampaignTests(CampaignBase):
         self.assertEqual(len(prompts), 9)      # parse retries were not needed: one request per matter and arm
         state = read_json(attempt.parents[4] / 'campaign.json')
         (receipt,) = state['reports'].values()
-        self.assertEqual(receipt['status'], 'disabled')
+        self.assertEqual(receipt['status'], 'generated')      # package F: a projected local report of cohort aggregates
+        import gzip
+        bundle = next((attempt.parents[4] / receipt['report'] / 'bundle/docs/results/legal-benchmark').iterdir())
+        self.assertNotIn(b'"record_type": "request"', gzip.decompress((bundle / 'raw/measurements.jsonl.gz').read_bytes()))
         rows = lines(attempt / 'requests.jsonl')
         metadata = read_json(attempt / 'metadata.json')
         self.assertEqual({frozenset(r) for r in rows}, {frozenset(PUBLIC_ROW_KEYS)})

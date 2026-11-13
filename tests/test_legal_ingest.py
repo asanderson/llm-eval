@@ -1518,7 +1518,7 @@ class PacketSuiteTests(unittest.TestCase):
         self.assertFalse({a['citation'] for a in packets['corpus']['authorities']} & {a['citation'] for a in smoke['corpus']['authorities']})
 
     def test_smoke_suite_and_its_lock_are_unchanged(self):
-        self.assertEqual(sha256_file(SMOKE / 'suite.lock.json'), legal.SMOKE_SUITE_SHA256)
+        self.assertIn(sha256_file(SMOKE / 'suite.lock.json'), contracts.approved_suites())
         suite = contracts.load_suite(SMOKE / 'suite.lock.json')
         self.assertEqual([p.name for p in contracts.pinned_files(SMOKE / 'suite.lock.json')], ['matters.json', 'corpus.json', 'rubric.json'])
         self.assertEqual({k: suite[k] for k in ('collection', 'visibility', 'oracle', 'review', 'dataset', 'originals')},

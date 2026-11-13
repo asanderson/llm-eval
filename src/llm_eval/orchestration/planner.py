@@ -7,7 +7,7 @@ import subprocess
 
 from llm_eval.common import read_json, sha256_file
 from llm_eval.core.contracts import fields, identifier, integer, no_credentials, config_hash
-from llm_eval.experiments import get_experiment, reporting_policy
+from llm_eval.experiments import data_policy, get_experiment, reporting_policy
 
 PATH_KEYS = {'suite', 'artifact_root', 'artifact_lock', 'offload_dir', 'installation_state', 'replay', 'data', 'benchmark_registry',
              'output_manifest', 'review_file', 'review_key', 'serving_profile', 'calibration_file'}
@@ -163,6 +163,11 @@ def compile_campaign(path, root, max_parallel_jobs=None):
                 role_target=inv['targets'][candidate['target_id']]
                 job['resources'].append(identifier(role_target['physical_host_id']))
         job['resources']=sorted(set(job['resources']))
+        if job['status']!='skipped':      # the plugin's data classification, before any reservation or execution RPC
+            policy=data_policy(job['experiment_id'],job)
+            if not policy['admit']:raise ValueError('Job is not admitted by the data policy of '+job['job_id']+': '+str(policy['reason']))
+            if job['target']['transport']=='ssh' and not policy['transfer']:
+                raise ValueError('Remote execution is not available for '+job['job_id']+': '+str(policy['reason']))
     total_api_reservation = sum(j['parameters'].get('budget_usd', 0) for j in jobs if j['status'] != 'skipped')
     if 'api_budget_usd' in execution:
         from llm_eval.common import finite_number

@@ -11,7 +11,9 @@ raw measurements. From those this writes:
 from __future__ import annotations
 
 import gzip
+import html
 import json
+import math
 import re
 import shutil
 import statistics
@@ -53,6 +55,8 @@ def slug(value):
 def identity(job):
     """(harness, model) of a planned job: the serving platform and the model it serves or routes with."""
     parameters = job.get('parameters') or {}
+    if isinstance(parameters.get('identity'), dict):      # a projected job names its harness and model explicitly
+        return parameters['identity'].get('harness', 'unknown'), parameters['identity'].get('model', 'unknown')
     config, router = parameters.get('config') or {}, parameters.get('router') or {}
     if config:
         return config.get('platform', 'unknown'), config.get('model_id', 'unknown')
@@ -75,7 +79,10 @@ def _counts(rows, rate, count):
     total = sum(r.get(count) or 0 for r in rows)
     if not total:
         return None
-    return round(sum((r.get(rate) or 0) * (r.get(count) or 0) for r in rows)), total
+    passed = sum((r.get(rate) or 0) * (r.get(count) or 0) for r in rows)
+    if not math.isfinite(passed):      # a hostile bundle's numbers: no count rather than an OverflowError
+        return None
+    return round(passed), total
 
 
 def _ratio(rows, rate, count):
@@ -106,6 +113,32 @@ def _peaks(bundle):
     return peaks
 
 
+KINDS = {'fixture': 'fixture', 'model-run': 'measured', 'score-only': 'score-only'}
+CLASSES = (('fixture', 'Fixture runs'), ('measured', 'Measured runs'), ('score-only', 'Score-only runs'), ('invalid', 'Invalid bundles'),
+           ('legacy', 'Legacy bundles'))
+
+
+def _identities(manifest, resolved):
+    """Every experiment identity a bundle carries, as `publish_report` collects them."""
+    experiment = resolved.get('experiment') if isinstance(resolved.get('experiment'), dict) else {}
+    names = {manifest.get('experiment_id'), experiment.get('experiment_id'),
+             *(j.get('experiment_id') for j in resolved.get('jobs', []) if isinstance(j, dict))}
+    return {str(n) for n in names if n is not None}
+
+
+def _classified(names, manifest, job):
+    """(class, ranked) of one job: `class` is None for a bundle of an experiment without a report projection."""
+    from llm_eval.experiments import plugin_hook
+    if len(names) > 1:
+        kind = 'invalid'
+    elif 'projection' in manifest:
+        kind = KINDS.get((job.get('parameters') or {}).get('execution_kind'), 'invalid')
+    else:
+        kind = 'legacy' if plugin_hook(next(iter(names)), 'report_projection') else None
+    generic = all(plugin_hook(n, 'GENERIC_RANKING') is not False for n in names)
+    return kind, kind not in ('invalid', 'legacy') and generic
+
+
 def collect(root):
     """One record per published job, newest first."""
     results = Path(root) / 'docs/results'
@@ -116,10 +149,13 @@ def collect(root):
         summary = _read(bundle / 'summary.json') if (bundle / 'summary.json').exists() else []
         coverage = {c['job_id']: c for c in manifest.get('coverage', [])}
         peaks = _peaks(bundle)
+        names = _identities(manifest, resolved)
         for job in resolved.get('jobs', []):
             rows = [r for r in summary if r.get('job_id') == job['job_id']]
             harness, model = identity(job)
-            config = (job.get('parameters') or {}).get('config') or {}
+            parameters = job.get('parameters') or {}
+            config = parameters.get('config') or {}
+            kind, rankable = _classified(names, manifest, job)
             records.append({
                 'date': manifest['created_utc'][:10], 'created': manifest['created_utc'],
                 'experiment': manifest['experiment_id'], 'mode': job.get('mode'),
@@ -127,7 +163,7 @@ def collect(root):
                 'hardware': job.get('hardware_config_id', 'unknown'), 'os': (job.get('hardware') or {}).get('os_id'),
                 'harness': harness, 'model': model, 'case': job.get('case_id'),
                 'status': (coverage.get(job['job_id']) or {}).get('status', manifest.get('status')),
-                'synthetic': bool(manifest.get('synthetic')),
+                'synthetic': bool(parameters.get('synthetic')) if 'projection' in manifest else bool(manifest.get('synthetic')),
                 'output_cap': config.get('max_output_tokens'),
                 'requests': sum(r.get('requests') or 0 for r in rows),
                 'errors': sum(r.get('errors_or_missing') or 0 for r in rows),
@@ -141,6 +177,9 @@ def collect(root):
                 'tokens_mid': _middle(r.get('output_tokens_per_wall_second_median') for r in rows),
                 'backend_rss_gib': peaks[job['job_id']].get('backend_rss_gib'), 'gpu_gib': peaks[job['job_id']].get('gpu_gib'),
                 'report': f"{bundle.parent.name}/{bundle.name}/README.md",
+                'execution_kind': parameters.get('execution_kind'), 'data_class': parameters.get('data_class'),
+                'cohorts': list(parameters['cohorts']) if isinstance(parameters.get('cohorts'), list) else [],
+                'class': kind, 'ranked': rankable,
             })
     records.sort(key=lambda r: (r['experiment'], r['hardware'], r['harness'], r['model'], str(r['case'])))
     records.sort(key=lambda r: r['created'], reverse=True)
@@ -148,7 +187,12 @@ def collect(root):
 
 
 def _cell(value):
-    return '–' if value is None else str(value).replace('|', '\\|')
+    """A table cell: line breaks become spaces and `&`, `<`, `>`, `[`, `]` and `|` are escaped, so a value is inert text. No
+    value of the published bundles holds one of these characters but `|`, so their cells are unchanged."""
+    if value is None:
+        return '–'
+    text = ' '.join(str(value).splitlines())
+    return html.escape(text, quote=False).replace('[', '\\[').replace(']', '\\]').replace('|', '\\|')
 
 
 def _link(category, value, index_prefix):
@@ -160,7 +204,7 @@ def table(records, index_prefix, report_prefix):
              'Median wall s | Output tok/s | Quality | Decisions | Report |',
              '|---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|']
     for r in records:
-        status = _cell(r['status']) + (' (synthetic)' if r['synthetic'] else '')
+        status = _cell(r['status']) + (f" ({r['class']})" if r.get('class') else ' (synthetic)' if r['synthetic'] else '')
         lines.append('| ' + ' | '.join([
             _link('date', r['date'], index_prefix), _link('experiment', r['experiment'], index_prefix),
             _link('hardware', r['hardware'], index_prefix), _link('harness', r['harness'], index_prefix),
@@ -182,7 +226,7 @@ def ranked(records):
     """{(experiment, hardware): every rankable harness and model combination, best first}."""
     newest = {}
     for r in records:      # records arrive newest first
-        if r['synthetic'] or r['status'] != 'succeeded' or not r['score']:
+        if not r.get('ranked', True) or r['synthetic'] or r['status'] != 'succeeded' or not r['score']:
             continue
         newest.setdefault((r['experiment'], r['hardware'], r['harness'], r['model']), r)
     groups = defaultdict(list)
@@ -203,7 +247,7 @@ def top_combinations(records, limit=3):
 def ranking(records, index_prefix, report_prefix, limit=3, charts=None):
     """Top combinations per experiment and hardware configuration; `charts` maps such a pair to an image link."""
     lines = [f'### Top {limit} harness and model combinations per experiment and hardware configuration', '', RANKING_RULE]
-    pairs = list(dict.fromkeys((r['experiment'], r['hardware']) for r in records))      # newest result first
+    pairs = list(dict.fromkeys((r['experiment'], r['hardware']) for r in records if r.get('ranked', True)))      # newest result first
     best = top_combinations(records, limit)
     for experiment, hardware in pairs:
         lines += ['', f"**{_link('experiment', experiment, index_prefix)} on {_link('hardware', hardware, index_prefix)}**", '']
@@ -235,7 +279,7 @@ def navigation(records, index_prefix, report_prefix):
     for experiment in dict.fromkeys(r['experiment'] for r in records):      # records arrive newest first
         chosen = [r for r in records if r['experiment'] == experiment]
         harnesses = sorted({r['harness'] for r in chosen})
-        lines += ['', f"### {experiment}: models by harness", '',
+        lines += ['', f"### {_cell(experiment)}: models by harness", '',
                   'Each cell links to the report of every published run of that model on that harness, newest first. '
                   'Models are ordered by their newest run.', '',
                   '| Model | ' + ' | '.join(_link('harness', h, index_prefix) for h in harnesses) + ' |',
@@ -245,17 +289,43 @@ def navigation(records, index_prefix, report_prefix):
             for harness in harnesses:
                 runs = [r for r in chosen if r['model'] == model and r['harness'] == harness]
                 cells.append('<br>'.join(
-                    f"[{r['date']}{' ' + r['hardware'] if several_hardware else ''}"
+                    f"[{r['date']}{' ' + _cell(r['hardware']) if several_hardware else ''}"
                     f"{' cap ' + str(r['output_cap']) if r['output_cap'] else ''}"
-                    f"{' synthetic' if r['synthetic'] else ''}{'' if r['status'] == 'succeeded' else ' ' + _cell(r['status'])}]"
+                    f"{' ' + r['class'] if r.get('class') else ' synthetic' if r['synthetic'] else ''}"
+                    f"{'' if r['status'] == 'succeeded' else ' ' + _cell(r['status'])}]"
                     f"({report_prefix}{r['report']})" for r in runs) or '–')
             lines.append(f"| {_link('model', model, index_prefix)} | " + ' | '.join(cells) + ' |')
     return '\n'.join(lines)
 
 
+def cohort_results(records, index_prefix, report_prefix):
+    """Results of experiments with a report projection, one table per class (fixture, measured, score-only, then invalid and
+    legacy bundles), one row per job and cohort. Empty when no record has a class."""
+    classed = [r for r in records if r.get('class')]
+    if not classed:
+        return ''
+    lines = ['### Results by class and cohort', '', 'These results are not ranked with other experiments. Two runs are comparable '
+             'only when their cohort digests are equal; fixture and score-only runs do not measure a model.']
+    for name, title in CLASSES:
+        chosen = [r for r in classed if r['class'] == name]
+        if not chosen:
+            continue
+        lines += ['', f'**{title}** ({name})', '', '| Experiment | Cohort | Mode | OS | Harness | Model | Status | Checks passed | Run |',
+                  '|---|---|---|---|---|---|---|---:|---|']
+        for r in chosen:
+            for cohort in r['cohorts'] or [None]:
+                lines.append('| ' + ' | '.join([
+                    _link('experiment', r['experiment'], index_prefix), _cell(None if cohort is None else str(cohort)[:12]), _cell(r['mode']),
+                    _cell(r['os']), _link('harness', r['harness'], index_prefix), _link('model', r['model'], index_prefix),
+                    f"{_cell(r['status'])} ({name})", _cell(r['quality']), f"[{r['date']}]({report_prefix}{r['report']})"]) + ' |')
+    return '\n'.join(lines)
+
+
 def overview(records, index_prefix, report_prefix):
-    """Top combinations, then the navigation."""
-    return ranking(records, index_prefix, report_prefix) + '\n\n' + navigation(records, index_prefix, report_prefix)
+    """Top combinations, then the navigation, then the results by class and cohort (when there are any)."""
+    cohorts = cohort_results(records, index_prefix, report_prefix)
+    return ranking(records, index_prefix, report_prefix) + '\n\n' + navigation(records, index_prefix, report_prefix) + \
+        ('\n\n' + cohorts if cohorts else '')
 
 
 def listing(root):
@@ -263,7 +333,8 @@ def listing(root):
     results, rows = Path(root) / 'docs/results', []
     for path in results.glob('*/*/manifest.json'):
         m, link = _read(path), (path.parent / 'README.md').relative_to(results).as_posix()
-        rows.append((m['created_utc'], f"| {m['experiment_id']} | {m['created_utc']} | {m['status']} | {m['synthetic']} | [Report]({link}) |"))
+        synthetic = ', '.join(sorted(m.get('execution_kinds') or [])) if 'projection' in m else m['synthetic']
+        rows.append((m['created_utc'], f"| {_cell(m['experiment_id'])} | {_cell(m['created_utc'])} | {_cell(m['status'])} | {_cell(synthetic)} | [Report]({link}) |"))
     return '\n'.join([LEGACY_LIST_HEADER, '|---|---|---|---|---|'] + [row for _, row in sorted(rows, reverse=True)])
 
 
@@ -312,7 +383,7 @@ def write_results_index(root):
         for value in sorted({r[category] for r in records}):
             chosen = [r for r in records if r[category] == value]
             save(index / category / (slug(value) + '.md'),
-                 f"# {title}: {value}\n\n[Results index](../README.md) · [Executive summary](../../README.md)\n\n"
+                 f"# {title}: {_cell(value)}\n\n[Results index](../README.md) · [Executive summary](../../README.md)\n\n"
                  f"{len(chosen)} published result(s). {note}\n\n" + table(chosen, '../', '../../') + '\n')
     readme = results / 'README.md'
     text = readme.read_text(encoding='utf-8') if readme.exists() else ''
@@ -320,7 +391,8 @@ def write_results_index(root):
         text = SKELETON
     if TOP_START in text and TOP_END in text:
         text = _fill(text, TOP_START, TOP_END, ranking(records, 'index/', '', charts=write_charts(root, records)))
-    text = _fill(text, START, END, navigation(records, 'index/', '') +
+    cohorts = cohort_results(records, 'index/', '')
+    text = _fill(text, START, END, navigation(records, 'index/', '') + ('\n\n' + cohorts if cohorts else '') +
                  '\n\nFull table and per-category pages: [results index](index/README.md).')
     text = _fill(text, LIST_START, LIST_END, listing(root))
     save(readme, text)

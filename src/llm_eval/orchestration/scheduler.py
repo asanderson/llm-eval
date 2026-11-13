@@ -6,8 +6,8 @@ from pathlib import Path
 import uuid
 
 from llm_eval.common import read_json
-from llm_eval.core.contracts import atomic_json, TERMINAL
-from llm_eval.experiments import get_experiment
+from llm_eval.core.contracts import atomic_json, config_hash, TERMINAL
+from llm_eval.experiments import data_policy, get_experiment, plugin_hook
 
 
 def utc_now():
@@ -58,6 +58,23 @@ def _release(job, attempt, plan):
         except ValueError:pass  # A completed reservation may already have been released and reassigned.
 
 
+def _transfer(job):
+    """Whether the attempt's bytes may be collected from a remote worker (the plugin's data policy; default yes)."""
+    return data_policy(job.get('experiment_id'),job)['transfer']
+
+
+def _receipt(job, out):
+    """What the plugin's optional `attempt_receipt` hook records about a finished attempt (the legal output-manifest digest)."""
+    hook=plugin_hook(job.get('experiment_id'),'attempt_receipt')
+    return hook(out) if hook else {}
+
+
+def _plan_unchanged(plan):
+    """Drift of the stored plan (an edit that forgot the digest), not forgery. Hand-built plans without the key run as before."""
+    if 'plan_sha256' in plan and config_hash({k:v for k,v in plan.items() if k!='plan_sha256'})!=plan['plan_sha256']:
+        raise ValueError('Campaign plan changed; create a new campaign')
+
+
 def _execute(job, attempt, plan, directory):
     from .transport import rpc, map_paths, collect
     target=job['target'];out=directory/attempt['output']
@@ -66,7 +83,9 @@ def _execute(job, attempt, plan, directory):
              'output':attempt['worker_output'],'owner':attempt['attempt_id'],'code_revision':plan['code_revision']}
     try:
         result=rpc(target,payload,plan['root'],timeout=172800)
-        if target['transport']=='ssh':collect(target,attempt['worker_output'],plan['root'],out)
+        if target['transport']=='ssh':
+            if _transfer(job):collect(target,attempt['worker_output'],plan['root'],out)
+            else:result={**result,'collect':'refused'}
         _release(job,attempt,plan)
         return result
     except BaseException as exc:
@@ -83,10 +102,11 @@ def _reconcile(job, attempt, plan, directory):
             return {'status':'blocked','reason':'reservation_recovered','stage':'released'}
         reply=rpc(job['target'],{'action':'status','output':attempt['worker_output']},plan['root'])
         if reply['result'] and not reply.get('active'):
-            if job['target']['transport']=='ssh':
+            refused=job['target']['transport']=='ssh' and not _transfer(job)
+            if job['target']['transport']=='ssh' and not refused:
                 collect(job['target'],attempt['worker_output'],plan['root'],directory/attempt['output'])
             _release(job,attempt,plan)
-            return reply['result']
+            return {**reply['result'],'collect':'refused'} if refused else reply['result']
     except (OSError,ValueError,RuntimeError):pass
     return {'status':'lost','reason':'worker_completion_not_confirmed'}
 
@@ -105,6 +125,7 @@ def run_campaign(directory, retry_failed=False, enable_targets=()):
         raise ValueError('Resume requires the measured harness revision')
     for path,sha in plan['inputs'].items():
         if sha256_file(path)!=sha:raise ValueError('Campaign input changed; create a new campaign')
+    _plan_unchanged(plan)
     coordinator_owner=uuid.uuid4().hex
     from .resources import ProcessLock
     coordinator = ProcessLock(directory/'.coordinator.lock')
@@ -117,7 +138,7 @@ def run_campaign(directory, retry_failed=False, enable_targets=()):
         for jid,record in state['jobs'].items():
             if record['status'] in {'running','lost'} and record['attempts']:
                 result=_reconcile(jobs[jid],record['attempts'][-1],plan,directory)
-                record['attempts'][-1].update(result);record['status']=result['status']
+                record['attempts'][-1].update(result,**_receipt(jobs[jid],directory/record['attempts'][-1]['output']));record['status']=result['status']
             elif retry_failed and record['status'] in {'failed','cancelled'}:
                 record['status']='planned'
         if retry_failed and (directory/'cancel.json').exists():(directory/'cancel.json').unlink()
@@ -144,6 +165,9 @@ def run_campaign(directory, retry_failed=False, enable_targets=()):
                         if any(state['jobs'][d]['status'] not in {'succeeded','skipped'} for d in job['depends_on']):
                             record.update(status='blocked',reason='dependency_not_succeeded');continue
                         if held.intersection(job['resources']):continue
+                        policy=data_policy(job.get('experiment_id'),job)      # no attempt, directory, reservation or RPC for a refused job
+                        if not policy['admit'] or (job['target']['transport']=='ssh' and not policy['transfer']):
+                            record.update(status='failed',reason='data_policy');save();continue
                         aid=uuid.uuid4().hex
                         rel=Path('experiments')/job['experiment_run_id']/'jobs'/job['job_id']/aid
                         remote=str(directory/rel)
@@ -171,7 +195,7 @@ def run_campaign(directory, retry_failed=False, enable_targets=()):
                     continue
                 for future in done:
                     job,attempt=active.pop(future);result=future.result()
-                    attempt.update(result,finished_utc=utc_now())
+                    attempt.update(result,finished_utc=utc_now(),**_receipt(job,directory/attempt['output']))
                     state['jobs'][job['job_id']]['status']=result['status']
                     held.difference_update(job['resources'])
                     if result['status']=='failed' and plan['execution']['on_failure']=='fail-fast':stop=True

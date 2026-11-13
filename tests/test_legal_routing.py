@@ -215,11 +215,11 @@ class ApprovalTests(TempCase):
             lock = read_json(shipped[key])
             self.assertEqual((lock['data_class'], lock['benchmark_id'], entry), ('public-synthetic', entry['benchmark_id'],
                                                                                  {'benchmark_id': lock['benchmark_id'], 'fixture_export': True}))
-        self.assertEqual(approved[legal.SMOKE_SUITE_SHA256]['benchmark_id'], 'legal-original-smoke')
-        self.assertEqual(contracts.export_allowed(SMOKE), legal.SMOKE_SUITE_SHA256)
+        self.assertEqual(approved[sha256_file(SMOKE)]['benchmark_id'], 'legal-original-smoke')
+        self.assertEqual(contracts.export_allowed(SMOKE), sha256_file(SMOKE))
         self.assertEqual(contracts.export_allowed(PACKETS), sha256_file(PACKETS))
         good = json.loads(data)
-        key = legal.SMOKE_SUITE_SHA256
+        key = sha256_file(SMOKE)
         for broken in ({**good, 'extra': 1}, {**good, 'schema_version': 2}, {'schema_version': 1, 'suites': {key.upper(): good['suites'][key]}},
                        {'schema_version': 1, 'suites': {key: {**good['suites'][key], 'fixture_export': 'yes'}}},
                        {'schema_version': 1, 'suites': {key: {**good['suites'][key], 'benchmark_id': 'Not An Id'}}},
@@ -1284,7 +1284,7 @@ class ReplayTests(ReplayCase):
         smoke = contracts.load_suite(SMOKE)
         attempt = smoke_attempt()
         self.assertEqual({k: v for k, v in provenance.items() if k not in ('attempts', 'outcomes', 'generator', 'generator_sha256')}, {
-            'schema_version': 1, 'kind': 'legal-routing-provenance', 'suite_lock_sha256': legal.SMOKE_SUITE_SHA256, 'split_id': 'smoke',
+            'schema_version': 1, 'kind': 'legal-routing-provenance', 'suite_lock_sha256': sha256_file(SMOKE), 'split_id': 'smoke',
             'rubric_version': smoke['rubric']['rubric_version'], 'scorer_fingerprint': g.scorer_fingerprint(smoke),
             'routing_suite_sha256': manifest['suite_sha256'], 'replay_manifest_sha256': digest(manifest), 'calibration': None})
         lineage = {'inference_job_id': 'legal-smoke-source', 'inference_attempt_id': attempt.name,
@@ -1313,7 +1313,7 @@ class ReplayTests(ReplayCase):
         self.assertEqual(provenance['generator'], {k: CANDIDATE[k] for k in CANDIDATE})
         self.assertEqual(provenance['generator_sha256'], read_json(attempt / 'metadata.json')['roles']['generator']['profile_sha256'])
         self.assertEqual(rescored['no-context']['lineage'], {**lineage, 'scorer_fingerprint': g.scorer_fingerprint(smoke),
-                                                             'suite_lock_sha256': legal.SMOKE_SUITE_SHA256,
+                                                             'suite_lock_sha256': sha256_file(SMOKE),
                                                              'generator_sha256': provenance['generator_sha256'], 'generator': provenance['generator']})
 
     def test_stale_orphan_and_duplicate_rows_are_rejected(self):
@@ -1663,7 +1663,7 @@ class ExampleTests(TempCase):
         for phrase in ('local forward', 'single active large model', 'raider` lock'):
             self.assertIn(phrase, readme)
         experiment = (X / 'README.md').read_text(encoding='utf-8')
-        for phrase in ('open gap', 'selector_deferral', 'route_error_type', 'never public', 'not re-read', 'informational'):
+        for phrase in ('refuses such bundles by content', 'selector_deferral', 'route_error_type', 'never public', 'not re-read', 'informational'):
             self.assertIn(phrase, experiment)
 
 

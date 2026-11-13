@@ -108,4 +108,87 @@ class ReportingTests(unittest.TestCase):
         self.assertEqual(receipt['status'],'generated')
         self.assertEqual(validate_bundle(directory/receipt['report'])[1]['status'],'complete')
 
+def fixed_routing_report(root):
+    """A generic llm-routing report built from fixed inputs (fixed campaign name, time, revision, attempt): every byte of its
+    text files is a function of the reporting code alone."""
+    from llm_eval.core.contracts import atomic_json
+    campaign=Path(root)/'campaign-20261112T000000Z-0000abcd';rel='experiments/routing/jobs/job/attempt';out=campaign/rel;out.mkdir(parents=True)
+    job={'job_id':'job','experiment_id':'llm-routing','experiment_run_id':'routing','case_id':'fixed','mode':'decision','hardware_config_id':'fixture',
+         'hardware':{'os_id':'fixture'},'parameters':{'synthetic':True,'router':{'kind':'fixed'}},'status':'planned','reason':None}
+    exp={'experiment_id':'llm-routing','experiment_run_id':'routing','job_ids':['job'],'version':1,'mode':'decision'}
+    atomic_json(campaign/'plan.json',{'campaign_id':'fixture','root':str(ROOT),'code_revision':'a'*40,'inputs':{'/fixture/case.json':'b'*64},'jobs':[job],
+                                      'experiments':[exp],'reporting':{'on_experiment_end':True}})
+    atomic_json(campaign/'campaign.json',{'schema_version':2,'campaign_id':'fixture','created_utc':'2026-11-12T00:00:00+00:00','status':'incomplete','reports':{},
+                                          'jobs':{'job':{'status':'failed','reason':None,'attempts':[{'attempt_id':'attempt','output':rel,'status':'failed'}]}}})
+    atomic_json(campaign/'experiments/routing/experiment.json',{**exp,'campaign_id':'fixture','code_revision':'a'*40})
+    rows=[{'category':'math','benchmark':'fixture','status':'ok','warmup':False,'synthetic':True,'expected_choice':'math','choice':'math','decision_correct':True,'elapsed_s':2,'output':'private text'},
+          {'category':'math','benchmark':'fixture','status':'error','warmup':False,'synthetic':True,'expected_choice':'math','elapsed_s':4}]
+    (out/'requests.jsonl').write_bytes(''.join(json.dumps(r)+'\n' for r in rows).encode())
+    write_json(out/'job.json',job);write_json(out/'metadata.json',{'api_key':'not-a-real-secret','endpoint':'http://private.example','config':{'model':'fixture'}})
+    (out/'reports').mkdir();(out/'reports/scores.csv').write_bytes(b'release,score\nfixture-release,0\n')
+    return build_report(campaign/'experiments/routing')
+
+
+def text_digests(report):
+    """{bundle file: sha256 of its text, LF line ends; of the decompressed bytes for the archive}; the PNG chart (rendering
+    library) and the manifest and receipt (which hash the chart) are left out."""
+    import hashlib
+    out={}
+    for p in sorted((report/'bundle').rglob('*')):
+        if p.is_file() and p.suffix!='.png' and p.name!='manifest.json':
+            data=gzip.decompress(p.read_bytes()) if p.suffix=='.gz' else p.read_bytes().replace(b'\r\n',b'\n')
+            out[p.relative_to(report/'bundle').as_posix()]=hashlib.sha256(data).hexdigest()
+    return out
+
+
+PUBLICATION='docs/results/llm-routing/campaign-20261112T000000Z-0000abcd-routing/'
+# Computed with the reporting code before package F (d3c7cc7) for fixed_routing_report.
+BASE_TEXT_DIGESTS={k:v for k,v in {
+    PUBLICATION+'README.md':'f1a6550e5d04b8bea7f2de1f9b224eb008a27885a3ea4b64c9b75042edd9454b',
+    PUBLICATION+'benchmark-summary.csv':'8333f1dca0f881692f30a4b843dee3428c8162741bb4b1dac8e5b663689732d1',
+    PUBLICATION+'benchmark-summary.json':'a260f71a5b074a57fd4c80d4781d10e358a86fa133fbe6f891bb49420d350f47',
+    PUBLICATION+'raw/measurements.jsonl.gz':'53f8943aeb558f8346c200a2ae526ab1fdfadb464eb2bcc70675fba539be8f87',
+    PUBLICATION+'resolved-config.json':'35125c0d9ee8bf5386eb43add25d14097176a252d0359ef6b94e5e3656955e3b',
+    PUBLICATION+'summary.csv':'c6006f0151de2fd16b7f638258f11a3a9f8e6e9e46247e197ce070d1cb25e479',
+    PUBLICATION+'summary.json':'a21d1580beef5f782baca1215f2aea72db94ad9d224d269908f88d2cd8ed672d',
+}.items()}
+
+
+class ProjectionTests(unittest.TestCase):
+    setUp=ReportingTests.setUp
+    def test_generic_experiments_keep_their_bundle(self):
+        # Pinned against the digests the reporting code produced before package F (d3c7cc7) for the same fixed inputs.
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(text_digests(fixed_routing_report(tmp)),BASE_TEXT_DIGESTS)
+        spec,manifest,_=validate_bundle(self.report)
+        files=sorted(manifest['files'])
+        self.assertEqual(sorted(Path(f).name for f in files),['README.md','benchmark-summary.csv','benchmark-summary.json','latency.png',
+                                                             'measurements.jsonl.gz','resolved-config.json','summary.csv','summary.json'])
+        self.assertNotIn('projection',manifest);self.assertNotIn('canonical_bytes',manifest)
+        plan=read_json(self.campaign/'plan.json');plan['reporting']['include_outputs']=True;write_json(self.campaign/'plan.json',plan)
+        report=build_report(self.experiment);dest=report/'bundle'/read_json(report/'publication.json')['report_path']
+        self.assertIn('private text',gzip.decompress((dest/'raw/measurements.jsonl.gz').read_bytes()).decode())
+
+class BytesTests(unittest.TestCase):
+    setUp=ReportingTests.setUp
+    def test_published_history_is_not_rewritten(self):
+        status=real_git(ROOT,'status','--porcelain')
+        bare=self.root/'remote.git';repo=self.root/'repo'
+        def run(*args):subprocess.run(args,check=True,capture_output=True)
+        run('git','init','--bare',str(bare));run('git','init','-b','main',str(repo))
+        (repo/'README.md').write_text('# Test repository\n')
+        run('git','-C',str(repo),'add','README.md');run('git','-C',str(repo),'-c','user.name=Fixture','-c','user.email=fixture@example.com','commit','-m','initial')
+        run('git','-C',str(repo),'remote','add','origin',str(bare));run('git','-C',str(repo),'push','-u','origin','main')
+        def fixture_git(root,*args,**kwargs):
+            if args==('remote','get-url','origin'):return 'https://github.com/asanderson/llm-eval.git'
+            if args[:1]==('ls-files',):raise AssertionError('a bundle without the canonical marker is not blob-checked')
+            return real_git(root,*args,**kwargs)
+        manifest=validate_bundle(self.report)[1]
+        with patch('llm_eval.reporting.publish.git',side_effect=fixture_git),patch('llm_eval.reporting.publish._blob',side_effect=AssertionError('no blob check')),\
+                patch.dict(os.environ,{'GH_TOKEN':'','GITHUB_TOKEN':''}):
+            receipt=publish_report(self.report,repo,api=FakeGitHub())
+        self.assertEqual(receipt['status'],'open')
+        self.assertEqual(validate_bundle(self.report)[1],manifest)      # the receipt is new; the bundle and its manifest are not
+        self.assertEqual(real_git(ROOT,'status','--porcelain'),status)
+
 if __name__=='__main__':unittest.main()
