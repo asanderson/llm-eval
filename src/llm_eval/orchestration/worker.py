@@ -53,6 +53,25 @@ def stop_child(child):
         child.wait(timeout=10)
 
 
+def _transferable(path):
+    """A job.json that cannot be read as a JSON object naming its experiment refuses the transfer; one of an experiment whose
+    plugin exports `data_policy` decides by that policy; any other job.json allows it, as before. The error names the path."""
+    from llm_eval.experiments import REGISTRY, data_policy, plugin_hook
+    try:job=read_json(path)
+    except (OSError,ValueError,RecursionError):job=None
+    name=job.get('experiment_id') if isinstance(job,dict) else None
+    if not isinstance(name,str) or not name:raise ValueError('Collection refused by data policy: '+str(path))
+    if name in REGISTRY and plugin_hook(name,'data_policy') and not data_policy(name,job)['transfer']:
+        raise ValueError('Collection refused by data policy: '+str(path))
+
+
+def _transfer_gate(directory):
+    """Every job.json at or above `directory`, at any depth up to the file-system root, decides whether bytes under it may
+    leave this host: a nearer job.json cannot override a refusing one above it."""
+    for candidate in [directory,*directory.parents]:
+        if (candidate/'job.json').is_file():_transferable(candidate/'job.json')
+
+
 def handle(p):
     action=p['action']
     if action in {'reserve','release'}:
@@ -94,15 +113,18 @@ def handle(p):
         path=(out/p['path']).resolve()
         if not path.is_relative_to(out) or path.is_symlink():raise ValueError('Unsafe artifact path')
         if type(p['offset']) is not int or p['offset']<0:raise ValueError('Invalid artifact offset')
+        _transfer_gate(path.parent)
         with path.open('rb') as f:
             f.seek(p['offset']);data=f.read(4*1024*1024)
         return {'data':base64.b64encode(data).decode()}
     if action=='collect':
+        _transfer_gate(out)
         from llm_eval.common import sha256_file
         files=[]
         for path in sorted(out.rglob('*')):
             if path.is_symlink():raise ValueError('Symlink in result bundle')
             if not path.is_file() or path.name in {'worker.log','execution.json'}:continue
+            if path.name=='job.json':_transferable(path)      # a listing that holds a refused attempt is refused as a whole
             files.append({'path':path.relative_to(out).as_posix(),'sha256':sha256_file(path),'bytes':path.stat().st_size})
             if len(files)>100000:raise ValueError('Artifact inventory exceeds limit')
         return {'files':files}
@@ -115,6 +137,8 @@ def handle(p):
     for file in job.get('input_files',[]):
         if sha256_file(file['path'])!=file['sha256']:raise ValueError('Worker input hash mismatch')
     if revision(root)!=p['code_revision']:raise ValueError('Worker code revision mismatch')
+    from llm_eval.experiments import data_policy
+    if not data_policy(job.get('experiment_id'),job)['admit']:raise ValueError('Data policy refused the job')
     if not synthetic:
         if subprocess.run(['git','-C',str(root),'diff','--quiet','HEAD']).returncode:
             raise ValueError('Worker checkout contains uncommitted code changes')

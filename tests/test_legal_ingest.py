@@ -1147,10 +1147,8 @@ class AdapterTests(unittest.TestCase):
                      'snippets': [{'file_path': 'privacy_qa/LANTERN.TXT', 'span': [a, a + len(KEPT)], 'answer': KEPT}]}] + tests()
         base = self.upstream(self, upstream_tests=upstream)
         report = benchmarks.import_dataset(base / 'request.json', base / 'import', nonce=NONCE)
-        variant_resolves = (base / 'upstream/corpus/privacy_qa/LANTERN.TXT').exists()      # a case-insensitive file system
-        first = report['examples']['rejected'][0] if variant_resolves else report['examples']['missing'][0]
-        self.assertEqual(first, {'upstream_id': 'privacy_qa:0', 'reason_code': 'unsafe_path'} if variant_resolves else
-                         {'upstream_id': 'privacy_qa:0', 'file_path': 'privacy_qa/LANTERN.TXT'})
+        # The same report on every file system: a case variant of a real entry is refused, whether or not it would open.
+        self.assertEqual(report['examples']['rejected'][0], {'upstream_id': 'privacy_qa:0', 'reason_code': 'unsafe_path'})
         # the correctly spelled path that follows is imported, not refused as a variant of the wrong spelling
         self.assertEqual(report['examples']['imported'], 2)
         copies = sorted(p.relative_to(base / 'import').as_posix() for p in (base / 'import/originals').rglob('*') if p.is_file())
@@ -1520,7 +1518,7 @@ class PacketSuiteTests(unittest.TestCase):
         self.assertFalse({a['citation'] for a in packets['corpus']['authorities']} & {a['citation'] for a in smoke['corpus']['authorities']})
 
     def test_smoke_suite_and_its_lock_are_unchanged(self):
-        self.assertEqual(sha256_file(SMOKE / 'suite.lock.json'), legal.SMOKE_SUITE_SHA256)
+        self.assertIn(sha256_file(SMOKE / 'suite.lock.json'), contracts.approved_suites())
         suite = contracts.load_suite(SMOKE / 'suite.lock.json')
         self.assertEqual([p.name for p in contracts.pinned_files(SMOKE / 'suite.lock.json')], ['matters.json', 'corpus.json', 'rubric.json'])
         self.assertEqual({k: suite[k] for k in ('collection', 'visibility', 'oracle', 'review', 'dataset', 'originals')},

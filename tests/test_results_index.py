@@ -196,5 +196,200 @@ class ResultsIndexTests(unittest.TestCase):
                 self.assertLess(text.index('## All published reports'), text.index('campaign-a-routing/README.md)', text.index(LIST_START)))
 
 
+def legal_job(job_id, kind, harness='fixture', model='fixture', mode='smoke', cohort='a' * 64, os_id='ubuntu-26.04-native', hardware='legal-host'):
+    return {'job_id': job_id, 'experiment_id': 'legal-benchmark', 'experiment_version': 1, 'mode': mode, 'case_id': job_id,
+            'hardware_config_id': hardware, 'hardware': {'os_id': os_id, 'hardware_profile': 'msi-raider-18-hx-ai'},
+            'parameters': {'synthetic': kind == 'fixture', 'execution_kind': kind, 'data_class': 'public-synthetic',
+                           'identity': {'harness': harness, 'model': model}, 'cohorts': [cohort]}, 'input_files': [{'sha256': 'b' * 64}]}
+
+
+def legal_bundle(root, publication, created, jobs, summary, projection=True):
+    """A legal bundle as the projection writes it: the marker, the execution kinds and public job descriptions."""
+    dest = root / 'docs/results/legal-benchmark' / publication
+    dest.mkdir(parents=True)
+    (dest / 'README.md').write_text('# report\n', encoding='utf-8')
+    manifest = {'experiment_id': 'legal-benchmark', 'publication_id': publication, 'campaign_id': 'fixture', 'created_utc': created,
+                'status': 'complete', 'synthetic': any(j['parameters'].get('synthetic') for j in jobs),
+                'coverage': [{'job_id': j['job_id'], 'status': 'succeeded'} for j in jobs]}
+    if projection:
+        manifest.update(projection={'id': 'legal-projection', 'version': 1}, canonical_bytes=1,
+                        execution_kinds=sorted({j['parameters']['execution_kind'] for j in jobs}))
+    (dest / 'manifest.json').write_text(json.dumps(manifest), encoding='utf-8')
+    (dest / 'resolved-config.json').write_text(json.dumps({'experiment': {'experiment_id': 'legal-benchmark'}, 'jobs': jobs}), encoding='utf-8')
+    (dest / 'summary.json').write_text(json.dumps(summary), encoding='utf-8')
+    return dest
+
+
+def without_legal(text):
+    """A generated page without what the legal records add: their rows, sections and cohort table, the browse-by counts and
+    the per-page result count (both count every record)."""
+    kept, skipping, browse = [], False, False
+    for line in text.split('\n'):
+        if line.startswith('#'):
+            skipping = 'legal-benchmark' in line or 'Results by class and cohort' in line
+            browse = line == '### Browse by category'
+        if line.startswith(('<!--', 'Full table and per-category pages')):      # the end of a generated section
+            skipping = False
+        if browse and line.startswith('|'):
+            continue
+        if skipping or 'campaign-l-legal' in line or 'published result(s)' in line:
+            continue
+        kept.append(line)
+    return kept
+
+
+class LegalIndexTests(unittest.TestCase):
+    """The cohort-aware index: legal results by class and cohort, never ranked with other experiments."""
+    setUp = ResultsIndexTests.setUp
+
+    def add_legal(self):
+        legal_bundle(self.root, 'campaign-l-legal', '2026-11-10T09:00:00+00:00',
+                     [legal_job('l1', 'fixture', cohort='c' * 64),
+                      legal_job('l2', 'model-run', 'ollama', 'deepseek-r1-32b', mode='generation', cohort='d' * 64, os_id='windows-11-native',
+                                hardware='raider-windows'),
+                      legal_job('l3', 'score-only', 'ollama', 'deepseek-r1-32b', mode='score', cohort='e' * 64)],
+                     [row('l1', 'all', 0.01, None, quality=1.0), row('l2', 'lexical-eligible', 5.0, 30.0, quality=1.0),
+                      row('l3', 'lexical-eligible', None, None, quality=1.0)])
+
+    def test_identity_and_cohort_fingerprint_are_parsed_for_legal_jobs(self):
+        self.assertEqual(identity(legal_job('x', 'model-run', 'llama.cpp', 'qwen3:27b')), ('llama.cpp', 'qwen3:27b'))
+        self.assertEqual(identity({'parameters': {'identity': {}}}), ('unknown', 'unknown'))
+        self.add_legal()
+        records = collect(self.root)
+        legal = {r['case']: r for r in records if r['experiment'] == 'legal-benchmark'}
+        self.assertEqual({k: (r['execution_kind'], r['data_class'], r['cohorts'], r['class'], r['ranked'], r['synthetic'], r['harness'])
+                          for k, r in legal.items()},
+                         {'l1': ('fixture', 'public-synthetic', ['c' * 64], 'fixture', False, True, 'fixture'),
+                          'l2': ('model-run', 'public-synthetic', ['d' * 64], 'measured', False, False, 'ollama'),
+                          'l3': ('score-only', 'public-synthetic', ['e' * 64], 'score-only', False, False, 'ollama')})
+        offload = next(r for r in records if r['experiment'] == 'model-offloading')
+        self.assertEqual({k: offload[k] for k in ('execution_kind', 'data_class', 'cohorts', 'class', 'ranked')},
+                         {'execution_kind': None, 'data_class': None, 'cohorts': [], 'class': None, 'ranked': True})
+        self.assertEqual(list(offload), ['date', 'created', 'experiment', 'mode', 'campaign', 'publication', 'hardware', 'os', 'harness', 'model',
+                                         'case', 'status', 'synthetic', 'output_cap', 'requests', 'errors', 'wall_s', 'tokens_per_s', 'quality',
+                                         'decisions', 'score', 'wall_mid', 'tokens_mid', 'backend_rss_gib', 'gpu_gib', 'report',
+                                         'execution_kind', 'data_class', 'cohorts', 'class', 'ranked'])
+
+    def test_legal_results_are_listed_by_class_cohort_os_and_runtime(self):
+        from llm_eval.reporting.index import cohort_results
+        self.assertEqual(cohort_results(collect(self.root), '', '../'), '')
+        self.add_legal()
+        write_results_index(self.root)
+        index = self.root / 'docs/results/index'
+        text = cohort_results(collect(self.root), '', '../')
+        for title, cohort in (('Fixture runs', 'c' * 12), ('Measured runs', 'd' * 12), ('Score-only runs', 'e' * 12)):
+            self.assertIn(title, text)
+            self.assertIn(cohort, text)
+        self.assertLess(text.index('Fixture runs'), text.index('Measured runs'))
+        self.assertLess(text.index('Measured runs'), text.index('Score-only runs'))
+        self.assertIn('windows-11-native', text)
+        self.assertIn('[ollama](harness/ollama.md)', text)
+        overview = (index / 'README.md').read_text(encoding='utf-8')
+        readme = self.summary.read_text(encoding='utf-8')
+        self.assertIn(text, overview)
+        self.assertIn(cohort_results(collect(self.root), 'index/', ''), readme.split(START)[1].split(END)[0])
+        for page in [*index.rglob('*.md'), self.summary]:
+            for line in page.read_text(encoding='utf-8').splitlines():
+                if 'campaign-l-legal' in line:
+                    self.assertTrue(any(word in line for word in ('fixture', 'measured', 'score-only')), (page.name, line))
+                    self.assertNotIn('(synthetic)', line)
+        listing = next(line for line in readme.splitlines() if 'campaign-l-legal' in line and '[Report]' in line)
+        self.assertIn('| fixture, model-run, score-only |', listing)
+        self.assertTrue((index / 'experiment/legal-benchmark.md').is_file())
+
+    def test_legal_records_never_enter_top_combinations(self):
+        self.add_legal()
+        records = collect(self.root)
+        self.assertTrue(any(r['experiment'] == 'legal-benchmark' and not r['synthetic'] and r['status'] == 'succeeded' and r['score'] for r in records))
+        self.assertFalse(any(r['experiment'] == 'legal-benchmark' for chosen in top_combinations(records, 10).values() for r in chosen))
+        write_results_index(self.root)
+        top = self.summary.read_text(encoding='utf-8').split(TOP_START)[1].split(TOP_END)[0]
+        self.assertNotIn('legal-benchmark', top)
+        self.assertNotIn('campaign-l-legal', top)
+        self.assertNotIn('legal-host', top)
+        charts = self.root / 'diagrams/results/summary'
+        self.assertFalse(charts.exists() and any('legal' in p.name for p in charts.iterdir()))
+
+    def test_fixture_or_incomparable_rubric_cannot_displace_a_ranked_result(self):
+        bundle(self.root, 'model-offloading', 'campaign-c-offload', '2026-11-09T14:52:55+00:00',
+               [offload_job('c1', 'ollama', 'qwen38-27b'), offload_job('c2', 'lmstudio', 'qwen38-27b')],
+               [row('c1', 'coding', 18.7, 3.58, quality=0.5), row('c2', 'coding', 7.7, 5.93, quality=1.0)])
+
+        def best():
+            return [(r['harness'], r['model'], r['publication']) for r in top_combinations(collect(self.root), 10)[('model-offloading', 'raider-windows')]]
+        before = best()
+        # Newer legal records on the same hardware, harness and model, with perfect checks: a fixture and an incomparable rubric.
+        legal_bundle(self.root, 'campaign-m-legal', '2026-11-11T09:00:00+00:00',
+                     [legal_job('m1', 'fixture', 'ollama', 'qwen38-27b', hardware='raider-windows'),
+                      legal_job('m2', 'model-run', 'ollama', 'qwen38-27b', mode='generation', hardware='raider-windows')],
+                     [row('m1', 'all', 0.001, 99.0, quality=1.0), row('m2', 'lexical-eligible', 0.001, 99.0, quality=1.0)])
+        self.assertEqual(best(), before)
+        self.assertEqual(sorted(top_combinations(collect(self.root), 10)), [('model-offloading', 'raider-windows')])
+
+    def test_relabelled_or_legacy_legal_bundles_are_not_ranked(self):
+        bundle(self.root, 'llm-routing', 'campaign-r-routing', '2026-11-09T03:57:38+00:00',
+               [{'job_id': 'r2', 'mode': 'decision', 'case_id': 'ollama-nimble', 'hardware_config_id': 'raider-ubuntu',
+                 'hardware': {'os_id': 'ubuntu-26.04-native'},
+                 'parameters': {'router': {'kind': 'systemone', 'platform': 'ollama', 'model': 'llm-eval-nimble:locked'}}}],
+               [row('r2', 'coding', 0.05, None, decisions=0.5)])
+        self.assertEqual([r['publication'] for r in top_combinations(collect(self.root))[('llm-routing', 'raider-ubuntu')]], ['campaign-r-routing'])
+        # Newer and perfect, but the manifest says llm-routing while the resolved jobs say legal-benchmark.
+        relabelled = legal_bundle(self.root, 'campaign-x-legal', '2026-11-12T03:57:38+00:00',
+                                  [{**legal_job('x1', 'model-run', hardware='raider-ubuntu'),
+                                    'parameters': {'router': {'kind': 'systemone', 'platform': 'ollama', 'model': 'llm-eval-nimble:locked'}}}],
+                                  [row('x1', 'coding', 0.01, None, decisions=1.0)], projection=False)
+        manifest = json.loads((relabelled / 'manifest.json').read_text(encoding='utf-8'))
+        (relabelled / 'manifest.json').write_text(json.dumps({**manifest, 'experiment_id': 'llm-routing'}), encoding='utf-8')
+        relabelled.rename(self.root / 'docs/results/llm-routing/campaign-x-legal')
+        legal_bundle(self.root, 'campaign-y-legal', '2026-11-12T04:00:00+00:00', [legal_job('y1', 'model-run', 'ollama', 'q')],
+                     [row('y1', 'all', 0.01, None, quality=1.0)], projection=False)
+        records = collect(self.root)
+        by_case = {r['case']: r for r in records}
+        self.assertEqual((by_case['x1']['class'], by_case['x1']['ranked'], by_case['x1']['experiment']), ('invalid', False, 'llm-routing'))
+        self.assertEqual((by_case['y1']['class'], by_case['y1']['ranked']), ('legacy', False))
+        self.assertEqual([r['publication'] for r in top_combinations(records)[('llm-routing', 'raider-ubuntu')]], ['campaign-r-routing'])
+
+    def test_offload_and_routing_output_is_identical_with_and_without_a_legal_bundle(self):
+        def outputs():
+            write_results_index(self.root)
+            return {p.relative_to(self.root).as_posix(): p.read_bytes() for p in sorted(self.root.rglob('*'))
+                    if p.is_file() and ('docs/results/index/' in p.as_posix() or '/diagrams/' in p.as_posix() or p == self.summary)}
+        bundle(self.root, 'model-offloading', 'campaign-c-offload', '2026-11-09T14:52:55+00:00',
+               [offload_job('c1', 'ollama', 'qwen38-27b'), offload_job('c2', 'lmstudio', 'qwen38-27b'), offload_job('c3', 'koboldcpp', 'gemma4-31b')],
+               [row('c1', 'coding', 18.7, 3.58, quality=1.0), row('c2', 'coding', 7.7, 5.93, quality=1.0), row('c3', 'coding', 1.1, 2.68, quality=8 / 9)])
+        before, records_before = outputs(), collect(self.root)
+        self.add_legal()
+        after, records_after = outputs(), collect(self.root)
+        self.assertEqual([r for r in records_after if r['experiment'] != 'legal-benchmark'], records_before)
+        readme = 'docs/results/README.md'
+        self.assertEqual(after[readme].decode().split(TOP_START)[1].split(TOP_END)[0], before[readme].decode().split(TOP_START)[1].split(TOP_END)[0])
+        charts = {k for k in before if k.endswith('.png')}
+        self.assertTrue(charts)
+        self.assertEqual({k: after[k] for k in after if k.endswith('.png')}, {k: before[k] for k in charts})
+        for name, data in before.items():
+            if not name.endswith('.png'):
+                with self.subTest(page=name):
+                    self.assertEqual(without_legal(after[name].decode()), without_legal(data.decode()))
+        self.assertEqual(sorted(set(after) - set(before)),
+                         ['docs/results/index/date/2026-11-10.md', 'docs/results/index/experiment/legal-benchmark.md',
+                          'docs/results/index/hardware/legal-host.md', 'docs/results/index/harness/fixture.md', 'docs/results/index/model/fixture.md'])
+
+    def test_hostile_values_of_a_projected_bundle_are_rendered_inert(self):
+        hostile = legal_job('h1', 'model-run', 'h](javascript:alert(1))', 'm\n| x |', mode='generation\n## INJECTED\n<script>x</script>',
+                            os_id='<img src=x onerror=alert(1)>', cohort='A' * 12 + '<b>')
+        dest = legal_bundle(self.root, 'campaign-h-legal', '2026-11-10T09:00:00+00:00', [hostile],
+                            [{**row('h1', 'lexical-eligible', 5.0, 30.0, quality=1e308), 'quality_check_n': 10 ** 20}])
+        manifest = json.loads((dest / 'manifest.json').read_text(encoding='utf-8'))
+        (dest / 'manifest.json').write_text(json.dumps({**manifest, 'status': 'ok\n\n<script>alert(1)</script>'}), encoding='utf-8')
+        records = collect(self.root)      # no OverflowError
+        (record,) = [r for r in records if r['case'] == 'h1']
+        self.assertIsNone(record['quality'])
+        write_results_index(self.root)
+        for page in [*(self.root / 'docs/results/index').rglob('*.md'), self.summary]:
+            text = page.read_text(encoding='utf-8')
+            for raw in ('<script>', '<img', '<b>', '\n## INJECTED', 'm\n| x |'):
+                self.assertNotIn(raw, text, page.name)
+
+
 if __name__ == '__main__':
     unittest.main()

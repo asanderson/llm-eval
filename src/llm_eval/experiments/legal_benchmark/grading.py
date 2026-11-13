@@ -766,7 +766,33 @@ def _manifest(path, suite):
         wrong('template_sha256')
     if not manifest['data_class'] == metadata.get('data_class') == suite['lock']['data_class']:
         wrong('data_class')
+    _recorded(attempt, sha)
     return manifest, attempt, job, sha
+
+
+def _recorded(attempt, sha, required=False):
+    """Where the coordinator's campaign record of the attempt is available (the attempt sits in its campaign layout
+    `<campaign>/experiments/<run>/jobs/<job>/<attempt>`), the record must hold this output-manifest digest: every lineage file
+    is written by whoever ran the attempt, the campaign record by the coordinator when the attempt finished. `required`
+    (publication) also refuses an attempt outside such a layout."""
+    attempt = Path(attempt).resolve()
+    parents = attempt.parents
+    if len(parents) < 5 or parents[1].name != 'jobs' or parents[3].name != 'experiments' or not (parents[4] / 'campaign.json').is_file():
+        if required:
+            raise ValueError('Output manifest is not in a campaign record')
+        return
+    try:
+        state, _ = contracts.read_json_strict(parents[4] / 'campaign.json')
+        attempts = state['jobs'][parents[0].name]['attempts']
+    except (OSError, ValueError, KeyError, TypeError):
+        raise ValueError('Output manifest is not in its campaign record') from None
+    record = next((a for a in attempts if isinstance(a, dict) and a.get('attempt_id') == attempt.name), None)
+    if record is None:
+        raise ValueError('Output manifest is not in its campaign record')
+    if 'output_manifest_sha256' not in record:
+        raise ValueError('Campaign record has no output-manifest digest (campaign written before this check)')
+    if record['output_manifest_sha256'] != sha:
+        raise ValueError('Output manifest differs from the campaign record')
 
 
 def _packet_outputs(attempt, suite, source=None):

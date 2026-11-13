@@ -1332,7 +1332,11 @@ class RetrievalCampaignTests(unittest.TestCase):
                          ('retrieval', 'fixture', 'fixture-default', '1', 80, 16, 8, {}, True))
         self.assertEqual(metadata['retrieval']['backend'], 'memory')
         (receipt,) = state['reports'].values()
-        self.assertEqual(receipt['status'], 'disabled')
+        self.assertEqual(receipt['status'], 'generated')      # package F: a projected local report of cohort aggregates
+        bundle = next((directory / receipt['report'] / 'bundle/docs/results/legal-benchmark').iterdir())
+        published = (bundle / 'raw/measurements.jsonl.gz').read_bytes()
+        import gzip
+        self.assertNotIn(b'"record_type": "request"', gzip.decompress(published))      # no per-matter row of a model-run mode
 
     def test_execution_kind_decides_the_synthetic_flag(self):
         fixture_arms = {'suite': str(LOCK), 'arms': ['lexical', 'dense'], 'roles': {'embedder': EMBEDDER}}

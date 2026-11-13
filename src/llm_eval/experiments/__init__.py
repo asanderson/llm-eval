@@ -21,5 +21,16 @@ def reporting_policy(experiment_id, jobs):
     return hook(jobs) if hook else {'report': True, 'publish': True, 'reason': None}
 
 
+def plugin_hook(experiment_id, name):
+    """An optional attribute of a registered plugin, or None."""
+    return getattr(get_experiment(experiment_id), name, None) if experiment_id in REGISTRY else None
+
+
+def data_policy(experiment_id, job):
+    """Whether a job may run and whether its data may leave the host. Plugins without the hook are unrestricted."""
+    hook = plugin_hook(experiment_id, 'data_policy')
+    return hook(job) if hook else {'admit': True, 'transfer': True, 'reason': None}
+
+
 def list_experiments():
     return [get_experiment(name).MANIFEST for name in REGISTRY]

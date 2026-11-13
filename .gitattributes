@@ -5,3 +5,4 @@
 *.csv text eol=lf
 *.yml text eol=lf
 experiments/legal-benchmark/workloads/*/raw/** -text
+*.gz -text

@@ -215,11 +215,11 @@ class ApprovalTests(TempCase):
             lock = read_json(shipped[key])
             self.assertEqual((lock['data_class'], lock['benchmark_id'], entry), ('public-synthetic', entry['benchmark_id'],
                                                                                  {'benchmark_id': lock['benchmark_id'], 'fixture_export': True}))
-        self.assertEqual(approved[legal.SMOKE_SUITE_SHA256]['benchmark_id'], 'legal-original-smoke')
-        self.assertEqual(contracts.export_allowed(SMOKE), legal.SMOKE_SUITE_SHA256)
+        self.assertEqual(approved[sha256_file(SMOKE)]['benchmark_id'], 'legal-original-smoke')
+        self.assertEqual(contracts.export_allowed(SMOKE), sha256_file(SMOKE))
         self.assertEqual(contracts.export_allowed(PACKETS), sha256_file(PACKETS))
         good = json.loads(data)
-        key = legal.SMOKE_SUITE_SHA256
+        key = sha256_file(SMOKE)
         for broken in ({**good, 'extra': 1}, {**good, 'schema_version': 2}, {'schema_version': 1, 'suites': {key.upper(): good['suites'][key]}},
                        {'schema_version': 1, 'suites': {key: {**good['suites'][key], 'fixture_export': 'yes'}}},
                        {'schema_version': 1, 'suites': {key: {**good['suites'][key], 'benchmark_id': 'Not An Id'}}},
@@ -721,7 +721,8 @@ class RoutingTests(RoutedCase):
         self.assertEqual([f['path'] for f in manifest['files']], sorted(f['path'] for f in manifest['files']))
         plan = self.plan('score', 'score', {'suite': 'suite/suite.lock.json', 'output_manifest': str(attempt / 'local/output-manifest.json')})
         (job,) = plan['jobs']
-        self.assertIn(str(attempt / 'local/route-decisions.jsonl'), {f['path'] for f in job['input_files']})
+        # The plan records resolved paths; the temporary directory can be an 8.3 short name on Windows.
+        self.assertIn(str((attempt / 'local/route-decisions.jsonl').resolve()), {f['path'] for f in job['input_files']})
         scored = self.run_job(job, 'score')
         source, rows = lines(attempt / 'requests.jsonl'), lines(scored / 'requests.jsonl')
         self.assertEqual(len(rows), len(source))
@@ -846,12 +847,13 @@ class RoutingTests(RoutedCase):
             return self.plan(name, 'generation', {'suite': str(SMOKE), 'arms': ['no-context', 'lexical-eligible'], 'roles': plan_roles, 'selector': selector})
         (job,) = plan({**served(abstain_threshold=threshold), 'calibration': calibration})['jobs']
         recorded = {f['path'] for f in job['input_files']}
-        self.assertIn(str(self.path / 'calibration.json'), recorded)
+        self.assertIn(str((self.path / 'calibration.json').resolve()), recorded)
         self.assertTrue({str(p) for p in contracts.pinned_files(PACKETS)} <= recorded)
         pinned = workflow().inputs(job['parameters'], smoke, ROOT, 'generation')
         self.assertEqual(pinned[:len(contracts.pinned_files(PACKETS))], [str(p) for p in contracts.pinned_files(PACKETS)])
         for attempt in calibration_attempts():      # both calibration attempts: every file their manifests list, and result.json
-            listed = {str(attempt / f['path']) for f in read_json(attempt / 'local/output-manifest.json')['files']} | {str(attempt / 'result.json')}
+            attempt = attempt.resolve()
+            listed ={str(attempt / f['path']) for f in read_json(attempt / 'local/output-manifest.json')['files']} | {str(attempt / 'result.json')}
             self.assertTrue(listed <= set(pinned))
             self.assertTrue(listed | {str(attempt / 'local/output-manifest.json')} <= recorded)
         self.assertEqual(workflow().inputs({**job['parameters'], 'selector': CATEGORY}, None, ROOT, 'generation'), [])
@@ -1282,7 +1284,7 @@ class ReplayTests(ReplayCase):
         smoke = contracts.load_suite(SMOKE)
         attempt = smoke_attempt()
         self.assertEqual({k: v for k, v in provenance.items() if k not in ('attempts', 'outcomes', 'generator', 'generator_sha256')}, {
-            'schema_version': 1, 'kind': 'legal-routing-provenance', 'suite_lock_sha256': legal.SMOKE_SUITE_SHA256, 'split_id': 'smoke',
+            'schema_version': 1, 'kind': 'legal-routing-provenance', 'suite_lock_sha256': sha256_file(SMOKE), 'split_id': 'smoke',
             'rubric_version': smoke['rubric']['rubric_version'], 'scorer_fingerprint': g.scorer_fingerprint(smoke),
             'routing_suite_sha256': manifest['suite_sha256'], 'replay_manifest_sha256': digest(manifest), 'calibration': None})
         lineage = {'inference_job_id': 'legal-smoke-source', 'inference_attempt_id': attempt.name,
@@ -1311,7 +1313,7 @@ class ReplayTests(ReplayCase):
         self.assertEqual(provenance['generator'], {k: CANDIDATE[k] for k in CANDIDATE})
         self.assertEqual(provenance['generator_sha256'], read_json(attempt / 'metadata.json')['roles']['generator']['profile_sha256'])
         self.assertEqual(rescored['no-context']['lineage'], {**lineage, 'scorer_fingerprint': g.scorer_fingerprint(smoke),
-                                                             'suite_lock_sha256': legal.SMOKE_SUITE_SHA256,
+                                                             'suite_lock_sha256': sha256_file(SMOKE),
                                                              'generator_sha256': provenance['generator_sha256'], 'generator': provenance['generator']})
 
     def test_stale_orphan_and_duplicate_rows_are_rejected(self):
@@ -1661,7 +1663,7 @@ class ExampleTests(TempCase):
         for phrase in ('local forward', 'single active large model', 'raider` lock'):
             self.assertIn(phrase, readme)
         experiment = (X / 'README.md').read_text(encoding='utf-8')
-        for phrase in ('open gap', 'selector_deferral', 'route_error_type', 'never public', 'not re-read', 'informational'):
+        for phrase in ('refuses such bundles by content', 'selector_deferral', 'route_error_type', 'never public', 'not re-read', 'informational'):
             self.assertIn(phrase, experiment)
 
 
@@ -2075,7 +2077,7 @@ class ReReviewTests(TempCase):
         roles = {'generator': generator(), 'selector': selector_role()}
         (job,) = self.plan('honest', 'generation', {'suite': str(SMOKE), 'arms': ['no-context', 'lexical-eligible'], 'roles': roles,
                                                     'selector': {**served(abstain_threshold=record['abstain_threshold']), 'calibration': block}})['jobs']
-        self.assertIn(str(Path(block['routed']['output_manifest'])), {f['path'] for f in job['input_files']})
+        self.assertIn(str(Path(block['routed']['output_manifest']).resolve()), {f['path'] for f in job['input_files']})
         # Item 4: the routed calibration attempt must have run without a threshold or required confidence.
         routed, fallback = calibration_attempts()
         with FakeSelector(lambda body: by_question(body, {'kiln': 'none'}, 0.8)) as selector, FakeGenerator('{}') as fake, NO_GPU:

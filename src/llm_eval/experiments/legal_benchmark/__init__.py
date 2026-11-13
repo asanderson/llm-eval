@@ -11,7 +11,6 @@ from importlib import import_module
 import json
 from pathlib import Path
 
-from llm_eval.common import sha256_file
 from llm_eval.core.contracts import fields
 
 from . import fixture
@@ -21,11 +20,8 @@ MODE_MODULES = {'smoke': 'fixture', 'retrieval': 'retrieval', 'generation': 'wor
 MANIFEST = {'id': 'legal-benchmark', 'version': 1, 'modes': list(MODE_MODULES),
             'description': 'Legal retrieval, evidence-grounded analysis and draft screening memos for human review'}
 BENCHMARK = 'legal-smoke'
-# SHA-256 of experiments/legal-benchmark/workloads/original-smoke/suite.lock.json. The lock pins every suite file,
-# so this one digest identifies the exact public-original suite that may enter generic report generation.
-SMOKE_SUITE_SHA256 = 'ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae'
-REPORTING_DISABLED = ('legal-benchmark reports are limited to the public-original smoke suite, and its results are not '
-                      'published, until the legal report projection is implemented')
+# Legal results stay out of the generic top-combinations ranking of the results index (read through `plugin_hook`).
+GENERIC_RANKING = False
 # Directory names the generic report builder tests on the absolute path of every file it scans.
 SCANNED_DIRECTORIES = ('model_judgment', 'reports')
 
@@ -107,31 +103,55 @@ def _planned_suite(job):
     return suite
 
 
-def _is_smoke_suite(job):
-    parameters = job.get('parameters', {})
-    suite = parameters.get('suite')
-    if job.get('mode') != 'smoke' or parameters.get('synthetic') is not True or not isinstance(suite, str):
-        return False
-    recorded = {f['path']: f['sha256'] for f in job.get('input_files', [])}
-    if recorded.get(suite) != SMOKE_SUITE_SHA256:
-        return False
-    try:      # the bytes on disk, not only the digest a job dict claims
-        return sha256_file(suite) == SMOKE_SUITE_SHA256
-    except OSError:
-        return False
+def data_policy(job):
+    """Whether a job may run here and whether its data may leave the host: the one classification of `reporting.classify`."""
+    from . import reporting
+    return reporting.data_policy(job)
 
 
 def reporting_policy(jobs):
-    """What the generic reporting layer may do with these jobs. Decided from the planned inputs, never from a
-    campaign's reporting settings or a report's own labels."""
-    allowed = bool(jobs) and all(_is_smoke_suite(job) for job in jobs)
-    return {'report': allowed, 'publish': False, 'reason': REPORTING_DISABLED}
+    """What the generic reporting layer may do with these jobs: a local projected report, never automatic publication.
+    Decided from the planned inputs, never from a campaign's reporting settings or a report's own labels."""
+    from . import reporting
+    return reporting.reporting_policy(jobs)
+
+
+def report_projection(campaign_dir, plan, state, exp, **options):
+    """The strict allowlisted projection that replaces the generic raw scan for this experiment."""
+    from . import reporting
+    return reporting.project(campaign_dir, plan, state, exp, **options)
+
+
+def verify_publication(report, root, base=None):
+    """The publication gate: ValueError(<reason code>) unless the bundle is the authorized projection of approved inputs."""
+    from . import reporting
+    return reporting.verify_publication(report, root, base)
+
+
+def claims_bundle(report, dest, manifest, resolved, records):
+    """True when a bundle of another experiment carries legal content (by content, not by name)."""
+    from . import reporting
+    return reporting.claims_bundle(report, dest, manifest, resolved, records)
+
+
+def attempt_receipt(directory):
+    """What the coordinator records about a finished attempt: its output-manifest digest."""
+    from . import reporting
+    return reporting.attempt_receipt(directory)
 
 
 def claims_benchmark(name):
     """True for a benchmark name this plugin writes (`legal-smoke` and every later `legal-*` export). A bundle of another
-    experiment that carries such a name has a second identity and is refused by `publish_report`."""
-    return str(name).strip().lower().startswith('legal-')      # normalised: `LEGAL-smoke` or ` legal-smoke` is still claimed
+    experiment that carries such a name has a second identity and is refused by `publish_report`. The name is compared after
+    NFKC normalisation, case folding and removal of `-`, `_` and spaces: `LEGAL_smoke`, ` legal smoke` and fullwidth letters
+    are claimed too."""
+    import re
+    import unicodedata
+    return re.sub(r'[-_\s]', '', unicodedata.normalize('NFKC', str(name)).casefold()).startswith('legal')
+
+
+# Files a publication branch must not change: the reviewed approved list decides what may be published.
+PROTECTED_PATHS = ('experiments/legal-benchmark/approved-suites.json',)
 
 
 def execute(job, output, root):
