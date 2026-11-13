@@ -333,6 +333,22 @@ class LaunchTests(unittest.TestCase):
                 spec = launch_spec(c, state, tmp)
             self.assertNotIn('secret-value', json.dumps(spec))
 
+    def test_strata_launch_selects_the_real_engine(self):
+        # Upstream serve/server.py defaults --engine to its scripted mock, which would answer every request.
+        with tempfile.TemporaryDirectory() as tmp:
+            c, state = self.config(tmp, 'strata')
+            c['reviewed_strata_config'] = True
+            c.pop('api_key_env', None)
+            c['launch']['strata_config'] = 'strata.json'
+            state['executable'] = str(Path(tmp) / 'engine')
+            write_json(Path(tmp) / 'strata.json', {'exe': state['executable']})
+            argv = launch_spec(c, state, tmp)['argv']
+            self.assertEqual(argv[argv.index('--engine') + 1], 'strata')
+            for extra in (['--engine', 'mock'], ['--engine=mock']):
+                c['launch']['extra_args'] = extra
+                with self.subTest(extra=extra), self.assertRaisesRegex(ValueError, 'override'):
+                    launch_spec(c, state, tmp)
+
     def test_readiness_checks_http_and_passes_auth(self):
         process = Mock()
         process.poll.return_value = None
