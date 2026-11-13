@@ -15,8 +15,11 @@ MAX_LINE_BYTES = 1024 * 1024
 
 
 def endpoint_parts(url):
+    # urlsplit lowercases the scheme and drops whitespace and control characters: an endpoint has one spelling.
+    if not isinstance(url, str) or not url.startswith("http://") or any(c <= " " or c == "\x7f" for c in url):
+        raise ValueError("Use an http loopback endpoint written as http://ADDRESS[:PORT][/PATH] without whitespace")
     parts = urlsplit(url)
-    if parts.scheme != "http" or parts.username or parts.password or parts.query or parts.fragment:
+    if parts.username or parts.password or parts.query or parts.fragment:
         raise ValueError("Use an http loopback endpoint without embedded credentials, query or fragment")
     try:
         address = ipaddress.ip_address(parts.hostname or "")
@@ -24,6 +27,15 @@ def endpoint_parts(url):
         raise ValueError("Use a literal loopback address, e.g. 127.0.0.1 (DNS is not used)") from exc
     if not address.is_loopback:
         raise ValueError("Remote endpoints are disabled: this project measures self-hosted local inference")
+    try:
+        port = parts.port
+    except ValueError as exc:
+        raise ValueError("Endpoint port must be between 1 and 65535") from exc
+    # IPv6 loopback is ::1 alone: no IPv4-mapped, scoped or expanded form, whatever the Python version calls loopback.
+    plain = address.version == 4 or address == ipaddress.IPv6Address("::1")
+    host = f"[{address}]" if address.version == 6 else str(address)
+    if not plain or port == 0 or parts.netloc != host + (f":{port}" if port else ""):
+        raise ValueError("Write the endpoint address plainly, e.g. 127.0.0.1:8000 or [::1]:8000")
     return parts
 
 
