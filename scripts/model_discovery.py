@@ -108,8 +108,32 @@ SITE_TYPES = {"html": ("text/html",), "json": ("application/json",), "csv": ("te
 WEIGHTS_KEY = "_overall_weights"
 # The order the site adds a 2.0 release's suites in: rn() sorts them by their index in this list (unknown suites last),
 # and the averaging code sums in that order, which can move an overall across a .xx5 rounding boundary. Read from
-# the main script each run; this is the list of the reviewed script (main.1e1ce12d.js), used when it cannot be read.
+# the main script each run; this is the list of the reviewed script (main.1e1ce12d.js; main.8a7822ea.js holds the same
+# list and the same rn()), used when it cannot be read.
 REVIEWED_SUITE_ORDER = ("Long Agentic", "Design", "Coding", "Browser", "Data Analysis", "Research", "Reasoning")
+# The averaging functions of the reviewed script (main.8a7822ea.js, read 2026-11-14), verbatim and in the script's
+# order: the mean of a suite's columns; the weights of a release and the weighted mean of the suites; the overall and
+# a suite's score. The site's bundle gets a new name on every deploy, so the run looks for these functions in the
+# served script instead of trusting or distrusting a name (rule_as_reviewed). Not part of it: the text shown beside
+# the overall (Cn) and the places that call the functions.
+REVIEWED_RULE = (
+    'mn=(e,t,n)=>{if(!t)return"-";const a=t.map(t=>parseFloat(e[t])).filter(e=>!isNaN(e)),'
+    'r=a.length>0?a.reduce((e,t)=>e+t,0)/a.length:NaN;return isNaN(r)?"-":n?r.toFixed(n):r}',
+    'kn="_overall_weights";function Nn(e){const{[kn]:t,...n}=e||{},a={};return Object.entries(t||{})'
+    '.forEach(([e,t])=>{const r=Number(t);e in n&&isFinite(r)&&r>0&&(a[e]=r)}),{categories:n,weights:a}}'
+    'const Sn=(e,t)=>e&&null!=e[t]?e[t]:1,jn=(e,t)=>t.some(t=>Sn(e,t)>0)?e:{};'
+    'function En(e,t,n){let a=0,r=0;for(const o of t){const t=e[o],i=Sn(n,o);null!=t&&i>0&&(a+=t*i,r+=i)}'
+    'return r>0?a/r:null}',
+    'function zn(e,t,n){const a=Object.keys(t||{});if(!n||((e,t)=>t.every(t=>1===Sn(e,t)))(n,a)){'
+    'const n=parseFloat(((e,t,n)=>{const a=Object.entries(t).filter(([,e])=>e.average||e.allSubcategories)'
+    '.map(([t])=>mn(e,n[t])).filter(e=>"-"!==e&&!isNaN(e)),r=a.length?a.reduce((e,t)=>e+t)/a.length:NaN;'
+    'return isNaN(r)?"-":r.toFixed(2)})(e,function(e){const t={};return Object.keys(e||{}).forEach(e=>{'
+    't[e]={average:!0,allSubcategories:!1}}),t}(t),t));return isNaN(n)?null:n}const r={};'
+    'a.forEach(n=>{r[n]=An(e,t,n)});const o=En(r,a,jn(n,a));return null==o?null:parseFloat(o.toFixed(2))}'
+    'function An(e,t,n){const a=mn(e,t[n]);return"-"===a||null==a?null:Number(a)}',
+)
+# Words of the language and globals the rule uses: a minifier never renames them, so they must be the same.
+JS_KEPT = frozenset("const function return let for of in if null NaN isNaN isFinite Number Object parseFloat".split())
 GENERATIONS = ("v1", "2.0")
 
 HARDWARE_CONFIG = "configs/hardware/msi-raider-18-hx-ai.json"
@@ -162,6 +186,7 @@ OPENWEIGHT_MARK = "openweight:!0"
 # X.length:t}...: the list of quoted suite names whose index orders the suites, unknown ones last.
 SUITE_ORDER_RE = re.compile(r'(?<![\w$.])(' + JS_ID + r')=\[((?:"[^"\\]+",)*"[^"\\]+")\][;,][^;]{0,160}?(?<![\w$.])\1'
                             r'\.indexOf\(' + JS_ID + r'\);return ' + JS_ID + r'<0\?\1\.length:')
+JS_TOKEN_RE = re.compile(r'"(?:[^"\\]|\\.)*"|\d[\w.]*|' + JS_ID + r"|.", re.S)     # of REVIEWED_RULE, never of a served script
 HF_LINK_RE = re.compile(r"^https://huggingface\.co/([A-Za-z0-9][A-Za-z0-9_.-]*/(?!\.\.?/?$)[A-Za-z0-9_.-]+)/?$")
 SIZE_RE = re.compile(r"^\d+(\.\d+)?b$")
 ACTIVE_RE = re.compile(r"^a\d+(\.\d+)?b$")
@@ -1028,6 +1053,38 @@ def parse_suite_order(text):
     the main script does not hold exactly one."""
     found = {tuple(js_string(t) for t in re.findall(r'"[^"\\]+"', m.group(2))) for m in SUITE_ORDER_RE.finditer(text)}
     return list(found.pop()) if len(found) == 1 else None
+
+
+def rule_pattern(fragments=REVIEWED_RULE):
+    """A pattern that finds the fragments, in their order, in a script whose minifier named the bindings differently.
+    A binding is a group where it first appears and a back-reference after that. Everything else must be the same:
+    strings, numbers, punctuation, the words in JS_KEPT, a property name after a dot and an object key."""
+    groups, parts = {}, []
+    for fragment in fragments:
+        out = [r"(?<![\w$.])"]
+        for m in JS_TOKEN_RE.finditer(fragment):
+            token, before, after = m.group(), fragment[max(0, m.start() - 2):m.start()], fragment[m.end():m.end() + 1]
+            prop = before.endswith(".") and before != ".."          # a.length, but not the n of {...n}
+            key = before[-1:] in ("{", ",") and after == ":"       # {categories:n,weights:a}
+            if not re.fullmatch(JS_ID, token) or token in JS_KEPT or prop or key:
+                out.append(re.escape(token))
+            elif token in groups:
+                out.append(f"(?P={groups[token]})")
+            else:
+                groups[token] = f"i{len(groups)}"
+                out.append(f"(?P<{groups[token]}>{JS_ID})")
+        parts.append("".join(out))
+    return re.compile(".*?".join(parts), re.S)
+
+
+def rule_as_reviewed(text):
+    """Whether the script holds the reviewed averaging functions, whatever its minifier called the bindings: one name
+    per binding, no name shared by two bindings and none of them a kept word. The code around them is not looked at."""
+    m = RULE_RE.search(text)
+    return bool(m) and len(set(m.groups())) == len(m.groups()) and not JS_KEPT.intersection(m.groups())
+
+
+RULE_RE = rule_pattern()
 
 
 def site_order(names, display):
@@ -1995,6 +2052,7 @@ class Discovery:
         self.forced = release              # a --release id, or None (the newest release)
         self.stage = "local inputs"
         self.local = self.site = self.release = self.script = self.registry = self.suite_order = None
+        self.rule_as_reviewed = None      # whether the served script holds REVIEWED_RULE; set with self.script
         self.timeline = []
         self.complete = False
         self.header_notes, self.header_warnings, self.warnings, self.notices = [], [], [], []
@@ -2034,8 +2092,14 @@ class Discovery:
     def read_site(self):
         path, text = self.site.main_script()
         body = self.site.get(path, "js").body
+        self.rule_as_reviewed = rule_as_reviewed(text)
         self.script = {"path": path, "url": SITE_URL + path, "sha256": hashlib.sha256(body).hexdigest(),
                        "bytes": len(body)}
+        if not self.rule_as_reviewed and path == self.local.site.main_script:
+            self.header_warnings.append(
+                f"`REVIEWED_RULE` in scripts/model_discovery.py is not the averaging code of `{path}`, the script "
+                "`site.main_script` names as reviewed: nothing is raised for this script, and the next deploy raises "
+                "\"Leaderboard site code changed\" until `REVIEWED_RULE` holds the code that was read.")
         self.timeline = parse_release_lists(text)
         if f'"{WEIGHTS_KEY}"' not in text:
             raise ShapeError(f'the averaging code\'s "{WEIGHTS_KEY}" literal in {path}', got="no such literal")
@@ -2345,15 +2409,17 @@ class Discovery:
             self.notices.append(Notice("new_release", r.date, f"New LiveBench release {r.date}", lines,
                                        "Clears when catalog/livebench-evidence.json `latest_release` records it: that edit is the decision."))
         reviewed, served = self.local.site.main_script, self.script["path"]
-        if served != reviewed:
+        if served != reviewed and not self.rule_as_reviewed:
             self.notices.append(Notice(
                 "site_code_changed", served, "Leaderboard site code changed",
-                [f"the averaging code was reviewed in {md_code(reviewed)} (on {self.local.site.reviewed_on}); re-read the "
+                [f"the averaging code was reviewed in {md_code(reviewed)} (on {self.local.site.reviewed_on}) and its "
+                 f"functions are not in the served script as they were read; re-read the "
                  f"weights rule in {md_code(served)} ([script]({SITE_URL}{served})) and update `site` once it still "
-                 "holds. Candidates are not withheld: the site's bundle changes on every deploy, and the run still "
-                 f"requires the `{WEIGHTS_KEY}` literal and checks every categories file's weights."],
+                 "holds. Candidates are not withheld: a rebuilt bundle with the reviewed functions raises nothing, and the "
+                 f"run still requires the `{WEIGHTS_KEY}` literal and checks every categories file's weights."],
                 "Clears when `site.main_script` in catalog/model-discovery.json names the served script (with "
-                "`site.reviewed_on` the date it was re-read)."))
+                "`site.reviewed_on` the date it was re-read). The next rebuild raises it again until `REVIEWED_RULE` "
+                "in scripts/model_discovery.py holds the code that was re-read."))
 
 
     # .. Hugging Face ............................................................................
@@ -2875,6 +2941,8 @@ class Report:
         ok, total = d.canary_score
         site, script = d.local.site, d.script
         code = (f"site code `{script['path']}` as reviewed on {site.reviewed_on}" if script["path"] == site.main_script
+                else f"site code `{script['path']}` holds the averaging functions reviewed in `{site.main_script}` on "
+                f"{site.reviewed_on}" if d.rule_as_reviewed
                 else f"site code **changed**: `{script['path']}` served, `{site.main_script}` reviewed")
         gen = "v1" if r.generation == "v1" else f"LiveBench 2.0, id `{r.id}`"
         lines = [
@@ -3241,7 +3309,8 @@ class Report:
         if d.script:
             out += ["### Leaderboard site", "",
                     f"- Main script `{d.script['path']}` ({d.script['bytes']} bytes, sha256 `{d.script['sha256']}`); "
-                    f"reviewed `{d.local.site.main_script}` on {d.local.site.reviewed_on}.",
+                    f"reviewed `{d.local.site.main_script}` on {d.local.site.reviewed_on}; the reviewed averaging "
+                    f"functions are {'in it' if d.rule_as_reviewed else 'NOT in it as they were read'}.",
                     "- Timeline: v1 " + (", ".join(r.id for r in d.timeline if r.generation == "v1") or "none")
                     + "; 2.0 " + (", ".join(r.id for r in d.timeline if r.generation == "2.0") or "none") + "."]
             if d.registry is not None:
@@ -3366,6 +3435,7 @@ def to_json(d, report, error=None):
                                              "message": str(error) if isinstance(error, DiscoveryError) else None},
         "sources": {"site": SITE_URL, "main_script": d.script,
                     "reviewed_script": dataclasses.asdict(d.local.site) if d.local else None,
+                    "rule_as_reviewed": d.rule_as_reviewed,
                     "timeline": [dataclasses.asdict(t) for t in d.timeline], "suite_order": d.suite_order,
                     "registry": None if d.registry is None else {
                         "problem": d.registry.problem, "entries": [len(t) for t in d.registry.tables],
@@ -3448,7 +3518,8 @@ def probe(net, root, today, lines):
         order = parse_suite_order(text)
         lines.append(f"- main script `{path}` (agrees with index.html): {len(body)} bytes, sha256 "
                      f"`{hashlib.sha256(body).hexdigest()}`; reviewed script `{local.site.main_script}` "
-                     f"({'the same' if path == local.site.main_script else 'DIFFERENT'}); "
+                     f"({'the same' if path == local.site.main_script else 'DIFFERENT'}); reviewed averaging functions "
+                     f"{'present' if rule_as_reviewed(text) else 'NOT FOUND as they were read'}; "
                      f"`{literal}` literal {'present' if literal in text else 'ABSENT'}; suite order "
                      + (md_code(", ".join(order), 400) + (" (as reviewed)" if tuple(order) == REVIEWED_SUITE_ORDER else
                                                           " (DIFFERS from the reviewed order)") if order else "NOT FOUND"))

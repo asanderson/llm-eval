@@ -228,29 +228,46 @@ def suite_order_js(order):
             't<0?an.length:t},n={};return Object.keys(e||{}).sort((e,n)=>t(e)-t(n)).forEach(t=>{n[t]=e[t]}),n}')
 
 
+# The averaging code of the real main.8a7822ea.js, verbatim (identifiers as minified there), in the script's order:
+# the mean of a suite's columns, the weights and the weighted mean, the text shown beside the overall (Cn, not part
+# of the rule), the overall and a suite's score. Kept apart from md.REVIEWED_RULE so that a slip there shows.
+RULE_MEAN = ('mn=(e,t,n)=>{if(!t)return"-";const a=t.map(t=>parseFloat(e[t])).filter(e=>!isNaN(e)),r=a.length>0?'
+             'a.reduce((e,t)=>e+t,0)/a.length:NaN;return isNaN(r)?"-":n?r.toFixed(n):r}')
+RULE_WEIGHTS = ('kn="_overall_weights";function Nn(e){const{[kn]:t,...n}=e||{},a={};return Object.entries(t||{})'
+                '.forEach(([e,t])=>{const r=Number(t);e in n&&isFinite(r)&&r>0&&(a[e]=r)}),{categories:n,weights:a}}')
+RULE_WEIGHTED = ('const Sn=(e,t)=>e&&null!=e[t]?e[t]:1,jn=(e,t)=>t.some(t=>Sn(e,t)>0)?e:{};function En(e,t,n){let a=0,'
+                 'r=0;for(const o of t){const t=e[o],i=Sn(n,o);null!=t&&i>0&&(a+=t*i,r+=i)}return r>0?a/r:null}')
+RULE_TEXT = ('function Cn(e,t){const n=(t||[]).filter(t=>1!==Sn(e,t));return n.length?`weighted mean of the suites with '
+             'a score (${n.map(t=>`${t} \\xd7${Sn(e,t)}`).join(", ")}, the rest \\xd71)`:"mean of the suites with a score"}')
+RULE_OVERALL = ('function zn(e,t,n){const a=Object.keys(t||{});if(!n||((e,t)=>t.every(t=>1===Sn(e,t)))(n,a)){const n='
+                'parseFloat(((e,t,n)=>{const a=Object.entries(t).filter(([,e])=>e.average||e.allSubcategories).map(([t])=>'
+                'mn(e,n[t])).filter(e=>"-"!==e&&!isNaN(e)),r=a.length?a.reduce((e,t)=>e+t)/a.length:NaN;return isNaN(r)?'
+                '"-":r.toFixed(2)})(e,function(e){const t={};return Object.keys(e||{}).forEach(e=>{t[e]={average:!0,'
+                'allSubcategories:!1}}),t}(t),t));return isNaN(n)?null:n}const r={};a.forEach(n=>{r[n]=An(e,t,n)});const '
+                'o=En(r,a,jn(n,a));return null==o?null:parseFloat(o.toFixed(2))}function An(e,t,n){const a=mn(e,t[n]);'
+                'return"-"===a||null==a?null:Number(a)}')
+
+
 def main_script(v1, v2, registry, v1_registry, weights_literal=True, before='', after='',
                 suite_order=md.REVIEWED_SUITE_ORDER):
-    """A bundle carrying the shapes the run reads: the code around the release lists, the suite order and the
-    averaging code are copied from the real main.1e1ce12d.js (identifiers as minified there); registries and lists
-    are the fixture's."""
+    """A bundle carrying the shapes the run reads: the code around the release lists and the suite order are copied
+    from the real main.1e1ce12d.js and the averaging code from the real main.8a7822ea.js (identifiers as minified
+    there); registries and lists are the fixture's."""
     v1_list = ','.join(f'"{d}"' for d in v1)
     v2_list = ','.join(f'"{d}"' for d in v2)
-    weights = ('const kn="_overall_weights";function Nn(e){const{[kn]:t,...n}=e||{},a={};return Object.entries(t||{})'
-               '.forEach(([e,t])=>{const r=Number(t);e in n&&isFinite(r)&&r>0&&(a[e]=r)}),{categories:n,weights:a}}'
-               if weights_literal else 'function Nn(e){return{categories:e,weights:{}}}')
+    weights = 'const ' + RULE_WEIGHTS if weights_literal else 'function Nn(e){return{categories:e,weights:{}}}'
     return (
         '/*! For license information please see main.1e1ce12d.js.LICENSE.txt */(()=>{var e={766:function(e){e.exports={}}};'
         + before
         + 'const tn={Qwen:"#7C3AED"},nn=e=>tn[e]||"#7A8AA8",' + (suite_order_js(suite_order) if suite_order else 'an=[]')
-        + ';const mn=(e,t,n)=>{if(!t)return"-";const a=t.map(t=>parseFloat(e[t])).filter(e=>!isNaN(e)),r=a.length>0?'
-          'a.reduce((e,t)=>e+t,0)/a.length:NaN;return isNaN(r)?"-":n?r.toFixed(n):r},gn={' + ','.join(registry) + '},vn={};'
+        + ';const ' + RULE_MEAN + ',gn={' + ','.join(registry) + '},vn={};'
         + f'Qt={{tablejoin:"table join"}},Yt=[{v2_list}],Jt="undefined"!==typeof window&&/^\\/new(\\/(index\\.html)?)?$/'
           '.test(window.location.pathname)?[...Yt]:Yt,Xt=e=>`${e.slice(0,4)}-${e.slice(4,6)}-${e.slice(6,8)}`,'
           f'Zt="25 October 2026",en=[...[{v1_list}].map(e=>({{id:e,label:e,gen:"v1"}})),...Jt.map(e=>({{id:e,label:Xt(e),'
           'gen:"v2"}))];if(new Set(en.map(e=>e.label)).size!==en.length)throw new Error("Two releases share a date on '
           'the timeline (v1 RELEASES vs 2.0 RELEASE_LABELS)");'
-        + weights
-        + 'const Sn=(e,t)=>e&&null!=e[t]?e[t]:1;const pa=e=>fn().parse(e,{header:!0,dynamicTyping:!0,skipEmptyLines:!0})'
+        + weights + RULE_WEIGHTED + RULE_TEXT + RULE_OVERALL
+        + 'const pa=e=>fn().parse(e,{header:!0,dynamicTyping:!0,skipEmptyLines:!0})'
           '.data.filter(e=>e.model);const ha=(e,t,n)=>{if(!t)return"-"},fa={' + ','.join(v1_registry) + '},ma={};'
           'fetch(`./v1/table_${a}.csv?v=1793398874`);fetch(`./data/${e}/table.csv?v=1793398874`);'
         + after + '})();'
@@ -1040,6 +1057,39 @@ class SiteTest(Base):
         # unknown suites go last in their own order, as the site's stable sort leaves them
         self.assertEqual(md.site_order(['Zeta', 'Reasoning', 'Alpha', 'Long Agentic'], md.REVIEWED_SUITE_ORDER),
                          ['Long Agentic', 'Reasoning', 'Zeta', 'Alpha'])
+
+    def test_the_averaging_code_of_the_real_bundle(self):
+        real = ('const ' + RULE_MEAN + ',gn={"a-1":{openweight:!0}};const ' + RULE_WEIGHTS + RULE_WEIGHTED + RULE_TEXT
+                + RULE_OVERALL + 'function Tn(e,t){return e}')
+        self.assertEqual(md.REVIEWED_RULE, (RULE_MEAN, RULE_WEIGHTS + RULE_WEIGHTED, RULE_OVERALL))
+        self.assertTrue(md.rule_as_reviewed(real))                  # the text beside the overall lies between: not the rule
+        names = 'mn e t n a r kn Nn Sn jn En o i zn An'.split()     # the bindings, and nothing but the bindings
+        self.assertEqual(list(md.RULE_RE.search(real).groups()), names)
+
+        def rename(text, new):
+            return re.sub(r'(?<![\w$])(?:' + '|'.join(new) + r')(?![\w$])', lambda m: new[m.group()], text)
+        fresh = dict(zip(names, 'Qa x y z u v Qb Qc Qd Qe Qf w s Qg $h'.split()))
+        self.assertNotIn('function zn(', rename(real, fresh))
+        self.assertTrue(md.rule_as_reviewed(rename(real, fresh)))   # minified names change between builds
+        changes = [('(a+=t*i,r+=i)', '(a+=t,r+=i)'),                           # the weight leaves the sum
+                   ('return r>0?a/r:null}', 'return a>0?r/a:null}'),           # sum and total change places
+                   ('o.toFixed(2)', 'o.toFixed(1)'), ('isFinite(r)&&r>0', 'isFinite(r)&&r>=0'),
+                   ('isFinite(r)', 'isNaN(r)'),                                # a word of the language is not a binding
+                   ('e.average||', 'e.mean||'), ('a.length>0', 'a.size>0'),    # nor is a property name
+                   ('{categories:n,weights:a}', '{categories:a,weights:n}'),
+                   ('"_overall_weights"', '"_weights"'), ('const{[kn]:t,...n}', 'const{[kn]:t,n}'),
+                   (RULE_OVERALL, ''), (RULE_MEAN, 'mn=0')]
+        for old, new in changes:
+            with self.subTest(old=old[:40]):
+                self.assertEqual(real.count(old), 1)
+                self.assertFalse(md.rule_as_reviewed(real.replace(old, new)))
+        moved = real.replace(RULE_MEAN, 'mn=0') + 'const ' + RULE_MEAN      # the same code in another order
+        self.assertFalse(md.rule_as_reviewed(moved))
+        self.assertFalse(md.rule_as_reviewed(''))
+        for merged in (rename(real, {'r': 'a'}), rename(real, {'o': 'of'})):  # two bindings under one name; a kept word
+            with self.subTest(merged=merged[:40]):
+                self.assertIsNotNone(md.RULE_RE.search(merged))
+                self.assertFalse(md.rule_as_reviewed(merged))
 
     def test_the_release_lists_of_the_real_bundle(self):
         timeline = md.parse_release_lists(REAL_LISTS)
@@ -2580,21 +2630,61 @@ class NoticeTest(Base):
         self.assertIn('LiveBench publishes release 2026-06-25 (v1, 8 scored rows) on livebench.ai', result.issue)
         self.assertIn('7 categories / 23 tasks: the same partition', result.issue)
 
-    def test_a_changed_site_script_is_a_notice_and_withholds_nothing(self):
+    def test_a_rebuilt_site_script_with_the_reviewed_averaging_functions_is_no_notice(self):
+        # the site's bundle gets a new name on every deploy: the name alone says nothing about the averaging code
         reviewed = 'static/js/main.0000aaaa.js'
         discovery = {**FIXTURE_DISCOVERY, 'site': {'main_script': reviewed, 'reviewed_on': '2026-11-01'}}
         result = self.run_world(pool_world(), decisions=[ALIAS], discovery=discovery)
         self.assertEqual(result.code, 0, result.failure)
+        self.assertEqual(result.data['notices'], [])
+        self.assertIs(result.data['sources']['rule_as_reviewed'], True)
+        self.assertIn('site code `static/js/main.1e1ce12d.js` holds the averaging functions reviewed in '
+                      '`static/js/main.0000aaaa.js` on 2026-11-01', result.issue)
+        self.assertIn('reviewed `static/js/main.0000aaaa.js` on 2026-11-01; the reviewed averaging functions are in it.',
+                      result.step)
+        self.assertNotIn('REVIEWED_RULE', result.issue)
+        result = self.run_world(World(), discovery=discovery)      # nothing else to decide: the issue can close
+        self.assertEqual((result.code, result.outputs['reportable']), (0, 'false'))
+
+    def test_changed_averaging_functions_in_a_rebuilt_site_script_are_a_notice_and_withhold_nothing(self):
+        reviewed = 'static/js/main.0000aaaa.js'
+        discovery = {**FIXTURE_DISCOVERY, 'site': {'main_script': reviewed, 'reviewed_on': '2026-11-01'}}
+        world = pool_world()
+        script = world.site()[SCRIPT]
+        world.script_bytes = script.replace(b'(a+=t*i,r+=i)', b'(a+=t,r+=i)')      # the weight leaves the sum
+        self.assertNotEqual(world.script_bytes, script)
+        result = self.run_world(world, decisions=[ALIAS], discovery=discovery)
+        self.assertEqual(result.code, 0, result.failure)
         self.assertEqual([n['kind'] for n in result.data['notices']], ['site_code_changed'])
+        self.assertIs(result.data['sources']['rule_as_reviewed'], False)
         self.assertIn('notice:site_code_changed:static/js/main.1e1ce12d.js', result.data['keys'])
-        self.assertIn('the averaging code was reviewed in `static/js/main.0000aaaa.js` (on 2026-11-01); re-read the '
+        self.assertIn('the averaging code was reviewed in `static/js/main.0000aaaa.js` (on 2026-11-01) and its functions '
+                      'are not in the served script as they were read; re-read the '
                       'weights rule in `static/js/main.1e1ce12d.js` ([script](https://livebench.ai/static/js/main.1e1ce12d.js)) '
                       'and update `site` once it still holds.', result.issue)
         self.assertIn('Clears when `site.main_script` in catalog/model-discovery.json names the served script', result.issue)
+        self.assertIn('until `REVIEWED_RULE` in scripts/model_discovery.py holds the code that was re-read', result.issue)
         self.assertIn('site code **changed**: `static/js/main.1e1ce12d.js` served, `static/js/main.0000aaaa.js` reviewed',
                       result.issue)
+        self.assertIn('the reviewed averaging functions are NOT in it as they were read.', result.step)
+        self.assertNotIn('is not the averaging code of', result.issue)
         self.assertIn('### Candidates (1)', result.issue)          # candidates are not withheld
         self.assertIn('#### `qwen4-80b` →', result.issue)
+        # the script the owner read, but not the functions the run keeps: no notice, and a warning that names the slip
+        result = self.run_world(world, decisions=[ALIAS])
+        self.assertEqual(result.data['notices'], [])
+        self.assertIs(result.data['sources']['rule_as_reviewed'], False)
+        self.assertIn('site code `static/js/main.1e1ce12d.js` as reviewed on 2026-11-08', result.issue)
+        self.assertIn('- Warning: `REVIEWED_RULE` in scripts/model_discovery.py is not the averaging code of '
+                      '`static/js/main.1e1ce12d.js`, the script `site.main_script` names as reviewed: nothing is raised '
+                      'for this script, and the next deploy raises "Leaderboard site code changed" until `REVIEWED_RULE` '
+                      'holds the code that was read.', result.issue)
+        # a script that fails a later shape check still says whether the functions were found
+        world.script_after = 'const Xy=["20990101"];'
+        world.script_bytes = None
+        result = self.run_world(world, discovery=discovery)
+        self.assertEqual(result.code, 2)
+        self.assertIn('the reviewed averaging functions are in it.', result.step)
         result = self.run_world(pool_world(), decisions=[ALIAS])   # the reviewed script is served: no notice
         self.assertEqual(result.data['notices'], [])
         self.assertIn('site code `static/js/main.1e1ce12d.js` as reviewed on 2026-11-08', result.issue)
@@ -2911,7 +3001,8 @@ class FailureTest(Base):
         for needle in ('- page https://livebench.ai/: HTTP 200, content-type `text/html; charset=utf-8`',
                        'files["main.js"] `./static/js/main.1e1ce12d.js`',
                        '- main script `static/js/main.1e1ce12d.js` (agrees with index.html)', 'reviewed script '
-                       '`static/js/main.1e1ce12d.js` (the same); `"_overall_weights"` literal present; suite order '
+                       '`static/js/main.1e1ce12d.js` (the same); reviewed averaging functions present; '
+                       '`"_overall_weights"` literal present; suite order '
                        '`Long Agentic, Design, Coding, Browser, Data Analysis, Research, Reasoning` (as reviewed)',
                        '- v1 release list: 5 releases: `2025-04-02, 2025-04-25, 2025-05-30, 2026-01-08, 2026-06-25`',
                        '- 2.0 release list: 2 releases: `20261014, 20261025`',
