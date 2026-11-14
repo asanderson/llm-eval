@@ -12,6 +12,13 @@ def lock_root(target=None):
     return Path((target or {}).get('lock_root') or Path.home()/'.cache/llm-eval/locks').expanduser()
 
 
+def coordinator_root(target):
+    """Where a coordinator reserves a host before it asks the worker. A local target's `lock_root` is a directory on this
+    machine, shared by every account and environment whose inventory names it, so the coordinator reserves there too. A remote
+    target's `lock_root` is a path on the remote host, so the coordinator keeps the default of the account that runs it."""
+    return lock_root(target if target.get('transport', 'local') == 'local' else None)/'coordinator'
+
+
 def reserve(root, resource, owner):
     directory = Path(root)/identifier(resource)
     directory.parent.mkdir(parents=True, exist_ok=True)

@@ -2,7 +2,7 @@
 from pathlib import Path
 import uuid
 
-from .resources import reserve, release, lock_root
+from .resources import reserve, release, coordinator_root
 from .transport import rpc, map_paths
 from llm_eval.experiments import get_experiment
 
@@ -24,7 +24,7 @@ def setup_campaign(plan):
             if key in seen:continue
             seen.add(key);owner=uuid.uuid4().hex
             try:
-                reserve(lock_root()/'coordinator',target['physical_host_id'],owner)
+                reserve(coordinator_root(target),target['physical_host_id'],owner)
                 rpc(target,{'action':'reserve','target':target,'owner':owner},plan['root'])
                 result=rpc(target,{'action':'setup','root':root,'output':prefix,'platform':platform,
                                   'code_revision':plan['code_revision'],'hardware':job['hardware'],
@@ -36,6 +36,6 @@ def setup_campaign(plan):
             finally:
                 try:rpc(target,{'action':'release','target':target,'owner':owner},plan['root'])
                 except (OSError,RuntimeError,ValueError):pass
-                try:release(lock_root()/'coordinator',target['physical_host_id'],owner)
+                try:release(coordinator_root(target),target['physical_host_id'],owner)
                 except ValueError:pass
     return int(failed)
