@@ -141,13 +141,13 @@ def attempt_receipt(directory):
 
 
 def claims_benchmark(name):
-    """True for a benchmark name this plugin writes (`legal-smoke` and every later `legal-*` export). A bundle of another
-    experiment that carries such a name has a second identity and is refused by `publish_report`. The name is compared after
-    NFKC normalisation, case folding and removal of `-`, `_` and spaces: `LEGAL_smoke`, ` legal smoke` and fullwidth letters
-    are claimed too."""
-    import re
-    import unicodedata
-    return re.sub(r'[-_\s]', '', unicodedata.normalize('NFKC', str(name)).casefold()).startswith('legal')
+    """True for a benchmark name this plugin writes: `legal-smoke`, `legal-routing`, `legal-shaped` and the `benchmark_id` of
+    every approved suite. A bundle of another experiment that carries such a name has a second identity and is refused by
+    `publish_report`; a public legal benchmark (`LegalBench`) is not claimed. The name is compared after NFKC normalisation,
+    case folding and removal of `-`, `_` and spaces: `LEGAL_smoke`, ` legal smoke` and fullwidth letters are claimed too. An
+    approved list that cannot be read raises ValueError (fail closed)."""
+    from . import reporting
+    return reporting.claims_name(name)
 
 
 # Files a publication branch must not change: the reviewed approved list decides what may be published.

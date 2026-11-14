@@ -1110,11 +1110,28 @@ MANIFEST_KEYS = ('projection', 'canonical_bytes', 'execution_kinds', 'data_class
 ROW_KEYS = frozenset({'suite_lock_sha256', 'family_id', 'review_status', *routing.ROUTE_KEYS}) - ROUTING_ROW_KEYS
 
 
+def _benchmark_names(markers):
+    """The benchmark names this plugin writes: the smoke mode's, the routing and workload exports' and every approved suite's
+    `benchmark_id`."""
+    from . import BENCHMARK, profiles
+    return {BENCHMARK, 'legal-routing', profiles.WORKLOAD_BENCHMARK, *markers['benchmarks']}
+
+
+def claims_name(name):
+    """True when `name`, compared by `_norm`, is a benchmark name this plugin writes; a public legal benchmark (`LegalBench`)
+    is not. Fails closed as `_markers` does."""
+    return _claimed(name, _markers())
+
+
+def _claimed(name, markers):
+    return _norm(name) in {_norm(n) for n in _benchmark_names(markers)}
+
+
 def _text_markers(markers):
     """Strings only this plugin writes into a report's text files: the experiment id (also part of every legal job and run id),
     the benchmark names of the approved suites and exports, and the names of the legal cohort metrics. Compared after NFKC normalisation and case folding."""
-    from . import BENCHMARK, MANIFEST, profiles
-    names = {MANIFEST['id'], BENCHMARK, 'legal-routing', profiles.WORKLOAD_BENCHMARK, *markers['benchmarks']}
+    from . import MANIFEST
+    names = {MANIFEST['id'], *_benchmark_names(markers)}
     names |= {m for m in ROW_METRICS if m.startswith(('retrieval.', 'usable_memo_s', 'rate.selector_deferral'))}
     names |= {m for m in grading.METRICS if len(m) >= 12}
     return tuple(sorted(n.casefold() for n in names))
@@ -1140,8 +1157,9 @@ def _text_files(dest):
 
 def claims_bundle(report, dest, manifest, resolved, records):
     """The class of the first legal mark a bundle of another experiment carries, or None: `manifest key`, `legal summary`,
-    `input file`, `row key`, `benchmark name`, `category`, `task id`, `export task`, `text marker`, `text file`, `pinned input`.
-    The class names the kind of mark, never text from the bundle."""
+    `input file`, `row key`, `benchmark name`, `task id`, `export task`, `text marker`, `text file`, `pinned input`.
+    The class names the kind of mark, never text from the bundle. A category is no mark by itself, and a benchmark name is one
+    only when it is a name this plugin writes (`claims_name`): a public legal benchmark under another experiment publishes."""
     if isinstance(manifest, dict) and set(MANIFEST_KEYS) & set(manifest):
         return 'manifest key'
     if (Path(dest) / 'legal-summary.json').exists():
@@ -1158,10 +1176,8 @@ def claims_bundle(report, dest, manifest, resolved, records):
         data = r.get('data') if isinstance(r, dict) and isinstance(r.get('data'), dict) else {}
         if ROW_KEYS & set(data):
             return 'row key'      # row and metadata keys only this plugin writes
-        if any(_norm(data.get(k, '')).startswith('legal') for k in ('benchmark', 'benchmark_id')):
+        if any(_claimed(data[k], markers) for k in ('benchmark', 'benchmark_id') if k in data):
             return 'benchmark name'
-        if _norm(data.get('category')) == 'legal':
-            return 'category'
         if r.get('record_type') == 'request' and _norm(data.get('task_id')) in markers['ids']:
             return 'task id'
         if isinstance(data.get('messages'), list) and digest(data['messages']) in markers['task']:
