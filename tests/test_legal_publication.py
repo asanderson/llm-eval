@@ -1519,12 +1519,15 @@ class ContentTests(Base):
     def test_bundles_of_other_experiments_built_from_legal_exports_are_refused(self):
         from llm_eval.experiments.legal_benchmark import profiles, routing
         exported = routing.route_tasks(contracts.load_suite(LOCK))
-        for name, benchmark, message in (('renamed', 'routing-fixture', r'carries content of legal-benchmark \(category\)'),
-                                         ('underscored', 'legal_routing', 'carries a legal benchmark name'),
-                                         ('joined', 'legalrouting', 'carries a legal benchmark name')):
-            with self.subTest(benchmark=benchmark):
+        # Neither the benchmark name nor the category `legal` decides the renamed cases: the content does (task id, then pinned input).
+        anonymous = [{**t, 'id': 'q' + str(i), 'category': 'general'} for i, t in enumerate(exported['tasks'])]
+        for name, benchmark, tasks, message in (('renamed', 'routing-fixture', None, r'carries content of legal-benchmark \(task id\)$'),
+                                                ('anonymous', 'routing-fixture', anonymous, r'carries content of legal-benchmark \(pinned input\)$'),
+                                                ('underscored', 'legal_routing', None, 'carries a legal benchmark name'),
+                                                ('joined', 'legalrouting', None, 'carries a legal benchmark name')):
+            with self.subTest(name=name, benchmark=benchmark):
                 path = self.path / f'{name}-suite.json'
-                write_json(path, {**exported, 'benchmark': benchmark})      # the task list of the approved export, under another name
+                write_json(path, {**exported, 'benchmark': benchmark, 'tasks': tasks or exported['tasks']})      # the approved export's tasks, renamed
                 report = self.routing_bundle(str(path), name=name)
                 with self.assertRaisesRegex(ValueError, message):
                     publish_report(report, ROOT, dry_run=True)
@@ -2270,6 +2273,96 @@ def edit_generic(report, rows=None, manifest=None):
     return report
 
 
+def generic_report(directory, experiment, mode, rows, metadata=None):
+    """A report of `model-offloading` or `llm-routing` built as tests/test_reporting.py builds one: one finished attempt with `rows`."""
+    job = {'job_id': 'job', 'experiment_id': experiment, 'experiment_run_id': 'run', 'case_id': 'fixed', 'mode': mode,
+           'hardware_config_id': 'fixture', 'hardware': {'os_id': 'fixture'}, 'parameters': {'synthetic': True, 'router': {'kind': 'fixed'}},
+           'status': 'planned', 'reason': None}
+    plan = {'campaign_id': 'fixture', 'root': str(ROOT), 'code_revision': revision(ROOT), 'inputs': {}, 'jobs': [job],
+            'experiments': [{'experiment_id': experiment, 'experiment_run_id': 'run', 'job_ids': ['job']}], 'reporting': {'on_experiment_end': True}}
+    campaign = initialize(plan, directory)
+    state = read_json(campaign / 'campaign.json')
+    out = campaign / 'experiments/run/jobs/job/attempt'
+    out.mkdir(parents=True)
+    (out / 'requests.jsonl').write_text(''.join(json.dumps(r) + '\n' for r in rows), encoding='utf-8')
+    write_json(out / 'job.json', job)
+    write_json(out / 'metadata.json', metadata or {'config': {'model': 'fixture'}})
+    state['jobs']['job'] = {'status': 'succeeded', 'attempts': [{'attempt_id': 'attempt', 'output': 'experiments/run/jobs/job/attempt',
+                                                                 'status': 'succeeded'}]}
+    write_json(campaign / 'campaign.json', state)
+    return build_report(campaign / 'experiments/run')
+
+
+class PublicLegalBenchmarkTests(unittest.TestCase):
+    """Owner decision of 2026-11-13: a generic bundle that measures a public legal benchmark (LegalBench, say) publishes; only this
+    plugin's own benchmark names and legal content refuse it."""
+    GENERIC = (('model-offloading', 'category-smoke'), ('llm-routing', 'decision'))
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.path = Path(tmp.name)
+
+    def report(self, name, experiment, mode, metadata=None, **row):
+        rows = [{'task_id': 't1', 'category': 'math', 'benchmark': 'fixture', 'status': 'ok', 'warmup': False, 'synthetic': True,
+                 'elapsed_s': 2, **row}]
+        return generic_report(self.path / name, experiment, mode, rows, metadata)
+
+    def test_public_legal_benchmarks_publish_under_the_generic_experiments(self):
+        cases = [*({'benchmark': b} for b in ('LegalBench', 'legalbench', 'legal-bench', 'legalese-quiz')),
+                 *({'category': c} for c in ('legal', 'Legal Reasoning')),
+                 {'benchmark': 'LegalBench', 'category': 'legal'}]
+        for experiment, mode in self.GENERIC:
+            for i, row in enumerate(cases):
+                with self.subTest(experiment=experiment, **row):
+                    report = self.report(f'{experiment}-{i}', experiment, mode, **row)
+                    self.assertTrue(publish_report(report, ROOT, dry_run=True)['dry_run'])
+
+    def test_this_plugins_benchmark_names_and_legal_content_are_still_refused(self):
+        name = '^Publication identity mismatch: the bundle carries a legal benchmark name$'
+        cases = [({'benchmark': 'LEGAL_smoke'}, None, name), ({'benchmark': 'legal-original-smoke'}, None, name),
+                 ({'benchmark': 'legal_routing', 'category': 'legal'}, None, name), ({'benchmark': 'ｌｅｇａｌ-shaped'}, None, name),
+                 ({'task_id': 'F1 Ledger A', 'benchmark': 'LegalBench'}, None, r'carries content of legal-benchmark \(task id\)$'),
+                 ({'family_id': 'fam', 'category': 'legal'}, None, r'carries content of legal-benchmark \(row key\)$'),
+                 ({}, {'config': {'model': 'fixture'}, 'suite_lock_sha256': 'x'}, r'carries content of legal-benchmark \(row key\)$')]
+        for experiment, mode in self.GENERIC:
+            for i, (row, metadata, message) in enumerate(cases):
+                with self.subTest(experiment=experiment, row=row, metadata=metadata):
+                    report = self.report(f'{experiment}-{i}', experiment, mode, metadata, **row)
+                    with self.assertRaisesRegex(ValueError, message):
+                        publish_report(report, ROOT, dry_run=True)
+        report = edit_generic(self.report('manifest', 'model-offloading', 'category-smoke'), manifest=lambda m: m.update(cohorts=1))
+        with self.assertRaisesRegex(ValueError, r'carries content of legal-benchmark \(manifest key\)$'):
+            publish_report(report, ROOT, dry_run=True)
+
+    def test_only_the_names_this_plugin_writes_are_claimed(self):
+        approved = {e['benchmark_id'] for e in contracts.approved_suites().values()}
+        self.assertEqual(approved, {'legal-original-smoke', 'legal-original-packets'})
+        for name in ('legal-smoke', 'LEGAL_smoke', ' legal smoke', 'ｌｅｇａｌ－ｓｍｏｋｅ', 'legal_routing', 'legalrouting', 'legal-shaped',
+                     *approved):
+            with self.subTest(claimed=name):
+                self.assertTrue(legal.claims_benchmark(name))
+                self.assertEqual(lr.claims_bundle(self.path / 'x' / 'report', self.path, {}, {},
+                                                  [{'record_type': 'request', 'data': {'benchmark': name}}]), 'benchmark name')
+                self.assertEqual(lr.claims_bundle(self.path / 'x' / 'report', self.path, {}, {},
+                                                  [{'record_type': 'metadata', 'data': {'benchmark_id': name}}]), 'benchmark name')
+        for name in ('LegalBench', 'legalbench', 'legal-bench', 'legalese-quiz', 'legal', 'legal-benchmark-x', 'routing-fixture', None):
+            with self.subTest(not_claimed=name):
+                self.assertFalse(legal.claims_benchmark(name))
+                self.assertIsNone(lr.claims_bundle(self.path / 'x' / 'report', self.path, {}, {},
+                                                   [{'record_type': 'request', 'data': {'benchmark': name, 'benchmark_id': name}}]))
+        for category in ('legal', 'Legal', 'LEGAL', 'Legal Reasoning'):      # a category is no mark by itself
+            with self.subTest(category=category):
+                self.assertIsNone(lr.claims_bundle(self.path / 'x' / 'report', self.path, {}, {},
+                                                   [{'record_type': 'request', 'data': {'category': category}}]))
+
+    def test_the_claim_fails_closed_when_the_approved_list_cannot_be_read(self):
+        with patch.object(contracts, 'approved_suites', side_effect=OSError('unreadable')):
+            for name in ('LegalBench', 'legal-smoke'):
+                with self.subTest(name=name), self.assertRaisesRegex(ValueError, '^Approved legal suites cannot be read$'):
+                    legal.claims_benchmark(name)
+
+
 class SecondRelabelTests(CohortCase):
     """B1 and B3: the cheapest relabels the re-review found are refused; the campaign record is found by walking up."""
 
@@ -2330,16 +2423,18 @@ class SecondRelabelTests(CohortCase):
                    ('projection', 'execution_kinds', 'data_class', 'suite_lock_sha256', 'cohorts')),      # canonical_bytes changes the required files
                  *((f'row key {k}', (lambda r, k=k: r.update({k: 'x'})), None, 'row key') for k in
                    ('family_id', 'review_status', 'suite_lock_sha256', 'route_choice', 'route_fallback')),
-                 ('category legal', lambda r: r.update(category='Legal'), None, 'category'),
                  ('task id spelled otherwise', lambda r: r.update(task_id='F1 Ledger A'), None, 'task id')]
         for name, rows, manifest, marker in cases:
             with self.subTest(name):
                 report = edit_generic(generic_bundle(self), rows, manifest)
                 with self.assertRaisesRegex(ValueError, rf'carries content of legal-benchmark \({marker}\)$'):
                     publish_report(report, ROOT, dry_run=True)
-        report = edit_generic(generic_bundle(self), lambda r: r.update(benchmark='LegalBench ' + CANARY))
+        report = edit_generic(generic_bundle(self), lambda r: r.update(benchmark='LEGAL_original smoke'))
         with self.assertRaisesRegex(ValueError, '^Publication identity mismatch: the bundle carries a legal benchmark name$'):
             publish_report(report, ROOT, dry_run=True)
+        # A public legal benchmark, or a row in category legal, is no mark by itself (owner decision 2026-11-13).
+        report = edit_generic(generic_bundle(self), lambda r: r.update(benchmark='LegalBench ' + CANARY, category='Legal'))
+        self.assertTrue(publish_report(report, ROOT, dry_run=True)['dry_run'])
         self.assertTrue(publish_report(edit_generic(generic_bundle(self)), ROOT, dry_run=True)['dry_run'])      # unchanged: publishes
 
     def test_the_exact_smoke_export_key_set_is_pinned(self):
