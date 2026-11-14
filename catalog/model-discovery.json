@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "site": {"main_script": "static/js/main.c884fa42.js", "reviewed_on": "2026-11-10"},
+  "site": {"main_script": "static/js/main.8a7822ea.js", "reviewed_on": "2026-11-14"},
   "publishers": [
     {"prefixes": ["deepseek-"], "hf_orgs": ["deepseek-ai"]},
     {"prefixes": ["qwen", "qwq-"], "hf_orgs": ["Qwen"]},
