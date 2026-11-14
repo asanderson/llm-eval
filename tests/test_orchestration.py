@@ -86,6 +86,32 @@ class OrchestrationTests(unittest.TestCase):
             with self.assertRaises(BlockingIOError):b.acquire()
             a.close();b.acquire();b.close()
 
+    def test_coordinator_reservation_follows_a_local_targets_lock_root(self):
+        from llm_eval.orchestration import scheduler
+        from llm_eval.orchestration.resources import coordinator_root, lock_root
+        with tempfile.TemporaryDirectory() as temp:
+            target={'transport':'local','physical_host_id':'host','lock_root':str(Path(temp)/'shared')}
+            job={'job_id':'0','target':target,'resources':['host']};plan={'root':str(ROOT),'jobs':[job]};calls=[]
+            def rpc(target,p,root,timeout=60):calls.append(p['action']);return {'ok':True}
+            # Two accounts or environments of one machine (native Windows and WSL) whose inventories name one shared directory.
+            with patch('llm_eval.orchestration.transport.rpc',side_effect=rpc):
+                with patch.object(Path,'home',return_value=Path(temp)/'home-a'):
+                    scheduler._reserve(job,{'attempt_id':'one'},plan)
+                with patch.object(Path,'home',return_value=Path(temp)/'home-b'):
+                    with self.assertRaisesRegex(BlockingIOError,'Resource reserved'):
+                        scheduler._reserve(job,{'attempt_id':'two'},plan)
+                    self.assertEqual(calls,['reserve'])      # the second coordinator is refused before it asks the worker
+                    scheduler._release(job,{'attempt_id':'one'},plan)
+                    scheduler._reserve(job,{'attempt_id':'two'},plan)
+            self.assertFalse((Path(temp)/'home-a').exists() or (Path(temp)/'home-b').exists())
+            with patch.object(Path,'home',return_value=Path(temp)/'home-a'):
+                default=lock_root()/'coordinator'
+                self.assertEqual(default,Path(temp)/'home-a/.cache/llm-eval/locks/coordinator')
+                self.assertEqual(coordinator_root(target),Path(temp)/'shared/coordinator')
+                self.assertEqual(coordinator_root({'transport':'local','physical_host_id':'host'}),default)
+                # A remote target's lock_root is a path on the remote host: the coordinator keeps its own directory.
+                self.assertEqual(coordinator_root({'transport':'ssh','physical_host_id':'host','lock_root':'/remote/locks'}),default)
+
     def test_profile_limits_and_remote_paths(self):
         self.assertEqual(limits({'os_id':'windows-11-wsl2-ubuntu-26.04'},ROOT)['ram_budget_gib'],46)
         self.assertEqual(map_paths({'artifact':'/models/x','suite':'/repo/workloads/a'},

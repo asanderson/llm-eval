@@ -39,22 +39,22 @@ def _targets(job, plan):
 
 
 def _reserve(job, attempt, plan):
-    from .resources import reserve, lock_root
+    from .resources import reserve, coordinator_root
     from .transport import rpc
     owner=attempt['attempt_id']
     # The caller journals this intent first. A lost reply may have acquired the
     # worker reservation, so retain its owner until cleanup is confirmed.
     for target in _targets(job,plan):
-        reserve(lock_root()/ 'coordinator',target['physical_host_id'],owner)
+        reserve(coordinator_root(target),target['physical_host_id'],owner)
         rpc(target,{'action':'reserve','target':target,'owner':owner},plan['root'])
 
 
 def _release(job, attempt, plan):
-    from .resources import release, lock_root
+    from .resources import release, coordinator_root
     from .transport import rpc
     for target in reversed(_targets(job,plan)):
         rpc(target,{'action':'release','target':target,'owner':attempt['attempt_id']},plan['root'])
-        try:release(lock_root()/ 'coordinator',target['physical_host_id'],attempt['attempt_id'])
+        try:release(coordinator_root(target),target['physical_host_id'],attempt['attempt_id'])
         except ValueError:pass  # A completed reservation may already have been released and reassigned.
 
 
