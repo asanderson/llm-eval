@@ -1,0 +1,273 @@
+{
+  "experiment": {
+    "experiment_run_id": "routing-llm-routing-1",
+    "experiment_id": "llm-routing",
+    "version": 1,
+    "mode": "decision",
+    "job_ids": [
+      "routing-llm-routing-1-389a241fd7b8",
+      "routing-llm-routing-1-25eff864a7d1"
+    ],
+    "campaign_id": "raider-windows-routing-rerun",
+    "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd"
+  },
+  "jobs": [
+    {
+      "schema_version": 2,
+      "job_id": "routing-llm-routing-1-389a241fd7b8",
+      "experiment_run_id": "routing-llm-routing-1",
+      "experiment_id": "llm-routing",
+      "experiment_version": 1,
+      "mode": "decision",
+      "case_id": "ollama-nimble",
+      "hardware_config_id": "raider-windows",
+      "hardware": {
+        "target": "raider",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-native"
+      },
+      "hardware_profile": {
+        "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+        "manufacturer": "MSI",
+        "model": "Raider 18 HX AI A2XWJG-069US",
+        "cpu": {
+          "name": "Intel Core Ultra 9 285HX",
+          "architecture": "Arrow Lake-HX",
+          "p_cores": 8,
+          "e_cores": 16,
+          "threads": 24,
+          "instruction_baseline": "AVX2",
+          "amx": false,
+          "avx512": false,
+          "thread_sweep": [
+            7,
+            8,
+            15,
+            23
+          ],
+          "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+        },
+        "ram": {
+          "installed_gib": 64,
+          "type": "DDR5-6400",
+          "channels": 2
+        },
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "architecture": "Blackwell",
+          "compute_capability": "12.0",
+          "vram_gib": 24,
+          "initial_reserve_gib": 2,
+          "desktop_gpu": false
+        },
+        "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+        "storage": [
+          {
+            "name": "Factory NVMe",
+            "capacity_tb": 2,
+            "model": "not inventoried"
+          },
+          {
+            "name": "WD_BLACK SN7100",
+            "capacity_tb": 4,
+            "interface": "PCIe Gen4 x4",
+            "role": "Model files, artifacts, results; separate swap/offload experiments"
+          }
+        ],
+        "evidence": {
+          "configuration": "user-provided",
+          "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+        },
+        "required_recordings": [
+          "BIOS version",
+          "NVIDIA driver",
+          "GPU power limit/TGP",
+          "AC state",
+          "MSI power/fan profile",
+          "hybrid/MUX setting",
+          "RAM configured speed",
+          "SSD mount and filesystem",
+          "SSD free space and temperature",
+          "OS build/kernel",
+          "WSL version and memory cap if applicable"
+        ],
+        "host_reserve_gib": 12,
+        "os_limits": {
+          "windows-11-wsl2-ubuntu-26.04": {
+            "ram_budget_gib": 46
+          }
+        }
+      },
+      "target_id": "raider",
+      "target": {
+        "transport": "local",
+        "physical_host_id": "raider"
+      },
+      "parameters": {
+        "suite": "[local path omitted]",
+        "router": {
+          "kind": "systemone",
+          "platform": "ollama",
+          "model": "llm-eval-nimble:locked",
+          "model_revision": "6aa3fde96874d5d9f03306e795016e232610aaa5f19efcb107bf9311c712ccd9",
+          "instructions": "Choose the category that best describes the user request.",
+          "criteria": {
+            "coding": "Writing or debugging software",
+            "math": "Mathematical reasoning",
+            "general": "Other requests"
+          },
+          "timeout_s": 300
+        },
+        "repeats": 3,
+        "warmups": 1,
+        "save_outputs": false
+      },
+      "depends_on": [],
+      "resources": [
+        "raider"
+      ],
+      "status": "planned",
+      "reason": null,
+      "config_sha256": "f94de4662b7758821027bf5d1479401ecbe46b8ce6acd576153a84242379fac9",
+      "input_files": [
+        {
+          "path": "[local path omitted]",
+          "sha256": "819cafec81eb9ba56db56b4a1c360fae55d5caf49fa0e1f14668b2952f4eb797"
+        }
+      ]
+    },
+    {
+      "schema_version": 2,
+      "job_id": "routing-llm-routing-1-25eff864a7d1",
+      "experiment_run_id": "routing-llm-routing-1",
+      "experiment_id": "llm-routing",
+      "experiment_version": 1,
+      "mode": "decision",
+      "case_id": "ollama-tev1",
+      "hardware_config_id": "raider-windows",
+      "hardware": {
+        "target": "raider",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-native"
+      },
+      "hardware_profile": {
+        "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+        "manufacturer": "MSI",
+        "model": "Raider 18 HX AI A2XWJG-069US",
+        "cpu": {
+          "name": "Intel Core Ultra 9 285HX",
+          "architecture": "Arrow Lake-HX",
+          "p_cores": 8,
+          "e_cores": 16,
+          "threads": 24,
+          "instruction_baseline": "AVX2",
+          "amx": false,
+          "avx512": false,
+          "thread_sweep": [
+            7,
+            8,
+            15,
+            23
+          ],
+          "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+        },
+        "ram": {
+          "installed_gib": 64,
+          "type": "DDR5-6400",
+          "channels": 2
+        },
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "architecture": "Blackwell",
+          "compute_capability": "12.0",
+          "vram_gib": 24,
+          "initial_reserve_gib": 2,
+          "desktop_gpu": false
+        },
+        "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+        "storage": [
+          {
+            "name": "Factory NVMe",
+            "capacity_tb": 2,
+            "model": "not inventoried"
+          },
+          {
+            "name": "WD_BLACK SN7100",
+            "capacity_tb": 4,
+            "interface": "PCIe Gen4 x4",
+            "role": "Model files, artifacts, results; separate swap/offload experiments"
+          }
+        ],
+        "evidence": {
+          "configuration": "user-provided",
+          "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+        },
+        "required_recordings": [
+          "BIOS version",
+          "NVIDIA driver",
+          "GPU power limit/TGP",
+          "AC state",
+          "MSI power/fan profile",
+          "hybrid/MUX setting",
+          "RAM configured speed",
+          "SSD mount and filesystem",
+          "SSD free space and temperature",
+          "OS build/kernel",
+          "WSL version and memory cap if applicable"
+        ],
+        "host_reserve_gib": 12,
+        "os_limits": {
+          "windows-11-wsl2-ubuntu-26.04": {
+            "ram_budget_gib": 46
+          }
+        }
+      },
+      "target_id": "raider",
+      "target": {
+        "transport": "local",
+        "physical_host_id": "raider"
+      },
+      "parameters": {
+        "suite": "[local path omitted]",
+        "router": {
+          "kind": "systemone",
+          "platform": "ollama",
+          "model": "llm-eval-tev1:locked",
+          "model_revision": "7954dce22bc6c29c3b119656207681d12cb34434fed7caa086bfbc919bef0740",
+          "instructions": "Choose the category that best describes the user request.",
+          "criteria": {
+            "coding": "Writing or debugging software",
+            "math": "Mathematical reasoning",
+            "general": "Other requests"
+          },
+          "timeout_s": 300
+        },
+        "repeats": 3,
+        "warmups": 1,
+        "save_outputs": false
+      },
+      "depends_on": [],
+      "resources": [
+        "raider"
+      ],
+      "status": "planned",
+      "reason": null,
+      "config_sha256": "62e594ee3c8ddba5cc2489c1eeb536b418b959df0b2f583fa92821309ba9a452",
+      "input_files": [
+        {
+          "path": "[local path omitted]",
+          "sha256": "819cafec81eb9ba56db56b4a1c360fae55d5caf49fa0e1f14668b2952f4eb797"
+        }
+      ]
+    }
+  ],
+  "input_hashes": [
+    "5bc67ed23f6e337aff84ce94a021f37abdf299a41e8008638c2e23bb37e9e311",
+    "005c3d62f96dd4fa9b7a777c73aff65c9742c1ad2151d422795c9e006afa95d5",
+    "a42fd789784d74c7bdf4b8057f06542c8b242e8393f43a0c9be9bc9d0146c15d",
+    "2c8bc87567cdeaefa1bc0e9c6a87a19dc45bda0c7f8d73de034b198b20525905",
+    "9939e1bc67f0af5bda168e4e0092e5378e2471d9bf6299905cb1a0b3dfb8cb6a",
+    "246937f2348244b186bf0599e2e9f0aeb76f687fa756381806f52189a5ea9e51",
+    "819cafec81eb9ba56db56b4a1c360fae55d5caf49fa0e1f14668b2952f4eb797"
+  ]
+}
