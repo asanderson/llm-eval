@@ -1,10 +1,12 @@
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from llm_eval.common import read_json, write_json
-from llm_eval.core.contracts import atomic_json, integer
+from llm_eval.core.contracts import REPLACE_ATTEMPTS, atomic_json, integer
 from llm_eval.orchestration.planner import compile_campaign
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -56,5 +58,31 @@ class CampaignPlanningTests(unittest.TestCase):
         path=self.path/'state.json';atomic_json(path,{'ok':1})
         self.assertEqual(read_json(path),{'ok':1})
         with self.assertRaises(ValueError): integer(True,'count')
+
+    def test_atomic_json_retries_a_replace_that_a_windows_reader_blocks(self):
+        directory=self.path/'beat';directory.mkdir();path=directory/'state.json'
+        real=os.replace;calls=[]
+        def blocked(source,target):
+            calls.append(target)
+            if len(calls)<3:raise PermissionError(13,'Access is denied')
+            real(source,target)
+        with patch('llm_eval.core.contracts.WINDOWS',True),patch('llm_eval.core.contracts.time.sleep') as sleep,patch('llm_eval.core.contracts.os.replace',side_effect=blocked):
+            atomic_json(path,{'ok':2})
+        self.assertEqual(read_json(path),{'ok':2})
+        self.assertEqual((len(calls),sleep.call_count),(3,2))
+        self.assertEqual([p.name for p in directory.iterdir()],['state.json'])      # no temporary file is left behind
+
+    def test_a_replace_that_stays_refused_raises_and_leaves_no_temporary_file(self):
+        directory=self.path/'beat';directory.mkdir()
+        with patch('llm_eval.core.contracts.WINDOWS',True),patch('llm_eval.core.contracts.time.sleep'),patch('llm_eval.core.contracts.os.replace',side_effect=PermissionError(13,'Access is denied')) as replace:
+            with self.assertRaises(PermissionError):atomic_json(directory/'state.json',{'ok':3})
+        self.assertEqual(replace.call_count,REPLACE_ATTEMPTS)
+        self.assertEqual(list(directory.iterdir()),[])
+
+    def test_off_windows_a_refused_replace_raises_at_once(self):
+        directory=self.path/'beat';directory.mkdir()
+        with patch('llm_eval.core.contracts.WINDOWS',False),patch('llm_eval.core.contracts.os.replace',side_effect=PermissionError(13,'Permission denied')) as replace:
+            with self.assertRaises(PermissionError):atomic_json(directory/'state.json',{'ok':4})
+        self.assertEqual(replace.call_count,1)
 
 if __name__ == '__main__': unittest.main()

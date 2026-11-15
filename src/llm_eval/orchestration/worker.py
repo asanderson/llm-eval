@@ -53,6 +53,14 @@ def stop_child(child):
         child.wait(timeout=10)
 
 
+def _beat(out, child, started, owner):
+    """One supervisor tick: refresh the heartbeat. A write that is still refused after its retries is skipped, never fatal: a
+    measurement that has run for hours must not die because a scanner held the file for a moment, and `status` needs only the
+    pid and start time that the first tick recorded."""
+    try:atomic_json(out/'heartbeat.json',{'pid':child.pid,'process_started':started,'unix':time.time(),'owner':owner})
+    except PermissionError:pass
+
+
 def _transferable(path):
     """A job.json that cannot be read as a JSON object naming its experiment refuses the transfer; one of an experiment whose
     plugin exports `data_policy` decides by that policy; any other job.json allows it, as before. The error names the path."""
@@ -167,7 +175,7 @@ def handle(p):
             try:process_started=psutil.Process(child.pid).create_time()
             except psutil.NoSuchProcess:process_started=None
             while child.poll() is None:
-                atomic_json(out/'heartbeat.json',{'pid':child.pid,'process_started':process_started,'unix':time.time(),'owner':p['owner']})
+                _beat(out,child,process_started,p['owner'])
                 if (out/'cancel.json').exists():stop_child(child)
                 time.sleep(.2)
             if not (out/'result.json').exists():

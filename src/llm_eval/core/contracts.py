@@ -6,11 +6,14 @@ import os
 from pathlib import Path
 import re
 import tempfile
+import time
 
 from llm_eval.common import digest, finite_number
 
 SCHEMA_VERSION = 2
 TERMINAL = frozenset({'succeeded', 'failed', 'skipped', 'cancelled'})
+WINDOWS = os.name == 'nt'
+REPLACE_ATTEMPTS = 8       # at most 8 tries, pausing 25 ms longer each time: about 0.7 s in all
 
 
 def identifier(value):
@@ -47,6 +50,20 @@ def no_credentials(value):
             no_credentials(item)
 
 
+def replace_file(source, target):
+    """`os.replace`, retried briefly on Windows. Replacing a file that another process holds open (a reader, a virus scanner,
+    an indexer) fails there with PermissionError until that handle closes, usually within milliseconds. Elsewhere, and after
+    the last try, the error is raised as before."""
+    for attempt in range(REPLACE_ATTEMPTS):
+        try:
+            os.replace(source, target)
+            return
+        except PermissionError:
+            if not WINDOWS or attempt == REPLACE_ATTEMPTS - 1:
+                raise
+            time.sleep(0.025 * (attempt + 1))
+
+
 def atomic_json(path, value):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -57,7 +74,7 @@ def atomic_json(path, value):
             handle.write('\n')
             handle.flush()
             os.fsync(handle.fileno())
-        os.replace(name, path)
+        replace_file(name, path)
     finally:
         if os.path.exists(name):
             os.unlink(name)
