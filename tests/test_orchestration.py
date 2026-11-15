@@ -8,6 +8,7 @@ from unittest.mock import patch
 from llm_eval.common import read_json
 from llm_eval.core.contracts import atomic_json
 from llm_eval.core.hardware import limits
+from llm_eval.orchestration import worker
 from llm_eval.orchestration.planner import revision
 from llm_eval.orchestration.resources import reserve, release, ProcessLock
 from llm_eval.orchestration.scheduler import initialize, run_campaign
@@ -173,5 +174,17 @@ class OrchestrationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp,patch.dict(sys.modules,{'psutil':None}),patch('subprocess.Popen') as child:
             with self.assertRaises(ImportError):handle({'action':'run','output':temp})
             child.assert_not_called();self.assertFalse((Path(temp)/'active').exists())
+
+    def test_a_refused_heartbeat_write_does_not_end_the_run(self):
+        class Child:pid=4242
+        with tempfile.TemporaryDirectory() as temp:
+            out=Path(temp)
+            with patch('llm_eval.orchestration.worker.atomic_json',side_effect=PermissionError(13,'Access is denied')):
+                worker._beat(out,Child(),1.5,'owner')      # skipped: a measurement of hours must not die of one refused write
+            self.assertFalse((out/'heartbeat.json').exists())
+            worker._beat(out,Child(),1.5,'owner')
+            self.assertEqual((read_json(out/'heartbeat.json')['pid'],read_json(out/'heartbeat.json')['owner']),(4242,'owner'))
+            with patch('llm_eval.orchestration.worker.atomic_json',side_effect=OSError(28,'No space left on device')):
+                with self.assertRaises(OSError):worker._beat(out,Child(),1.5,'owner')      # any other failure still ends it
 
 if __name__=='__main__':unittest.main()
