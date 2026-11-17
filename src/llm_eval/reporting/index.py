@@ -217,7 +217,8 @@ def table(records, index_prefix, report_prefix):
 RANKING_RULE = ('Ranked by share of checks passed (correct decisions for routing experiments, quality checks otherwise), '
                 'then lower median wall time per request, then higher output tokens per second. Each harness and model '
                 'combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and '
-                'runs without scored checks are not ranked. Wall time and token rate are the median of the category medians.')
+                'runs without scored checks are not ranked. Wall time and token rate are the median of the category medians. Where a model '
+                'repeats among the best combinations, a second table ranks the models, each by its best combination.')
 CHART_NOTE = ('Chart: every ranked combination, best-ranked model first, one color per harness. Each panel has its own '
               'axis; wall time is on a log scale. Exact values are in the tables of this page and in the linked reports.')
 
@@ -239,16 +240,37 @@ def ranked(records):
     return {key: sorted(groups[key], key=order) for key in sorted(groups)}
 
 
-def top_combinations(records, limit=3):
+TOP_LIMIT = 5      # rows of the ranking per experiment and hardware configuration
+
+
+def top_combinations(records, limit=TOP_LIMIT):
     """{(experiment, hardware): best `limit` records}, one record per harness and model combination."""
     return {key: chosen[:limit] for key, chosen in ranked(records).items()}
 
 
-def ranking(records, index_prefix, report_prefix, limit=3, charts=None):
-    """Top combinations per experiment and hardware configuration; `charts` maps such a pair to an image link."""
+def top_models(records, limit=TOP_LIMIT):
+    """{(experiment, hardware): best `limit` records}, one per model: the model's best harness and model combination."""
+    out = {}
+    for key, chosen in ranked(records).items():
+        best = {}
+        for r in chosen:      # best combination first, so a model keeps its best harness
+            best.setdefault(r['model'], r)
+        out[key] = list(best.values())[:limit]
+    return out
+
+
+def ranking(records, index_prefix, report_prefix, limit=TOP_LIMIT, charts=None):
+    """Top combinations per experiment and hardware configuration, and the top models where a model repeats among them;
+    `charts` maps such a pair to an image link."""
     lines = [f'### Top {limit} harness and model combinations per experiment and hardware configuration', '', RANKING_RULE]
     pairs = list(dict.fromkeys((r['experiment'], r['hardware']) for r in records if r.get('ranked', True)))      # newest result first
-    best = top_combinations(records, limit)
+    best, models = top_combinations(records, limit), top_models(records, limit)
+
+    def row(rank, r, first, second):
+        return (f"| {rank} | {first} | {second} | {r['score'][0]}/{r['score'][1]} | "
+                f"{_cell(None if r['wall_mid'] is None else format(r['wall_mid'], '.3g'))} | "
+                f"{_cell(None if r['tokens_mid'] is None else format(r['tokens_mid'], '.3g'))} | "
+                f"[{r['date']}{' cap ' + str(r['output_cap']) if r['output_cap'] else ''}]({report_prefix}{r['report']}) |")
     for experiment, hardware in pairs:
         lines += ['', f"**{_link('experiment', experiment, index_prefix)} on {_link('hardware', hardware, index_prefix)}**", '']
         chosen = best.get((experiment, hardware))
@@ -256,11 +278,13 @@ def ranking(records, index_prefix, report_prefix, limit=3, charts=None):
             lines.append('No measured run with scored checks has been published yet.')
             continue
         lines += ['| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |', '|---:|---|---|---:|---:|---:|---|']
-        for rank, r in enumerate(chosen, 1):
-            lines.append(f"| {rank} | {_link('harness', r['harness'], index_prefix)} | {_link('model', r['model'], index_prefix)} | "
-                         f"{r['score'][0]}/{r['score'][1]} | {_cell(None if r['wall_mid'] is None else format(r['wall_mid'], '.3g'))} | "
-                         f"{_cell(None if r['tokens_mid'] is None else format(r['tokens_mid'], '.3g'))} | "
-                         f"[{r['date']}{' cap ' + str(r['output_cap']) if r['output_cap'] else ''}]({report_prefix}{r['report']}) |")
+        lines += [row(rank, r, _link('harness', r['harness'], index_prefix), _link('model', r['model'], index_prefix))
+                  for rank, r in enumerate(chosen, 1)]
+        if models[(experiment, hardware)] != chosen:      # a model repeats among the best combinations: rank the models too
+            lines += ['', f'Top {limit} models, each on its best-ranked harness:', '',
+                      '| Rank | Model | Harness | Checks passed | Median wall s | Output tok/s | Run |', '|---:|---|---|---:|---:|---:|---|']
+            lines += [row(rank, r, _link('model', r['model'], index_prefix), _link('harness', r['harness'], index_prefix))
+                      for rank, r in enumerate(models[(experiment, hardware)], 1)]
         if (charts or {}).get((experiment, hardware)):
             lines += ['', f"![{experiment} on {hardware}: harness and model combinations compared]({charts[(experiment, hardware)]})", '', CHART_NOTE]
     return '\n'.join(lines)

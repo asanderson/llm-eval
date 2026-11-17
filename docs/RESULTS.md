@@ -28,7 +28,7 @@ Each report lists its configuration coverage and measurements **by harness and m
 
 ## Navigating published results
 
-[`docs/results/README.md`](results/README.md) is the entry point. It opens with the executive summary (the three best harness and model combinations per experiment for each hardware configuration, a comparison chart for each, and the conclusions per hardware configuration), followed by the navigation index, the detailed results and the list of published reports.
+[`docs/results/README.md`](results/README.md) is the entry point. It opens with the executive summary (the five best harness and model combinations per experiment for each hardware configuration, the five best models where a model repeats among them, a comparison chart for each, and the conclusions per hardware configuration), followed by the navigation index, the detailed results and the list of published reports.
 
 `llm-eval index-results` regenerates everything derived from the published bundles: `docs/results/index/` (one page per hardware configuration, experiment, harness, model and UTC date, and an overview), the summary charts in `diagrams/results/summary/` (one per experiment and hardware configuration with at least two ranked combinations; needs the `reporting` extra), and three marked blocks of the results README: `results-top` (ranking and charts), `results-index` (browse links and a models-by-harness matrix per experiment whose cells link to every published run) and `results-list` (every report, newest first). Text outside the `<!-- results-*:start -->` and `<!-- results-*:end -->` markers is hand-written and left untouched. The publisher runs the same step, so a results PR carries the updated indexes. Never edit the generated pages by hand.
 
