@@ -1,0 +1,62 @@
+{
+  "experiment": {
+    "campaign_id": "legal-evaluation-windows",
+    "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+    "experiment_id": "legal-benchmark",
+    "experiment_run_id": "retrieval-legal-benchmark-1",
+    "job_ids": [
+      "retrieval-legal-benchmark-1-a051474dea68"
+    ],
+    "mode": "retrieval",
+    "version": 1
+  },
+  "input_hashes": [
+    "0894c7d2f055caa62122ab3a48395074027c93ad22148ac915b894ace0f66cbe",
+    "1a87f5eb15c9c358a61c9d720386139b4daecb76eefcb27493d4f11bbed78db3",
+    "54dc75f6c8c825e38c3b85bf518556defec72471bf7acd05a430ecf62c7a2106",
+    "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae"
+  ],
+  "jobs": [
+    {
+      "case_id": "legal-retrieval",
+      "experiment_id": "legal-benchmark",
+      "experiment_version": 1,
+      "hardware": {
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-native"
+      },
+      "hardware_config_id": "raider-windows",
+      "input_files": [
+        {
+          "sha256": "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae"
+        },
+        {
+          "sha256": "1a87f5eb15c9c358a61c9d720386139b4daecb76eefcb27493d4f11bbed78db3"
+        },
+        {
+          "sha256": "54dc75f6c8c825e38c3b85bf518556defec72471bf7acd05a430ecf62c7a2106"
+        },
+        {
+          "sha256": "0894c7d2f055caa62122ab3a48395074027c93ad22148ac915b894ace0f66cbe"
+        }
+      ],
+      "job_id": "retrieval-legal-benchmark-1-a051474dea68",
+      "mode": "retrieval",
+      "parameters": {
+        "cohorts": [
+          "6bf6a5a2277be2f663aa0474c05dc201c759e1ef9d978211f7da44113690b973",
+          "6f2d41f843f367f0a4390fce6462ad09c1a1744f88aaa9bf899d2d5a4bc64a9f",
+          "baeeaeeac14ff68448fb521e0988da35085cf9d7bd9d832fec5a9ede57bb673f",
+          "cd5c9a086d15d2fa6c8dab0c499991ca683e6f8895c547d8ec2ef041269823cc"
+        ],
+        "data_class": "public-synthetic",
+        "execution_kind": "fixture",
+        "identity": {
+          "harness": "fixture",
+          "model": "fixture"
+        },
+        "synthetic": true
+      }
+    }
+  ]
+}
