@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_on": "2026-11-16",
+  "checked_on": "2026-11-17",
   "qualification": "Recipe pins, not verified laptop installations. Transitive Python dependencies are captured with pip freeze after installation; not a fully hashed dependency lock.",
   "harness_packages": [
     "psutil==7.2.2"
@@ -22,7 +22,7 @@
     "ik_llama.cpp": {
       "kind": "cmake",
       "repository": "https://github.com/ikawrakow/ik_llama.cpp.git",
-      "revision": "4f60fdfdd9b5b1f9e3530a9b6f735ded3df8145e"
+      "revision": "a6383da414f74c944999e7b9312a5a5d76191f6b"
     },
     "ktransformers": {
       "kind": "pip",
@@ -75,7 +75,7 @@
       "torch_index": "https://download.pytorch.org/whl/cu128",
       "packages": [
         "transformers==5.23.0",
-        "accelerate==1.15.0",
+        "accelerate==1.16.0",
         "sentencepiece==0.2.3"
       ]
     },
@@ -86,20 +86,20 @@
       "packages": [
         "airllm==4.0.0",
         "transformers==5.23.0",
-        "accelerate==1.15.0",
+        "accelerate==1.16.0",
         "sentencepiece==0.2.3"
       ]
     },
     "vllm": {
       "kind": "pip",
       "packages": [
-        "vllm==0.33.0"
+        "vllm==0.34.0"
       ]
     },
     "strata": {
       "kind": "strata",
       "repository": "https://github.com/Niko1221/Strata.git",
-      "revision": "09b603886925994d0d4461857b01321ef3aa431c"
+      "revision": "c77572806996349b49995e4f98d41b5294d36a21"
     },
     "lmstudio": {
       "kind": "lmstudio",
