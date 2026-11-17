@@ -1,0 +1,64 @@
+{
+  "experiment": {
+    "campaign_id": "legal-evaluation-windows",
+    "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+    "experiment_id": "legal-benchmark",
+    "experiment_run_id": "workflow-legal-benchmark-1",
+    "job_ids": [
+      "workflow-legal-benchmark-1-047c18a9ef19"
+    ],
+    "mode": "workflow",
+    "version": 1
+  },
+  "input_hashes": [
+    "0894c7d2f055caa62122ab3a48395074027c93ad22148ac915b894ace0f66cbe",
+    "1a87f5eb15c9c358a61c9d720386139b4daecb76eefcb27493d4f11bbed78db3",
+    "54dc75f6c8c825e38c3b85bf518556defec72471bf7acd05a430ecf62c7a2106",
+    "8781c92eeedc124bc7b578a4836df80df0594c64ac0e6ac57018be9fec5caeba",
+    "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae"
+  ],
+  "jobs": [
+    {
+      "case_id": "legal-workflow",
+      "experiment_id": "legal-benchmark",
+      "experiment_version": 1,
+      "hardware": {
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-native"
+      },
+      "hardware_config_id": "raider-windows",
+      "input_files": [
+        {
+          "sha256": "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae"
+        },
+        {
+          "sha256": "8781c92eeedc124bc7b578a4836df80df0594c64ac0e6ac57018be9fec5caeba"
+        },
+        {
+          "sha256": "1a87f5eb15c9c358a61c9d720386139b4daecb76eefcb27493d4f11bbed78db3"
+        },
+        {
+          "sha256": "54dc75f6c8c825e38c3b85bf518556defec72471bf7acd05a430ecf62c7a2106"
+        },
+        {
+          "sha256": "0894c7d2f055caa62122ab3a48395074027c93ad22148ac915b894ace0f66cbe"
+        }
+      ],
+      "job_id": "workflow-legal-benchmark-1-047c18a9ef19",
+      "mode": "workflow",
+      "parameters": {
+        "cohorts": [
+          "2e44e4cdb02bb768f13c4e3b63c9756195852b6f060472f7505833ebc8770e97",
+          "39c96ebf6e5d8034cdaf6734bb08f2debf639422691425534d6f94ae9a0edab4"
+        ],
+        "data_class": "public-synthetic",
+        "execution_kind": "model-run",
+        "identity": {
+          "harness": "ollama",
+          "model": "llm-eval-kimi-linear-48b:locked"
+        },
+        "synthetic": false
+      }
+    }
+  ]
+}
