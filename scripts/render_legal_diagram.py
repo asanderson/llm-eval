@@ -47,7 +47,7 @@ for label,x,y,stage in NODES.values():
                              edgecolor='#3265a8' if stage else '#78716c',linewidth=1.4,zorder=2))
  ax.text(x,y,label,ha='center',va='center',fontsize=10,color='#173452' if stage else '#292524',zorder=3)
 ax.text(.5,.995,'Outputs are passed by naming the file in the next case; dashed: only with a selector threshold. '
-        'Fictional fixture suites only; host measurements are pending.',ha='center',va='top',fontsize=9.5,color='#475569')
+        'Fictional fixture suites only; Windows-host runs published.',ha='center',va='top',fontsize=9.5,color='#475569')
 fig.tight_layout();fig.savefig(ROOT/'diagrams/legal-benchmark-workflow.png',dpi=150,metadata={'Software':'llm-eval'});plt.close(fig)
 source=('# Legal benchmark workflow\n\nThe five stages of the [legal benchmark walkthrough](../docs/LEGAL_BENCHMARK_WALKTHROUGH.md) and the explicit '
         'output of each. A phase dependency only orders jobs; the next stage names the output file in its case. Stage 3 is '
