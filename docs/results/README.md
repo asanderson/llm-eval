@@ -1,6 +1,6 @@
 # Experiment results
 
-Results of the llm-eval experiments on the hardware configurations measured so far. The page opens with the **executive summary**: the three best harness and model combinations per experiment for each hardware configuration, a comparison chart for each, and the conclusions per hardware configuration. After it come the navigation index (by hardware configuration, experiment, harness, model and date), the detailed results by experiment, harness and model, the tooling issues observed, and the list of every published report.
+Results of the llm-eval experiments on the hardware configurations measured so far. The page opens with the **executive summary**: the five best harness and model combinations per experiment for each hardware configuration, the five best models where a model repeats among them, a comparison chart for each, and the conclusions per hardware configuration. After it come the navigation index (by hardware configuration, experiment, harness, model and date), the detailed results by experiment, harness and model, the tooling issues observed, and the list of every published report.
 
 Tables and charts between `results-*` markers are generated from the published bundles by `llm-eval index-results`; everything else is operator-written. Results are listed newest first: experiments by their newest result, models within a harness by their newest run, and runs within a table by date. Figures are medians over measured (non-warmup) requests unless stated otherwise. Each linked report includes raw measurements, summaries, its own latency chart and reproducibility metadata. Synthetic fixtures are explicitly labeled.
 
@@ -8,9 +8,9 @@ Tables and charts between `results-*` markers are generated from the published b
 
 <!-- results-top:start -->
 
-### Top 3 harness and model combinations per experiment and hardware configuration
+### Top 5 harness and model combinations per experiment and hardware configuration
 
-Ranked by share of checks passed (correct decisions for routing experiments, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians.
+Ranked by share of checks passed (correct decisions for routing experiments, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians. Where a model repeats among the best combinations, a second table ranks the models, each by its best combination.
 
 **[model-offloading](index/experiment/model-offloading.md) on [raider-windows](index/hardware/raider-windows.md)**
 
@@ -19,6 +19,18 @@ Ranked by share of checks passed (correct decisions for routing experiments, qua
 | 1 | [ollama](index/harness/ollama.md) | [kimi-linear-48b](index/model/kimi-linear-48b.md) | 24/27 | 0.141 | 16.8 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md) |
 | 2 | [lmstudio](index/harness/lmstudio.md) | [kimi-linear-48b](index/model/kimi-linear-48b.md) | 24/27 | 0.147 | 15.8 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md) |
 | 3 | [koboldcpp](index/harness/koboldcpp.md) | [kimi-linear-48b](index/model/kimi-linear-48b.md) | 24/27 | 0.58 | 3.54 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md) |
+| 4 | [ollama](index/harness/ollama.md) | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | 24/27 | 2.47 | 29.5 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) |
+| 5 | [lmstudio](index/harness/lmstudio.md) | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | 24/27 | 4.62 | 14.4 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) |
+
+Top 5 models, each on its best-ranked harness:
+
+| Rank | Model | Harness | Checks passed | Median wall s | Output tok/s | Run |
+|---:|---|---|---:|---:|---:|---|
+| 1 | [kimi-linear-48b](index/model/kimi-linear-48b.md) | [ollama](index/harness/ollama.md) | 24/27 | 0.141 | 16.8 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md) |
+| 2 | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | [ollama](index/harness/ollama.md) | 24/27 | 2.47 | 29.5 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) |
+| 3 | [qwen38-27b](index/model/qwen38-27b.md) | [lmstudio](index/harness/lmstudio.md) | 24/27 | 7.92 | 6.44 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T222422Z-7671e746-offload-model-offloading-1/README.md) |
+| 4 | [gemma4-31b](index/model/gemma4-31b.md) | [ollama](index/harness/ollama.md) | 24/27 | 46.9 | 3.39 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T143606Z-03f6333f-offload-model-offloading-1/README.md) |
+| 5 | [gemma4-26b-moe](index/model/gemma4-26b-moe.md) | [koboldcpp](index/harness/koboldcpp.md) | 21/27 | 0.582 | 3.53 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T161112Z-fff50610-offload-model-offloading-1/README.md) |
 
 ![model-offloading on raider-windows: harness and model combinations compared](../../diagrams/results/summary/model-offloading-raider-windows.png)
 
@@ -54,7 +66,7 @@ MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 285HX, NVIDIA RTX 5090 Laptop (24
 - Harness choice matters less than placement for that model, with one exception: LM Studio at its defaults delivered 2.60 tokens per second and used about 11 GiB more RAM than the other two.
 - Qwen 3.8 27B Q8_0 with the same 20-layer split answers the smoke tasks in 7 to 26 s and passes 24 of 27 checks on every harness. Against DeepSeek-R1-32B it has the same or higher token rate, far fewer tokens per answer and about 2 GiB less GPU memory.
 - **Best measured combination: Kimi Linear 48B A3B (Q6_K) on Ollama or LM Studio.** 24 of 27 checks in 0.1 to 0.3 s per answer without reasoning, with 13 of 28 layers on GPU. KoboldCpp gives the same 24 of 27 at 0.6 s. Nemotron 3 Nano 30B on Ollama, the best of the first batch, keeps 24 of 27 at 2 to 3 s per answer and about 30 output tokens per second with 20 of 53 layers on GPU; its mixture-of-experts design activates about 3B parameters per token.
-- **Highest token rate: Qwen3.5 35B A3B (Q8_0) on LM Studio at 43 output tokens per second**, 24 of 27 checks with reasoning and 7 to 11 s per answer. Ollama serves the same model at 30 tokens per second and 21 of 27.
+- **Highest token rate: Qwen3.5 35B A3B (Q8_0) on LM Studio at 43 output tokens per second**, 24 of 27 checks with reasoning and 7 to 11 s per answer in the first measurement; the [rerun of 2026-11-15](#rerun-of-2026-11-15) gives 40.5 tokens per second and 21 of 27 on LM Studio, so the rankings above, which use the newest run, place it below its first-measurement position. Ollama serves the same model at 30 tokens per second and 21 of 27.
 - **Active parameters, not file size, set the speed at this split.** The three mixture-of-experts models (Nemotron 3 Nano 30B, Qwen3.5 35B A3B, Kimi Linear 48B A3B) and Laguna XS 2.1 decode at 15 to 43 tokens per second on Ollama and LM Studio; every dense model of 24B or more decodes at 1.9 to 6.4, and the five 70B and 72B models at Q4_K_M (61 of 81 layers on CPU) at 1.9 to 2.7. Gemma 4 26B A4B, a fourth mixture of experts, was measured at bf16 with 11 of 31 layers requested on the GPU and decodes at 13.6 tokens per second on LM Studio.
 - **Chat templates move scores more than weights do.** Llama 3.1 70B scores 0 of 27 on Ollama and LM Studio, which apply the GGUF template and get a sentence for every task, and 12 of 27 on KoboldCpp, which builds its own prompt; Llama 3 and 3.3 70B score 15 of 27 on all three. Phi-4-reasoning-plus reasons inline past the 2,048 cap on every Ollama request with its template system prompt and answers coding and math in a median of 2 tokens without it. Outputs are not saved in these runs, so a right answer wrapped in prose cannot be told from a wrong one.
 - **bf16 GGUFs do not pay off for dense models here.** Mistral Small 3.1 24B at bf16 (47.2 GB) fits only 16 layers in the placement budget, decodes at 2.3 to 2.9 tokens per second, passes 6 of 27 on every harness and takes LM Studio to 57 GiB of system RAM; Phi-4-reasoning-plus at bf16 decodes at 3.4 to 5.2 tokens per second. Gemma 4 26B A4B at bf16 (50.5 GB in two parts) passes 21 of 27 and decodes at 13.6 tokens per second on LM Studio, but takes it to 60.9 GiB of system RAM, and the harness cannot import its two-part file into Ollama.

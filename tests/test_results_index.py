@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from llm_eval.reporting.index import (END, LIST_END, LIST_START, START, TOP_END, TOP_START, collect, identity, slug,
-                                      top_combinations, write_results_index)
+                                      top_combinations, top_models, write_results_index)
 
 
 def bundle(root, experiment, publication, created, jobs, summary, synthetic=False):
@@ -101,7 +101,7 @@ class ResultsIndexTests(unittest.TestCase):
         self.assertTrue(text.endswith(LIST_END + '\n'))
         # each block holds its own part: ranking on top, navigation in the middle, the report list last
         top, rest = text.split(TOP_END)
-        self.assertIn('### Top 3 harness and model combinations', top)
+        self.assertIn('### Top 5 harness and model combinations', top)
         self.assertNotIn('models by harness', top)
         self.assertIn('[Report](model-offloading/campaign-b-offload/README.md)', rest.split(LIST_START)[1])
         self.assertNotIn('stale', text)
@@ -133,21 +133,32 @@ class ResultsIndexTests(unittest.TestCase):
                 row('c5', 'coding', 0.5, 9.0)])
         best = top_combinations(collect(self.root))
         self.assertEqual(sorted(best), [('model-offloading', 'raider-windows')])      # the only routing run is synthetic
-        self.assertEqual([(r['harness'], r['model'], r['score']) for r in best[('model-offloading', 'raider-windows')]],
+        self.assertEqual([(r['harness'], r['model'], r['score']) for r in best[('model-offloading', 'raider-windows')]][:3],
                          [('lmstudio', 'qwen38-27b', (18, 18)), ('ollama', 'qwen38-27b', (18, 18)), ('koboldcpp', 'gemma4-31b', (8, 9))])
         # A combination is judged on its newest succeeded run: ollama/deepseek is the 0/9 rerun, not the older 3/18.
         every = top_combinations(collect(self.root), limit=10)[('model-offloading', 'raider-windows')]
         self.assertEqual([(r['harness'], r['model'], r['publication']) for r in every][3:],
                          [('koboldcpp', 'qwen38-27b', 'campaign-c-offload'), ('ollama', 'deepseek-r1-32b', 'campaign-b-offload')])
+        self.assertEqual(best[('model-offloading', 'raider-windows')], every)      # five combinations fill the default five rows
+        # the models, each on its best harness: qwen38-27b ran on three harnesses and appears once, on lmstudio
+        by_model = top_models(collect(self.root))[('model-offloading', 'raider-windows')]
+        self.assertEqual([(r['model'], r['harness']) for r in by_model],
+                         [('qwen38-27b', 'lmstudio'), ('gemma4-31b', 'koboldcpp'), ('deepseek-r1-32b', 'ollama')])
+        self.assertEqual(len(top_models(collect(self.root), limit=2)[('model-offloading', 'raider-windows')]), 2)
+        self.assertEqual(len(top_combinations(collect(self.root), limit=3)[('model-offloading', 'raider-windows')]), 3)
         write_results_index(self.root)
         text = self.summary.read_text(encoding='utf-8')
-        heading = '### Top 3 harness and model combinations per experiment and hardware configuration'
+        heading = '### Top 5 harness and model combinations per experiment and hardware configuration'
         self.assertLess(text.index(heading), text.index('### Browse by category'))
         self.assertIn('| 1 | [lmstudio](index/harness/lmstudio.md) | [qwen38-27b](index/model/qwen38-27b.md) | 18/18 | 7.45 | 6.37 | '
                       '[2026-11-09 cap 2048](model-offloading/campaign-c-offload/README.md) |', text)
         self.assertIn('**[llm-routing](index/experiment/llm-routing.md) on [raider-ubuntu](index/hardware/raider-ubuntu.md)**'
                       '\n\n'
                       'No measured run with scored checks has been published yet.', text)
+        # qwen38-27b ran on three harnesses, so the models are ranked too, each once on its best harness
+        models = text.split('Top 5 models, each on its best-ranked harness:')[1].split('![')[0]
+        self.assertEqual(re.findall(r'^\| (\d) \| \[([^\]]+)\]\(index/model/[^)]+\) \| \[([^\]]+)\]', models, flags=re.M),
+                         [('1', 'qwen38-27b', 'lmstudio'), ('2', 'gemma4-31b', 'koboldcpp'), ('3', 'deepseek-r1-32b', 'ollama')])
         overview = (self.root / 'docs/results/index/README.md').read_text(encoding='utf-8')
         self.assertIn(heading, overview)
         # four ranked combinations are a comparison: the summary gets a chart, the index page does not repeat it
@@ -156,6 +167,22 @@ class ResultsIndexTests(unittest.TestCase):
         self.assertIn('](../../diagrams/results/summary/model-offloading-raider-windows.png)', text)
         self.assertNotIn('.png', overview)
         self.assertEqual([p.name for p in chart.parent.iterdir()], [chart.name])      # routing has nothing to compare
+
+    def test_the_ranking_shows_five_rows_and_keeps_the_rest_in_the_index(self):
+        models = [f'model-{n}' for n in range(7)]      # seven combinations whose checks fall from 9/9 to 3/9
+        bundle(self.root, 'model-offloading', 'campaign-d-offload', '2026-11-10T09:00:00+00:00',
+               [offload_job(f'd{n}', 'ollama', m) for n, m in enumerate(models)],
+               [row(f'd{n}', 'coding', 1.0 + n, 5.0, quality=(9 - n) / 9) for n in range(7)])
+        write_results_index(self.root)
+        text = self.summary.read_text(encoding='utf-8')
+        top = text.split(TOP_END)[0].split('**[model-offloading]')[1]
+        ranks = re.findall(r'^\| (\d+) \| \[ollama\]', top, flags=re.M)
+        self.assertEqual(ranks, ['1', '2', '3', '4', '5'])
+        self.assertIn('[model-4](index/model/model-4.md)', top)
+        self.assertNotIn('model-5', top)
+        self.assertNotIn('Top 5 models', text)      # the five best combinations are five different models: nothing more to rank
+        self.assertTrue((self.root / 'docs/results/index/model/model-5.md').is_file())      # ranked sixth, still indexed
+        self.assertIn('model-5', (self.root / 'docs/results/index/harness/ollama.md').read_text(encoding='utf-8'))
 
     def test_results_readme_lists_newest_first(self):
         from llm_eval.reporting.publish import write_index
@@ -191,7 +218,7 @@ class ResultsIndexTests(unittest.TestCase):
                     self.summary.write_text(before, encoding='utf-8')
                 write_results_index(self.root)
                 text = self.summary.read_text(encoding='utf-8')
-                self.assertLess(text.index('## Executive summary'), text.index('### Top 3 harness and model combinations'))
+                self.assertLess(text.index('## Executive summary'), text.index('### Top 5 harness and model combinations'))
                 self.assertLess(text.index('## Results index'), text.index('### Browse by category'))
                 self.assertLess(text.index('## All published reports'), text.index('campaign-a-routing/README.md)', text.index(LIST_START)))
 
