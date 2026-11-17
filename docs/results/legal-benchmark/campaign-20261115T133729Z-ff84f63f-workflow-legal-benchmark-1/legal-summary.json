@@ -1,0 +1,1448 @@
+{
+  "cohorts": [
+    {
+      "arm": "lexical-eligible",
+      "cohort": {
+        "accelerator": "gpu",
+        "arm": "lexical-eligible",
+        "artifact_sha256": "f5702d198d056349a98203943b98c213831c4d486f9b2962f23b842bb5a13bb2",
+        "backend_version": "0.40.15",
+        "benchmark_id": "legal-original-smoke",
+        "context_tokens": 4096,
+        "data_class": "public-synthetic",
+        "execution_kind": "model-run",
+        "experiment": "legal-benchmark",
+        "generation_sha256": "676351137b140f919dff7763cf97d706af64f70c9835fa9dce3fdd46373b6d08",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "jurisdiction_profile": "veld-fictional-v1",
+        "max_output_tokens": 1024,
+        "mode": "workflow",
+        "model": "llm-eval-kimi-linear-48b:locked",
+        "model_revision": "228dbe476e5a02091624a19068f4c962caa8a1c5",
+        "os_id": "windows-11-native",
+        "platform": "ollama",
+        "policy_id": "fixture-default",
+        "policy_version": "1",
+        "prompt_template_sha256": "0cb3dd8c441c6fb8f02c3e5bde69c3a12d939a985a06a0f96228a91c0dc5ca2e",
+        "protocol": "ollama",
+        "quantization": "Q6_K",
+        "retrieval_sha256": "c840f9c7b1184ca8b8a36ee171a5a88b060fb425fd457a35bcfc9ffbc574b410",
+        "reviewer_fingerprint": null,
+        "role_digests": {
+          "generator": "aef7ab114e3afa6fffc812258cad414d39ac475faf1e98095f911bc14a4d795a"
+        },
+        "rubric_version": "original-smoke-rubric-2",
+        "scorer_fingerprint": "75f804ae05394008d2adfe4e777b2d05b7cf0e2fab5b2d110ffa109fbcc2e1b5",
+        "scorer_version": "legal-scorer-1",
+        "selector_sha256": null,
+        "split_id": "smoke",
+        "suite_lock_sha256": "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae",
+        "suite_revision": "2026-11-11.1"
+      },
+      "cohort_sha256": "2e44e4cdb02bb768f13c4e3b63c9756195852b6f060472f7505833ebc8770e97",
+      "job_id": "workflow-legal-benchmark-1-047c18a9ef19",
+      "metrics": {
+        "abstention": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "all_pass": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "all_pass_deterministic": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "all_pass_reviewed": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "author_dangerous_commitment": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 4,
+          "value": 1.0
+        },
+        "author_false_charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 9,
+          "value": 0.777778
+        },
+        "author_false_defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 12,
+          "value": 0.0
+        },
+        "confusion.charge.charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 7
+        },
+        "confusion.charge.decline": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "confusion.charge.defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "confusion.charge.none": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "confusion.decline.charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 3
+        },
+        "confusion.decline.decline": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 2
+        },
+        "confusion.decline.defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "confusion.decline.none": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "confusion.defer.charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 4
+        },
+        "confusion.defer.decline": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "confusion.defer.defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "confusion.defer.none": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "criterion.adverse_authority": {
+          "high": 1.0,
+          "low": 0.625,
+          "missing": 0,
+          "n": 16,
+          "value": 0.875
+        },
+        "criterion.authority_version": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "criterion.citations_resolve": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "criterion.claim_status": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "criterion.conflicts_flagged": {
+          "high": 1.0,
+          "low": 0.8125,
+          "missing": 0,
+          "n": 16,
+          "value": 0.9375
+        },
+        "criterion.element_findings": {
+          "high": 0.8125,
+          "low": 0.1875,
+          "missing": 0,
+          "n": 16,
+          "value": 0.5
+        },
+        "criterion.evidence_grounding": {
+          "high": 0.8125,
+          "low": 0.1875,
+          "missing": 0,
+          "n": 16,
+          "value": 0.5
+        },
+        "criterion.insufficiency_flagged": {
+          "high": 0.6875,
+          "low": 0.5,
+          "missing": 0,
+          "n": 16,
+          "value": 0.5625
+        },
+        "criterion.missing_information_flagged": {
+          "high": 0.8125,
+          "low": 0.3125,
+          "missing": 0,
+          "n": 16,
+          "value": 0.5625
+        },
+        "criterion.no_ineligible_version_supported": {
+          "high": 1.0,
+          "low": 1.0,
+          "missing": 0,
+          "n": 16,
+          "value": 1.0
+        },
+        "criterion.pinpoints_correct": {
+          "high": 1.0,
+          "low": 1.0,
+          "missing": 0,
+          "n": 16,
+          "value": 1.0
+        },
+        "criterion.recommendation": {
+          "high": 0.75,
+          "low": 0.375,
+          "missing": 0,
+          "n": 16,
+          "value": 0.5625
+        },
+        "criterion.schema_valid": {
+          "high": 1.0,
+          "low": 1.0,
+          "missing": 0,
+          "n": 16,
+          "value": 1.0
+        },
+        "criterion.untrusted_instruction_flagged": {
+          "high": 1.0,
+          "low": 0.8125,
+          "missing": 0,
+          "n": 16,
+          "value": 0.9375
+        },
+        "critical_errors": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 1.0
+        },
+        "critical_unreviewed": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 1.0
+        },
+        "elapsed_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 28.698278
+        },
+        "elapsed_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 49.354772
+        },
+        "error.absent_element": {
+          "high": 0.1875,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0625
+        },
+        "error.dangerous_commitment": {
+          "high": 0.4375,
+          "low": 0.0625,
+          "missing": 0,
+          "n": 16,
+          "value": 0.25
+        },
+        "error.fabricated_citation": {
+          "high": 1.0,
+          "low": 1.0,
+          "missing": 0,
+          "n": 16,
+          "value": 1.0
+        },
+        "error.false_charge": {
+          "high": 0.625,
+          "low": 0.25,
+          "missing": 0,
+          "n": 16,
+          "value": 0.4375
+        },
+        "error.ineligible_version": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.out_of_scope_citation": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.pinpoint_mismatch": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.quote_mismatch": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.schema_invalid": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.span_digest_mismatch": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.unknown_span": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.unknown_version": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.unsupported_charge": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.unsupportive_citation": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.unverified_validity": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.wrong_version": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "first_output_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 1.296689
+        },
+        "first_output_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 1.712322
+        },
+        "first_visible_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 1.296689
+        },
+        "first_visible_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 1.712322
+        },
+        "forced_defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 1.0
+        },
+        "missing.no_response": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "missing.pending": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "missing.unavailable": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "rate.revised": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 1.0
+        },
+        "rate.route_fallback": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.selector_deferral": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.truncated": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "retrieval.adverse_authority_coverage": {
+          "high": null,
+          "low": null,
+          "missing": 15,
+          "n": 1,
+          "value": 1.0
+        },
+        "retrieval.authority_ndcg_at_10": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.authority_recall_at_5": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.evidence_ndcg_at_10": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 0.994266
+        },
+        "retrieval.evidence_recall_at_5": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.exact_version_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.ineligible_version_leakage": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "retrieval.prompt_authority_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.prompt_evidence_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.retrieved_passages": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 6.9375
+        },
+        "retrieval.retrieved_tokens": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 100.3125
+        },
+        "status.error": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.invalid": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.missing": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.ok": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 16
+        },
+        "usable_memo_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "usable_memo_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "workflow_confusion.charge.charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "workflow_confusion.charge.decline": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "workflow_confusion.charge.defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 7
+        },
+        "workflow_confusion.decline.charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "workflow_confusion.decline.decline": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "workflow_confusion.decline.defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 5
+        },
+        "workflow_confusion.defer.charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "workflow_confusion.defer.decline": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "workflow_confusion.defer.defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 4
+        },
+        "workflow_dangerous_commitment": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 4,
+          "value": 0.0
+        },
+        "workflow_false_charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 9,
+          "value": 0.0
+        },
+        "workflow_false_defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 12,
+          "value": 1.0
+        }
+      },
+      "run_status": "complete",
+      "suppressed": false
+    },
+    {
+      "arm": "no-context",
+      "cohort": {
+        "accelerator": "gpu",
+        "arm": "no-context",
+        "artifact_sha256": "f5702d198d056349a98203943b98c213831c4d486f9b2962f23b842bb5a13bb2",
+        "backend_version": "0.40.15",
+        "benchmark_id": "legal-original-smoke",
+        "context_tokens": 4096,
+        "data_class": "public-synthetic",
+        "execution_kind": "model-run",
+        "experiment": "legal-benchmark",
+        "generation_sha256": "676351137b140f919dff7763cf97d706af64f70c9835fa9dce3fdd46373b6d08",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "jurisdiction_profile": "veld-fictional-v1",
+        "max_output_tokens": 1024,
+        "mode": "workflow",
+        "model": "llm-eval-kimi-linear-48b:locked",
+        "model_revision": "228dbe476e5a02091624a19068f4c962caa8a1c5",
+        "os_id": "windows-11-native",
+        "platform": "ollama",
+        "policy_id": "fixture-default",
+        "policy_version": "1",
+        "prompt_template_sha256": "0cb3dd8c441c6fb8f02c3e5bde69c3a12d939a985a06a0f96228a91c0dc5ca2e",
+        "protocol": "ollama",
+        "quantization": "Q6_K",
+        "retrieval_sha256": "c840f9c7b1184ca8b8a36ee171a5a88b060fb425fd457a35bcfc9ffbc574b410",
+        "reviewer_fingerprint": null,
+        "role_digests": {
+          "generator": "aef7ab114e3afa6fffc812258cad414d39ac475faf1e98095f911bc14a4d795a"
+        },
+        "rubric_version": "original-smoke-rubric-2",
+        "scorer_fingerprint": "75f804ae05394008d2adfe4e777b2d05b7cf0e2fab5b2d110ffa109fbcc2e1b5",
+        "scorer_version": "legal-scorer-1",
+        "selector_sha256": null,
+        "split_id": "smoke",
+        "suite_lock_sha256": "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae",
+        "suite_revision": "2026-11-11.1"
+      },
+      "cohort_sha256": "39c96ebf6e5d8034cdaf6734bb08f2debf639422691425534d6f94ae9a0edab4",
+      "job_id": "workflow-legal-benchmark-1-047c18a9ef19",
+      "metrics": {
+        "abstention": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.25
+        },
+        "all_pass": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "all_pass_deterministic": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "all_pass_reviewed": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "author_dangerous_commitment": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 4,
+          "value": 0.0
+        },
+        "author_false_charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 9,
+          "value": 0.222222
+        },
+        "author_false_defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 12,
+          "value": 0.166667
+        },
+        "confusion.charge.charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 1
+        },
+        "confusion.charge.decline": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "confusion.charge.defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 2
+        },
+        "confusion.charge.none": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 4
+        },
+        "confusion.decline.charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 2
+        },
+        "confusion.decline.decline": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "confusion.decline.defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "confusion.decline.none": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 3
+        },
+        "confusion.defer.charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "confusion.defer.decline": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "confusion.defer.defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 2
+        },
+        "confusion.defer.none": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 2
+        },
+        "criterion.adverse_authority": {
+          "high": 0.625,
+          "low": 0.0625,
+          "missing": 0,
+          "n": 16,
+          "value": 0.3125
+        },
+        "criterion.authority_version": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "criterion.citations_resolve": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "criterion.claim_status": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "criterion.conflicts_flagged": {
+          "high": 0.75,
+          "low": 0.125,
+          "missing": 0,
+          "n": 16,
+          "value": 0.4375
+        },
+        "criterion.element_findings": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "criterion.evidence_grounding": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "criterion.insufficiency_flagged": {
+          "high": 0.5625,
+          "low": 0.125,
+          "missing": 0,
+          "n": 16,
+          "value": 0.3125
+        },
+        "criterion.missing_information_flagged": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "criterion.no_ineligible_version_supported": {
+          "high": 0.75,
+          "low": 0.125,
+          "missing": 0,
+          "n": 16,
+          "value": 0.4375
+        },
+        "criterion.pinpoints_correct": {
+          "high": 0.75,
+          "low": 0.125,
+          "missing": 0,
+          "n": 16,
+          "value": 0.4375
+        },
+        "criterion.recommendation": {
+          "high": 0.375,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.1875
+        },
+        "criterion.schema_valid": {
+          "high": 0.75,
+          "low": 0.125,
+          "missing": 0,
+          "n": 16,
+          "value": 0.4375
+        },
+        "criterion.untrusted_instruction_flagged": {
+          "high": 0.75,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.375
+        },
+        "critical_errors": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 1.0
+        },
+        "critical_unreviewed": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 1.0
+        },
+        "elapsed_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 9,
+          "n": 7,
+          "value": 30.353586
+        },
+        "elapsed_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 9,
+          "n": 7,
+          "value": 37.929017
+        },
+        "error.absent_element": {
+          "high": 0.75,
+          "low": 0.125,
+          "missing": 0,
+          "n": 16,
+          "value": 0.4375
+        },
+        "error.dangerous_commitment": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.fabricated_citation": {
+          "high": 0.75,
+          "low": 0.125,
+          "missing": 0,
+          "n": 16,
+          "value": 0.4375
+        },
+        "error.false_charge": {
+          "high": 0.3125,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.125
+        },
+        "error.ineligible_version": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.out_of_scope_citation": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.pinpoint_mismatch": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.quote_mismatch": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.schema_invalid": {
+          "high": 0.875,
+          "low": 0.25,
+          "missing": 0,
+          "n": 16,
+          "value": 0.5625
+        },
+        "error.span_digest_mismatch": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.unknown_span": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.unknown_version": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.unsupported_charge": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.unsupportive_citation": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.unverified_validity": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "error.wrong_version": {
+          "high": 0.0,
+          "low": 0.0,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "first_output_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 9,
+          "n": 7,
+          "value": 1.314531
+        },
+        "first_output_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 9,
+          "n": 7,
+          "value": 1.337442
+        },
+        "first_visible_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 9,
+          "n": 7,
+          "value": 1.314531
+        },
+        "first_visible_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 9,
+          "n": 7,
+          "value": 1.337442
+        },
+        "forced_defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.75
+        },
+        "missing.no_response": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "missing.pending": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "missing.unavailable": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "rate.revised": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.4375
+        },
+        "rate.route_fallback": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.selector_deferral": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.truncated": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "retrieval.adverse_authority_coverage": {
+          "high": null,
+          "low": null,
+          "missing": 15,
+          "n": 1,
+          "value": 0.0
+        },
+        "retrieval.authority_ndcg_at_10": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.authority_recall_at_5": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.evidence_ndcg_at_10": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.evidence_recall_at_5": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.exact_version_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 0.0
+        },
+        "retrieval.ineligible_version_leakage": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.prompt_authority_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 0.0
+        },
+        "retrieval.prompt_evidence_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.retrieved_passages": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 2.1875
+        },
+        "retrieval.retrieved_tokens": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 22.25
+        },
+        "status.error": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.invalid": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 9
+        },
+        "status.missing": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.ok": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 7
+        },
+        "usable_memo_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "usable_memo_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "workflow_confusion.charge.charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "workflow_confusion.charge.decline": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "workflow_confusion.charge.defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 7
+        },
+        "workflow_confusion.decline.charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "workflow_confusion.decline.decline": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "workflow_confusion.decline.defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 5
+        },
+        "workflow_confusion.defer.charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "workflow_confusion.defer.decline": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "workflow_confusion.defer.defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 4
+        },
+        "workflow_dangerous_commitment": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 4,
+          "value": 0.0
+        },
+        "workflow_false_charge": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 9,
+          "value": 0.0
+        },
+        "workflow_false_defer": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 12,
+          "value": 1.0
+        }
+      },
+      "run_status": "complete",
+      "suppressed": false
+    }
+  ],
+  "paired": [
+    {
+      "arm_a": "no-context",
+      "arm_b": "lexical-eligible",
+      "high": 0.0,
+      "job_id": "workflow-legal-benchmark-1-047c18a9ef19",
+      "low": 0.0,
+      "mean": 0.0,
+      "metric": "all_pass",
+      "missing": 0,
+      "n": 16
+    },
+    {
+      "arm_a": "no-context",
+      "arm_b": "lexical-eligible",
+      "high": 0.0,
+      "job_id": "workflow-legal-benchmark-1-047c18a9ef19",
+      "low": 0.0,
+      "mean": 0.0,
+      "metric": "error.wrong_version",
+      "missing": 0,
+      "n": 16
+    },
+    {
+      "arm_a": "no-context",
+      "arm_b": "lexical-eligible",
+      "high": 0.0,
+      "job_id": "workflow-legal-benchmark-1-047c18a9ef19",
+      "low": 0.0,
+      "mean": 0.0,
+      "metric": "error.unsupportive_citation",
+      "missing": 0,
+      "n": 16
+    }
+  ],
+  "schema_version": 1
+}
