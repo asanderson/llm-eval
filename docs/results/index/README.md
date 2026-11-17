@@ -31,11 +31,11 @@ No measured run with scored checks has been published yet.
 
 | Category | Indexes (results) |
 |---|---|
-| Hardware configuration | [raider-ubuntu](hardware/raider-ubuntu.md) (1) · [raider-windows](hardware/raider-windows.md) (113) |
-| Experiment | [legal-benchmark](experiment/legal-benchmark.md) (3) · [llm-routing](experiment/llm-routing.md) (5) · [model-offloading](experiment/model-offloading.md) (106) |
-| Harness | [category](harness/category.md) (1) · [koboldcpp](harness/koboldcpp.md) (34) · [lmstudio](harness/lmstudio.md) (34) · [ollama](harness/ollama.md) (45) |
-| Model | [category](model/category.md) (1) · [deepseek-r1-32b](model/deepseek-r1-32b.md) (9) · [deepseek-r1-70b](model/deepseek-r1-70b.md) (6) · [gemma3-27b](model/gemma3-27b.md) (6) · [gemma4-26b-moe](model/gemma4-26b-moe.md) (6) · [gemma4-31b](model/gemma4-31b.md) (7) · [kimi-dev-72b](model/kimi-dev-72b.md) (6) · [kimi-linear-48b](model/kimi-linear-48b.md) (6) · [laguna-xs21](model/laguna-xs21.md) (6) · [llama3-70b](model/llama3-70b.md) (6) · [llama31-70b](model/llama31-70b.md) (6) · [llama33-70b](model/llama33-70b.md) (6) · [llm-eval-kimi-linear-48b:locked](model/llm-eval-kimi-linear-48b-locked.md) (3) · [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) (2) · [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) (2) · [mistral-small31](model/mistral-small31.md) (6) · [nemotron-nano-30b](model/nemotron-nano-30b.md) (6) · [nemotron-super-49b](model/nemotron-super-49b.md) (6) · [phi4-reasoning-plus](model/phi4-reasoning-plus.md) (6) · [qwen35-35b-moe](model/qwen35-35b-moe.md) (6) · [qwen38-27b](model/qwen38-27b.md) (6) |
-| Date (UTC) | [2026-11-16](date/2026-11-16.md) (12) · [2026-11-15](date/2026-11-15.md) (44) · [2026-11-11](date/2026-11-11.md) (3) · [2026-11-10](date/2026-11-10.md) (30) · [2026-11-09](date/2026-11-09.md) (19) · [2026-11-08](date/2026-11-08.md) (6) |
+| Hardware configuration | [raider-ubuntu](hardware/raider-ubuntu.md) (1) · [raider-windows](hardware/raider-windows.md) (114) |
+| Experiment | [legal-benchmark](experiment/legal-benchmark.md) (4) · [llm-routing](experiment/llm-routing.md) (5) · [model-offloading](experiment/model-offloading.md) (106) |
+| Harness | [category](harness/category.md) (1) · [fixture](harness/fixture.md) (1) · [koboldcpp](harness/koboldcpp.md) (34) · [lmstudio](harness/lmstudio.md) (34) · [ollama](harness/ollama.md) (45) |
+| Model | [category](model/category.md) (1) · [deepseek-r1-32b](model/deepseek-r1-32b.md) (9) · [deepseek-r1-70b](model/deepseek-r1-70b.md) (6) · [fixture](model/fixture.md) (1) · [gemma3-27b](model/gemma3-27b.md) (6) · [gemma4-26b-moe](model/gemma4-26b-moe.md) (6) · [gemma4-31b](model/gemma4-31b.md) (7) · [kimi-dev-72b](model/kimi-dev-72b.md) (6) · [kimi-linear-48b](model/kimi-linear-48b.md) (6) · [laguna-xs21](model/laguna-xs21.md) (6) · [llama3-70b](model/llama3-70b.md) (6) · [llama31-70b](model/llama31-70b.md) (6) · [llama33-70b](model/llama33-70b.md) (6) · [llm-eval-kimi-linear-48b:locked](model/llm-eval-kimi-linear-48b-locked.md) (3) · [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) (2) · [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) (2) · [mistral-small31](model/mistral-small31.md) (6) · [nemotron-nano-30b](model/nemotron-nano-30b.md) (6) · [nemotron-super-49b](model/nemotron-super-49b.md) (6) · [phi4-reasoning-plus](model/phi4-reasoning-plus.md) (6) · [qwen35-35b-moe](model/qwen35-35b-moe.md) (6) · [qwen38-27b](model/qwen38-27b.md) (6) |
+| Date (UTC) | [2026-11-16](date/2026-11-16.md) (12) · [2026-11-15](date/2026-11-15.md) (45) · [2026-11-11](date/2026-11-11.md) (3) · [2026-11-10](date/2026-11-10.md) (30) · [2026-11-09](date/2026-11-09.md) (19) · [2026-11-08](date/2026-11-08.md) (6) |
 
 ### model-offloading: models by harness
 
@@ -65,9 +65,10 @@ Each cell links to the report of every published run of that model on that harne
 
 Each cell links to the report of every published run of that model on that harness, newest first. Models are ordered by their newest run.
 
-| Model | [ollama](harness/ollama.md) |
-|---|---|
-| [llm-eval-kimi-linear-48b:locked](model/llm-eval-kimi-linear-48b-locked.md) | [2026-11-15 raider-windows score-only](../legal-benchmark/campaign-20261115T140033Z-ed2177f1-score-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](../legal-benchmark/campaign-20261115T133729Z-ff84f63f-generation-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](../legal-benchmark/campaign-20261115T133729Z-ff84f63f-workflow-legal-benchmark-1/README.md) |
+| Model | [fixture](harness/fixture.md) | [ollama](harness/ollama.md) |
+|---|---|---|
+| [llm-eval-kimi-linear-48b:locked](model/llm-eval-kimi-linear-48b-locked.md) | – | [2026-11-15 raider-windows score-only](../legal-benchmark/campaign-20261115T140033Z-ed2177f1-score-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](../legal-benchmark/campaign-20261115T133729Z-ff84f63f-generation-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](../legal-benchmark/campaign-20261115T133729Z-ff84f63f-workflow-legal-benchmark-1/README.md) |
+| [fixture](model/fixture.md) | [2026-11-15 raider-windows fixture](../legal-benchmark/campaign-20261115T133729Z-ff84f63f-retrieval-legal-benchmark-1/README.md) | – |
 
 ### llm-routing: models by harness
 
@@ -82,6 +83,12 @@ Each cell links to the report of every published run of that model on that harne
 ### Results by class and cohort
 
 These results are not ranked with other experiments. Two runs are comparable only when their cohort digests are equal; fixture and score-only runs do not measure a model.
+
+**Fixture runs** (fixture)
+
+| Experiment | Cohorts | Mode | OS | Harness | Model | Status | Checks passed, all cohorts of the job | Run |
+|---|---|---|---|---|---|---|---:|---|
+| [legal-benchmark](experiment/legal-benchmark.md) | 6bf6a5a2277b, 6f2d41f843f3, baeeaeeac14f, cd5c9a086d15 | retrieval | windows-11-native | [fixture](harness/fixture.md) | [fixture](model/fixture.md) | succeeded (fixture) | 39/56 | [2026-11-15](../legal-benchmark/campaign-20261115T133729Z-ff84f63f-retrieval-legal-benchmark-1/README.md) |
 
 **Measured runs** (measured)
 
@@ -152,6 +159,7 @@ These results are not ranked with other experiments. Two runs are comparable onl
 | [2026-11-15](date/2026-11-15.md) | [model-offloading](experiment/model-offloading.md) | [raider-windows](hardware/raider-windows.md) | [lmstudio](harness/lmstudio.md) | [kimi-linear-48b](model/kimi-linear-48b.md) | kimi-linear-48b-lmstudio | 2048 | succeeded | 27 | 0 | 0.129–0.325 | 15.5–21.5 | 24/27 | – | [report](../model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md) |
 | [2026-11-15](date/2026-11-15.md) | [model-offloading](experiment/model-offloading.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [kimi-linear-48b](model/kimi-linear-48b.md) | kimi-linear-48b-ollama | 2048 | succeeded | 27 | 0 | 0.128–0.163 | 15.6–18.4 | 24/27 | – | [report](../model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md) |
 | [2026-11-15](date/2026-11-15.md) | [legal-benchmark](experiment/legal-benchmark.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](model/llm-eval-kimi-linear-48b-locked.md) | legal-score | – | succeeded (score-only) | 32 | 6 | – | – | 0/32 | – | [report](../legal-benchmark/campaign-20261115T140033Z-ed2177f1-score-legal-benchmark-1/README.md) |
+| [2026-11-15](date/2026-11-15.md) | [legal-benchmark](experiment/legal-benchmark.md) | [raider-windows](hardware/raider-windows.md) | [fixture](harness/fixture.md) | [fixture](model/fixture.md) | legal-retrieval | – | succeeded (fixture) | 64 | 0 | 4.26e-05–0.000157 | – | 39/56 | – | [report](../legal-benchmark/campaign-20261115T133729Z-ff84f63f-retrieval-legal-benchmark-1/README.md) |
 | [2026-11-15](date/2026-11-15.md) | [legal-benchmark](experiment/legal-benchmark.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](model/llm-eval-kimi-linear-48b-locked.md) | legal-generation | – | succeeded (measured) | 32 | 6 | 10.7–11.7 | 31.2–31.4 | 0/32 | – | [report](../legal-benchmark/campaign-20261115T133729Z-ff84f63f-generation-legal-benchmark-1/README.md) |
 | [2026-11-15](date/2026-11-15.md) | [legal-benchmark](experiment/legal-benchmark.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](model/llm-eval-kimi-linear-48b-locked.md) | legal-workflow | – | succeeded (measured) | 32 | 9 | 28.8–30.4 | 29–29.1 | 0/32 | – | [report](../legal-benchmark/campaign-20261115T133729Z-ff84f63f-workflow-legal-benchmark-1/README.md) |
 | [2026-11-15](date/2026-11-15.md) | [llm-routing](experiment/llm-routing.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) | ollama-nimble | – | succeeded | 6 | 0 | 0.0594–0.061 | – | – | 6/6 | [report](../llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md) |
