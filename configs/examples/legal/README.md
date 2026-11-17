@@ -58,4 +58,4 @@ A role served on another physical host names it in `resource_host`. Its `endpoin
 
 ## Publication
 
-A routing or offload bundle built from a legal export cannot be published: its benchmark names (`legal-routing`, `legal-shaped`) start with `legal-`, which the legal plugin claims, so `publish-results` finds a second experiment identity in the bundle and refuses it. Local reports are unaffected. No legal result bundle is published by this effort.
+A routing or offload bundle built from a legal export cannot be published: its benchmark names (`legal-routing`, `legal-shaped`) start with `legal-`, which the legal plugin claims, so `publish-results` finds a second experiment identity in the bundle and refuses it. Local reports are unaffected. A legal result bundle is published only by the separately authorized step, never by a campaign: `publish.mode` is `none` in every campaign file here.
