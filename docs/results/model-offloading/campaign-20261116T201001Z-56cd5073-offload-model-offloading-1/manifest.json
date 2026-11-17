@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "experiment_id": "model-offloading",
+  "experiment_run_id": "offload-model-offloading-1",
+  "publication_id": "campaign-20261116T201001Z-56cd5073-offload-model-offloading-1",
+  "campaign_id": "matrix-nemotron-super-49b",
+  "created_utc": "2026-11-16T20:10:01.097584+00:00",
+  "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+  "status": "complete",
+  "synthetic": false,
+  "coverage": [
+    {
+      "job_id": "offload-model-offloading-1-f8f3b4e3e15b",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "offload-model-offloading-1-e10f80682fcb",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "offload-model-offloading-1-39784eb03258",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    }
+  ],
+  "raw_records": 22028,
+  "removed_fields": [
+    "absolute_path_values",
+    "artifact_lock",
+    "artifact_root",
+    "backend_pid",
+    "endpoint",
+    "host",
+    "offload_dir",
+    "python"
+  ],
+  "files": {
+    "diagrams/results/model-offloading/campaign-20261116T201001Z-56cd5073-offload-model-offloading-1/latency.png": "338a203e6c5216a31074c038fc126f927e07a0a4473bd669d4ce21d2a586c062",
+    "docs/results/model-offloading/campaign-20261116T201001Z-56cd5073-offload-model-offloading-1/benchmark-summary.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/results/model-offloading/campaign-20261116T201001Z-56cd5073-offload-model-offloading-1/benchmark-summary.json": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+    "docs/results/model-offloading/campaign-20261116T201001Z-56cd5073-offload-model-offloading-1/raw/measurements.jsonl.gz": "2312cabebbf3519a6c05022f11802844426afa26d8a083ec2529440105403911",
+    "docs/results/model-offloading/campaign-20261116T201001Z-56cd5073-offload-model-offloading-1/README.md": "97950f0d80326d06e1b77a553cc92dd8bae82ea029ad60880ad6d30c7f98add0",
+    "docs/results/model-offloading/campaign-20261116T201001Z-56cd5073-offload-model-offloading-1/resolved-config.json": "7b9deb7beed88d356aecac8c0e7d34e34398e32b904f89f93ae34fa00d5b7886",
+    "docs/results/model-offloading/campaign-20261116T201001Z-56cd5073-offload-model-offloading-1/summary.csv": "f99b1262f65f43b7a9b776c83a05b72f63cbd6814c7cb7cdfc2fe77bcdfb1fe3",
+    "docs/results/model-offloading/campaign-20261116T201001Z-56cd5073-offload-model-offloading-1/summary.json": "bc9f4ff581aa2df092de01575a1cbbe76c3bde811f3d238caa154d8f3531a011"
+  },
+  "report_fingerprint": "ed5575baf3b5001c7cd624bca28494c01215fb9b861b0cc0144150d93d5bc0a1"
+}
