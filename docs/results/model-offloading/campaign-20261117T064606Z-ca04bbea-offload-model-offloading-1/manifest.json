@@ -1,0 +1,48 @@
+{
+  "schema_version": 2,
+  "experiment_id": "model-offloading",
+  "experiment_run_id": "offload-model-offloading-1",
+  "publication_id": "campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1",
+  "campaign_id": "matrix-wsl-nemotron-nano-30b",
+  "created_utc": "2026-11-17T06:46:06.438005+00:00",
+  "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce",
+  "status": "complete",
+  "synthetic": false,
+  "coverage": [
+    {
+      "job_id": "offload-model-offloading-1-94b0edd74bf6",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "offload-model-offloading-1-28129d927ca2",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    }
+  ],
+  "raw_records": 296,
+  "removed_fields": [
+    "absolute_path_values",
+    "artifact_lock",
+    "artifact_root",
+    "backend_pid",
+    "endpoint",
+    "host",
+    "lock_root",
+    "offload_dir",
+    "python"
+  ],
+  "files": {
+    "diagrams/results/model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/latency.png": "bd2b2aba3532bd7d30f4dbc395273796e112788f95167129b4a1168356e769e7",
+    "docs/results/model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/README.md": "75e08bfa27820d01608840d6f02b28d6ff49f792261f030a9d7387f927bf556e",
+    "docs/results/model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/benchmark-summary.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/results/model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/benchmark-summary.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "docs/results/model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/raw/measurements.jsonl.gz": "6e84a699fd5c4d48858c876b3944cdde57098373749b3ea3fcc037da8c7a4cf0",
+    "docs/results/model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/resolved-config.json": "2c1be9e9f6aa83d15039bec22ff82241caf992f61eaebdb46b8e6432dba3b49a",
+    "docs/results/model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/summary.csv": "0405c69f94e0beb80b0edc7a0b80b76654101eae669ba886f2884b914a50c712",
+    "docs/results/model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/summary.json": "7a783f17afbe2d41ac3ecb4155ac37d274e4f82e3ff088fcd2d333ee531cc228"
+  },
+  "report_fingerprint": "2ac87801a7dd0e1b9d67cf4dbf19e01fbad6a9d50dad7466654c151002842968"
+}

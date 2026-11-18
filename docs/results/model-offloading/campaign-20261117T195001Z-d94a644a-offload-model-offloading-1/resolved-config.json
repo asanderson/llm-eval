@@ -1,0 +1,380 @@
+{
+  "experiment": {
+    "experiment_run_id": "offload-model-offloading-1",
+    "experiment_id": "model-offloading",
+    "version": 1,
+    "mode": "category-smoke",
+    "job_ids": [
+      "offload-model-offloading-1-6415edfa1ed2",
+      "offload-model-offloading-1-4fdd4a317ab7"
+    ],
+    "campaign_id": "matrix-wsl-mistral-small31",
+    "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce"
+  },
+  "jobs": [
+    {
+      "schema_version": 2,
+      "job_id": "offload-model-offloading-1-6415edfa1ed2",
+      "experiment_run_id": "offload-model-offloading-1",
+      "experiment_id": "model-offloading",
+      "experiment_version": 1,
+      "mode": "category-smoke",
+      "case_id": "mistral-small31-ollama",
+      "hardware_config_id": "raider-wsl",
+      "hardware": {
+        "target": "raider",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-wsl2-ubuntu-26.04"
+      },
+      "hardware_profile": {
+        "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+        "manufacturer": "MSI",
+        "model": "Raider 18 HX AI A2XWJG-069US",
+        "cpu": {
+          "name": "Intel Core Ultra 9 285HX",
+          "architecture": "Arrow Lake-HX",
+          "p_cores": 8,
+          "e_cores": 16,
+          "threads": 24,
+          "instruction_baseline": "AVX2",
+          "amx": false,
+          "avx512": false,
+          "thread_sweep": [
+            7,
+            8,
+            15,
+            23
+          ],
+          "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+        },
+        "ram": {
+          "installed_gib": 64,
+          "type": "DDR5-6400",
+          "channels": 2
+        },
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "architecture": "Blackwell",
+          "compute_capability": "12.0",
+          "vram_gib": 24,
+          "initial_reserve_gib": 2,
+          "desktop_gpu": false
+        },
+        "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+        "storage": [
+          {
+            "name": "Factory NVMe",
+            "capacity_tb": 2,
+            "model": "not inventoried"
+          },
+          {
+            "name": "WD_BLACK SN7100",
+            "capacity_tb": 4,
+            "interface": "PCIe Gen4 x4",
+            "role": "Model files, artifacts, results; separate swap/offload experiments"
+          }
+        ],
+        "evidence": {
+          "configuration": "user-provided",
+          "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+        },
+        "required_recordings": [
+          "BIOS version",
+          "NVIDIA driver",
+          "GPU power limit/TGP",
+          "AC state",
+          "MSI power/fan profile",
+          "hybrid/MUX setting",
+          "RAM configured speed",
+          "SSD mount and filesystem",
+          "SSD free space and temperature",
+          "OS build/kernel",
+          "WSL version and memory cap if applicable"
+        ],
+        "host_reserve_gib": 12,
+        "os_limits": {
+          "windows-11-wsl2-ubuntu-26.04": {
+            "ram_budget_gib": 46
+          }
+        }
+      },
+      "target_id": "raider",
+      "target": {
+        "transport": "local",
+        "physical_host_id": "raider"
+      },
+      "parameters": {
+        "config": {
+          "schema_version": 1,
+          "model_id": "mistral-small31",
+          "os_id": "windows-11-wsl2-ubuntu-26.04",
+          "lane": "offload",
+          "context_tokens": 4096,
+          "max_output_tokens": 2048,
+          "repeats": 3,
+          "warmups": 1,
+          "temperature": 0.0,
+          "seed": 20261005,
+          "concurrency": 1,
+          "timeout_s": 900,
+          "load_timeout_s": 1800,
+          "telemetry_interval_s": 1.0,
+          "ram_budget_gib": 46,
+          "gpu_budget_gib": 22,
+          "suite": "[local path omitted]",
+          "backend_version": "0.40.16",
+          "tokenizer_revision": "bartowski/mistralai_Mistral-Small-3.1-24B-Instruct-2503-GGUF@f73dfd9e812922fb503a993e3fa5671424f486d3 (tokenizer embedded in locked GGUF)",
+          "chat_template_sha256": "391b7940a4191b7667b3cb61a00afa18edf9f07541a30a042d836226e0782e1e",
+          "placement_notes": "Requested 16 of 41 layers on GPU (arch llama, 43.9 GiB weights, policy min(20, floor(18 GiB / per-layer GiB))), 16 CPU threads. Actual placement is in the backend log of each attempt.",
+          "hardware_attestation": {
+            "bios": "E1824IMS.317",
+            "os_build": "10.0.26300 (Windows host; guest kernel 6.18.33.2-microsoft-standard-WSL2)",
+            "nvidia_driver": "610.74",
+            "ac_connected": true,
+            "ram_configured_mhz": [
+              6400,
+              6400
+            ],
+            "msi_power_fan_profile": "Best Performance (user-reported, MSI Center)",
+            "mux_hybrid_setting": "MSHybrid (observed: Intel Graphics and NVIDIA both active display adapters, Intel drives internal 3840px panel; MSI Center GPU Switch not read directly)",
+            "gpu_tgp_power_limit": "nvidia-smi power.limit N/A; default 95 W, max 175 W",
+            "model_ssd_filesystem": "ext4 on the WSL virtual disk in the Linux home, on the Windows C: NVMe volume",
+            "carried_from_windows_attestation": "bios, ram_configured_mhz, msi_power_fan_profile, mux_hybrid_setting and gpu_tgp_power_limit are the operator attestations of the native Windows runs of 2026-11-08 on the same machine; they were not read again for the WSL runs",
+            "wsl_version": "2.7.12.0, kernel 6.18.33.2-microsoft-standard-WSL2",
+            "wsl_memory_cap": "guest MemTotal 51.0 GiB at the start of this run; swap 0 MiB (see wsl_config)",
+            "wsl_config": "[local path omitted]",
+            "model_path": "[local path omitted]",
+            "other_workloads": "Harness-by-model matrix on WSL2 Ubuntu 26.04 (guest of this Windows host). Notable Windows programs running at the start: consumer Ollama tray app, a Windows Ollama server, Microsoft Teams, VMware tray, VMware authorization service, LM Studio desktop app, ProtonVPN client, ChatGPT desktop app, Claude desktop app."
+          },
+          "save_outputs": false,
+          "cache_condition": "warm_process_repeated_prompt; prefix-cache policy must be recorded",
+          "speculative_decoding": "disabled",
+          "reasoning_mode": "model default; OpenAI-protocol harnesses may return reasoning inline in content",
+          "platform": "ollama",
+          "protocol": "ollama",
+          "served_model": "llm-eval-mistral-small31:matrix",
+          "request_usage": true,
+          "request_options": {
+            "keep_alive": "30m"
+          },
+          "hardware_profile": "msi-raider-18-hx-ai",
+          "launch": {
+            "model_file": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-bf16.gguf",
+            "threads": 16,
+            "gpu_layers": 16
+          }
+        },
+        "server_mode": "managed",
+        "categories": [
+          "reasoning",
+          "coding",
+          "math"
+        ]
+      },
+      "depends_on": [],
+      "resources": [
+        "raider"
+      ],
+      "status": "planned",
+      "reason": null,
+      "config_sha256": "0ae649c5a6c58b129f40cb193a209f37b2a2cfbbd6ba597b546646ddacebd4a7",
+      "input_files": [
+        {
+          "path": "[local path omitted]",
+          "sha256": "26892545cadcda503b23da4ec13e63820ea43f8c605b9a9e2e248d6049800bd2"
+        },
+        {
+          "path": "[local path omitted]",
+          "sha256": "f839aa8c5ab4bbed7ae5350e5e95aeae14f72a49de330e3ad1ac32c3cbcee626"
+        }
+      ]
+    },
+    {
+      "schema_version": 2,
+      "job_id": "offload-model-offloading-1-4fdd4a317ab7",
+      "experiment_run_id": "offload-model-offloading-1",
+      "experiment_id": "model-offloading",
+      "experiment_version": 1,
+      "mode": "category-smoke",
+      "case_id": "mistral-small31-koboldcpp",
+      "hardware_config_id": "raider-wsl",
+      "hardware": {
+        "target": "raider",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-wsl2-ubuntu-26.04"
+      },
+      "hardware_profile": {
+        "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+        "manufacturer": "MSI",
+        "model": "Raider 18 HX AI A2XWJG-069US",
+        "cpu": {
+          "name": "Intel Core Ultra 9 285HX",
+          "architecture": "Arrow Lake-HX",
+          "p_cores": 8,
+          "e_cores": 16,
+          "threads": 24,
+          "instruction_baseline": "AVX2",
+          "amx": false,
+          "avx512": false,
+          "thread_sweep": [
+            7,
+            8,
+            15,
+            23
+          ],
+          "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+        },
+        "ram": {
+          "installed_gib": 64,
+          "type": "DDR5-6400",
+          "channels": 2
+        },
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "architecture": "Blackwell",
+          "compute_capability": "12.0",
+          "vram_gib": 24,
+          "initial_reserve_gib": 2,
+          "desktop_gpu": false
+        },
+        "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+        "storage": [
+          {
+            "name": "Factory NVMe",
+            "capacity_tb": 2,
+            "model": "not inventoried"
+          },
+          {
+            "name": "WD_BLACK SN7100",
+            "capacity_tb": 4,
+            "interface": "PCIe Gen4 x4",
+            "role": "Model files, artifacts, results; separate swap/offload experiments"
+          }
+        ],
+        "evidence": {
+          "configuration": "user-provided",
+          "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+        },
+        "required_recordings": [
+          "BIOS version",
+          "NVIDIA driver",
+          "GPU power limit/TGP",
+          "AC state",
+          "MSI power/fan profile",
+          "hybrid/MUX setting",
+          "RAM configured speed",
+          "SSD mount and filesystem",
+          "SSD free space and temperature",
+          "OS build/kernel",
+          "WSL version and memory cap if applicable"
+        ],
+        "host_reserve_gib": 12,
+        "os_limits": {
+          "windows-11-wsl2-ubuntu-26.04": {
+            "ram_budget_gib": 46
+          }
+        }
+      },
+      "target_id": "raider",
+      "target": {
+        "transport": "local",
+        "physical_host_id": "raider"
+      },
+      "parameters": {
+        "config": {
+          "schema_version": 1,
+          "model_id": "mistral-small31",
+          "os_id": "windows-11-wsl2-ubuntu-26.04",
+          "lane": "offload",
+          "context_tokens": 4096,
+          "max_output_tokens": 2048,
+          "repeats": 3,
+          "warmups": 1,
+          "temperature": 0.0,
+          "seed": 20261005,
+          "concurrency": 1,
+          "timeout_s": 900,
+          "load_timeout_s": 1800,
+          "telemetry_interval_s": 1.0,
+          "ram_budget_gib": 46,
+          "gpu_budget_gib": 22,
+          "suite": "[local path omitted]",
+          "backend_version": "1.124.2",
+          "tokenizer_revision": "bartowski/mistralai_Mistral-Small-3.1-24B-Instruct-2503-GGUF@f73dfd9e812922fb503a993e3fa5671424f486d3 (tokenizer embedded in locked GGUF)",
+          "chat_template_sha256": "391b7940a4191b7667b3cb61a00afa18edf9f07541a30a042d836226e0782e1e",
+          "placement_notes": "Requested 16 of 41 layers on GPU (arch llama, 43.9 GiB weights, policy min(20, floor(18 GiB / per-layer GiB))), 16 CPU threads. Actual placement is in the backend log of each attempt.",
+          "hardware_attestation": {
+            "bios": "E1824IMS.317",
+            "os_build": "10.0.26300 (Windows host; guest kernel 6.18.33.2-microsoft-standard-WSL2)",
+            "nvidia_driver": "610.74",
+            "ac_connected": true,
+            "ram_configured_mhz": [
+              6400,
+              6400
+            ],
+            "msi_power_fan_profile": "Best Performance (user-reported, MSI Center)",
+            "mux_hybrid_setting": "MSHybrid (observed: Intel Graphics and NVIDIA both active display adapters, Intel drives internal 3840px panel; MSI Center GPU Switch not read directly)",
+            "gpu_tgp_power_limit": "nvidia-smi power.limit N/A; default 95 W, max 175 W",
+            "model_ssd_filesystem": "ext4 on the WSL virtual disk in the Linux home, on the Windows C: NVMe volume",
+            "carried_from_windows_attestation": "bios, ram_configured_mhz, msi_power_fan_profile, mux_hybrid_setting and gpu_tgp_power_limit are the operator attestations of the native Windows runs of 2026-11-08 on the same machine; they were not read again for the WSL runs",
+            "wsl_version": "2.7.12.0, kernel 6.18.33.2-microsoft-standard-WSL2",
+            "wsl_memory_cap": "guest MemTotal 51.0 GiB at the start of this run; swap 0 MiB (see wsl_config)",
+            "wsl_config": "[local path omitted]",
+            "model_path": "[local path omitted]",
+            "other_workloads": "Harness-by-model matrix on WSL2 Ubuntu 26.04 (guest of this Windows host). Notable Windows programs running at the start: consumer Ollama tray app, a Windows Ollama server, Microsoft Teams, VMware tray, VMware authorization service, LM Studio desktop app, ProtonVPN client, ChatGPT desktop app, Claude desktop app."
+          },
+          "save_outputs": false,
+          "cache_condition": "warm_process_repeated_prompt; prefix-cache policy must be recorded",
+          "speculative_decoding": "disabled",
+          "reasoning_mode": "model default; OpenAI-protocol harnesses may return reasoning inline in content",
+          "platform": "koboldcpp",
+          "protocol": "openai",
+          "served_model": "koboldcpp",
+          "request_usage": true,
+          "request_options": {},
+          "hardware_profile": "msi-raider-18-hx-ai",
+          "launch": {
+            "model_file": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-bf16.gguf",
+            "threads": 16,
+            "gpu_layers": 16
+          }
+        },
+        "server_mode": "managed",
+        "categories": [
+          "reasoning",
+          "coding",
+          "math"
+        ]
+      },
+      "depends_on": [],
+      "resources": [
+        "raider"
+      ],
+      "status": "planned",
+      "reason": null,
+      "config_sha256": "6be7dabe0898f6062f1fe5fcca8c129c1a94c8b59709e422076a02a0f4f71e66",
+      "input_files": [
+        {
+          "path": "[local path omitted]",
+          "sha256": "26892545cadcda503b23da4ec13e63820ea43f8c605b9a9e2e248d6049800bd2"
+        },
+        {
+          "path": "[local path omitted]",
+          "sha256": "f839aa8c5ab4bbed7ae5350e5e95aeae14f72a49de330e3ad1ac32c3cbcee626"
+        }
+      ]
+    }
+  ],
+  "input_hashes": [
+    "b21c9b7c8794a63e45cf4f9753cd35fe8cc4b247cdfbc4f50337ac0a463d58e4",
+    "cfafc16469a842bbb45f547b323ab49f5e2ae828a989fe4073b98682a69c14fa",
+    "c11fe651925908ad8b6970426e929440c26f01a97a0db4c5b4bbfcd0720b7347",
+    "14d3c2365d99d72631655adfb3cdc8ad6b35c15e7ed763abb0f21ceedd21bd53",
+    "21050faac7949d2113196b42831ab9b664e8e33d53b9dc3d099368d4afe60c28",
+    "9939e1bc67f0af5bda168e4e0092e5378e2471d9bf6299905cb1a0b3dfb8cb6a",
+    "4af9d749b8c1564a56b8128374a785b6401a845a28578ad166670f75f6d0d030",
+    "94d23f468da69dd50c523f8c278bf95551b47d7b536298ff8213e479e634c64b",
+    "26892545cadcda503b23da4ec13e63820ea43f8c605b9a9e2e248d6049800bd2",
+    "f839aa8c5ab4bbed7ae5350e5e95aeae14f72a49de330e3ad1ac32c3cbcee626"
+  ]
+}
