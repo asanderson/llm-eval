@@ -1,0 +1,938 @@
+{
+  "cohorts": [
+    {
+      "arm": "filters-only",
+      "cohort": {
+        "accelerator": null,
+        "arm": "filters-only",
+        "artifact_sha256": null,
+        "backend_version": null,
+        "benchmark_id": "legal-original-smoke",
+        "context_tokens": null,
+        "data_class": "public-synthetic",
+        "execution_kind": "fixture",
+        "experiment": "legal-benchmark",
+        "generation_sha256": null,
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "jurisdiction_profile": "veld-fictional-v1",
+        "max_output_tokens": null,
+        "mode": "retrieval",
+        "model": null,
+        "model_revision": null,
+        "os_id": "windows-11-wsl2-ubuntu-26.04",
+        "platform": null,
+        "policy_id": "fixture-default",
+        "policy_version": "1",
+        "prompt_template_sha256": null,
+        "protocol": null,
+        "quantization": null,
+        "retrieval_sha256": "ca9d75dd9ec789416512a4978c6503709d5a8d1b900804c574f63a2681d35c21",
+        "reviewer_fingerprint": null,
+        "role_digests": {},
+        "rubric_version": "original-smoke-rubric-2",
+        "scorer_fingerprint": null,
+        "scorer_version": null,
+        "selector_sha256": null,
+        "split_id": "smoke",
+        "suite_lock_sha256": "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae",
+        "suite_revision": "2026-11-11.1"
+      },
+      "cohort_sha256": "ec47becd2a64d7628085bf17666c6dd9b66bd35e0a975f9ec8d7a084bc41fd6a",
+      "job_id": "retrieval-legal-benchmark-1-5aef2f285d5d",
+      "metrics": {
+        "elapsed_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 6.7e-05
+        },
+        "elapsed_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 9.8e-05
+        },
+        "first_output_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "first_output_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "first_visible_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "first_visible_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.revised": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.route_fallback": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.selector_deferral": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.truncated": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.adverse_authority_coverage": {
+          "high": null,
+          "low": null,
+          "missing": 15,
+          "n": 1,
+          "value": 1.0
+        },
+        "retrieval.authority_ndcg_at_10": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.authority_recall_at_5": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.evidence_ndcg_at_10": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.evidence_recall_at_5": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.exact_version_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.ineligible_version_leakage": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "retrieval.prompt_authority_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.prompt_evidence_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.retrieved_passages": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 8.9375
+        },
+        "retrieval.retrieved_tokens": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 133.125
+        },
+        "status.error": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.invalid": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.missing": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.ok": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 16
+        },
+        "usable_memo_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "usable_memo_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        }
+      },
+      "run_status": "complete",
+      "suppressed": false
+    },
+    {
+      "arm": "lexical",
+      "cohort": {
+        "accelerator": null,
+        "arm": "lexical",
+        "artifact_sha256": null,
+        "backend_version": null,
+        "benchmark_id": "legal-original-smoke",
+        "context_tokens": null,
+        "data_class": "public-synthetic",
+        "execution_kind": "fixture",
+        "experiment": "legal-benchmark",
+        "generation_sha256": null,
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "jurisdiction_profile": "veld-fictional-v1",
+        "max_output_tokens": null,
+        "mode": "retrieval",
+        "model": null,
+        "model_revision": null,
+        "os_id": "windows-11-wsl2-ubuntu-26.04",
+        "platform": null,
+        "policy_id": "fixture-default",
+        "policy_version": "1",
+        "prompt_template_sha256": null,
+        "protocol": null,
+        "quantization": null,
+        "retrieval_sha256": "ca9d75dd9ec789416512a4978c6503709d5a8d1b900804c574f63a2681d35c21",
+        "reviewer_fingerprint": null,
+        "role_digests": {},
+        "rubric_version": "original-smoke-rubric-2",
+        "scorer_fingerprint": null,
+        "scorer_version": null,
+        "selector_sha256": null,
+        "split_id": "smoke",
+        "suite_lock_sha256": "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae",
+        "suite_revision": "2026-11-11.1"
+      },
+      "cohort_sha256": "51bfc24c09cbfb208efceaadd663573dec25f32d54369c06bde31337c4b62e20",
+      "job_id": "retrieval-legal-benchmark-1-5aef2f285d5d",
+      "metrics": {
+        "elapsed_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.000121
+        },
+        "elapsed_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.000168
+        },
+        "first_output_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "first_output_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "first_visible_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "first_visible_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.revised": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.route_fallback": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.selector_deferral": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.truncated": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.adverse_authority_coverage": {
+          "high": null,
+          "low": null,
+          "missing": 15,
+          "n": 1,
+          "value": 1.0
+        },
+        "retrieval.authority_ndcg_at_10": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 0.973638
+        },
+        "retrieval.authority_recall_at_5": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.evidence_ndcg_at_10": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 0.994266
+        },
+        "retrieval.evidence_recall_at_5": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.exact_version_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.ineligible_version_leakage": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.075
+        },
+        "retrieval.prompt_authority_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.prompt_evidence_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.retrieved_passages": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 7.1875
+        },
+        "retrieval.retrieved_tokens": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 107.25
+        },
+        "status.error": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.invalid": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.missing": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.ok": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 16
+        },
+        "usable_memo_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "usable_memo_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        }
+      },
+      "run_status": "complete",
+      "suppressed": false
+    },
+    {
+      "arm": "lexical-eligible",
+      "cohort": {
+        "accelerator": null,
+        "arm": "lexical-eligible",
+        "artifact_sha256": null,
+        "backend_version": null,
+        "benchmark_id": "legal-original-smoke",
+        "context_tokens": null,
+        "data_class": "public-synthetic",
+        "execution_kind": "fixture",
+        "experiment": "legal-benchmark",
+        "generation_sha256": null,
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "jurisdiction_profile": "veld-fictional-v1",
+        "max_output_tokens": null,
+        "mode": "retrieval",
+        "model": null,
+        "model_revision": null,
+        "os_id": "windows-11-wsl2-ubuntu-26.04",
+        "platform": null,
+        "policy_id": "fixture-default",
+        "policy_version": "1",
+        "prompt_template_sha256": null,
+        "protocol": null,
+        "quantization": null,
+        "retrieval_sha256": "ca9d75dd9ec789416512a4978c6503709d5a8d1b900804c574f63a2681d35c21",
+        "reviewer_fingerprint": null,
+        "role_digests": {},
+        "rubric_version": "original-smoke-rubric-2",
+        "scorer_fingerprint": null,
+        "scorer_version": null,
+        "selector_sha256": null,
+        "split_id": "smoke",
+        "suite_lock_sha256": "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae",
+        "suite_revision": "2026-11-11.1"
+      },
+      "cohort_sha256": "f42b95936572b0381a9fc5f78a9b54aadf07e5fd6d8ce3127b70ac8c94f235ba",
+      "job_id": "retrieval-legal-benchmark-1-5aef2f285d5d",
+      "metrics": {
+        "elapsed_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.000134
+        },
+        "elapsed_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.000159
+        },
+        "first_output_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "first_output_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "first_visible_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "first_visible_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.revised": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.route_fallback": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.selector_deferral": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.truncated": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.adverse_authority_coverage": {
+          "high": null,
+          "low": null,
+          "missing": 15,
+          "n": 1,
+          "value": 1.0
+        },
+        "retrieval.authority_ndcg_at_10": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.authority_recall_at_5": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.evidence_ndcg_at_10": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 0.994266
+        },
+        "retrieval.evidence_recall_at_5": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.exact_version_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.ineligible_version_leakage": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0.0
+        },
+        "retrieval.prompt_authority_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.prompt_evidence_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.retrieved_passages": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 6.9375
+        },
+        "retrieval.retrieved_tokens": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 100.3125
+        },
+        "status.error": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.invalid": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.missing": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.ok": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 16
+        },
+        "usable_memo_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "usable_memo_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        }
+      },
+      "run_status": "complete",
+      "suppressed": false
+    },
+    {
+      "arm": "no-context",
+      "cohort": {
+        "accelerator": null,
+        "arm": "no-context",
+        "artifact_sha256": null,
+        "backend_version": null,
+        "benchmark_id": "legal-original-smoke",
+        "context_tokens": null,
+        "data_class": "public-synthetic",
+        "execution_kind": "fixture",
+        "experiment": "legal-benchmark",
+        "generation_sha256": null,
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "jurisdiction_profile": "veld-fictional-v1",
+        "max_output_tokens": null,
+        "mode": "retrieval",
+        "model": null,
+        "model_revision": null,
+        "os_id": "windows-11-wsl2-ubuntu-26.04",
+        "platform": null,
+        "policy_id": "fixture-default",
+        "policy_version": "1",
+        "prompt_template_sha256": null,
+        "protocol": null,
+        "quantization": null,
+        "retrieval_sha256": "ca9d75dd9ec789416512a4978c6503709d5a8d1b900804c574f63a2681d35c21",
+        "reviewer_fingerprint": null,
+        "role_digests": {},
+        "rubric_version": "original-smoke-rubric-2",
+        "scorer_fingerprint": null,
+        "scorer_version": null,
+        "selector_sha256": null,
+        "split_id": "smoke",
+        "suite_lock_sha256": "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae",
+        "suite_revision": "2026-11-11.1"
+      },
+      "cohort_sha256": "a703a0efa8ee10c47b1cdd68f0c7f3c47b25ddcebad8da90e99a37165de153c2",
+      "job_id": "retrieval-legal-benchmark-1-5aef2f285d5d",
+      "metrics": {
+        "elapsed_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 3.5e-05
+        },
+        "elapsed_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 7.7e-05
+        },
+        "first_output_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "first_output_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "first_visible_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "first_visible_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.revised": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.route_fallback": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.selector_deferral": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "rate.truncated": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.adverse_authority_coverage": {
+          "high": null,
+          "low": null,
+          "missing": 15,
+          "n": 1,
+          "value": 0.0
+        },
+        "retrieval.authority_ndcg_at_10": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.authority_recall_at_5": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.evidence_ndcg_at_10": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.evidence_recall_at_5": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.exact_version_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 0.0
+        },
+        "retrieval.ineligible_version_leakage": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "retrieval.prompt_authority_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 0.0
+        },
+        "retrieval.prompt_evidence_recall": {
+          "high": null,
+          "low": null,
+          "missing": 2,
+          "n": 14,
+          "value": 1.0
+        },
+        "retrieval.retrieved_passages": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 2.1875
+        },
+        "retrieval.retrieved_tokens": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 22.25
+        },
+        "status.error": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.invalid": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.missing": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 0
+        },
+        "status.ok": {
+          "high": null,
+          "low": null,
+          "missing": 0,
+          "n": 16,
+          "value": 16
+        },
+        "usable_memo_s.median": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        },
+        "usable_memo_s.p95": {
+          "high": null,
+          "low": null,
+          "missing": 16,
+          "n": 0,
+          "value": null
+        }
+      },
+      "run_status": "complete",
+      "suppressed": false
+    }
+  ],
+  "paired": [],
+  "schema_version": 1
+}
