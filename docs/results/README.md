@@ -8,9 +8,9 @@ Tables and charts between `results-*` markers are generated from the published b
 
 <!-- results-top:start -->
 
-### Top 5 harness and model combinations per experiment and hardware configuration
+### Top 3 harness and model combinations per experiment and hardware configuration
 
-Ranked by share of checks passed (correct decisions for routing experiments, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians. Where a model repeats among the best combinations, a second table ranks the models, each by its best combination.
+Ranked by share of checks passed (correct decisions for routing experiments, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians.
 
 **[llm-routing](index/experiment/llm-routing.md) on [raider-wsl](index/hardware/raider-wsl.md)**
 
@@ -30,18 +30,6 @@ Chart: every ranked combination, best-ranked model first, one color per harness.
 | 1 | [ollama](index/harness/ollama.md) | [kimi-linear-48b](index/model/kimi-linear-48b.md) | 24/27 | 0.149 | 15.7 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T043857Z-d2cbbd81-offload-model-offloading-1/README.md) |
 | 2 | [koboldcpp](index/harness/koboldcpp.md) | [kimi-linear-48b](index/model/kimi-linear-48b.md) | 24/27 | 0.524 | 3.82 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T043857Z-d2cbbd81-offload-model-offloading-1/README.md) |
 | 3 | [ollama](index/harness/ollama.md) | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | 24/27 | 2.71 | 27 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/README.md) |
-| 4 | [ollama](index/harness/ollama.md) | [qwen38-27b](index/model/qwen38-27b.md) | 24/27 | 16.4 | 3.65 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T044726Z-01d2a5a1-offload-model-offloading-1/README.md) |
-| 5 | [koboldcpp](index/harness/koboldcpp.md) | [qwen38-27b](index/model/qwen38-27b.md) | 24/27 | 25.2 | 3.49 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T044726Z-01d2a5a1-offload-model-offloading-1/README.md) |
-
-Top 5 models, each on its best-ranked harness:
-
-| Rank | Model | Harness | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---:|---:|---:|---|
-| 1 | [kimi-linear-48b](index/model/kimi-linear-48b.md) | [ollama](index/harness/ollama.md) | 24/27 | 0.149 | 15.7 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T043857Z-d2cbbd81-offload-model-offloading-1/README.md) |
-| 2 | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | [ollama](index/harness/ollama.md) | 24/27 | 2.71 | 27 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/README.md) |
-| 3 | [qwen38-27b](index/model/qwen38-27b.md) | [ollama](index/harness/ollama.md) | 24/27 | 16.4 | 3.65 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T044726Z-01d2a5a1-offload-model-offloading-1/README.md) |
-| 4 | [gemma4-31b](index/model/gemma4-31b.md) | [ollama](index/harness/ollama.md) | 24/27 | 44.8 | 3.36 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T052908Z-16a250ab-offload-model-offloading-1/README.md) |
-| 5 | [gemma4-26b-moe](index/model/gemma4-26b-moe.md) | [koboldcpp](index/harness/koboldcpp.md) | 21/27 | 0.524 | 3.82 | [2026-11-18 cap 2048](model-offloading/campaign-20261118T050451Z-60d1fe39-offload-model-offloading-1/README.md) |
 
 ![model-offloading on raider-wsl: harness and model combinations compared](../../diagrams/results/summary/model-offloading-raider-wsl.png)
 
@@ -54,18 +42,6 @@ Chart: every ranked combination, best-ranked model first, one color per harness.
 | 1 | [ollama](index/harness/ollama.md) | [kimi-linear-48b](index/model/kimi-linear-48b.md) | 24/27 | 0.141 | 16.8 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md) |
 | 2 | [lmstudio](index/harness/lmstudio.md) | [kimi-linear-48b](index/model/kimi-linear-48b.md) | 24/27 | 0.147 | 15.8 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md) |
 | 3 | [koboldcpp](index/harness/koboldcpp.md) | [kimi-linear-48b](index/model/kimi-linear-48b.md) | 24/27 | 0.58 | 3.54 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md) |
-| 4 | [ollama](index/harness/ollama.md) | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | 24/27 | 2.47 | 29.5 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) |
-| 5 | [lmstudio](index/harness/lmstudio.md) | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | 24/27 | 4.62 | 14.4 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) |
-
-Top 5 models, each on its best-ranked harness:
-
-| Rank | Model | Harness | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---:|---:|---:|---|
-| 1 | [kimi-linear-48b](index/model/kimi-linear-48b.md) | [ollama](index/harness/ollama.md) | 24/27 | 0.141 | 16.8 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md) |
-| 2 | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | [ollama](index/harness/ollama.md) | 24/27 | 2.47 | 29.5 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) |
-| 3 | [qwen38-27b](index/model/qwen38-27b.md) | [lmstudio](index/harness/lmstudio.md) | 24/27 | 7.92 | 6.44 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T222422Z-7671e746-offload-model-offloading-1/README.md) |
-| 4 | [gemma4-31b](index/model/gemma4-31b.md) | [ollama](index/harness/ollama.md) | 24/27 | 46.9 | 3.39 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T143606Z-03f6333f-offload-model-offloading-1/README.md) |
-| 5 | [gemma4-26b-moe](index/model/gemma4-26b-moe.md) | [koboldcpp](index/harness/koboldcpp.md) | 21/27 | 0.582 | 3.53 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T161112Z-fff50610-offload-model-offloading-1/README.md) |
 
 ![model-offloading on raider-windows: harness and model combinations compared](../../diagrams/results/summary/model-offloading-raider-windows.png)
 
@@ -281,11 +257,20 @@ Checks are those passed out of the 27 measured requests of the three categories;
 
 | Category | Indexes (results) |
 |---|---|
-| Hardware configuration | [raider-ubuntu](index/hardware/raider-ubuntu.md) (1) · [raider-windows](index/hardware/raider-windows.md) (114) · [raider-wsl](index/hardware/raider-wsl.md) (36) |
-| Experiment | [legal-benchmark](index/experiment/legal-benchmark.md) (4) · [llm-routing](index/experiment/llm-routing.md) (7) · [model-offloading](index/experiment/model-offloading.md) (140) |
-| Harness | [category](index/harness/category.md) (1) · [fixture](index/harness/fixture.md) (1) · [koboldcpp](index/harness/koboldcpp.md) (51) · [lmstudio](index/harness/lmstudio.md) (34) · [ollama](index/harness/ollama.md) (64) |
-| Model | [category](index/model/category.md) (1) · [deepseek-r1-32b](index/model/deepseek-r1-32b.md) (11) · [deepseek-r1-70b](index/model/deepseek-r1-70b.md) (8) · [fixture](index/model/fixture.md) (1) · [gemma3-27b](index/model/gemma3-27b.md) (8) · [gemma4-26b-moe](index/model/gemma4-26b-moe.md) (8) · [gemma4-31b](index/model/gemma4-31b.md) (9) · [kimi-dev-72b](index/model/kimi-dev-72b.md) (8) · [kimi-linear-48b](index/model/kimi-linear-48b.md) (8) · [laguna-xs21](index/model/laguna-xs21.md) (8) · [llama3-70b](index/model/llama3-70b.md) (8) · [llama31-70b](index/model/llama31-70b.md) (8) · [llama33-70b](index/model/llama33-70b.md) (8) · [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) (3) · [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) (3) · [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) (3) · [mistral-small31](index/model/mistral-small31.md) (8) · [nemotron-nano-30b](index/model/nemotron-nano-30b.md) (8) · [nemotron-super-49b](index/model/nemotron-super-49b.md) (8) · [phi4-reasoning-plus](index/model/phi4-reasoning-plus.md) (8) · [qwen35-35b-moe](index/model/qwen35-35b-moe.md) (8) · [qwen38-27b](index/model/qwen38-27b.md) (8) |
-| Date (UTC) | [2026-11-18](index/date/2026-11-18.md) (6) · [2026-11-17](index/date/2026-11-17.md) (30) · [2026-11-16](index/date/2026-11-16.md) (12) · [2026-11-15](index/date/2026-11-15.md) (45) · [2026-11-11](index/date/2026-11-11.md) (3) · [2026-11-10](index/date/2026-11-10.md) (30) · [2026-11-09](index/date/2026-11-09.md) (19) · [2026-11-08](index/date/2026-11-08.md) (6) |
+| Hardware configuration | [raider-ubuntu](index/hardware/raider-ubuntu.md) (1) · [raider-windows](index/hardware/raider-windows.md) (114) · [raider-wsl](index/hardware/raider-wsl.md) (37) |
+| Experiment | [legal-benchmark](index/experiment/legal-benchmark.md) (5) · [llm-routing](index/experiment/llm-routing.md) (7) · [model-offloading](index/experiment/model-offloading.md) (140) |
+| Harness | [category](index/harness/category.md) (1) · [fixture](index/harness/fixture.md) (1) · [koboldcpp](index/harness/koboldcpp.md) (51) · [lmstudio](index/harness/lmstudio.md) (34) · [ollama](index/harness/ollama.md) (65) |
+| Model | [category](index/model/category.md) (1) · [deepseek-r1-32b](index/model/deepseek-r1-32b.md) (11) · [deepseek-r1-70b](index/model/deepseek-r1-70b.md) (8) · [fixture](index/model/fixture.md) (1) · [gemma3-27b](index/model/gemma3-27b.md) (8) · [gemma4-26b-moe](index/model/gemma4-26b-moe.md) (8) · [gemma4-31b](index/model/gemma4-31b.md) (9) · [kimi-dev-72b](index/model/kimi-dev-72b.md) (8) · [kimi-linear-48b](index/model/kimi-linear-48b.md) (8) · [laguna-xs21](index/model/laguna-xs21.md) (8) · [llama3-70b](index/model/llama3-70b.md) (8) · [llama31-70b](index/model/llama31-70b.md) (8) · [llama33-70b](index/model/llama33-70b.md) (8) · [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) (4) · [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) (3) · [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) (3) · [mistral-small31](index/model/mistral-small31.md) (8) · [nemotron-nano-30b](index/model/nemotron-nano-30b.md) (8) · [nemotron-super-49b](index/model/nemotron-super-49b.md) (8) · [phi4-reasoning-plus](index/model/phi4-reasoning-plus.md) (8) · [qwen35-35b-moe](index/model/qwen35-35b-moe.md) (8) · [qwen38-27b](index/model/qwen38-27b.md) (8) |
+| Date (UTC) | [2026-11-18](index/date/2026-11-18.md) (7) · [2026-11-17](index/date/2026-11-17.md) (30) · [2026-11-16](index/date/2026-11-16.md) (12) · [2026-11-15](index/date/2026-11-15.md) (45) · [2026-11-11](index/date/2026-11-11.md) (3) · [2026-11-10](index/date/2026-11-10.md) (30) · [2026-11-09](index/date/2026-11-09.md) (19) · [2026-11-08](index/date/2026-11-08.md) (6) |
+
+### legal-benchmark: models by harness
+
+Each cell links to the report of every published run of that model on that harness, newest first. Models are ordered by their newest run.
+
+| Model | [fixture](index/harness/fixture.md) | [ollama](index/harness/ollama.md) |
+|---|---|---|
+| [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) | – | [2026-11-18 raider-wsl measured](legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows score-only](legal-benchmark/campaign-20261115T140033Z-ed2177f1-score-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](legal-benchmark/campaign-20261115T133729Z-ff84f63f-generation-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](legal-benchmark/campaign-20261115T133729Z-ff84f63f-workflow-legal-benchmark-1/README.md) |
+| [fixture](index/model/fixture.md) | [2026-11-15 raider-windows fixture](legal-benchmark/campaign-20261115T133729Z-ff84f63f-retrieval-legal-benchmark-1/README.md) | – |
 
 ### llm-routing: models by harness
 
@@ -321,15 +306,6 @@ Each cell links to the report of every published run of that model on that harne
 | [qwen38-27b](index/model/qwen38-27b.md) | [2026-11-17 raider-wsl cap 2048](model-offloading/campaign-20261117T044726Z-01d2a5a1-offload-model-offloading-1/README.md)<br>[2026-11-15 raider-windows cap 2048](model-offloading/campaign-20261115T222422Z-7671e746-offload-model-offloading-1/README.md)<br>[2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md) | [2026-11-15 raider-windows cap 2048](model-offloading/campaign-20261115T222422Z-7671e746-offload-model-offloading-1/README.md)<br>[2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md) | [2026-11-17 raider-wsl cap 2048](model-offloading/campaign-20261117T044726Z-01d2a5a1-offload-model-offloading-1/README.md)<br>[2026-11-15 raider-windows cap 2048](model-offloading/campaign-20261115T222422Z-7671e746-offload-model-offloading-1/README.md)<br>[2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md) |
 | [kimi-linear-48b](index/model/kimi-linear-48b.md) | [2026-11-17 raider-wsl cap 2048](model-offloading/campaign-20261117T043857Z-d2cbbd81-offload-model-offloading-1/README.md)<br>[2026-11-15 raider-windows cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md)<br>[2026-11-10 raider-windows cap 2048](model-offloading/campaign-20261110T111300Z-172c453b-offload-model-offloading-1/README.md) | [2026-11-15 raider-windows cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md)<br>[2026-11-10 raider-windows cap 2048](model-offloading/campaign-20261110T111300Z-172c453b-offload-model-offloading-1/README.md) | [2026-11-17 raider-wsl cap 2048](model-offloading/campaign-20261117T043857Z-d2cbbd81-offload-model-offloading-1/README.md)<br>[2026-11-15 raider-windows cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md)<br>[2026-11-10 raider-windows cap 2048](model-offloading/campaign-20261110T111300Z-172c453b-offload-model-offloading-1/README.md) |
 
-### legal-benchmark: models by harness
-
-Each cell links to the report of every published run of that model on that harness, newest first. Models are ordered by their newest run.
-
-| Model | [fixture](index/harness/fixture.md) | [ollama](index/harness/ollama.md) |
-|---|---|---|
-| [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) | – | [2026-11-15 raider-windows score-only](legal-benchmark/campaign-20261115T140033Z-ed2177f1-score-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](legal-benchmark/campaign-20261115T133729Z-ff84f63f-generation-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](legal-benchmark/campaign-20261115T133729Z-ff84f63f-workflow-legal-benchmark-1/README.md) |
-| [fixture](index/model/fixture.md) | [2026-11-15 raider-windows fixture](legal-benchmark/campaign-20261115T133729Z-ff84f63f-retrieval-legal-benchmark-1/README.md) | – |
-
 ### Results by class and cohort
 
 These results are not ranked with other experiments. Two runs are comparable only when their cohort digests are equal; fixture and score-only runs do not measure a model.
@@ -344,6 +320,7 @@ These results are not ranked with other experiments. Two runs are comparable onl
 
 | Experiment | Cohorts | Mode | OS | Harness | Model | Status | Checks passed, all cohorts of the job | Run |
 |---|---|---|---|---|---|---|---:|---|
+| [legal-benchmark](index/experiment/legal-benchmark.md) | 472486def2e9, 6c4923f1df12 | workflow | windows-11-wsl2-ubuntu-26.04 | [ollama](index/harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) | succeeded (measured) | 0/32 | [2026-11-18](legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/README.md) |
 | [legal-benchmark](index/experiment/legal-benchmark.md) | 73ba2c0309ec, 9410c5b3239f | generation | windows-11-native | [ollama](index/harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) | succeeded (measured) | 0/32 | [2026-11-15](legal-benchmark/campaign-20261115T133729Z-ff84f63f-generation-legal-benchmark-1/README.md) |
 | [legal-benchmark](index/experiment/legal-benchmark.md) | 2e44e4cdb02b, 39c96ebf6e5d | workflow | windows-11-native | [ollama](index/harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) | succeeded (measured) | 0/32 | [2026-11-15](legal-benchmark/campaign-20261115T133729Z-ff84f63f-workflow-legal-benchmark-1/README.md) |
 
@@ -1287,6 +1264,7 @@ Declared for hardware configuration `raider-ubuntu`, [run of 2026-11-08 01:38](l
 
 | Experiment | Run time UTC | Status | Synthetic | Results |
 |---|---|---|---|---|
+| legal-benchmark | 2026-11-18T06:48:54.008458+00:00 | complete | model-run | [Report](legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/README.md) |
 | llm-routing | 2026-11-18T05:10:19.056084+00:00 | complete | False | [Report](llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
 | model-offloading | 2026-11-18T05:04:51.044818+00:00 | incomplete | False | [Report](model-offloading/campaign-20261118T050451Z-60d1fe39-offload-model-offloading-1/README.md) |
 | model-offloading | 2026-11-18T01:48:08.266672+00:00 | incomplete | False | [Report](model-offloading/campaign-20261118T014808Z-cc8eec8c-offload-model-offloading-1/README.md) |
