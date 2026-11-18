@@ -277,7 +277,7 @@ Checks are those passed out of the 27 measured requests of the three categories;
 
 ### Legal benchmark in WSL2 of 2026-11-18
 
-The four legal benchmark runs that ran on the Windows host on 2026-11-15 ran again in WSL2 with Ubuntu 26.04 on the same machine, on 2026-11-18. The served model is the same, `kimi-linear-48b` (Kimi-Linear-48B-A3B-Instruct Q6_K) on Ollama 0.40.16. The suite is the approved public-synthetic fixture suite `legal-original-smoke`: 16 matters of a fictional jurisdiction. No bundle holds private matter. Each bundle needed its own authorization of the run, recorded from the operator's written instruction. Every output requires human review, and none of this says anything about legal quality.
+The four legal benchmark runs that ran on the Windows host on 2026-11-15 ran again in WSL2 with Ubuntu 26.04 on the same machine, on 2026-11-18. The served model is the same, `kimi-linear-48b` (Kimi-Linear-48B-A3B-Instruct Q6_K, same revision). Ollama was 0.40.15 on Windows and is 0.40.16 in WSL, and the operating system differs, so the cohort digests differ and the runs are set side by side, not compared as one cohort. The suite is the approved public-synthetic fixture suite `legal-original-smoke`: 16 matters of a fictional jurisdiction. No bundle holds private matter. Each bundle needed its own authorization of the run, recorded from the operator's written instruction. Every output requires human review, and none of this says anything about legal quality.
 
 | Run | Report |
 |---|---|
@@ -286,7 +286,7 @@ The four legal benchmark runs that ran on the Windows host on 2026-11-15 ran aga
 | workflow | [report](legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/README.md) |
 | score of the stored generation outputs | [report](legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/README.md) |
 
-**Against the Windows runs of 2026-11-15.** Each arm has 16 requests, one per matter. The table gives the timings of the two modes that call the model and how many of the 94 metrics of an arm are equal between the hosts.
+**Against the Windows runs of 2026-11-15.** Each arm has 16 requests, one per matter. The table gives the timings of the two modes that call the model and how many of the 94 metrics of an arm are equal between the hosts. Timings are medians over the responses with status ok: 16 on each host in the lexical-eligible arms, 10 on Windows and 13 in WSL in generation no-context, and 7 on each host in workflow no-context.
 
 | Mode | Arm | Median wall s, Windows | Median wall s, WSL | Median first output s, Windows | Median first output s, WSL | Metrics equal, of 94 |
 |---|---|---:|---:|---:|---:|---:|
@@ -295,19 +295,19 @@ The four legal benchmark runs that ran on the Windows host on 2026-11-15 ran aga
 | workflow | lexical-eligible | 28.7 | 39.7 | 1.30 | 4.10 | 85 |
 | workflow | no-context | 30.4 | 36.6 | 1.31 | 4.19 | 76 |
 
-- No arm passes all checks for any matter on either host: `all_pass` is 0 of 16 in all four arms of both modes on both hosts.
+- No arm passes all checks for any matter on either host: `all_pass` is 0 of 16 in both arms of both modes on both hosts.
 - Retrieval: 25 of the 27 metrics of each arm are equal. The two that differ are the median and p95 of the elapsed time, both below 0.001 s in both runs.
 - Score: it grades the stored outputs of the WSL generation run, and 88 of its 94 metrics per arm equal those of the generation bundle. The other six are timings, which a score run does not measure.
 - Median wall time per request is 9 to 38 % longer in WSL, and median time to first output is 2.8 to 10.9 times longer. The bundles do not show a cause.
-- Apart from timings, 1 to 27 of the 94 metrics of an arm differ between the hosts. A rate moves by 0.0625 when one matter changes. The bundles do not show why the outputs differ.
+- Apart from timings, 1 to 27 of the 94 metrics of an arm differ between the hosts. A rate over all 16 matters moves by 0.0625 when one matter changes. The bundles do not show why the outputs differ.
 
 **Conditions of the serving qualification.** The generation and workflow roles use a serving profile frozen from one attempt of a `model-offloading` qualification run over the `legal-shaped` workload, in the same guest, served by a private Ollama service the operator started for the legal stages. That run is not published: its benchmark names start with `legal-`, which the publisher refuses. The bundles carry no field for host memory or paging, so these conditions are stated here.
 
-- Cold loads of the 37.7 GiB model paged on the Windows host: `Pages Output/sec` rose above zero while it loaded in three of four cold attempts of 2026-11-18. Host paging that began before the fourth disturbed it. A cold load on this host is therefore not attested as free of paging.
-- The qualified attempt was a fifth, warm one. An earlier request had loaded the model, so no load falls inside it. The serving profile attests `paging: none` for that attempt only, and the attestation text says why. During it, the guest's clean, unmapped page cache was dropped every 2 s, which does not drop mapped model pages.
-- The Windows host sampled `Pages Output/sec` and `Available MBytes` every 5 s through the published evaluation and score runs, from 06:48:54 to 07:17:05 UTC: 339 samples, no page-out, at least 21.7 GB available.
-- The guest had 51.0 GiB of memory and no swap, from `memory=52GB`, `processors=24` and `swap=0` in `.wslconfig`. The published evaluation ran warm with the model resident.
-- A first evaluation of the same roles, run with a cache dropper active during its requests, produced no report. The projection rejected it at `disk_read_bytes`, which was 1.6 to 5.0 GB above the bound of 10^9 bytes. The published evaluation is a rerun without the dropper. The bound is below the size of the model file, so an evaluation whose attempt includes a cold load of this model would be rejected as well. That was not run.
+- Cold loads of the 37.7 GiB model paged on the Windows host: `Pages Output/sec` rose above zero while it loaded in attempts 1, 2 and 4 of four cold attempts of 2026-11-18. Host paging that began before attempt 3 disturbed it. A cold load on this host is therefore not attested as free of paging. The run records of the four cold attempts carry `paging: none`, which the host samples contradict for three of them. Those records are not published and are not evidence of a paging-free load.
+- The serving profile was frozen from a fifth attempt that ran warm: an earlier request had loaded the model, so no load falls inside it. The run attestation of that attempt says `paging: none` and says that it holds for a warm attempt only. The model stayed resident from the cold load of attempt 4, which paged the host, through the evaluation. During attempts 3, 4 and 5 the guest's clean, unmapped page cache was dropped every 2 s, which does not drop mapped model pages.
+- The Windows host sampled `Pages Output/sec` and `Available MBytes` every 5 s through the published evaluation and score runs, from 06:48:54 to 07:17:05 UTC: 337 samples, no page-out, and at least 21,707 MB (21.2 GiB) available. By the operator's account, the published evaluation ran warm with the model resident and no page-cache script running.
+- The guest had 51.0 GiB of memory and no swap, from `memory=52GB`, `processors=24` and `swap=0` in `.wslconfig`.
+- By the operator's account, a first evaluation of the same roles ran with a script that dropped the guest's page cache every 2 s during its requests. It produced no report: the [projection](../../experiments/legal-benchmark/README.md#classification-gates-and-the-report-projection) rejected the generation and workflow reports at `disk_read_bytes`, which was 1.6 to 5.0 GB, above the bound of 10^9 bytes. The published evaluation is a rerun without the script, and its disk reads were 0.4 to 38 MB. The bound is below the size of the model file, so an evaluation whose attempt reads the model from disk would be rejected as well. That was not run.
 - BIOS, RAM speed, MSI power profile, MUX mode and GPU power limit are carried from the Windows attestation of 2026-11-08 and were not read again. Programs running on the Windows side at the start of the qualification: the consumer Ollama tray app (idle, no model loaded), Microsoft Teams, VMware tray and authorization service, the LM Studio desktop app, the ProtonVPN client, and the ChatGPT and Claude desktop apps.
 
 <!-- legal-wsl-2026-11-18:end -->
