@@ -7,6 +7,7 @@ import http.client
 import json
 import os
 from pathlib import Path
+import re
 import signal
 import socket
 import subprocess
@@ -14,6 +15,29 @@ import time
 
 from .adapters import endpoint_parts
 from .common import read_json, safe_relative
+
+SPLIT_GGUF = re.compile(r'^(?P<stem>.+)-(?P<index>\d{5})-of-(?P<total>\d{5})\.gguf$')
+
+
+def split_gguf_directory(model_file):
+    """The directory `ollama create` must read for a GGUF split into parts, or None for a single file.
+
+    Ollama imports a split GGUF only from a directory that holds all of its parts, so a `FROM` line naming one part
+    fails with "has 1 shards, expected N". The parts are imported unchanged, so each keeps its locked SHA-256.
+    Ollama reads every GGUF in the directory; one that is not a part of this model would be mixed into the import.
+    """
+    path = Path(model_file)
+    match = SPLIT_GGUF.match(path.name)
+    if not match or int(match['total']) < 2:
+        return None
+    parts = [f"{match['stem']}-{index:05d}-of-{match['total']}.gguf" for index in range(1, int(match['total']) + 1)]
+    missing = [name for name in parts if not (path.parent / name).is_file()]
+    if missing:
+        raise ValueError('launch.model_file is part of a split GGUF; missing next to it: ' + ', '.join(missing))
+    others = sorted(p.name for p in path.parent.glob('*.gguf') if p.name not in parts)
+    if others:
+        raise ValueError('Ollama imports a split GGUF from its directory, which must hold no other GGUF file: ' + ', '.join(others))
+    return str(path.parent)
 
 
 def launch_spec(config, state, workdir):
@@ -59,8 +83,8 @@ def launch_spec(config, state, workdir):
         env.update(OLLAMA_HOST=f'{host}:{port}',OLLAMA_NO_CLOUD='1',OLLAMA_NUM_PARALLEL='1',
                    OLLAMA_MAX_LOADED_MODELS='1',OLLAMA_MODELS=str(Path(state['plan']['prefix'])/'ollama-models'))
         model_file=local('model_file')
-        # JSON quoting also handles backslashes and spaces in Windows paths.
-        modelfile='FROM '+json.dumps(model_file)+'\nPARAMETER num_ctx '+ctx+'\nPARAMETER num_gpu '+layers+'\nPARAMETER num_thread '+threads+'\n'
+        # A split GGUF is imported from the directory of its parts. JSON quoting also handles backslashes and spaces in Windows paths.
+        modelfile='FROM '+json.dumps(split_gguf_directory(model_file) or model_file)+'\nPARAMETER num_ctx '+ctx+'\nPARAMETER num_gpu '+layers+'\nPARAMETER num_thread '+threads+'\n'
         commands=[{'file':str(Path(workdir)/'Modelfile'),'content':modelfile,
                    'argv':[exe,'create',config['served_model'],'-f',str(Path(workdir)/'Modelfile')]}]
         argv=[exe,'serve']

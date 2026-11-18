@@ -322,6 +322,38 @@ class LaunchTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 launch_spec(c, state, tmp)
 
+    def test_ollama_imports_a_split_gguf_from_the_directory_of_its_parts(self):
+        # `FROM <first part>` makes Ollama fail with "has 1 shards, expected N"; it needs the directory of all parts.
+        with tempfile.TemporaryDirectory() as tmp:
+            c, state = self.config(tmp, 'ollama')
+            parts = Path(tmp, 'parts')
+            parts.mkdir()
+            for index in (1, 2):
+                (parts / f'model-0000{index}-of-00002.gguf').write_bytes(b'fixture')
+            c['launch']['model_file'] = 'parts/model-00001-of-00002.gguf'
+            modelfile = launch_spec(c, state, tmp)['prepare'][0]['content']
+            self.assertEqual(modelfile.splitlines()[0], 'FROM ' + json.dumps(str(parts.resolve())))
+            # A single file is still named directly.
+            c['launch']['model_file'] = 'model.gguf'
+            self.assertEqual(launch_spec(c, state, tmp)['prepare'][0]['content'].splitlines()[0],
+                             'FROM ' + json.dumps(str(Path(tmp, 'model.gguf').resolve())))
+
+    def test_split_gguf_needs_every_part_and_no_other_gguf_beside_them(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            c, state = self.config(tmp, 'ollama')
+            parts = Path(tmp, 'parts')
+            parts.mkdir()
+            (parts / 'model-00001-of-00003.gguf').write_bytes(b'fixture')
+            (parts / 'model-00002-of-00003.gguf').write_bytes(b'fixture')
+            c['launch']['model_file'] = 'parts/model-00001-of-00003.gguf'
+            with self.assertRaisesRegex(ValueError, 'missing next to it: model-00003-of-00003.gguf'):
+                launch_spec(c, state, tmp)
+            (parts / 'model-00003-of-00003.gguf').write_bytes(b'fixture')
+            launch_spec(c, state, tmp)
+            (parts / 'other.gguf').write_bytes(b'fixture')
+            with self.assertRaisesRegex(ValueError, 'no other GGUF file: other.gguf'):
+                launch_spec(c, state, tmp)
+
     def test_strata_plan_never_includes_secret(self):
         with tempfile.TemporaryDirectory() as tmp:
             c, state = self.config(tmp, 'strata')

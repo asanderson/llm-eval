@@ -63,6 +63,8 @@ PARAMETER temperature 0
 
 Create the model with `ollama create eval-model -f Modelfile`, record its digest and actual template (`ollama show eval-model --modelfile`), then set `served_model` to `eval-model`. Templates/default system prompts can differ from other engines; compare and align them. `ollama ps` reports CPU/GPU placement. Use the native `http://127.0.0.1:11434/api/chat` endpoint so the harness can capture prompt/eval counts and durations.
 
+A GGUF split into parts (`name-00001-of-00002.gguf`, `name-00002-of-00002.gguf`) cannot be imported by naming its first part: Ollama fails with `invalid split GGUF ... has 1 shards, expected 2`. The managed launcher writes `FROM <directory of the parts>` instead, which Ollama 0.40.16 imports with each part unchanged (each keeps the SHA-256 of the locked file). The directory must hold every part and no other `.gguf` file; the launcher refuses a missing part or an extra file. LM Studio has no such support yet: its launcher imports only the named part.
+
 ## KoboldCpp
 
 Use a pinned official release or source build appropriate to your OS/GPU. Select the exact GGUF, CUDA backend, context 8192, and explicit GPU-layer/CPU-thread placement in its launcher. Bind to loopback, disable optional agents/tools, record all launcher options, and use its OpenAI-compatible `/v1/chat/completions` endpoint. Some versions do not provide streaming usage; `request_usage=false` is the example default. Missing usage stays unknown, not a fabricated token rate. Check actual endpoint behavior before running a full suite.
