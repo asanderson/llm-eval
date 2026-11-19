@@ -2,10 +2,11 @@
 
 [Results index](../README.md) · [Executive summary](../../README.md)
 
-36 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
+37 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
+| [2026-11-18](../date/2026-11-18.md) | [legal-benchmark](../experiment/legal-benchmark.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](../model/llm-eval-kimi-linear-48b-locked.md) | legal-workflow | – | succeeded (measured) | 32 | 9 | 36.6–40.4 | 21.6–21.9 | 0/32 | – | [report](../../legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/README.md) |
 | [2026-11-18](../date/2026-11-18.md) | [llm-routing](../experiment/llm-routing.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [llm-eval-nimble:locked](../model/llm-eval-nimble-locked.md) | ollama-nimble | – | succeeded | 6 | 0 | 0.0507–0.0554 | – | – | 6/6 | [report](../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
 | [2026-11-18](../date/2026-11-18.md) | [llm-routing](../experiment/llm-routing.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [llm-eval-tev1:locked](../model/llm-eval-tev1-locked.md) | ollama-tev1 | – | succeeded | 6 | 0 | 0.0245–0.0261 | – | – | 6/6 | [report](../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
 | [2026-11-18](../date/2026-11-18.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [koboldcpp](../harness/koboldcpp.md) | [gemma4-26b-moe](../model/gemma4-26b-moe.md) | gemma4-26b-moe-koboldcpp | 2048 | succeeded | 27 | 0 | 0.523–0.524 | 3.82–5.74 | 21/27 | – | [report](../../model-offloading/campaign-20261118T050451Z-60d1fe39-offload-model-offloading-1/README.md) |
