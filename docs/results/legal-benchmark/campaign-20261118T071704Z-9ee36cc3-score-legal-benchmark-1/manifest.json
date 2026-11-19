@@ -1,0 +1,43 @@
+{
+  "campaign_id": "legal-score-wsl",
+  "canonical_bytes": 1,
+  "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce",
+  "cohorts": 2,
+  "coverage": [
+    {
+      "attempts": 1,
+      "job_id": "score-legal-benchmark-1-ff60ca399ae0",
+      "reason": null,
+      "status": "succeeded"
+    }
+  ],
+  "created_utc": "2026-11-18T07:17:04.491102+00:00",
+  "data_class": "public-synthetic",
+  "execution_kinds": [
+    "score-only"
+  ],
+  "experiment_id": "legal-benchmark",
+  "experiment_run_id": "score-legal-benchmark-1",
+  "files": {
+    "docs/results/legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/README.md": "9c79675a5776388d95d561974f7983fe04a21cd08e8e3fcd4e1e3a46d9b83d05",
+    "docs/results/legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/legal-summary.json": "d08994d50913dc0cb7bc62ae3a15c5674a0440e87aa42f72cb9b1a410db1033a",
+    "docs/results/legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/raw/measurements.jsonl.gz": "ee6566f9fc426352e32498b94be97a727453cabcd29d07b16acf61e536b3ca64",
+    "docs/results/legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/resolved-config.json": "89a6945510b577a25c86ab5a5263e8d3e274e2f1a8de9daf6fe13c6dd28df130",
+    "docs/results/legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/summary.csv": "59f108b3b39f71dd1a00f18617ec147a4a8d729493651272e90fe99a052429c3",
+    "docs/results/legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/summary.json": "7a3a6ecc7707710384ba158c33c2c2de176aa87e170b70e876d353f2f4046dcf"
+  },
+  "projection": {
+    "id": "legal-projection",
+    "version": 1
+  },
+  "publication_id": "campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1",
+  "raw_records": 1,
+  "removed_fields": [],
+  "report_fingerprint": "912c274d5eb48d1d2bd1321600a7f40ec3e54be6a200eaea076053541b6d8a95",
+  "schema_version": 2,
+  "status": "complete",
+  "suite_lock_sha256": [
+    "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae"
+  ],
+  "synthetic": false
+}

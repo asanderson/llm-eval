@@ -1,0 +1,96 @@
+{
+  "experiment": {
+    "campaign_id": "legal-score-wsl",
+    "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce",
+    "experiment_id": "legal-benchmark",
+    "experiment_run_id": "score-legal-benchmark-1",
+    "job_ids": [
+      "score-legal-benchmark-1-ff60ca399ae0"
+    ],
+    "mode": "score",
+    "version": 1
+  },
+  "input_hashes": [
+    "0894c7d2f055caa62122ab3a48395074027c93ad22148ac915b894ace0f66cbe",
+    "0ed4a037fc3139daac91d905d4847f319799e8871804349b5abefe34b65fcf45",
+    "1a87f5eb15c9c358a61c9d720386139b4daecb76eefcb27493d4f11bbed78db3",
+    "1dbd5b545d51b7b3e5a880d48f571fde118ce1219bbca7a62f116dfb7eda73e7",
+    "54dc75f6c8c825e38c3b85bf518556defec72471bf7acd05a430ecf62c7a2106",
+    "78a5dea194314c16a13b925871aa0fa6eb454ff715c5957c1ee744389a6fecdd",
+    "8384c476974dade213bb052331e5872e24ab5bd5b60e9a4139cc61e401252e80",
+    "a5fff00e3d91803676ab55d789bd148f06a423b3facf95783092465ebeb3fa4e",
+    "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae",
+    "b4320c8985bea2b07ad1a489514af45b579fb37766d5a4cb07d3ef158ec8ee17",
+    "c8bb70991ed06a9ed1ff1c30d36b4726d9202d1bacadbea349add23ee84a81c5",
+    "d0b67f86f6091e87407c22b6bd458ddcdce078d3f10b7bc0c7ee8b2bf17edef6",
+    "ffc334dec856af8b0b221cbb370e8b3b2771dd4e9e6e3b9f6a6a7dc2b6b54279"
+  ],
+  "jobs": [
+    {
+      "case_id": "legal-score",
+      "experiment_id": "legal-benchmark",
+      "experiment_version": 1,
+      "hardware": {
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-wsl2-ubuntu-26.04"
+      },
+      "hardware_config_id": "raider-wsl",
+      "input_files": [
+        {
+          "sha256": "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae"
+        },
+        {
+          "sha256": "78a5dea194314c16a13b925871aa0fa6eb454ff715c5957c1ee744389a6fecdd"
+        },
+        {
+          "sha256": "1a87f5eb15c9c358a61c9d720386139b4daecb76eefcb27493d4f11bbed78db3"
+        },
+        {
+          "sha256": "54dc75f6c8c825e38c3b85bf518556defec72471bf7acd05a430ecf62c7a2106"
+        },
+        {
+          "sha256": "0894c7d2f055caa62122ab3a48395074027c93ad22148ac915b894ace0f66cbe"
+        },
+        {
+          "sha256": "ffc334dec856af8b0b221cbb370e8b3b2771dd4e9e6e3b9f6a6a7dc2b6b54279"
+        },
+        {
+          "sha256": "8384c476974dade213bb052331e5872e24ab5bd5b60e9a4139cc61e401252e80"
+        },
+        {
+          "sha256": "b4320c8985bea2b07ad1a489514af45b579fb37766d5a4cb07d3ef158ec8ee17"
+        },
+        {
+          "sha256": "0ed4a037fc3139daac91d905d4847f319799e8871804349b5abefe34b65fcf45"
+        },
+        {
+          "sha256": "c8bb70991ed06a9ed1ff1c30d36b4726d9202d1bacadbea349add23ee84a81c5"
+        },
+        {
+          "sha256": "a5fff00e3d91803676ab55d789bd148f06a423b3facf95783092465ebeb3fa4e"
+        },
+        {
+          "sha256": "1dbd5b545d51b7b3e5a880d48f571fde118ce1219bbca7a62f116dfb7eda73e7"
+        },
+        {
+          "sha256": "d0b67f86f6091e87407c22b6bd458ddcdce078d3f10b7bc0c7ee8b2bf17edef6"
+        }
+      ],
+      "job_id": "score-legal-benchmark-1-ff60ca399ae0",
+      "mode": "score",
+      "parameters": {
+        "cohorts": [
+          "1ebf89d17c04d4981e75113905ab4cf8aa66bb7c0bfd2fee384f6d394e78772c",
+          "79bcd479444de72976b160eb38b1c3d86cc9f9bd528abd9dce40b21acdd6f892"
+        ],
+        "data_class": "public-synthetic",
+        "execution_kind": "score-only",
+        "identity": {
+          "harness": "ollama",
+          "model": "llm-eval-kimi-linear-48b:locked"
+        },
+        "synthetic": false
+      }
+    }
+  ]
+}
