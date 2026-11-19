@@ -1,0 +1,43 @@
+{
+  "campaign_id": "legal-evaluation-wsl",
+  "canonical_bytes": 1,
+  "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce",
+  "cohorts": 2,
+  "coverage": [
+    {
+      "attempts": 1,
+      "job_id": "workflow-legal-benchmark-1-00efc50ea670",
+      "reason": null,
+      "status": "succeeded"
+    }
+  ],
+  "created_utc": "2026-11-18T06:48:54.008458+00:00",
+  "data_class": "public-synthetic",
+  "execution_kinds": [
+    "model-run"
+  ],
+  "experiment_id": "legal-benchmark",
+  "experiment_run_id": "workflow-legal-benchmark-1",
+  "files": {
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/README.md": "20726ee4a80a1b93fd65da40af30a0f0fa6cd8923de7fdda3ddd483cc551c44a",
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/legal-summary.json": "2410a2fc72719e234eb4f48143ec478ca2423db25e9b3e1ff73fd64bd6ac3229",
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/raw/measurements.jsonl.gz": "2426ca674f8c4cf1ace1bbdcc702a1a589c6703d0b601662c0d5fecdfcffb2e8",
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/resolved-config.json": "383aedaa05ec1b947e21321db6be7ff5f85b4d1822f4e82a1cc11d4ee12354e3",
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/summary.csv": "f5a52d48ea352e5b51d5120d5c5abef6508313424824baf49f4274dd93cb6258",
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/summary.json": "3e511edb0bd7681d7fd3fcb5066a7a4dc1328381bd0c8ffa315aef909de04f8e"
+  },
+  "projection": {
+    "id": "legal-projection",
+    "version": 1
+  },
+  "publication_id": "campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1",
+  "raw_records": 1,
+  "removed_fields": [],
+  "report_fingerprint": "0a0e4ca95b2b67ff2711e9873c1a637748d4c7ce98b3b8a398b3a715b650473e",
+  "schema_version": 2,
+  "status": "complete",
+  "suite_lock_sha256": [
+    "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae"
+  ],
+  "synthetic": false
+}
