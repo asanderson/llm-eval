@@ -281,6 +281,45 @@ Checks are those passed out of the 27 measured requests of the three categories;
 
 <!-- wsl-2026-11-18:end -->
 
+<!-- legal-wsl-2026-11-18:start -->
+
+### Legal benchmark in WSL2 of 2026-11-18
+
+The four legal benchmark runs that ran on the Windows host on 2026-11-15 ran again in WSL2 with Ubuntu 26.04 on the same machine, on 2026-11-18. The served model is the same, `kimi-linear-48b` (Kimi-Linear-48B-A3B-Instruct Q6_K, same revision). Ollama was 0.40.15 on Windows and is 0.40.16 in WSL, and the operating system differs, so the cohort digests differ and the runs are set side by side, not compared as one cohort. The suite is the approved public-synthetic fixture suite `legal-original-smoke`: 16 matters of a fictional jurisdiction. No bundle holds private matter. Each bundle needed its own authorization of the run, recorded from the operator's written instruction. Every output requires human review, and none of this says anything about legal quality.
+
+| Run | Report |
+|---|---|
+| retrieval, a fixture run with no model | [report](legal-benchmark/campaign-20261118T064854Z-6746b621-retrieval-legal-benchmark-1/README.md) |
+| generation | [report](legal-benchmark/campaign-20261118T064854Z-6746b621-generation-legal-benchmark-1/README.md) |
+| workflow | [report](legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/README.md) |
+| score of the stored generation outputs | [report](legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/README.md) |
+
+**Against the Windows runs of 2026-11-15.** Each arm has 16 requests, one per matter. The table gives the timings of the two modes that call the model and how many of the 94 metrics of an arm are equal between the hosts. Timings are medians over the responses with status ok: 16 on each host in the lexical-eligible arms, 10 on Windows and 13 in WSL in generation no-context, and 7 on each host in workflow no-context.
+
+| Mode | Arm | Median wall s, Windows | Median wall s, WSL | Median first output s, Windows | Median first output s, WSL | Metrics equal, of 94 |
+|---|---|---:|---:|---:|---:|---:|
+| generation | lexical-eligible | 11.1 | 12.1 | 0.187 | 2.04 | 87 |
+| generation | no-context | 10.6 | 12.2 | 0.764 | 2.11 | 61 |
+| workflow | lexical-eligible | 28.7 | 39.7 | 1.30 | 4.10 | 85 |
+| workflow | no-context | 30.4 | 36.6 | 1.31 | 4.19 | 76 |
+
+- No arm passes all checks for any matter on either host: `all_pass` is 0 of 16 in both arms of both modes on both hosts.
+- Retrieval: 25 of the 27 metrics of each arm are equal. The two that differ are the median and p95 of the elapsed time, both below 0.001 s in both runs.
+- Score: it grades the stored outputs of the WSL generation run, and 88 of its 94 metrics per arm equal those of the generation bundle. The other six are timings, which a score run does not measure.
+- Median wall time per request is 9 to 38 % longer in WSL, and median time to first output is 2.8 to 10.9 times longer. The bundles do not show a cause.
+- Apart from timings, 1 to 27 of the 94 metrics of an arm differ between the hosts. A rate over all 16 matters moves by 0.0625 when one matter changes. The bundles do not show why the outputs differ.
+
+**Conditions of the serving qualification.** The generation and workflow roles use a serving profile frozen from one attempt of a `model-offloading` qualification run over the `legal-shaped` workload, in the same guest, served by a private Ollama service the operator started for the legal stages. That run is not published: its benchmark names start with `legal-`, which the publisher refuses. The bundles carry no field for host memory or paging, so these conditions are stated here.
+
+- Cold loads of the 37.7 GiB model paged on the Windows host: `Pages Output/sec` rose above zero while it loaded in attempts 1, 2 and 4 of four cold attempts of 2026-11-18. Host paging that began before attempt 3 disturbed it. A cold load on this host is therefore not attested as free of paging. The run records of the four cold attempts carry `paging: none`, which the host samples contradict for three of them. Those records are not published and are not evidence of a paging-free load.
+- The serving profile was frozen from a fifth attempt that ran warm: an earlier request had loaded the model, so no load falls inside it. The run attestation of that attempt says `paging: none` and says that it holds for a warm attempt only. The model stayed resident from the cold load of attempt 4, which paged the host, through the evaluation. During attempts 3, 4 and 5 the guest's clean, unmapped page cache was dropped every 2 s, which does not drop mapped model pages.
+- The Windows host sampled `Pages Output/sec` and `Available MBytes` every 5 s through the published evaluation and score runs, from 06:48:54 to 07:17:05 UTC: 337 samples, no page-out, and at least 21,707 MB (21.2 GiB) available. By the operator's account, the published evaluation ran warm with the model resident and no page-cache script running.
+- The guest had 51.0 GiB of memory and no swap, from `memory=52GB`, `processors=24` and `swap=0` in `.wslconfig`.
+- By the operator's account, a first evaluation of the same roles ran with a script that dropped the guest's page cache every 2 s during its requests. It produced no report: the [projection](../../experiments/legal-benchmark/README.md#classification-gates-and-the-report-projection) rejected the generation and workflow reports at `disk_read_bytes`, which was 1.6 to 5.0 GB, above the bound of 10^9 bytes. The published evaluation is a rerun without the script, and its disk reads were 0.4 to 38 MB. The bound is below the size of the model file, so an evaluation whose attempt reads the model from disk would be rejected as well. That was not run.
+- BIOS, RAM speed, MSI power profile, MUX mode and GPU power limit are carried from the Windows attestation of 2026-11-08 and were not read again. Programs running on the Windows side at the start of the qualification: the consumer Ollama tray app (idle, no model loaded), Microsoft Teams, VMware tray and authorization service, the LM Studio desktop app, the ProtonVPN client, and the ChatGPT and Claude desktop apps.
+
+<!-- legal-wsl-2026-11-18:end -->
+
 ## Results index
 
 <!-- results-index:start -->
@@ -289,11 +328,11 @@ Checks are those passed out of the 27 measured requests of the three categories;
 
 | Category | Indexes (results) |
 |---|---|
-| Hardware configuration | [raider-ubuntu](index/hardware/raider-ubuntu.md) (1) · [raider-windows](index/hardware/raider-windows.md) (114) · [raider-wsl](index/hardware/raider-wsl.md) (39) |
-| Experiment | [legal-benchmark](index/experiment/legal-benchmark.md) (5) · [llm-routing](index/experiment/llm-routing.md) (7) · [model-offloading](index/experiment/model-offloading.md) (142) |
-| Harness | [category](index/harness/category.md) (1) · [fixture](index/harness/fixture.md) (1) · [koboldcpp](index/harness/koboldcpp.md) (51) · [lmstudio](index/harness/lmstudio.md) (34) · [ollama](index/harness/ollama.md) (67) |
-| Model | [category](index/model/category.md) (1) · [deepseek-r1-32b](index/model/deepseek-r1-32b.md) (11) · [deepseek-r1-70b](index/model/deepseek-r1-70b.md) (8) · [fixture](index/model/fixture.md) (1) · [gemma3-27b](index/model/gemma3-27b.md) (8) · [gemma4-26b-moe](index/model/gemma4-26b-moe.md) (9) · [gemma4-31b](index/model/gemma4-31b.md) (9) · [kimi-dev-72b](index/model/kimi-dev-72b.md) (9) · [kimi-linear-48b](index/model/kimi-linear-48b.md) (8) · [laguna-xs21](index/model/laguna-xs21.md) (8) · [llama3-70b](index/model/llama3-70b.md) (8) · [llama31-70b](index/model/llama31-70b.md) (8) · [llama33-70b](index/model/llama33-70b.md) (8) · [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) (4) · [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) (3) · [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) (3) · [mistral-small31](index/model/mistral-small31.md) (8) · [nemotron-nano-30b](index/model/nemotron-nano-30b.md) (8) · [nemotron-super-49b](index/model/nemotron-super-49b.md) (8) · [phi4-reasoning-plus](index/model/phi4-reasoning-plus.md) (8) · [qwen35-35b-moe](index/model/qwen35-35b-moe.md) (8) · [qwen38-27b](index/model/qwen38-27b.md) (8) |
-| Date (UTC) | [2026-11-18](index/date/2026-11-18.md) (9) · [2026-11-17](index/date/2026-11-17.md) (30) · [2026-11-16](index/date/2026-11-16.md) (12) · [2026-11-15](index/date/2026-11-15.md) (45) · [2026-11-11](index/date/2026-11-11.md) (3) · [2026-11-10](index/date/2026-11-10.md) (30) · [2026-11-09](index/date/2026-11-09.md) (19) · [2026-11-08](index/date/2026-11-08.md) (6) |
+| Hardware configuration | [raider-ubuntu](index/hardware/raider-ubuntu.md) (1) · [raider-windows](index/hardware/raider-windows.md) (114) · [raider-wsl](index/hardware/raider-wsl.md) (40) |
+| Experiment | [legal-benchmark](index/experiment/legal-benchmark.md) (6) · [llm-routing](index/experiment/llm-routing.md) (7) · [model-offloading](index/experiment/model-offloading.md) (142) |
+| Harness | [category](index/harness/category.md) (1) · [fixture](index/harness/fixture.md) (1) · [koboldcpp](index/harness/koboldcpp.md) (51) · [lmstudio](index/harness/lmstudio.md) (34) · [ollama](index/harness/ollama.md) (68) |
+| Model | [category](index/model/category.md) (1) · [deepseek-r1-32b](index/model/deepseek-r1-32b.md) (11) · [deepseek-r1-70b](index/model/deepseek-r1-70b.md) (8) · [fixture](index/model/fixture.md) (1) · [gemma3-27b](index/model/gemma3-27b.md) (8) · [gemma4-26b-moe](index/model/gemma4-26b-moe.md) (9) · [gemma4-31b](index/model/gemma4-31b.md) (9) · [kimi-dev-72b](index/model/kimi-dev-72b.md) (9) · [kimi-linear-48b](index/model/kimi-linear-48b.md) (8) · [laguna-xs21](index/model/laguna-xs21.md) (8) · [llama3-70b](index/model/llama3-70b.md) (8) · [llama31-70b](index/model/llama31-70b.md) (8) · [llama33-70b](index/model/llama33-70b.md) (8) · [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) (5) · [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) (3) · [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) (3) · [mistral-small31](index/model/mistral-small31.md) (8) · [nemotron-nano-30b](index/model/nemotron-nano-30b.md) (8) · [nemotron-super-49b](index/model/nemotron-super-49b.md) (8) · [phi4-reasoning-plus](index/model/phi4-reasoning-plus.md) (8) · [qwen35-35b-moe](index/model/qwen35-35b-moe.md) (8) · [qwen38-27b](index/model/qwen38-27b.md) (8) |
+| Date (UTC) | [2026-11-18](index/date/2026-11-18.md) (10) · [2026-11-17](index/date/2026-11-17.md) (30) · [2026-11-16](index/date/2026-11-16.md) (12) · [2026-11-15](index/date/2026-11-15.md) (45) · [2026-11-11](index/date/2026-11-11.md) (3) · [2026-11-10](index/date/2026-11-10.md) (30) · [2026-11-09](index/date/2026-11-09.md) (19) · [2026-11-08](index/date/2026-11-08.md) (6) |
 
 ### model-offloading: models by harness
 
@@ -325,7 +364,7 @@ Each cell links to the report of every published run of that model on that harne
 
 | Model | [fixture](index/harness/fixture.md) | [ollama](index/harness/ollama.md) |
 |---|---|---|
-| [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) | – | [2026-11-18 raider-wsl measured](legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows score-only](legal-benchmark/campaign-20261115T140033Z-ed2177f1-score-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](legal-benchmark/campaign-20261115T133729Z-ff84f63f-generation-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](legal-benchmark/campaign-20261115T133729Z-ff84f63f-workflow-legal-benchmark-1/README.md) |
+| [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) | – | [2026-11-18 raider-wsl score-only](legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/README.md)<br>[2026-11-18 raider-wsl measured](legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows score-only](legal-benchmark/campaign-20261115T140033Z-ed2177f1-score-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](legal-benchmark/campaign-20261115T133729Z-ff84f63f-generation-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](legal-benchmark/campaign-20261115T133729Z-ff84f63f-workflow-legal-benchmark-1/README.md) |
 | [fixture](index/model/fixture.md) | [2026-11-15 raider-windows fixture](legal-benchmark/campaign-20261115T133729Z-ff84f63f-retrieval-legal-benchmark-1/README.md) | – |
 
 ### llm-routing: models by harness
@@ -360,6 +399,7 @@ These results are not ranked with other experiments. Two runs are comparable onl
 
 | Experiment | Cohorts | Mode | OS | Harness | Model | Status | Checks passed, all cohorts of the job | Run |
 |---|---|---|---|---|---|---|---:|---|
+| [legal-benchmark](index/experiment/legal-benchmark.md) | 1ebf89d17c04, 79bcd479444d | score | windows-11-wsl2-ubuntu-26.04 | [ollama](index/harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) | succeeded (score-only) | 0/32 | [2026-11-18](legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/README.md) |
 | [legal-benchmark](index/experiment/legal-benchmark.md) | 2a8c00595072, 91eb97d690a1 | score | windows-11-native | [ollama](index/harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) | succeeded (score-only) | 0/32 | [2026-11-15](legal-benchmark/campaign-20261115T140033Z-ed2177f1-score-legal-benchmark-1/README.md) |
 
 Full table and per-category pages: [results index](index/README.md).
@@ -1299,6 +1339,7 @@ Declared for hardware configuration `raider-ubuntu`, [run of 2026-11-08 01:38](l
 |---|---|---|---|---|
 | model-offloading | 2026-11-18T12:06:58.177136+00:00 | complete | False | [Report](model-offloading/campaign-20261118T120658Z-2f4fa5af-offload-model-offloading-1/README.md) |
 | model-offloading | 2026-11-18T09:18:47.453461+00:00 | complete | False | [Report](model-offloading/campaign-20261118T091847Z-e5ed63b4-offload-model-offloading-1/README.md) |
+| legal-benchmark | 2026-11-18T07:17:04.491102+00:00 | complete | score-only | [Report](legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/README.md) |
 | legal-benchmark | 2026-11-18T06:48:54.008458+00:00 | complete | model-run | [Report](legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/README.md) |
 | llm-routing | 2026-11-18T05:10:19.056084+00:00 | complete | False | [Report](llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
 | model-offloading | 2026-11-18T05:04:51.044818+00:00 | incomplete | False | [Report](model-offloading/campaign-20261118T050451Z-60d1fe39-offload-model-offloading-1/README.md) |

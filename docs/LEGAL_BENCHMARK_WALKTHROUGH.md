@@ -1,6 +1,6 @@
 # Legal benchmark walkthrough
 
-**Output provenance.** This walkthrough was written from the code of the `legal-benchmark` experiment and its tests. While writing it, these commands were run on a Windows development host, CPU only: the repository's unit tests (scripted loopback test servers stand in for every model), `llm-eval experiments list`, the read-only `llm-eval plan` of the example campaigns, `llm-eval matrix` with its output outside the checkout, and `scripts/render_legal_diagram.py`. No model was served, no GPU was used, and no campaign was set up or run on a target host. Every output block below is illustrative expected output, not a measurement: values in angle brackets are placeholders. Host measurements are pending. That describes this walkthrough as written on 2026-11-13: four Windows-host runs of the approved fixture suite were published on 2026-11-17 and are listed under [Legal benchmark reports](RESULTS.md#legal-benchmark-reports).
+**Output provenance.** This walkthrough was written from the code of the `legal-benchmark` experiment and its tests. While writing it, these commands were run on a Windows development host, CPU only: the repository's unit tests (scripted loopback test servers stand in for every model), `llm-eval experiments list`, the read-only `llm-eval plan` of the example campaigns, `llm-eval matrix` with its output outside the checkout, and `scripts/render_legal_diagram.py`. No model was served, no GPU was used, and no campaign was set up or run on a target host. Every output block below is illustrative expected output, not a measurement: values in angle brackets are placeholders. Host measurements are pending. That describes this walkthrough as written on 2026-11-13: four Windows-host runs of the approved fixture suite were published on 2026-11-17 and four WSL2 runs followed, and all are listed under [Legal benchmark reports](RESULTS.md#legal-benchmark-reports).
 
 The experiment drafts internal screening memos **for human review** over a **fictional jurisdiction with original authorities** (the "Commonwealth of Veld" fixtures). It never files, charges, contacts anyone or discloses evidence. The plan this walkthrough implements states the scope:
 
@@ -219,7 +219,7 @@ Candidate-side code receives only `contracts.candidate_view(suite)`: the lock (l
 
   > Differencing is not prevented: two reduced runs over overlapping subsets (five matters and the same five plus a sixth) can be subtracted to give the sixth matter's result.
 
-- **Publication.** Manual publication needs `publication-authorization.json`, which `python -m llm_eval.experiments.legal_benchmark.reporting authorize` writes only after the run id is typed back on an interactive terminal; a Python caller of `reporting.authorize` can instead pass a `confirm` hook, and the authorization is then written once the hook returns true. Four bundles of the approved public-synthetic fixture suite have been published, each after its own authorization given through that hook (see [Legal benchmark reports](RESULTS.md#legal-benchmark-reports)). No campaign or code of this repository runs `authorize`. See [Publication](../experiments/legal-benchmark/README.md#classification-gates-and-the-report-projection).
+- **Publication.** Manual publication needs `publication-authorization.json`, which `python -m llm_eval.experiments.legal_benchmark.reporting authorize` writes only after the run id is typed back on an interactive terminal; a Python caller of `reporting.authorize` can instead pass a `confirm` hook, and the authorization is then written once the hook returns true. Eight bundles of the approved public-synthetic fixture suite have been published, four from the Windows host and four from WSL2, each after its own authorization given through that hook (see [Legal benchmark reports](RESULTS.md#legal-benchmark-reports)). No campaign or code of this repository runs `authorize`. See [Publication](../experiments/legal-benchmark/README.md#classification-gates-and-the-report-projection).
 
   > A report manifest's own labels authorize nothing.
 
@@ -282,7 +282,7 @@ python -m unittest discover -s tests -v
 
 `experiments list` shows the five legal modes; both plans print and create no file; the full suite ends with `OK`. The result of this sequence on the development host is recorded in [VALIDATION.md](VALIDATION.md#legal-benchmark-issue-45).
 
-Target-host sequence, per host cell, one campaign at a time on the Raider. **Not run in the effort that wrote this walkthrough (2026-11-13); the Windows cell has been run since, see [Legal benchmark reports](RESULTS.md#legal-benchmark-reports).** `setup` and `run` reserve the `raider` host lock.
+Target-host sequence, per host cell, one campaign at a time on the Raider. **Not run in the effort that wrote this walkthrough (2026-11-13); the Windows and WSL2 cells have been run since, see [Legal benchmark reports](RESULTS.md#legal-benchmark-reports).** `setup` and `run` reserve the `raider` host lock.
 
 ```bash
 bash scripts/readiness.sh --campaign configs/local/legal/raider-HOST/legal-evaluation-campaign.json --json-output OUTSIDE_DIR/readiness-legal.json
