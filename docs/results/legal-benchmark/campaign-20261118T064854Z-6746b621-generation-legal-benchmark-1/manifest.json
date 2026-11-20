@@ -1,0 +1,43 @@
+{
+  "campaign_id": "legal-evaluation-wsl",
+  "canonical_bytes": 1,
+  "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce",
+  "cohorts": 2,
+  "coverage": [
+    {
+      "attempts": 1,
+      "job_id": "generation-legal-benchmark-1-727308bd9fb4",
+      "reason": null,
+      "status": "succeeded"
+    }
+  ],
+  "created_utc": "2026-11-18T06:48:54.008458+00:00",
+  "data_class": "public-synthetic",
+  "execution_kinds": [
+    "model-run"
+  ],
+  "experiment_id": "legal-benchmark",
+  "experiment_run_id": "generation-legal-benchmark-1",
+  "files": {
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-generation-legal-benchmark-1/README.md": "e78ba0199df01ac36df61b84e29ca9fc0a3bcb7860909eaeedf7af413f97c9bc",
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-generation-legal-benchmark-1/legal-summary.json": "d4dac75b6e6efe6e1611e1b4d7e21f94b8789660742b0ec156822bad0ce8a362",
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-generation-legal-benchmark-1/raw/measurements.jsonl.gz": "feb7254f30c394197f0377640ef98edc8c387381fa48eea729a68683c3d09010",
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-generation-legal-benchmark-1/resolved-config.json": "730af6eaab39d8da95962756161cca719850a2be16edf1ad435465feb8f36e0d",
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-generation-legal-benchmark-1/summary.csv": "b8fffc7ee380ae430ccf382a8f256d28121bad7878534fd0e554c6fae6febabe",
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-generation-legal-benchmark-1/summary.json": "48e5f9f2c3176b2f80ea7bf35f0a6cd1e0f267d76b6efd1737ca7ab6320df2a8"
+  },
+  "projection": {
+    "id": "legal-projection",
+    "version": 1
+  },
+  "publication_id": "campaign-20261118T064854Z-6746b621-generation-legal-benchmark-1",
+  "raw_records": 1,
+  "removed_fields": [],
+  "report_fingerprint": "f979981c48f0237be32a0030a6d1ab8e414559e1b2428300b43f6f7149df4ea3",
+  "schema_version": 2,
+  "status": "complete",
+  "suite_lock_sha256": [
+    "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae"
+  ],
+  "synthetic": false
+}
