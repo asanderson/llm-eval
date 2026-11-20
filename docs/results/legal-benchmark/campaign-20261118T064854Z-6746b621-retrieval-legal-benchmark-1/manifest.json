@@ -1,0 +1,43 @@
+{
+  "campaign_id": "legal-evaluation-wsl",
+  "canonical_bytes": 1,
+  "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce",
+  "cohorts": 4,
+  "coverage": [
+    {
+      "attempts": 1,
+      "job_id": "retrieval-legal-benchmark-1-5aef2f285d5d",
+      "reason": null,
+      "status": "succeeded"
+    }
+  ],
+  "created_utc": "2026-11-18T06:48:54.008458+00:00",
+  "data_class": "public-synthetic",
+  "execution_kinds": [
+    "fixture"
+  ],
+  "experiment_id": "legal-benchmark",
+  "experiment_run_id": "retrieval-legal-benchmark-1",
+  "files": {
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-retrieval-legal-benchmark-1/README.md": "ac1cd17e8671648d727bfbd444ddf889d64cd46430a92d4958938115bde01e2e",
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-retrieval-legal-benchmark-1/legal-summary.json": "603339562f1dedd18f9207061ce5d769f80748ee410b9b8e1acdbe288e8c1b52",
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-retrieval-legal-benchmark-1/raw/measurements.jsonl.gz": "5f550f2027365c2d5c74346ad2242a20042f4636cdd63c31812eaedf5207aa82",
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-retrieval-legal-benchmark-1/resolved-config.json": "acd3115613f00cee2475072fb02ecf7e2cd30e140a125b15b946859251969176",
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-retrieval-legal-benchmark-1/summary.csv": "7c29ef86e07ea34741482367306f065410fdd2d112df0a64e6aed85e5ba11fa4",
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-retrieval-legal-benchmark-1/summary.json": "57dbb37d4f94130f7846033bc6010b9ca19e48d28bcd2e166a0d4c2db19f9ae2"
+  },
+  "projection": {
+    "id": "legal-projection",
+    "version": 1
+  },
+  "publication_id": "campaign-20261118T064854Z-6746b621-retrieval-legal-benchmark-1",
+  "raw_records": 1,
+  "removed_fields": [],
+  "report_fingerprint": "5abec3a8065734657627e0675d896d3eb6e2e0f8033bfcca134c2b076c89a8c9",
+  "schema_version": 2,
+  "status": "complete",
+  "suite_lock_sha256": [
+    "ad3c2e3a506a9730ff2ac55b82ac62fbb4d3e9ea37365e9aebea7a6222f6c6ae"
+  ],
+  "synthetic": true
+}
