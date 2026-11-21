@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_on": "2026-11-20",
+  "checked_on": "2026-11-21",
   "qualification": "Recipe pins, not verified laptop installations. Transitive Python dependencies are captured with pip freeze after installation; not a fully hashed dependency lock.",
   "harness_packages": [
     "psutil==7.2.2"
@@ -22,7 +22,7 @@
     "ik_llama.cpp": {
       "kind": "cmake",
       "repository": "https://github.com/ikawrakow/ik_llama.cpp.git",
-      "revision": "06a141f3bdb59a634ed2021760446522e2e8fe9d"
+      "revision": "7c00f8788e303bfba2886138e288effb0fd5fbbf"
     },
     "ktransformers": {
       "kind": "pip",
@@ -35,18 +35,18 @@
     },
     "ollama": {
       "kind": "archive",
-      "version": "0.40.16",
+      "version": "0.40.17",
       "assets": {
         "linux": {
-          "url": "https://github.com/ollama/ollama/releases/download/v0.40.16/ollama-linux-amd64.tar.zst",
-          "sha256": "87bfafb2acbc89b2e6a1be0a9043de6aa75fb450696f86bc426e65fc448f788d",
-          "bytes": 1545767640,
+          "url": "https://github.com/ollama/ollama/releases/download/v0.40.17/ollama-linux-amd64.tar.zst",
+          "sha256": "1df9d6228bac5a22e420b242708c0d10e5b886db97bab99d446a41760f4e79af",
+          "bytes": 1545470208,
           "filename": "ollama-linux-amd64.tar.zst"
         },
         "windows": {
-          "url": "https://github.com/ollama/ollama/releases/download/v0.40.16/ollama-windows-amd64.zip",
-          "sha256": "50fcf5ad54277f2fa5d173ebfc93bcb017adbc0c9ef2314daabc96ca9e6aa64e",
-          "bytes": 1618244995,
+          "url": "https://github.com/ollama/ollama/releases/download/v0.40.17/ollama-windows-amd64.zip",
+          "sha256": "3dd80f6e3a9699f2eadf4ac418f00529cee594df9557541806eda1f1f3f5588a",
+          "bytes": 1618522644,
           "filename": "ollama-windows-amd64.zip"
         }
       }
@@ -99,7 +99,7 @@
     "strata": {
       "kind": "strata",
       "repository": "https://github.com/Niko1221/Strata.git",
-      "revision": "64524fb9fc82222ddce554c0643b64f056ec8366"
+      "revision": "12d491da4a6904eb49aaa6f2f63ec4b1a17582e3"
     },
     "lmstudio": {
       "kind": "lmstudio",
