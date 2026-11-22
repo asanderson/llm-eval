@@ -116,9 +116,60 @@ The target precision is part of the recommendation. Q4 versions of many 27–35B
 | `qwen35-122b-moe` | Apache-2.0 | `dc4d348443bc740c68e2d77492492c11606384d5` |
 | `qwen38-flash-next-strata` | Apache-2.0 (verify quantization artifact terms) | `de4b8e4d43b917e7706784d8bb445c9af86a3540` |
 
-Repository IDs and metadata revisions were resolved through the official publishers' public Hugging Face API. They identify source-model snapshots, **not a chosen community GGUF**. Quantized artifact paths/revisions remain unfilled until an actual compatible artifact is selected; do not manufacture filenames or assume a precision exists on every backend.
+Repository IDs and metadata revisions were resolved through the official publishers' public Hugging Face API. They identify source-model snapshots, **not a chosen community GGUF**. Quantized artifact paths/revisions remain unfilled in `catalog/models.json`; the artifact selected for each measured model is pinned separately, in `catalog/model-artifacts.json` ([Artifact pins](#artifact-pins)). Do not manufacture filenames or assume a precision exists on every backend.
 
 Kimi-Dev's [LICENSE.md](https://huggingface.co/moonshotai/Kimi-Dev-72B/blob/main/LICENSE.md) retains the upstream Qwen license condition. [Poolside's official collection](https://huggingface.co/poolside/collections) distinguishes Apache-licensed XS.2 from OpenMDW-licensed 2.1 releases. [NVIDIA's 49B card](https://huggingface.co/nvidia/Llama-3_3-Nemotron-Super-49B-v1_5) also references Llama terms. Metadata labels alone are insufficient to replace review of actual model license files.
+
+## Artifact pins
+
+[catalog/model-artifacts.json](../catalog/model-artifacts.json) pins the quantized artifact that each measured catalog model loads in the next run. It is separate from the table above: those revisions stay snapshots of the publishers' repositories, and no run loads them.
+
+| Field | Meaning |
+|---|---|
+| `model_id` | Catalog ID. Entries follow the catalog order. |
+| `base_model` | The catalog `upstream_repo`. A run refuses an artifact lock whose base model is another repository. |
+| `source_repo`, `source_revision` | The artifact repository on Hugging Face and one full 40-character commit of it. |
+| `precision` | The selected quantization. |
+| `files` | The selected files, each with `path`, `bytes` and `sha256` as Hugging Face lists them at that commit. A split GGUF lists every part. |
+
+The 17 entries were seeded on 2026-11-22 from the published `model-offloading` results. Each seeded entry equals the artifact lock that those runs recorded: repository, revision, precision, file paths, sizes and SHA-256. The top-level `checked_on` is the date of the last check that moved a pin. `new_models_since` is the date from which new publisher repositories are reported.
+
+No run reads the pin file, and it starts no download. A run loads what the operator's artifact lock names, as before. The pins reach a run through a download manifest:
+
+```bash
+python scripts/model_pins.py --download-spec configs/local/download.json --models deepseek-r1-32b
+```
+
+The command makes no network request. It writes a manifest in the shape of [download.example.json](../configs/workflows/download.example.json): the pinned repository, revision and precision, the exact pinned file paths as `include`, `models/<model_id>` as the artifact directory and `artifacts/<model_id>.lock.json` as the lock. Without `--models` it lists every pinned model. An ID without a pin ends the command with exit code 2. `accept_license` is written as `false`, so setup refuses the manifest until the operator has reviewed the model and quantization licenses and set it to `true`. Setup also refuses a manifest that lists a model it was not asked to set up, so pass the same IDs to both commands. [WORKFLOWS.md](WORKFLOWS.md#models-conversion-and-run-configuration) describes the setup step. The lock that setup writes hashes the downloaded files itself. Nothing compares that lock with the pin automatically; both carry `bytes` and `sha256` per file for that comparison.
+
+### Nightly model pin check
+
+The model pin check (`.github/workflows/model-pins.yml`, 07:17 UTC) runs `scripts/model_pins.py --apply`. It asks the Hugging Face API for the head commit of every pinned artifact repository, for the file listing at that commit when it differs from the pin, for the head commit of every pinned model's publisher repository, and for the 50 newest repositories of each publisher org. It writes `catalog/model-artifacts.json` and no other file, and opens or refreshes one pull request from the branch `auto/model-pins`, titled "Bump pinned model artifact revisions". What needs a decision is also kept in the issue "Model versions needing a manual decision".
+
+| Finding | What the check does |
+|---|---|
+| The artifact repository has another head commit, and every pinned file is listed there with a Git LFS SHA-256 | Bump: `source_revision` moves to that commit and the listed sizes and hashes are recorded. The row says "repository moved; pinned files unchanged" when sizes and hashes are equal, and "weights changed" with the file names when they are not. |
+| A pinned file is not listed at that commit, or is listed without a Git LFS SHA-256 | Manual decision. The pin stays. |
+| Hugging Face answers 401, 403, 404 or 410 for an artifact or publisher repository | Manual decision. Nothing is changed. |
+| The published `model-offloading` results measured a model that has no pin | Manual decision. |
+| The publisher repository has a head commit other than the catalog `source_revision` | Manual decision. `catalog/models.json` is never rewritten: that revision is tied to `upstream_metadata`, to the table above and to the anchors of [model discovery](MODEL_DISCOVERY.md), and is reviewed by hand. |
+| `base_model` is not the catalog `upstream_repo`, or `model_id` is not a catalog ID | Manual decision. |
+| A publisher org of a pinned model created a repository on or after `new_models_since` that is not a catalog `upstream_repo` and that no `hf:` decision in `catalog/model-discovery.json` covers | Manual decision, one row per repository. |
+| A lookup fails: the network, another HTTP status, or an answer in an unexpected shape | The row is reported as failed and the other rows still resolve. A run with a failed lookup does not close the issue. |
+
+`checked_on` is stamped only when a pin moved, so a night without a bump leaves the file byte-identical. While a bump pull request stays open, each later night finds the same bump with a new date and pushes the branch again.
+
+An `hf:` key matches as [MODEL_DISCOVERY.md](MODEL_DISCOVERY.md#recording-a-decision) documents: the exact repository, or a name prefix within the same org. A deferral counts until its `until` date. The list of new repositories judges neither size nor license; the model discovery issue does that for the models LiveBench ranks. A repository leaves the list when it is added to the catalog, when a decision covers it, or when `new_models_since` is moved past its creation date. The check reads the 50 newest repositories of each org. When all 50 were created on or after `new_models_since`, it reports that older ones were not read.
+
+A moved artifact pin changes what the next run loads. A changed artifact revision is a new cohort, also when the pinned files are byte-identical: the artifact lock records the revision, and the digest of the lock is part of the cohort key. Results of the next run are therefore a different cohort from the results measured at the old revision. Published results keep the revision they recorded; the check never writes under `docs/results/`. For a model with published results, the artifact row names its newest published measurement by short revision and date and says whether that is the pinned revision. An artifact that is already downloaded and locked at the old revision still runs and stays the old cohort.
+
+The check does not cover:
+
+- The router models of the routing experiment. They are pulled from the Ollama registry and are identified by a digest that the operator records.
+- The legal serving profile. A legal role is bound to a locked serving profile, which records the digest of an artifact lock and its source revision. A moved pin does not change that profile; a role that should use the new revision needs re-qualification.
+- Catalog models without a pin. The check follows the artifact and the publisher repository of pinned models only.
+
+Run `python3 scripts/model_pins.py` locally for a report without writing anything. On 2026-11-22 one report run against the real Hugging Face API resolved every row without a failed lookup: sixteen pins were current, one artifact repository had moved with its pinned file unchanged, and two publisher repositories had moved. The `--apply` path and the workflow itself have run only against a scripted Hugging Face in `tests/test_model_pins.py`.
 
 ## Initial experiment order
 

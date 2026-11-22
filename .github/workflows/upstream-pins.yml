@@ -11,7 +11,8 @@ name: Upstream pin check
 # live in ecosystem manifests (pyproject.toml, the livebench Dockerfile base
 # image, GitHub Actions) are handled by Dependabot (.github/dependabot.yml)
 # on the same nightly cadence. Leaderboard discovery (new LiveBench releases
-# and models) lives in model-discovery.yml.
+# and models) lives in model-discovery.yml. The quantized model artifacts the
+# next runs load (catalog/model-artifacts.json) are followed by model-pins.yml.
 #
 # Token: the default GITHUB_TOKEN cannot open pull requests here and the
 # ones it could open would not trigger harness-tests. Add a fine-grained PAT
