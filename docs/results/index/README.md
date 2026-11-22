@@ -2,6 +2,8 @@
 
 Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
 
+Recommended setup, harness and model per hardware configuration and experiment: [recommended setups](recommended/README.md).
+
 ## Navigate
 
 ### Top 5 harness and model combinations per experiment and hardware configuration

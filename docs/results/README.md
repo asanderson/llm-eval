@@ -455,7 +455,7 @@ These results are not ranked with other experiments. Two runs are comparable onl
 | [legal-benchmark](index/experiment/legal-benchmark.md) | 1ebf89d17c04, 79bcd479444d | score | windows-11-wsl2-ubuntu-26.04 | [ollama](index/harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) | succeeded (score-only) | 0/32 | [2026-11-18](legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/README.md) |
 | [legal-benchmark](index/experiment/legal-benchmark.md) | 2a8c00595072, 91eb97d690a1 | score | windows-11-native | [ollama](index/harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) | succeeded (score-only) | 0/32 | [2026-11-15](legal-benchmark/campaign-20261115T140033Z-ed2177f1-score-legal-benchmark-1/README.md) |
 
-Full table and per-category pages: [results index](index/README.md).
+Full table and per-category pages: [results index](index/README.md). Recommended setup, harness and model per hardware configuration and experiment: [recommended setups](index/recommended/README.md).
 
 <!-- results-index:end -->
 

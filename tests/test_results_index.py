@@ -82,7 +82,8 @@ class ResultsIndexTests(unittest.TestCase):
         self.assertEqual(pages, ['README.md', 'date/2026-11-08.md', 'date/2026-11-09.md', 'experiment/llm-routing.md',
                                  'experiment/model-offloading.md', 'hardware/raider-ubuntu.md', 'hardware/raider-windows.md',
                                  'harness/koboldcpp.md', 'harness/ollama.md', 'model/deepseek-r1-32b.md',
-                                 'model/llm-eval-nimble-locked.md'])
+                                 'model/llm-eval-nimble-locked.md', 'recommended/README.md',
+                                 'recommended/raider-ubuntu/llm-routing.md', 'recommended/raider-windows/model-offloading.md'])
         for page in [*index.rglob('*.md'), self.summary]:
             for target in re.findall(r'\]\(([^)#]+)\)', page.read_text(encoding='utf-8')):
                 self.assertTrue((page.parent / target).resolve().is_file(), f'{page.name}: {target}')
@@ -413,7 +414,9 @@ class LegalIndexTests(unittest.TestCase):
                     self.assertEqual(without_legal(after[name].decode()), without_legal(data.decode()))
         self.assertEqual(sorted(set(after) - set(before)),
                          ['docs/results/index/date/2026-11-10.md', 'docs/results/index/experiment/legal-benchmark.md',
-                          'docs/results/index/hardware/legal-host.md', 'docs/results/index/harness/fixture.md', 'docs/results/index/model/fixture.md'])
+                          'docs/results/index/hardware/legal-host.md', 'docs/results/index/harness/fixture.md', 'docs/results/index/model/fixture.md',
+                          'docs/results/index/recommended/legal-host/legal-benchmark.md',
+                          'docs/results/index/recommended/raider-windows/legal-benchmark.md'])
 
     def test_hostile_values_of_a_projected_bundle_are_rendered_inert(self):
         hostile = legal_job('h1', 'model-run', 'h](javascript:alert(1))', 'm\n| x |', mode='generation\n## INJECTED\n<script>x</script>',
@@ -430,6 +433,123 @@ class LegalIndexTests(unittest.TestCase):
             text = page.read_text(encoding='utf-8')
             for raw in ('<script>', '<img', '<b>', '\n## INJECTED', 'm\n| x |'):
                 self.assertNotIn(raw, text, page.name)
+
+
+class RecommendationTests(unittest.TestCase):
+    """One generated page per hardware configuration and experiment: the best-ranked combination and its recorded setup."""
+    setUp = ResultsIndexTests.setUp
+
+    def page(self, hardware, experiment):
+        return (self.root / 'docs/results/index/recommended' / hardware / (experiment + '.md')).read_text(encoding='utf-8')
+
+    def add_ranked(self):
+        config = {'backend_version': '0.4.28+2', 'lane': 'offload', 'context_tokens': 4096, 'temperature': 0.0, 'seed': 7,
+                  'tokenizer_revision': 'owner/Repo-GGUF@' + 'a' * 40 + ' (tokenizer embedded in locked GGUF)',
+                  'launch': {'model_file': 'model-Q8_0.gguf', 'gpu_offload': '0.476', 'import_mode': 'hard-link'},
+                  'request_options': {}, 'hardware_attestation': {'nvidia_driver': '610.74', 'bios': 'not shown'}}
+        fast = offload_job('c2', 'lmstudio', 'qwen38-27b')
+        fast['parameters']['config'].update(config)
+        bundle(self.root, 'model-offloading', 'campaign-c-offload', '2026-11-09T14:52:55+00:00',
+               [offload_job('c1', 'ollama', 'qwen38-27b'), fast, offload_job('c3', 'koboldcpp', 'gemma4-31b')],
+               [row('c1', 'coding', 18.7, 3.58, quality=1.0), row('c2', 'coding', 7.7, 5.93, quality=1.0), row('c3', 'coding', 1.1, 2.68, quality=8 / 9)])
+
+    def test_a_ranked_pair_recommends_its_best_combination_with_the_recorded_setup(self):
+        self.add_ranked()
+        write_results_index(self.root)
+        text = self.page('raider-windows', 'model-offloading')
+        self.assertTrue(text.startswith('# Recommended setup, harness and model: model-offloading on raider-windows\n'))
+        recommendation = text.split('## Recommendation')[1].split('## Setup of the recommended run')[0]
+        # both qwen38-27b runs pass every check; the faster one, on lmstudio, is recommended
+        self.assertIn('| Harness | [lmstudio](../../harness/lmstudio.md) |', recommendation)
+        self.assertIn('| Model | [qwen38-27b](../../model/qwen38-27b.md) |', recommendation)
+        self.assertIn('| Operating system | windows-11-native |', recommendation)
+        self.assertIn('| Checks passed | 9/9 |', recommendation)
+        self.assertIn('| Measured | [2026-11-09](../../../model-offloading/campaign-c-offload/README.md) |', recommendation)
+        self.assertIn('2 combinations pass the same share of checks as the recommended one', recommendation)
+        setup = text.split('## Setup of the recommended run')[1].split('## Best combination on each harness')[0]
+        for line in ('| Harness version | 0.4.28+2 |', '| Model file | model-Q8_0.gguf |', '| GPU share requested (ratio) | 0.476 |',
+                     '| Import mode | hard-link |', '| Lane | offload |', '| Context tokens | 4096 |', '| Output cap (tokens) | 2048 |',
+                     '| Temperature | 0.0 |', '| Seed | 7 |', '| NVIDIA driver | 610.74 |',
+                     '| Model artifact and tokenizer revision | owner/Repo-GGUF@' + 'a' * 40 + ' (tokenizer embedded in locked GGUF) |'):
+            self.assertIn(line, setup)
+        for absent in ('GPU layers requested', 'CPU threads', 'Request options', 'not shown'):      # not recorded, empty, or not a listed setting
+            self.assertNotIn(absent, setup)
+        per_harness = text.split('## Best combination on each harness')[1].split('## Best ')[0]
+        ranks = [line.split(' | ')[0:2] for line in per_harness.splitlines() if line.startswith('| ') and line[2].isdigit()]
+        self.assertEqual(ranks, [['| 1', '[lmstudio](../../harness/lmstudio.md)'], ['| 2', '[ollama](../../harness/ollama.md)'],
+                                 ['| 3', '[koboldcpp](../../harness/koboldcpp.md)']])
+        self.assertIn('## Best 4 combinations', text)      # deepseek-r1-32b's newest ollama run passes no check and ranks fourth
+        overview = (self.root / 'docs/results/index/recommended/README.md').read_text(encoding='utf-8')
+        self.assertIn('| [raider-windows](../hardware/raider-windows.md) | [lmstudio](../harness/lmstudio.md) | [qwen38-27b](../model/qwen38-27b.md) | '
+                      '9/9 | 7.7 | 5.93 | [recommended setup](raider-windows/model-offloading.md) |', overview)
+        self.assertLess(overview.index('## model-offloading'), overview.index('## llm-routing'))      # newest result first
+
+    def test_pairs_without_a_ranked_run_say_why_and_list_their_results(self):
+        legal_bundle(self.root, 'campaign-l-legal', '2026-11-10T09:00:00+00:00', [legal_job('l1', 'model-run', 'ollama', 'deepseek-r1-32b')],
+                     [row('l1', 'lexical-eligible', 5.0, 30.0, quality=1.0)])
+        bundle(self.root, 'model-offloading', 'campaign-u-offload', '2026-11-10T10:00:00+00:00',
+               [{**offload_job('u1', 'ollama', 'gemma4-31b'), 'hardware_config_id': 'other-host'}], [row('u1', 'coding', 2.0, 9.0)])
+        write_results_index(self.root)
+        for hardware, experiment, reason in (
+                ('raider-ubuntu', 'llm-routing', 'Every published run of this pair is a synthetic fixture, which measures no model.'),
+                ('legal-host', 'legal-benchmark', 'The results of this experiment are published by class and cohort and are not ranked.'),
+                ('other-host', 'model-offloading', 'No run of this pair has succeeded with scored checks.')):
+            text = self.page(hardware, experiment)
+            self.assertIn('## No recommendation\n\n' + reason, text)
+            self.assertNotIn('## Recommendation', text)
+            self.assertNotIn('## Setup of the recommended run', text)
+            self.assertIn('## Published results of this pair\n\n| Date | Experiment |', text)
+        overview = (self.root / 'docs/results/index/recommended/README.md').read_text(encoding='utf-8')
+        self.assertIn('| [legal-host](../hardware/legal-host.md) | – | – | – | – | – | [recommended setup](legal-host/legal-benchmark.md) (no recommendation) |', overview)
+
+    def test_a_routing_pair_shows_the_router_settings(self):
+        bundle(self.root, 'llm-routing', 'campaign-m-routing', '2026-11-10T03:00:00+00:00',
+               [{'job_id': 'm1', 'mode': 'decision', 'case_id': 'ollama-tev1', 'hardware_config_id': 'raider-windows',
+                 'hardware': {'os_id': 'windows-11-native'},
+                 'parameters': {'router': {'kind': 'systemone', 'platform': 'ollama', 'model': 'llm-eval-tev1:locked',
+                                           'model_revision': 'f' * 64, 'labels': ['coding', 'math']}}}],
+               [row('m1', 'coding', 0.03, None, decisions=1.0)])
+        write_results_index(self.root)
+        text = self.page('raider-windows', 'llm-routing')
+        self.assertIn('| Model | [llm-eval-tev1:locked](../../model/llm-eval-tev1-locked.md) |', text)
+        self.assertIn('| Router model_revision | ' + 'f' * 64 + ' |', text)
+        self.assertIn('| Router platform | ollama |', text)
+        self.assertNotIn('Router labels', text)      # only scalar router settings are listed
+        self.assertNotIn('## Best combination on each harness', text)      # one combination: nothing to compare
+
+    def test_the_pages_are_regenerated_with_the_index_and_linked_from_it(self):
+        self.add_ranked()
+        stale = self.root / 'docs/results/index/recommended/removed-host/model-offloading.md'
+        stale.parent.mkdir(parents=True)
+        stale.write_text('stale', encoding='utf-8')
+        write_results_index(self.root)
+        self.assertFalse(stale.exists())
+        directory = self.root / 'docs/results/index/recommended'
+        before = {p.relative_to(directory).as_posix(): p.read_bytes() for p in sorted(directory.rglob('*.md'))}
+        self.assertEqual(sorted(before), ['README.md', 'raider-ubuntu/llm-routing.md', 'raider-windows/model-offloading.md'])
+        self.assertTrue(all(b'\r' not in data for data in before.values()))
+        write_results_index(self.root)
+        self.assertEqual({p.relative_to(directory).as_posix(): p.read_bytes() for p in sorted(directory.rglob('*.md'))}, before)
+        self.assertIn('[recommended setups](index/recommended/README.md)', self.summary.read_text(encoding='utf-8').split(START)[1].split(END)[0])
+        self.assertIn('[recommended setups](recommended/README.md)', (self.root / 'docs/results/index/README.md').read_text(encoding='utf-8'))
+        for page in directory.rglob('*.md'):
+            for target in re.findall(r'\]\(([^)#]+)\)', page.read_text(encoding='utf-8')):
+                self.assertTrue((page.parent / target).resolve().is_file(), f'{page.name}: {target}')
+
+    def test_hostile_values_of_the_recommended_run_are_rendered_inert(self):
+        hostile = offload_job('h1', 'ollama', 'm](javascript:alert(1))')
+        hostile['hardware_config_id'] = 'raider-windows'
+        hostile['hardware'] = {'os_id': '<img src=x onerror=alert(1)>'}
+        hostile['parameters']['config'].update({'backend_version': '1 |\n| injected | row', 'placement_notes': 'notes\n## INJECTED\n<script>x</script>',
+                                                'launch': {'model_file': '[click](javascript:alert(2))'}, 'request_options': {'x': '<b>bold</b>'}})
+        bundle(self.root, 'model-offloading', 'campaign-h-offload', '2026-11-10T11:00:00+00:00', [hostile], [row('h1', 'coding', 0.5, 50.0, quality=1.0)])
+        write_results_index(self.root)
+        text = self.page('raider-windows', 'model-offloading')
+        self.assertIn('| Model | [m\\](javascript:alert(1))](../../model/m-javascript-alert-1.md) |', text)      # recommended: the only full score
+        for raw in ('<script>', '<img', '<b>', '\n## INJECTED', '\n| injected | row', '[click](javascript'):
+            self.assertNotIn(raw, text)
+        self.assertEqual([line for line in text.splitlines() if line.startswith('#')][:3],
+                         ['# Recommended setup, harness and model: model-offloading on raider-windows', '## Recommendation', '## Setup of the recommended run'])
 
 
 if __name__ == '__main__':
