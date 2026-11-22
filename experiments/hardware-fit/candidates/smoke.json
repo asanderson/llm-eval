@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "id": "smoke",
+  "synthetic": true,
+  "retrieved_on": "2026-11-22",
+  "description": "Fictional fixture for the software smoke: two invented models and five invented artifacts. No repository, revision, size or hash in this file is real.",
+  "size_basis": "Invented byte sizes, chosen as round GiB values so the projection can be checked by hand.",
+  "architecture_basis": "Invented architecture values, chosen so the key and value cache at 8192 tokens is exactly 1 GiB and 3 GiB.",
+  "models": [
+    {
+      "model_id": "fixture-small-7b",
+      "base_model": "fictional-lab/fixture-small-7b",
+      "architecture": "fixture",
+      "parameters": 7000000000,
+      "layers": 32,
+      "kv_elements_per_token": 65536,
+      "trained_context_tokens": 32768,
+      "sliding_window_tokens": 0,
+      "source_repo": "fictional-lab/fixture-small-7b-GGUF",
+      "source_revision": "1111111111111111111111111111111111111111"
+    },
+    {
+      "model_id": "fixture-large-30b",
+      "base_model": "fictional-lab/fixture-large-30b",
+      "architecture": "fixture",
+      "parameters": 30000000000,
+      "layers": 48,
+      "kv_elements_per_token": 196608,
+      "trained_context_tokens": 131072,
+      "sliding_window_tokens": 0,
+      "source_repo": "fictional-lab/fixture-large-30b-GGUF",
+      "source_revision": "2222222222222222222222222222222222222222"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "fixture-small-7b-q4_k_m",
+      "model_id": "fixture-small-7b",
+      "quantization": "Q4_K_M",
+      "weight_bytes": 4563402752,
+      "files": [
+        {
+          "path": "fixture-small-7b-Q4_K_M.gguf",
+          "bytes": 4563402752,
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      ]
+    },
+    {
+      "id": "fixture-small-7b-q8_0",
+      "model_id": "fixture-small-7b",
+      "quantization": "Q8_0",
+      "weight_bytes": 8053063680,
+      "files": [
+        {
+          "path": "fixture-small-7b-Q8_0.gguf",
+          "bytes": 8053063680,
+          "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      ]
+    },
+    {
+      "id": "fixture-large-30b-q3_k_s",
+      "model_id": "fixture-large-30b",
+      "quantization": "Q3_K_S",
+      "weight_bytes": 13421772800,
+      "files": [
+        {
+          "path": "fixture-large-30b-Q3_K_S.gguf",
+          "bytes": 13421772800,
+          "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        }
+      ]
+    },
+    {
+      "id": "fixture-large-30b-q4_k_m",
+      "model_id": "fixture-large-30b",
+      "quantization": "Q4_K_M",
+      "weight_bytes": 18253611008,
+      "files": [
+        {
+          "path": "fixture-large-30b-Q4_K_M.gguf",
+          "bytes": 18253611008,
+          "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        }
+      ]
+    },
+    {
+      "id": "fixture-large-30b-q8_0",
+      "model_id": "fixture-large-30b",
+      "quantization": "Q8_0",
+      "weight_bytes": 32212254720,
+      "files": [
+        {
+          "path": "split/fixture-large-30b-Q8_0-00001-of-00002.gguf",
+          "bytes": 16106127360,
+          "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        },
+        {
+          "path": "split/fixture-large-30b-Q8_0-00002-of-00002.gguf",
+          "bytes": 16106127360,
+          "sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        }
+      ]
+    }
+  ]
+}

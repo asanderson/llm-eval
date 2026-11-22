@@ -1,0 +1,20 @@
+{
+  "id": "measured-ollama",
+  "parameters": {
+    "identity": {
+      "harness": "ollama",
+      "model": "qwen38-27b-q4_k_m"
+    },
+    "config": "../runs/ollama.example.json",
+    "server_mode": "managed",
+    "categories": [
+      "reasoning",
+      "coding",
+      "math"
+    ],
+    "fit": {
+      "min_gpu_weight_fraction": 0.8,
+      "require_layer_evidence": false
+    }
+  }
+}

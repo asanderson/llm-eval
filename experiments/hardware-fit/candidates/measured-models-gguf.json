@@ -1,0 +1,5967 @@
+{
+ "schema_version": 1,
+ "id": "measured-models-gguf",
+ "retrieved_on": "2026-11-22",
+ "description": "Every GGUF quantization published in the artifact repository of each of the 17 catalog models that have published model-offloading results, at the revision those runs measured.",
+ "size_basis": "Hugging Face tree listing of each repository at the pinned revision: byte size and LFS SHA-256 of every file.",
+ "architecture_basis": "Values llama.cpp printed when it loaded the measured artifact of the model in the published model-offloading runs: layers (n_layer), trained context (n_ctx_train), sliding window (n_swa) and parameter count (model params). The key and value elements per token are the bytes of key and value cache the engine allocated per context cell, summed over its caches and divided by two (f16 elements), so layers that keep no cache are not counted. They do not depend on the quantization.",
+ "excluded": "Projector (mmproj), importance-matrix (imatrix) and mtp files, and split sets whose parts are ambiguous in the listing.",
+ "models": [
+  {
+   "model_id": "nemotron-nano-30b",
+   "base_model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+   "architecture": "nemotron_h_moe",
+   "parameters": 31580000000,
+   "layers": 52,
+   "kv_elements_per_token": 3072,
+   "trained_context_tokens": 1048576,
+   "sliding_window_tokens": 0,
+   "source_repo": "bartowski/nvidia_Nemotron-3-Nano-30B-A3B-GGUF",
+   "source_revision": "1fc64d5b160654ec892df2708aa893b0e96e6491"
+  },
+  {
+   "model_id": "nemotron-super-49b",
+   "base_model": "nvidia/Llama-3_3-Nemotron-Super-49B-v1_5",
+   "architecture": "deci",
+   "parameters": 49870000000,
+   "layers": 80,
+   "kv_elements_per_token": 100352,
+   "trained_context_tokens": 131072,
+   "sliding_window_tokens": 0,
+   "source_repo": "bartowski/nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-GGUF",
+   "source_revision": "98fc9722ebffe74e41685c477cf2982012d3f0ad"
+  },
+  {
+   "model_id": "gemma4-31b",
+   "base_model": "google/gemma-4-31B-it",
+   "architecture": "gemma4",
+   "parameters": 30700000000,
+   "layers": 60,
+   "kv_elements_per_token": 450560,
+   "trained_context_tokens": 262144,
+   "sliding_window_tokens": 1024,
+   "source_repo": "bartowski/google_gemma-4-31B-it-GGUF",
+   "source_revision": "619aca7589c72be65dd968de8602ad23d68b5c14"
+  },
+  {
+   "model_id": "gemma4-26b-moe",
+   "base_model": "google/gemma-4-26B-A4B-it",
+   "architecture": "gemma4",
+   "parameters": 25230000000,
+   "layers": 30,
+   "kv_elements_per_token": 112640,
+   "trained_context_tokens": 262144,
+   "sliding_window_tokens": 1024,
+   "source_repo": "bartowski/google_gemma-4-26B-A4B-it-GGUF",
+   "source_revision": "10f3b41bcf8d3047f4e136e7197ffc2dd1654c9d"
+  },
+  {
+   "model_id": "gemma3-27b",
+   "base_model": "google/gemma-3-27b-it",
+   "architecture": "gemma3",
+   "parameters": 27010000000,
+   "layers": 62,
+   "kv_elements_per_token": 253952,
+   "trained_context_tokens": 131072,
+   "sliding_window_tokens": 1024,
+   "source_repo": "bartowski/google_gemma-3-27b-it-GGUF",
+   "source_revision": "4a05c54413bd0d87d77a97af403266f69cec0ee6"
+  },
+  {
+   "model_id": "llama33-70b",
+   "base_model": "meta-llama/Llama-3.3-70B-Instruct",
+   "architecture": "llama",
+   "parameters": 70550000000,
+   "layers": 80,
+   "kv_elements_per_token": 163840,
+   "trained_context_tokens": 131072,
+   "sliding_window_tokens": 0,
+   "source_repo": "bartowski/Llama-3.3-70B-Instruct-GGUF",
+   "source_revision": "b6c5c9f176f3279204034e1d16d393105e95cb88"
+  },
+  {
+   "model_id": "llama31-70b",
+   "base_model": "meta-llama/Llama-3.1-70B-Instruct",
+   "architecture": "llama",
+   "parameters": 70550000000,
+   "layers": 80,
+   "kv_elements_per_token": 163840,
+   "trained_context_tokens": 131072,
+   "sliding_window_tokens": 0,
+   "source_repo": "bartowski/Meta-Llama-3.1-70B-Instruct-GGUF",
+   "source_revision": "83fb6e83d0a8aada42d499259bc929d922e9a558"
+  },
+  {
+   "model_id": "llama3-70b",
+   "base_model": "meta-llama/Meta-Llama-3-70B-Instruct",
+   "architecture": "llama",
+   "parameters": 70550000000,
+   "layers": 80,
+   "kv_elements_per_token": 163840,
+   "trained_context_tokens": 8192,
+   "sliding_window_tokens": 0,
+   "source_repo": "bartowski/Meta-Llama-3-70B-Instruct-GGUF",
+   "source_revision": "60662f1eb60bb4843d98e2bac32f9d5b407084db"
+  },
+  {
+   "model_id": "laguna-xs21",
+   "base_model": "poolside/Laguna-XS-2.1",
+   "architecture": "laguna",
+   "parameters": 33440000000,
+   "layers": 40,
+   "kv_elements_per_token": 81920,
+   "trained_context_tokens": 262144,
+   "sliding_window_tokens": 512,
+   "source_repo": "bartowski/Laguna-XS-2.1-GGUF",
+   "source_revision": "8f7579d6ab7d3122716100116cf1a62f490ab6f3"
+  },
+  {
+   "model_id": "kimi-linear-48b",
+   "base_model": "moonshotai/Kimi-Linear-48B-A3B-Instruct",
+   "architecture": "kimi-linear",
+   "parameters": 49120000000,
+   "layers": 27,
+   "kv_elements_per_token": 4032,
+   "trained_context_tokens": 1048576,
+   "sliding_window_tokens": 0,
+   "source_repo": "bartowski/moonshotai_Kimi-Linear-48B-A3B-Instruct-GGUF",
+   "source_revision": "228dbe476e5a02091624a19068f4c962caa8a1c5"
+  },
+  {
+   "model_id": "kimi-dev-72b",
+   "base_model": "moonshotai/Kimi-Dev-72B",
+   "architecture": "qwen2",
+   "parameters": 72710000000,
+   "layers": 80,
+   "kv_elements_per_token": 163840,
+   "trained_context_tokens": 131072,
+   "sliding_window_tokens": 0,
+   "source_repo": "mradermacher/Kimi-Dev-72B-GGUF",
+   "source_revision": "a1c3c37eb57c84de93e381860272ab0c63391d8f"
+  },
+  {
+   "model_id": "qwen38-27b",
+   "base_model": "Qwen/Qwen3.8-27B",
+   "architecture": "qwen35",
+   "parameters": 27320000000,
+   "layers": 64,
+   "kv_elements_per_token": 32768,
+   "trained_context_tokens": 262144,
+   "sliding_window_tokens": 0,
+   "source_repo": "unsloth/Qwen3.8-27B-GGUF",
+   "source_revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502"
+  },
+  {
+   "model_id": "qwen35-35b-moe",
+   "base_model": "Qwen/Qwen3.5-35B-A3B",
+   "architecture": "qwen35moe",
+   "parameters": 35510000000,
+   "layers": 40,
+   "kv_elements_per_token": 10240,
+   "trained_context_tokens": 262144,
+   "sliding_window_tokens": 0,
+   "source_repo": "bartowski/Qwen_Qwen3.5-35B-A3B-GGUF",
+   "source_revision": "3d2a22d4eb631b9c8fd2be94599dc2fd84b4a595"
+  },
+  {
+   "model_id": "deepseek-r1-32b",
+   "base_model": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+   "architecture": "qwen2",
+   "parameters": 32760000000,
+   "layers": 64,
+   "kv_elements_per_token": 131072,
+   "trained_context_tokens": 131072,
+   "sliding_window_tokens": 0,
+   "source_repo": "bartowski/DeepSeek-R1-Distill-Qwen-32B-GGUF",
+   "source_revision": "1dc8cf9ffa5dd333057ea1b09ccf4772d8726dec"
+  },
+  {
+   "model_id": "deepseek-r1-70b",
+   "base_model": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+   "architecture": "llama",
+   "parameters": 70550000000,
+   "layers": 80,
+   "kv_elements_per_token": 163840,
+   "trained_context_tokens": 131072,
+   "sliding_window_tokens": 0,
+   "source_repo": "bartowski/DeepSeek-R1-Distill-Llama-70B-GGUF",
+   "source_revision": "1842c5f7280f933ead58adf8afd078672c9f6cd0"
+  },
+  {
+   "model_id": "mistral-small31",
+   "base_model": "mistralai/Mistral-Small-3.1-24B-Instruct-2503",
+   "architecture": "llama",
+   "parameters": 23570000000,
+   "layers": 40,
+   "kv_elements_per_token": 81920,
+   "trained_context_tokens": 131072,
+   "sliding_window_tokens": 0,
+   "source_repo": "bartowski/mistralai_Mistral-Small-3.1-24B-Instruct-2503-GGUF",
+   "source_revision": "f73dfd9e812922fb503a993e3fa5671424f486d3"
+  },
+  {
+   "model_id": "phi4-reasoning-plus",
+   "base_model": "microsoft/Phi-4-reasoning-plus",
+   "architecture": "phi3",
+   "parameters": 14660000000,
+   "layers": 40,
+   "kv_elements_per_token": 102400,
+   "trained_context_tokens": 32768,
+   "sliding_window_tokens": 0,
+   "source_repo": "bartowski/microsoft_Phi-4-reasoning-plus-GGUF",
+   "source_revision": "96b602db19694b8323c8638ad771289fb5be0863"
+  }
+ ],
+ "candidates": [
+  {
+   "id": "nemotron-nano-30b-iq2_m",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "IQ2_M",
+   "weight_bytes": 18034839776,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-IQ2_M.gguf",
+     "bytes": 18034839776,
+     "sha256": "35437b000134a5efccd7c641db698ed5c15ba819d6a5a48129677fc31327215a"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-iq2_s",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "IQ2_S",
+   "weight_bytes": 18026926304,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-IQ2_S.gguf",
+     "bytes": 18026926304,
+     "sha256": "8f55e1149d3fcb4dda88cb1b5221a538c097ad9bffe622631162debf1b21dfd4"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-iq2_xs",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "IQ2_XS",
+   "weight_bytes": 18018668768,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-IQ2_XS.gguf",
+     "bytes": 18018668768,
+     "sha256": "9aaad08dd5bcb513e0f5d2f342d1d2676da44c28a39d97d23e989ebe9bc3935e"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-iq2_xxs",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "IQ2_XXS",
+   "weight_bytes": 18010755296,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-IQ2_XXS.gguf",
+     "bytes": 18010755296,
+     "sha256": "f3da710c046ce7cc6ff28a9b5f1a9153ac72e3f60603e51c7bb679d80716b58a"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-iq3_m",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "IQ3_M",
+   "weight_bytes": 18987036896,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-IQ3_M.gguf",
+     "bytes": 18987036896,
+     "sha256": "a4ef9d64c030d6ebf80d518a3c6aa6ecf2ea452750b46ea3e6eeea8aa8a273b3"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-iq3_xs",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "IQ3_XS",
+   "weight_bytes": 18108469472,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-IQ3_XS.gguf",
+     "bytes": 18108469472,
+     "sha256": "b2fce39c97d7994b56a5298a3db15a5ebdff3ccc0cf69676539bec01ea8ec483"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-iq3_xxs",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "IQ3_XXS",
+   "weight_bytes": 18096599264,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-IQ3_XXS.gguf",
+     "bytes": 18096599264,
+     "sha256": "8b8160810bc7a50539e54b8bc6b88e39594cef0333d0e5ec0610f3d92eeea0bb"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-iq4_nl",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "IQ4_NL",
+   "weight_bytes": 18142101728,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-IQ4_NL.gguf",
+     "bytes": 18142101728,
+     "sha256": "cc4ccbb8fa18ab4a4936e764a4bca92ee42c6558d35a83d3e5edde68cbbb620b"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-iq4_xs",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 18134188256,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-IQ4_XS.gguf",
+     "bytes": 18134188256,
+     "sha256": "d9d2831dd72e9ee1f2b960ed7b00a266aee4dcce665c584f8689f962cce5b3f3"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q2_k",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q2_K",
+   "weight_bytes": 18082750688,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q2_K.gguf",
+     "bytes": 18082750688,
+     "sha256": "97ffff4bd61d249e85986f95f42c650f4c113af1f71e8a2d96f8b9ff3e2edb6b"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q2_k_l",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q2_K_L",
+   "weight_bytes": 18258911456,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q2_K_L.gguf",
+     "bytes": 18258911456,
+     "sha256": "d82ba96343657b026c292f3faa3eea26da51be3ebe4c3570f71b49590dd5fbf4"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q3_k_l",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 19409289440,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q3_K_L.gguf",
+     "bytes": 19409289440,
+     "sha256": "c6020ae33a2ba4b5b3a44623f453a69c2b2885b862d6af3a14ae6d6d06fbfdcc"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q3_k_m",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 18987122912,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q3_K_M.gguf",
+     "bytes": 18987122912,
+     "sha256": "1b282e9ddf8622bf318dd9fadcc76cea1bac8815fbbef5bd76581336ba3f27b0"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q3_k_s",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 18108469472,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q3_K_S.gguf",
+     "bytes": 18108469472,
+     "sha256": "1639a94132818a6a2bdc76d5acfab7a197b3dd4d3560aa8d8ecc60181a360efe"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q3_k_xl",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q3_K_XL",
+   "weight_bytes": 19585450208,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q3_K_XL.gguf",
+     "bytes": 19585450208,
+     "sha256": "4b949352759b8cd389a3f88d2bed5d179ea9016596632c1469f4698be6b3a109"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q4_0",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q4_0",
+   "weight_bytes": 18572869856,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q4_0.gguf",
+     "bytes": 18572869856,
+     "sha256": "bdc13d6da211d7a9dfd8691b613ad5968dcb62c5427164737911c7b2809e9140"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q4_1",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q4_1",
+   "weight_bytes": 20055946976,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q4_1.gguf",
+     "bytes": 20055946976,
+     "sha256": "2443171aa03f49358952ca9f60dc289f0fa475508bc4cdd76c1f953f1e2019e2"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q4_k_l",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q4_K_L",
+   "weight_bytes": 24788020448,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q4_K_L.gguf",
+     "bytes": 24788020448,
+     "sha256": "60c15d73961b7076c7c0d3d89578ad1e25c526f8fdae79d309a2573b86a9ad26"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q4_k_m",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 24655899872,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q4_K_M.gguf",
+     "bytes": 24655899872,
+     "sha256": "378a2765fb2567f3cee90b2ced046eb01c4219d72d94d49f72e22ed5b1c124d2"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q4_k_s",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 22385593568,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q4_K_S.gguf",
+     "bytes": 22385593568,
+     "sha256": "bfd41eff6d0ba0595df3f270fb5c37f6afd1016646103d2e32c07a6aae2270bb"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q5_k_l",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q5_K_L",
+   "weight_bytes": 26260689632,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q5_K_L.gguf",
+     "bytes": 26260689632,
+     "sha256": "37e7a0bf6ca3dcf7570d5640708aa06bb77c3db2709b5e0eb5bd199759372171"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q5_k_m",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q5_K_M",
+   "weight_bytes": 26150589152,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q5_K_M.gguf",
+     "bytes": 26150589152,
+     "sha256": "b6b52b1bfd9cc3509a0337eb1a4be3b405190ec49863b352ebf33e448c1149af"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q5_k_s",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q5_K_S",
+   "weight_bytes": 23955030752,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q5_K_S.gguf",
+     "bytes": 23955030752,
+     "sha256": "a2f49f1711143665eb9af3107c7b45b2dcf93316397a202b1af4357281d9cdde"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q6_k",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q6_K",
+   "weight_bytes": 33433338080,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q6_K.gguf",
+     "bytes": 33433338080,
+     "sha256": "332a8b2d8bdc3358bb928b9c806c352d673053ded93561c455f712914e5bc4bf"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q6_k_l",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q6_K_L",
+   "weight_bytes": 33433338080,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q6_K_L.gguf",
+     "bytes": 33433338080,
+     "sha256": "332a8b2d8bdc3358bb928b9c806c352d673053ded93561c455f712914e5bc4bf"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-q8_0",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "Q8_0",
+   "weight_bytes": 33585500096,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q8_0.gguf",
+     "bytes": 33585500096,
+     "sha256": "b74f731e2832bc271420def4033edeefe3bb9664ad1d344a04b090e64aae026b"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-nano-30b-bf16",
+   "model_id": "nemotron-nano-30b",
+   "quantization": "BF16",
+   "weight_bytes": 63181509280,
+   "files": [
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-bf16/nvidia_Nemotron-3-Nano-30B-A3B-bf16-00001-of-00002.gguf",
+     "bytes": 39858639840,
+     "sha256": "b1dfb00f312ac333ea985aa7033f272d78ee30e582014431863596f03560af21"
+    },
+    {
+     "path": "nvidia_Nemotron-3-Nano-30B-A3B-bf16/nvidia_Nemotron-3-Nano-30B-A3B-bf16-00002-of-00002.gguf",
+     "bytes": 23322869440,
+     "sha256": "2fa593bf77e480bd20850581d4448b3ed8cbfd29f0ce1c78b021695f333b2899"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-iq2_m",
+   "model_id": "nemotron-super-49b",
+   "quantization": "IQ2_M",
+   "weight_bytes": 17163134464,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-IQ2_M.gguf",
+     "bytes": 17163134464,
+     "sha256": "d1f9bac3d5a07f15eb02c2abd750dea7852668dc25825d3bb56922290b174bf4"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-iq2_s",
+   "model_id": "nemotron-super-49b",
+   "quantization": "IQ2_S",
+   "weight_bytes": 15848482304,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-IQ2_S.gguf",
+     "bytes": 15848482304,
+     "sha256": "8979464fa4192ef10900eac313c682ceba03c13235f85a2b0af6f3d08263f8d7"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-iq2_xs",
+   "model_id": "nemotron-super-49b",
+   "quantization": "IQ2_XS",
+   "weight_bytes": 15076582912,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-IQ2_XS.gguf",
+     "bytes": 15076582912,
+     "sha256": "7a0678d1647008d66f5a3eda3c80099cddf518e0c41976db67accf2d8bdcd336"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-iq2_xxs",
+   "model_id": "nemotron-super-49b",
+   "quantization": "IQ2_XXS",
+   "weight_bytes": 13659170304,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-IQ2_XXS.gguf",
+     "bytes": 13659170304,
+     "sha256": "a4f8438e649c1f7215632731fcc59dbdab2530dfe1b38b7102cac9089d6474a3"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-iq3_m",
+   "model_id": "nemotron-super-49b",
+   "quantization": "IQ3_M",
+   "weight_bytes": 22657230336,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-IQ3_M.gguf",
+     "bytes": 22657230336,
+     "sha256": "ee481bdb2ef0de39ade62fca3615d74c67a958516c57088b3e4127945f457875"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-iq3_xs",
+   "model_id": "nemotron-super-49b",
+   "quantization": "IQ3_XS",
+   "weight_bytes": 20908008960,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-IQ3_XS.gguf",
+     "bytes": 20908008960,
+     "sha256": "ef0bb77010d2c2763bdf668ff7b135d803a608db42d60411d017b4c647b38749"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-iq3_xxs",
+   "model_id": "nemotron-super-49b",
+   "quantization": "IQ3_XXS",
+   "weight_bytes": 19519022592,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-IQ3_XXS.gguf",
+     "bytes": 19519022592,
+     "sha256": "d414bc968051b5dfb807fb6042371fff2cf8da31109c4e2cf7664f55eb241c35"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-iq4_nl",
+   "model_id": "nemotron-super-49b",
+   "quantization": "IQ4_NL",
+   "weight_bytes": 28384044544,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-IQ4_NL.gguf",
+     "bytes": 28384044544,
+     "sha256": "f6e1d1da7126945a791f8f35ba63fc12d8b42173c44bd99d93ce0cb8a7718050"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-iq4_xs",
+   "model_id": "nemotron-super-49b",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 26871408128,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-IQ4_XS.gguf",
+     "bytes": 26871408128,
+     "sha256": "ef50f0cbecda2188c481cd17b035c6dd3ec05898a0ac736e9536ffc850264e5b"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q2_k",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q2_K",
+   "weight_bytes": 18739799552,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q2_K.gguf",
+     "bytes": 18739799552,
+     "sha256": "e43a0eaac4d0011215c8b1e472726d2190df77b43fac2df670ae9ab8c04f86b5"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q2_k_l",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q2_K_L",
+   "weight_bytes": 19765847552,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q2_K_L.gguf",
+     "bytes": 19765847552,
+     "sha256": "a0d65c158532f6cef95ddc9349780f6c5ab3614e87110d9ce70253fa640c7be5"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q3_k_l",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 26272065024,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q3_K_L.gguf",
+     "bytes": 26272065024,
+     "sha256": "b404304cf08028a2ee69e61e84904fae365672d7ecb04927cbe2380dc9bc2353"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q3_k_m",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 24311227904,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q3_K_M.gguf",
+     "bytes": 24311227904,
+     "sha256": "0cad468c7db9f7cedd330e83529ff668901b5e71cefde68271c97a0c33b89aeb"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q3_k_s",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 21955339776,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q3_K_S.gguf",
+     "bytes": 21955339776,
+     "sha256": "3c86b4db0740a0848bfa8622092f5222a8fc1dbc5c81f3678f69d0fc3af01a0f"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q3_k_xl",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q3_K_XL",
+   "weight_bytes": 27191404032,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q3_K_XL.gguf",
+     "bytes": 27191404032,
+     "sha256": "0f18562d7ed8554e80118ced8729a950fb413874e9df25672295f02e1fc6da0b"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q4_0",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q4_0",
+   "weight_bytes": 28457444864,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q4_0.gguf",
+     "bytes": 28457444864,
+     "sha256": "169aac492cc5d0260407455188b440792cf91110ce1fb8edb305a9e6d3a18bcb"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q4_1",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q4_1",
+   "weight_bytes": 31383627264,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q4_1.gguf",
+     "bytes": 31383627264,
+     "sha256": "11f63497d603c6aace353f18eb2c9e354836a5b7dfc500ad9117b3ddca517381"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q4_k_l",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q4_K_L",
+   "weight_bytes": 30995375616,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q4_K_L.gguf",
+     "bytes": 30995375616,
+     "sha256": "9871d2389119f9fbca882ae01a9ea6086d92c4f5071ffc4ed9bc85630ba49a1a"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q4_k_m",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 30215579136,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q4_K_M.gguf",
+     "bytes": 30215579136,
+     "sha256": "eb619df799350250d51148874e6033f0b395b6b867291644e03225a71bda8c01"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q4_k_s",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 28633605632,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q4_K_S.gguf",
+     "bytes": 28633605632,
+     "sha256": "014b035632b97cb416270838bdc80527b93958b01a3317eb57f87f1a175b02f8"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q5_k_l",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q5_K_L",
+   "weight_bytes": 36040074752,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q5_K_L.gguf",
+     "bytes": 36040074752,
+     "sha256": "fc42d52474d2645b53e10ee6685fcc0adba6d6d1927d5086bdf71f2ebdb6092e"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q5_k_m",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q5_K_M",
+   "weight_bytes": 35391612416,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q5_K_M.gguf",
+     "bytes": 35391612416,
+     "sha256": "aa7f328484eed0e539b8f1297c8984f669840cc79479ab461616ede8a16ac758"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q5_k_s",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q5_K_S",
+   "weight_bytes": 34434590208,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q5_K_S.gguf",
+     "bytes": 34434590208,
+     "sha256": "a0aad8bbe2479e06dba63c51edeb12d80a85e08ce265720acad93c0c325571f3"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q6_k",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q6_K",
+   "weight_bytes": 40917886464,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q6_K.gguf",
+     "bytes": 40917886464,
+     "sha256": "1c107617e1529640116ff482790ee655a860a4b74362e508707380fef653bf78"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q6_k_l",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q6_K_L",
+   "weight_bytes": 41426806272,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q6_K_L.gguf",
+     "bytes": 41426806272,
+     "sha256": "85e570dad54cc502f22a9eab4c81db16e4fd501cb6185871b7dc32bec072d7fb"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-q8_0",
+   "model_id": "nemotron-super-49b",
+   "quantization": "Q8_0",
+   "weight_bytes": 52994827968,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q8_0/nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q8_0-00001-of-00002.gguf",
+     "bytes": 39913700160,
+     "sha256": "d468807c25d8fdd530ac2daac6f3c1cb26afb845138bb68df7c59ce21237c678"
+    },
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q8_0/nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q8_0-00002-of-00002.gguf",
+     "bytes": 13081127808,
+     "sha256": "a8a37434e4ab2929a4f3abd5030d4f41c17175c2504cfdd65fc36596297a68cd"
+    }
+   ]
+  },
+  {
+   "id": "nemotron-super-49b-bf16",
+   "model_id": "nemotron-super-49b",
+   "quantization": "BF16",
+   "weight_bytes": 99744278048,
+   "files": [
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-bf16/nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-bf16-00001-of-00003.gguf",
+     "bytes": 39632932864,
+     "sha256": "072b9f9d2de05dc88812129f010acf3f80d9955fddbbca3a65038025c1910be2"
+    },
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-bf16/nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-bf16-00002-of-00003.gguf",
+     "bytes": 39965079328,
+     "sha256": "14dd9b2862c5309f38cd602d6ddb236d7856c57e7247fdc364ed3827eedac08d"
+    },
+    {
+     "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-bf16/nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-bf16-00003-of-00003.gguf",
+     "bytes": 20146265856,
+     "sha256": "163b87cb95411d26618e3ab790cbc1ecbbd5f5edf98e1edf6f0d07379bfbc6c6"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-iq1_m",
+   "model_id": "gemma4-31b",
+   "quantization": "IQ1_M",
+   "weight_bytes": 10112172384,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-IQ1_M.gguf",
+     "bytes": 10112172384,
+     "sha256": "99870ee4aeeab03532bbb72f0af7332d6f2e3f9de4a4ba26c6aff8b906a8a201"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-iq2_m",
+   "model_id": "gemma4-31b",
+   "quantization": "IQ2_M",
+   "weight_bytes": 12649773408,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-IQ2_M.gguf",
+     "bytes": 12649773408,
+     "sha256": "3f98b832e1a097356f55fc40a44c6193a877ce0467eea38e7001fb96e9cd9a8f"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-iq2_s",
+   "model_id": "gemma4-31b",
+   "quantization": "IQ2_S",
+   "weight_bytes": 12075358560,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-IQ2_S.gguf",
+     "bytes": 12075358560,
+     "sha256": "26c268ebddd0c4315dc57a0846e74bee8cb99836f186b4ce561eaae9e8755066"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-iq2_xs",
+   "model_id": "gemma4-31b",
+   "quantization": "IQ2_XS",
+   "weight_bytes": 11500943712,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-IQ2_XS.gguf",
+     "bytes": 11500943712,
+     "sha256": "8c4abed66c765ff6ebb96ee257a65018f3d800351cc6e0db288735bc05919d43"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-iq2_xxs",
+   "model_id": "gemma4-31b",
+   "quantization": "IQ2_XXS",
+   "weight_bytes": 10830190944,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-IQ2_XXS.gguf",
+     "bytes": 10830190944,
+     "sha256": "3023b2dc6f8719ada9536c22a5b57408ddb1f18d4377de8efa7997237329ec3f"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-iq3_m",
+   "model_id": "gemma4-31b",
+   "quantization": "IQ3_M",
+   "weight_bytes": 15129829728,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-IQ3_M.gguf",
+     "bytes": 15129829728,
+     "sha256": "34fee56068a087c32e753ac1c25d45e329bc3e5c6a768279e20ff4f107ca7802"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-iq3_xs",
+   "model_id": "gemma4-31b",
+   "quantization": "IQ3_XS",
+   "weight_bytes": 13841353056,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-IQ3_XS.gguf",
+     "bytes": 13841353056,
+     "sha256": "9919f8d192412bad9161890a3c5ac748d553b9018e6856de47bc2a4fe91401e1"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-iq3_xxs",
+   "model_id": "gemma4-31b",
+   "quantization": "IQ3_XXS",
+   "weight_bytes": 12981709152,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-IQ3_XXS.gguf",
+     "bytes": 12981709152,
+     "sha256": "c9f34994715a016cd0bcd7ff4c1f5710718bbcc25d40796302db0a89b6d0d8ea"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-iq4_nl",
+   "model_id": "gemma4-31b",
+   "quantization": "IQ4_NL",
+   "weight_bytes": 18025687392,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-IQ4_NL.gguf",
+     "bytes": 18025687392,
+     "sha256": "95cf739e546a1c8ade9b84ce4cd0358a5c87f69c450e04d768126acbd2f17723"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-iq4_xs",
+   "model_id": "gemma4-31b",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 17155893600,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-IQ4_XS.gguf",
+     "bytes": 17155893600,
+     "sha256": "05e0fa1452e73e1b43bdfd378b82b488f57eb63db2bc5e4209f458e08d0542a7"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q2_k",
+   "model_id": "gemma4-31b",
+   "quantization": "Q2_K",
+   "weight_bytes": 12631624032,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q2_K.gguf",
+     "bytes": 12631624032,
+     "sha256": "0c9ac8f56177147f30a8845b3637e119ee5c0ba528af73cd363fb486f05ef0c7"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q2_k_l",
+   "model_id": "gemma4-31b",
+   "quantization": "Q2_K_L",
+   "weight_bytes": 12972935520,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q2_K_L.gguf",
+     "bytes": 12972935520,
+     "sha256": "a0ca05763da9239a8ac4b4c267a43a1abd8dbfe3e373181d6f4ad837b81578fb"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q3_k_l",
+   "model_id": "gemma4-31b",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 16810625376,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q3_K_L.gguf",
+     "bytes": 16810625376,
+     "sha256": "a61e2576c8d95ee021f162462555e17b4b02c1f72691e69edc85c01e81151e70"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q3_k_m",
+   "model_id": "gemma4-31b",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 15918123360,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q3_K_M.gguf",
+     "bytes": 15918123360,
+     "sha256": "eafa3499f35610f0c71af7b688328692f710d01283e140b5089991cf6478f486"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q3_k_s",
+   "model_id": "gemma4-31b",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 14329063776,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q3_K_S.gguf",
+     "bytes": 14329063776,
+     "sha256": "99398bdab6241b3e513c129a4c24e8047bee51026585bfaa9eee80f656154789"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q3_k_xl",
+   "model_id": "gemma4-31b",
+   "quantization": "Q3_K_XL",
+   "weight_bytes": 17151936864,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q3_K_XL.gguf",
+     "bytes": 17151936864,
+     "sha256": "0831a19763d76da64f15cd2448ab881a9058cc47cdeb778116bbf3794853725d"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q4_0",
+   "model_id": "gemma4-31b",
+   "quantization": "Q4_0",
+   "weight_bytes": 18076264800,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q4_0.gguf",
+     "bytes": 18076264800,
+     "sha256": "4591e5ee10527739514d6db436b51169c882949e3858d30285aa997b0b253554"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q4_1",
+   "model_id": "gemma4-31b",
+   "quantization": "Q4_1",
+   "weight_bytes": 19765274976,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q4_1.gguf",
+     "bytes": 19765274976,
+     "sha256": "567d744757d575d84c0a42278091223aa2351cdae8f375d4962eec44272659be"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q4_k_l",
+   "model_id": "gemma4-31b",
+   "quantization": "Q4_K_L",
+   "weight_bytes": 19939801440,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q4_K_L.gguf",
+     "bytes": 19939801440,
+     "sha256": "805ecb7f3d6b2cca58f31a6bc3579716173ec21f310e3af62c2b728c51488057"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q4_k_m",
+   "model_id": "gemma4-31b",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 19598489952,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q4_K_M.gguf",
+     "bytes": 19598489952,
+     "sha256": "2959c1b0a4f792493bb0092846ea06aec54547e47be979c282634d938d501b75"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q4_k_s",
+   "model_id": "gemma4-31b",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 18195655008,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q4_K_S.gguf",
+     "bytes": 18195655008,
+     "sha256": "a8f81e34d3720884355b3b220ae58c8f8cbf7d1f5bdab0f073a681fb768c9d52"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q5_k_l",
+   "model_id": "gemma4-31b",
+   "quantization": "Q5_K_L",
+   "weight_bytes": 22950189408,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q5_K_L.gguf",
+     "bytes": 22950189408,
+     "sha256": "ca773a604cd05507c95d671119a83a010ba0bda42e4c715b542be32ed68ad649"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q5_k_m",
+   "model_id": "gemma4-31b",
+   "quantization": "Q5_K_M",
+   "weight_bytes": 22608877920,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q5_K_M.gguf",
+     "bytes": 22608877920,
+     "sha256": "9f6882d4780880c96f2292c7daf5d5f18fa7e3678cecc47fc22649e93ce6f693"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q5_k_s",
+   "model_id": "gemma4-31b",
+   "quantization": "Q5_K_S",
+   "weight_bytes": 21504862560,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q5_K_S.gguf",
+     "bytes": 21504862560,
+     "sha256": "7761c1ff2f0ec42fb5aa510f0c6b172d9042e94b289d9a9b73ce63ea5f6f7b0d"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q6_k",
+   "model_id": "gemma4-31b",
+   "quantization": "Q6_K",
+   "weight_bytes": 26726721888,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q6_K.gguf",
+     "bytes": 26726721888,
+     "sha256": "3ddedb5dbd39acced499c489181983f27bd6e6bd3cd5d4a367696eeda3d1e397"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q6_k_l",
+   "model_id": "gemma4-31b",
+   "quantization": "Q6_K_L",
+   "weight_bytes": 27068033376,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q6_K_L.gguf",
+     "bytes": 27068033376,
+     "sha256": "f77819db7b83a145425084048efec024b5efbc175bc0fdc4bc4bfe7d4b5802df"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-q8_0",
+   "model_id": "gemma4-31b",
+   "quantization": "Q8_0",
+   "weight_bytes": 32635677024,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-Q8_0.gguf",
+     "bytes": 32635677024,
+     "sha256": "b2021742dad920260eea1a2fe3f7ebacc6f4963b4242ea3211f6bdb46e494a8e"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-31b-bf16",
+   "model_id": "gemma4-31b",
+   "quantization": "BF16",
+   "weight_bytes": 61413189920,
+   "files": [
+    {
+     "path": "google_gemma-4-31B-it-bf16/google_gemma-4-31B-it-bf16-00001-of-00002.gguf",
+     "bytes": 39996137216,
+     "sha256": "00d6ab955e63cde6d0306adb99455c3fab96c3254b2fbfe750b65e8e4543485a"
+    },
+    {
+     "path": "google_gemma-4-31B-it-bf16/google_gemma-4-31B-it-bf16-00002-of-00002.gguf",
+     "bytes": 21417052704,
+     "sha256": "ed3ed48c668ef6b7a14ec06a56554deea9f3af5d2f245560f450ab7f25756e29"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-iq2_m",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "IQ2_M",
+   "weight_bytes": 10700622464,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-IQ2_M.gguf",
+     "bytes": 10700622464,
+     "sha256": "88c25a0e8ecc975b90bcf3766301d5e565a5378ed04fbdd04c8049d87eab43a5"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-iq2_s",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "IQ2_S",
+   "weight_bytes": 10230468736,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-IQ2_S.gguf",
+     "bytes": 10230468736,
+     "sha256": "df0581fac422331ae375a9ca86b0f81010fa16dae29c05eb3403b0b9314a5185"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-iq2_xs",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "IQ2_XS",
+   "weight_bytes": 10126649856,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-IQ2_XS.gguf",
+     "bytes": 10126649856,
+     "sha256": "8bb3371e964ccb5ec98fd3c5bf95707b8f711a5fcec09932c67abfafd0fc88ad"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-iq2_xxs",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "IQ2_XXS",
+   "weight_bytes": 9656496128,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-IQ2_XXS.gguf",
+     "bytes": 9656496128,
+     "sha256": "2f3685099756ae2cde65c6328be73e5406b602803f2186536dce3ae06ea83c77"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-iq3_m",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "IQ3_M",
+   "weight_bytes": 13280213632,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-IQ3_M.gguf",
+     "bytes": 13280213632,
+     "sha256": "b08876e7eb0adc0dcac8f2d24ec064c62fd2cbd1813514516ad669e75fefecf6"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-iq3_xs",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "IQ3_XS",
+   "weight_bytes": 12437322880,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-IQ3_XS.gguf",
+     "bytes": 12437322880,
+     "sha256": "4dcbe01bfe42b186c226aa65306bc179ea51da18faeac465c721d8b83ccd0039"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-iq3_xxs",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "IQ3_XXS",
+   "weight_bytes": 12160200320,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-IQ3_XXS.gguf",
+     "bytes": 12160200320,
+     "sha256": "61a9be08df2dd3ee5e98b23f1f548530c05ec89e02647a650f2ad447fcc83998"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-iq4_nl",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "IQ4_NL",
+   "weight_bytes": 14697714816,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-IQ4_NL.gguf",
+     "bytes": 14697714816,
+     "sha256": "a4092d039b489536066deb4314c3303ea45041f776d19938f64dada478a29dcf"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-iq4_xs",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 14205004928,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-IQ4_XS.gguf",
+     "bytes": 14205004928,
+     "sha256": "86f0f6ca5f622bca4506f7849eee3459d0cac867b919630132145efd452ee8b9"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q2_k",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q2_K",
+   "weight_bytes": 10951927936,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q2_K.gguf",
+     "bytes": 10951927936,
+     "sha256": "c9247d1f76eef1abd14aea173df4229bb7c298bece7d13e0cf4acd893dd754e4"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q2_k_l",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q2_K_L",
+   "weight_bytes": 11130710144,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q2_K_L.gguf",
+     "bytes": 11130710144,
+     "sha256": "87f966c3f2e226017acc32b72f68111691e0bb9a2e8b64eaf6c30baadad94be8"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q3_k_l",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 13199180416,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q3_K_L.gguf",
+     "bytes": 13199180416,
+     "sha256": "2a74593c43e06245f86577f2d1e27a268d91be655993f70dfd64cb556214b347"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q3_k_m",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 13019981440,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q3_K_M.gguf",
+     "bytes": 13019981440,
+     "sha256": "4826221b7a285284b65222537f58ebfc6880290ff5441e13bfb1a7ca4d65df21"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q3_k_s",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 12553235072,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q3_K_S.gguf",
+     "bytes": 12553235072,
+     "sha256": "302d143948006836721f735da401582a85751f4d8fe55ea6ac54300809204bae"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q3_k_xl",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q3_K_XL",
+   "weight_bytes": 13377962624,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q3_K_XL.gguf",
+     "bytes": 13377962624,
+     "sha256": "3e7b3be5116a1cc6321953f6f11d97d242482fd4a69cecd01e88eebff7d0dee2"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q4_0",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q4_0",
+   "weight_bytes": 14759385216,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q4_0.gguf",
+     "bytes": 14759385216,
+     "sha256": "a6be80ed54a90d47e5c0ef6f1cf087c1162edc327781ff3ce9a2018b2d66f6ef"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q4_1",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q4_1",
+   "weight_bytes": 16144845952,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q4_1.gguf",
+     "bytes": 16144845952,
+     "sha256": "b345da64474d693acdf9d9b36bf7f2960a7f94ae1ff4327fc6450d135a3a1da9"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q4_k_l",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q4_K_L",
+   "weight_bytes": 17213822080,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q4_K_L.gguf",
+     "bytes": 17213822080,
+     "sha256": "3020b31690b47dd8ff4902332fcf6d9ac02bd749ff45f971bca3bddd20b8c25e"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q4_k_m",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 17035039872,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q4_K_M.gguf",
+     "bytes": 17035039872,
+     "sha256": "a07f72221e8e3f77455ab0d7f7652d01a9f63c262b954aa6932a53275a0e895a"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q4_k_s",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 15844288640,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q4_K_S.gguf",
+     "bytes": 15844288640,
+     "sha256": "2700522f644211990d7082f480e7f564a05b4613e93e54d7e274be7e727e5916"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q5_k_l",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q5_K_L",
+   "weight_bytes": 19497981056,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q5_K_L.gguf",
+     "bytes": 19497981056,
+     "sha256": "90a2843d12d3290d7eddc48d0fa1a4bdb5409a354b0a10731931d6289ae60c9b"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q5_k_m",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q5_K_M",
+   "weight_bytes": 19319198848,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q5_K_M.gguf",
+     "bytes": 19319198848,
+     "sha256": "6b4f8074239f72543997a950ff6ae4509553c599f5b432748309ff3438416493"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q5_k_s",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q5_K_S",
+   "weight_bytes": 18129382528,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q5_K_S.gguf",
+     "bytes": 18129382528,
+     "sha256": "36a23a99694d21c04c66978ee59ae64281f3804cd7cee9bd252c88fe6812e5a6"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q6_k",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q6_K",
+   "weight_bytes": 22862577280,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q6_K.gguf",
+     "bytes": 22862577280,
+     "sha256": "dd9f8a9f4646258bd97e1241899ecd875ad51572bcf6de44d09dab30662983f1"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q6_k_l",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q6_K_L",
+   "weight_bytes": 23041359488,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q6_K_L.gguf",
+     "bytes": 23041359488,
+     "sha256": "00d6e37ef6965e35db4a108d9178f889b9ad4c2428b94c8778b9231c0d26ef7e"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-q8_0",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "Q8_0",
+   "weight_bytes": 26859861120,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-Q8_0.gguf",
+     "bytes": 26859861120,
+     "sha256": "1bb7fdb37fbd542ba972b3eb83ae87752bb9063aff560402e0e2f64235c85226"
+    }
+   ]
+  },
+  {
+   "id": "gemma4-26b-moe-bf16",
+   "model_id": "gemma4-26b-moe",
+   "quantization": "BF16",
+   "weight_bytes": 50505135424,
+   "files": [
+    {
+     "path": "google_gemma-4-26B-A4B-it-bf16/google_gemma-4-26B-A4B-it-bf16-00001-of-00002.gguf",
+     "bytes": 39538690528,
+     "sha256": "4d82522edff064ee9305dd078f7e37bb8ed31d0ebb2773791ca103a2fb5b53fb"
+    },
+    {
+     "path": "google_gemma-4-26B-A4B-it-bf16/google_gemma-4-26B-A4B-it-bf16-00002-of-00002.gguf",
+     "bytes": 10966444896,
+     "sha256": "3f2790e5db81b60f45cab2a7fbd5d531a08f7a6f8360bd03c851164f43a3c4c9"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-iq2_m",
+   "model_id": "gemma3-27b",
+   "quantization": "IQ2_M",
+   "weight_bytes": 9492834944,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-IQ2_M.gguf",
+     "bytes": 9492834944,
+     "sha256": "3f687dfab9b46921614e4f5d2c58d2a067ddd5a7daba41f9089550656ae77f1f"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-iq2_s",
+   "model_id": "gemma3-27b",
+   "quantization": "IQ2_S",
+   "weight_bytes": 8782170752,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-IQ2_S.gguf",
+     "bytes": 8782170752,
+     "sha256": "59c2e6ee8b12fdc1bf56cb57a28c3c316667a683099bbda88457a813c41699f6"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-iq2_xs",
+   "model_id": "gemma3-27b",
+   "quantization": "IQ2_XS",
+   "weight_bytes": 8438665856,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-IQ2_XS.gguf",
+     "bytes": 8438665856,
+     "sha256": "080150a6758afefb40950f2753ea9f113b3cdc2b8ad4243a3711959748cd4df0"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-iq3_m",
+   "model_id": "gemma3-27b",
+   "quantization": "IQ3_M",
+   "weight_bytes": 12546790016,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-IQ3_M.gguf",
+     "bytes": 12546790016,
+     "sha256": "33c07cf49428853aa63f22f3a95cf05436cdb65ec908d56b02e1098c691e5c1a"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-iq3_xs",
+   "model_id": "gemma3-27b",
+   "quantization": "IQ3_XS",
+   "weight_bytes": 11561949824,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-IQ3_XS.gguf",
+     "bytes": 11561949824,
+     "sha256": "e6e8bde1bd29dbc765edebce39b83047ab2fbb19cb4763ed70f8ba321e15ab13"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-iq3_xxs",
+   "model_id": "gemma3-27b",
+   "quantization": "IQ3_XXS",
+   "weight_bytes": 10716240512,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-IQ3_XXS.gguf",
+     "bytes": 10716240512,
+     "sha256": "194f643e0d6acdd471f2a52f3eef2617aa84b39c23b596ac1619f8fa4fc71606"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-iq4_nl",
+   "model_id": "gemma3-27b",
+   "quantization": "IQ4_NL",
+   "weight_bytes": 15567112832,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-IQ4_NL.gguf",
+     "bytes": 15567112832,
+     "sha256": "b558d312c8e692d9d367a176efa7d6c8cce07da89cb47cd8b3458bc425d80d89"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-iq4_xs",
+   "model_id": "gemma3-27b",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 14767164032,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-IQ4_XS.gguf",
+     "bytes": 14767164032,
+     "sha256": "bd2f188c66d8ccb0bffcb0c91e4dbbb72754bb1732e0bca323a2f266a35e01c8"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q2_k",
+   "model_id": "gemma3-27b",
+   "quantization": "Q2_K",
+   "weight_bytes": 10503436928,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q2_K.gguf",
+     "bytes": 10503436928,
+     "sha256": "a2d0a6dfb1c3fb9d17dae5c8b9eb17cbfeea75280260ea10dc5a9b68691d0e74"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q2_k_l",
+   "model_id": "gemma3-27b",
+   "quantization": "Q2_K_L",
+   "weight_bytes": 10844748416,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q2_K_L.gguf",
+     "bytes": 10844748416,
+     "sha256": "c9e920ffb9288c2322e8945d83430620281899a6b0bc65e3acd5b46ad817b943"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q3_k_l",
+   "model_id": "gemma3-27b",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 14543178368,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q3_K_L.gguf",
+     "bytes": 14543178368,
+     "sha256": "83c4e971dbf62bfb9cb4860f372602a83926809ebf2cc57daaf50eca13ab55b3"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q3_k_m",
+   "model_id": "gemma3-27b",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 13437356672,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q3_K_M.gguf",
+     "bytes": 13437356672,
+     "sha256": "9eabf6ef615b50ffb59f52751fe4789a036e0815b0dac42ab9774fd157b54831"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q3_k_s",
+   "model_id": "gemma3-27b",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 12167330432,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q3_K_S.gguf",
+     "bytes": 12167330432,
+     "sha256": "a8492ad1e76b7f0b2cb6632fa395586e253d4dfd99f8683063f6ec79b73a0797"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q3_k_xl",
+   "model_id": "gemma3-27b",
+   "quantization": "Q3_K_XL",
+   "weight_bytes": 14884489856,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q3_K_XL.gguf",
+     "bytes": 14884489856,
+     "sha256": "2f99f057733bc422a06b37f8dd532adf70cf862f60d033628fe439175b60d4c8"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q4_0",
+   "model_id": "gemma3-27b",
+   "quantization": "Q4_0",
+   "weight_bytes": 15617690240,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q4_0.gguf",
+     "bytes": 15617690240,
+     "sha256": "a6edacc9e7bab200eea6dd9ff4568c5838e959235dd0da71309e68ff5c81d775"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q4_1",
+   "model_id": "gemma3-27b",
+   "quantization": "Q4_1",
+   "weight_bytes": 17167010432,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q4_1.gguf",
+     "bytes": 17167010432,
+     "sha256": "15774af877b3cb478f4fe5e48b3be7c6972bb315bd4f8fc345cebf0642a35385"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q4_k_l",
+   "model_id": "gemma3-27b",
+   "quantization": "Q4_K_L",
+   "weight_bytes": 16887716480,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q4_K_L.gguf",
+     "bytes": 16887716480,
+     "sha256": "96588257d982e43dab39d1bc335111356b7d0df5d175f092b5f98b4eda1ae289"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q4_k_m",
+   "model_id": "gemma3-27b",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 16546404992,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q4_K_M.gguf",
+     "bytes": 16546404992,
+     "sha256": "4e83142e3ad3719ac61334f70a956dcc60bbba8adb29de5114161310bb9f7170"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q4_k_s",
+   "model_id": "gemma3-27b",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 15673772672,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q4_K_S.gguf",
+     "bytes": 15673772672,
+     "sha256": "e7e800240905ceaa1266ce7f698bac22fae63e7b956dcf21c63cda34a7f188a2"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q5_k_l",
+   "model_id": "gemma3-27b",
+   "quantization": "Q5_K_L",
+   "weight_bytes": 19612703360,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q5_K_L.gguf",
+     "bytes": 19612703360,
+     "sha256": "504fe8833e5deb8580d6732dd8c232c7de8dd6e5e641652677caf92beb2e7e2a"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q5_k_m",
+   "model_id": "gemma3-27b",
+   "quantization": "Q5_K_M",
+   "weight_bytes": 19271391872,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q5_K_M.gguf",
+     "bytes": 19271391872,
+     "sha256": "7babc9bc281f07edae1cbfe519f61b12daa760b36be8ba53e72ddfdc9eceb846"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q5_k_s",
+   "model_id": "gemma3-27b",
+   "quantization": "Q5_K_S",
+   "weight_bytes": 18766908032,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q5_K_S.gguf",
+     "bytes": 18766908032,
+     "sha256": "6b317716786799f999d12b7604e6af278092867a28d0d66e70143a98c0709265"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q6_k",
+   "model_id": "gemma3-27b",
+   "quantization": "Q6_K",
+   "weight_bytes": 22166690432,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q6_K.gguf",
+     "bytes": 22166690432,
+     "sha256": "bb33daa83fab45a9323358fddc059df9fae3b5934461a7294ad20741ec5c3682"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q6_k_l",
+   "model_id": "gemma3-27b",
+   "quantization": "Q6_K_L",
+   "weight_bytes": 22508001920,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q6_K_L.gguf",
+     "bytes": 22508001920,
+     "sha256": "5c594848cea498025c6b75b8b109b0676690786529b4b996a2f49b3fbca94d7c"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-q8_0",
+   "model_id": "gemma3-27b",
+   "quantization": "Q8_0",
+   "weight_bytes": 28707605120,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-Q8_0.gguf",
+     "bytes": 28707605120,
+     "sha256": "f997aef7f4ed368819f8bcd3e66262612eab4b9ecd562efbad2a7fdebc872693"
+    }
+   ]
+  },
+  {
+   "id": "gemma3-27b-bf16",
+   "model_id": "gemma3-27b",
+   "quantization": "BF16",
+   "weight_bytes": 54027274816,
+   "files": [
+    {
+     "path": "google_gemma-3-27b-it-bf16/google_gemma-3-27b-it-bf16-00001-of-00002.gguf",
+     "bytes": 39987970624,
+     "sha256": "d766201186b219086aa28a28c4bcb538bb3983defd01712716be5ca4a14f4d5d"
+    },
+    {
+     "path": "google_gemma-3-27b-it-bf16/google_gemma-3-27b-it-bf16-00002-of-00002.gguf",
+     "bytes": 14039304192,
+     "sha256": "cd07a0a61035b8dd1f0d16ab48ba545efc225d8a3a079978dc85b4fc5b208b8b"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-iq1_m",
+   "model_id": "llama33-70b",
+   "quantization": "IQ1_M",
+   "weight_bytes": 16751201248,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-IQ1_M.gguf",
+     "bytes": 16751201248,
+     "sha256": "4253febb74e420fde26c0c6bb250ca06ef2ae0a15dfc8fe669c773ff5674c74d"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-iq2_m",
+   "model_id": "llama33-70b",
+   "quantization": "IQ2_M",
+   "weight_bytes": 24119299040,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-IQ2_M.gguf",
+     "bytes": 24119299040,
+     "sha256": "4067a84d6587d0c0e963b4008a749c595d587a36e382bc6e592ed0cb97746251"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-iq2_s",
+   "model_id": "llama33-70b",
+   "quantization": "IQ2_S",
+   "weight_bytes": 22242348000,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-IQ2_S.gguf",
+     "bytes": 22242348000,
+     "sha256": "a9c3da46ebeace1e21577e09dc024d46cfdc37cb7984d81e1cfcfae164a59e10"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-iq2_xs",
+   "model_id": "llama33-70b",
+   "quantization": "IQ2_XS",
+   "weight_bytes": 21142113248,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-IQ2_XS.gguf",
+     "bytes": 21142113248,
+     "sha256": "0b4527182ff9b6bc84b7dd754c6161bdf2d9fec93489a482f10942d40c7bdf68"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-iq2_xxs",
+   "model_id": "llama33-70b",
+   "quantization": "IQ2_XXS",
+   "weight_bytes": 19097390048,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-IQ2_XXS.gguf",
+     "bytes": 19097390048,
+     "sha256": "b9625ef8daa030849fc3a5c81fb1660c2a9c2aa677011577478d0e93045723ca"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-iq3_m",
+   "model_id": "llama33-70b",
+   "quantization": "IQ3_M",
+   "weight_bytes": 31937039328,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-IQ3_M.gguf",
+     "bytes": 31937039328,
+     "sha256": "6d91ffd62b932f0094ce0f3cc25b5215a47b31f7c3db4d0aee04fd251c284fa8"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-iq3_xs",
+   "model_id": "llama33-70b",
+   "quantization": "IQ3_XS",
+   "weight_bytes": 29307735008,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-IQ3_XS.gguf",
+     "bytes": 29307735008,
+     "sha256": "aad2cf3348d8c7fdbd2c0dd58e0d99368450d43c9584aef81a467dd347561344"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-iq3_xxs",
+   "model_id": "llama33-70b",
+   "quantization": "IQ3_XXS",
+   "weight_bytes": 27469499360,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-IQ3_XXS.gguf",
+     "bytes": 27469499360,
+     "sha256": "a2a70f064765a8161ab76dc053b07acae14bc14056c0852550c1608724d60815"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-iq4_nl",
+   "model_id": "llama33-70b",
+   "quantization": "IQ4_NL",
+   "weight_bytes": 40053623776,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-IQ4_NL.gguf",
+     "bytes": 40053623776,
+     "sha256": "fd3b6fd2de9eea1fbd0bb19a14c232b62df390e4f71c6511a26d1a5a4b9838f6"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-iq4_xs",
+   "model_id": "llama33-70b",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 37902666720,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-IQ4_XS.gguf",
+     "bytes": 37902666720,
+     "sha256": "42a31baf403c4fe2151f55213eef5556b71483a135fa900c19589892d563c0b1"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q2_k",
+   "model_id": "llama33-70b",
+   "quantization": "Q2_K",
+   "weight_bytes": 26375113696,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q2_K.gguf",
+     "bytes": 26375113696,
+     "sha256": "9b2b9e9b0b0c8c2a6fc331b4df3cd837859be5634778f665e8d64765f123df25"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q2_k_l",
+   "model_id": "llama33-70b",
+   "quantization": "Q2_K_L",
+   "weight_bytes": 27401161696,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q2_K_L.gguf",
+     "bytes": 27401161696,
+     "sha256": "1207c664b07ecfc4c30e83a57a538bed87818c8d8888426183f2e0a22d24e45e"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q3_k_l",
+   "model_id": "llama33-70b",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 37140597728,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q3_K_L.gguf",
+     "bytes": 37140597728,
+     "sha256": "cdcc1bc890c7aed41ff6ea0d77fe180248329297034e706066144b14f97aedf2"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q3_k_m",
+   "model_id": "llama33-70b",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 34267499488,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q3_K_M.gguf",
+     "bytes": 34267499488,
+     "sha256": "50221eecf9fd26481a55804e74581123f3a175cc589d044bee3306bc53f137c1"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q3_k_s",
+   "model_id": "llama33-70b",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 30912056288,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q3_K_S.gguf",
+     "bytes": 30912056288,
+     "sha256": "ce33aa5f546cfcef603d5de1f1cf9029f45def8cdc346a0ca0124ce199836332"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q3_k_xl",
+   "model_id": "llama33-70b",
+   "quantization": "Q3_K_XL",
+   "weight_bytes": 38059936736,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q3_K_XL.gguf",
+     "bytes": 38059936736,
+     "sha256": "d204e56d3ca7f95b3aaf8b47c22138f6c9701c0f4a9edcd301f7f680350a8478"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q4_0",
+   "model_id": "llama33-70b",
+   "quantization": "Q4_0",
+   "weight_bytes": 40116538336,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q4_0.gguf",
+     "bytes": 40116538336,
+     "sha256": "564d5978d93c54b6ec1c6f25cd2ab11a8383f0902ea92546dd6e2c78509c4c1c"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q4_0_4_4",
+   "model_id": "llama33-70b",
+   "quantization": "Q4_0_4_4",
+   "weight_bytes": 39969737696,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q4_0_4_4.gguf",
+     "bytes": 39969737696,
+     "sha256": "e20314c874360dd361e233599d8edc984cc6146df7d8539cfcc2cabe00efc751"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q4_0_4_8",
+   "model_id": "llama33-70b",
+   "quantization": "Q4_0_4_8",
+   "weight_bytes": 39969737696,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q4_0_4_8.gguf",
+     "bytes": 39969737696,
+     "sha256": "91c0fc37a4344526f80a37ae86adae9d102b4814713b9ce42a856819fcdb1185"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q4_0_8_8",
+   "model_id": "llama33-70b",
+   "quantization": "Q4_0_8_8",
+   "weight_bytes": 39969737696,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q4_0_8_8.gguf",
+     "bytes": 39969737696,
+     "sha256": "26e14d4b0292634ad128dfc03d2fc13af523ff6b0ef57d722cea3fa420d2ec69"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q4_k_l",
+   "model_id": "llama33-70b",
+   "quantization": "Q4_K_L",
+   "weight_bytes": 43300195296,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q4_K_L.gguf",
+     "bytes": 43300195296,
+     "sha256": "d5d2b00c020bf2616be097a144701e1d37698e2f0c4e1a7a6cf582488cb7d302"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q4_k_m",
+   "model_id": "llama33-70b",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 42520398816,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q4_K_M.gguf",
+     "bytes": 42520398816,
+     "sha256": "32df3baccb556f9840059b2528b2dee4d3d516b24afdfb9d0c56ff5f63e3a664"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q4_k_s",
+   "model_id": "llama33-70b",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 40347225056,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q4_K_S.gguf",
+     "bytes": 40347225056,
+     "sha256": "67becd30e2aa0f3cc5b5e64c712055085ed8f36e44102d3d0c4cbbca3e26ec90"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q5_k_l",
+   "model_id": "llama33-70b",
+   "quantization": "Q5_K_L",
+   "weight_bytes": 50598284448,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q5_K_L/Llama-3.3-70B-Instruct-Q5_K_L-00001-of-00002.gguf",
+     "bytes": 39853877184,
+     "sha256": "1010a2b9464cf6f62c66d97c653c621d1487c09adda507fa94b7ca969e3c7245"
+    },
+    {
+     "path": "Llama-3.3-70B-Instruct-Q5_K_L/Llama-3.3-70B-Instruct-Q5_K_L-00002-of-00002.gguf",
+     "bytes": 10744407264,
+     "sha256": "85bc477d39a9dd49c53062c156392aae51e615aa4695337a1de1345a61eab34e"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q5_k_m",
+   "model_id": "llama33-70b",
+   "quantization": "Q5_K_M",
+   "weight_bytes": 49949822112,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q5_K_M/Llama-3.3-70B-Instruct-Q5_K_M-00001-of-00002.gguf",
+     "bytes": 39987554880,
+     "sha256": "1e0a25b0c10a7590947fce663985c0d5e7401c41ad4cf994dd36d9337c532d3d"
+    },
+    {
+     "path": "Llama-3.3-70B-Instruct-Q5_K_M/Llama-3.3-70B-Instruct-Q5_K_M-00002-of-00002.gguf",
+     "bytes": 9962267232,
+     "sha256": "7d1098ce9c1cea0cee718467d0914ad1cdcef501651b0917300284181838cd39"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q5_k_s",
+   "model_id": "llama33-70b",
+   "quantization": "Q5_K_S",
+   "weight_bytes": 48657452000,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q5_K_S.gguf",
+     "bytes": 48657452000,
+     "sha256": "99f696854cf3945943bbe1c8d0a2b5c462839cbfc938d8dc81a244ac211ecbb0"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q6_k",
+   "model_id": "llama33-70b",
+   "quantization": "Q6_K",
+   "weight_bytes": 57888148672,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q6_K/Llama-3.3-70B-Instruct-Q6_K-00001-of-00002.gguf",
+     "bytes": 39953848064,
+     "sha256": "a3fdb310817544d0f3368fea19df2e611228b3c4d9c2390f4b55261ec0f5e9d4"
+    },
+    {
+     "path": "Llama-3.3-70B-Instruct-Q6_K/Llama-3.3-70B-Instruct-Q6_K-00002-of-00002.gguf",
+     "bytes": 17934300608,
+     "sha256": "828c8425b56575ed0631806ff61ebdc516754895a112865bf2a18daf1c257b0b"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q6_k_l",
+   "model_id": "llama33-70b",
+   "quantization": "Q6_K_L",
+   "weight_bytes": 58397068448,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q6_K_L/Llama-3.3-70B-Instruct-Q6_K_L-00001-of-00002.gguf",
+     "bytes": 39953519936,
+     "sha256": "7439d005f2abcac1ebe7d30129f4067ae7ddb50bb9933e87a313ca94d9de38e3"
+    },
+    {
+     "path": "Llama-3.3-70B-Instruct-Q6_K_L/Llama-3.3-70B-Instruct-Q6_K_L-00002-of-00002.gguf",
+     "bytes": 18443548512,
+     "sha256": "f740bada5af7eceb82a111f9b77909f5cd606e1cbf6612184ffe3c3a565f0254"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-q8_0",
+   "model_id": "llama33-70b",
+   "quantization": "Q8_0",
+   "weight_bytes": 74975055008,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-Q8_0/Llama-3.3-70B-Instruct-Q8_0-00001-of-00002.gguf",
+     "bytes": 39927004064,
+     "sha256": "0c4ec5083aec2efa104269e8b63e2d9f3322e2fa50511184314093a7b4697878"
+    },
+    {
+     "path": "Llama-3.3-70B-Instruct-Q8_0/Llama-3.3-70B-Instruct-Q8_0-00002-of-00002.gguf",
+     "bytes": 35048050944,
+     "sha256": "e5c8858f5feafdc56200bbcbb3c4fadb07cb323c8ed13548dfb798dd1fb24255"
+    }
+   ]
+  },
+  {
+   "id": "llama33-70b-f16",
+   "model_id": "llama33-70b",
+   "quantization": "F16",
+   "weight_bytes": 141117918624,
+   "files": [
+    {
+     "path": "Llama-3.3-70B-Instruct-f16/Llama-3.3-70B-Instruct-f16-00001-of-00004.gguf",
+     "bytes": 39678971904,
+     "sha256": "30e2e65b0e48f48cb667a17616f20cdae9231cc4a01a3c177d446f70101d29d5"
+    },
+    {
+     "path": "Llama-3.3-70B-Instruct-f16/Llama-3.3-70B-Instruct-f16-00002-of-00004.gguf",
+     "bytes": 39981658560,
+     "sha256": "967cf7ba785baaa59f5acb5889a1edc26b65445e9a01dd4517cef026028394a4"
+    },
+    {
+     "path": "Llama-3.3-70B-Instruct-f16/Llama-3.3-70B-Instruct-f16-00003-of-00004.gguf",
+     "bytes": 39981625728,
+     "sha256": "da6a31a4fa7a574594daf2f281e3cfece5beeda8655b482f50a0b95ee5db33e1"
+    },
+    {
+     "path": "Llama-3.3-70B-Instruct-f16/Llama-3.3-70B-Instruct-f16-00004-of-00004.gguf",
+     "bytes": 21475662432,
+     "sha256": "f4d36b377ed6e09ee79d1821677131506d8de2906f6c37ec1f75cb9b0ce9ce56"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-iq1_m",
+   "model_id": "llama31-70b",
+   "quantization": "IQ1_M",
+   "weight_bytes": 16751200832,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-IQ1_M.gguf",
+     "bytes": 16751200832,
+     "sha256": "0695183f116d3531023e69e0a1b84fd3e2f4298bb3854293bd966308aa8eaf82"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-iq2_m",
+   "model_id": "llama31-70b",
+   "quantization": "IQ2_M",
+   "weight_bytes": 24119298624,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-IQ2_M.gguf",
+     "bytes": 24119298624,
+     "sha256": "2bc4fc6cb5c8b45d41e99e57bdaa07fe34fc53354b4fe496b3b51b9cfc2b3002"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-iq2_s",
+   "model_id": "llama31-70b",
+   "quantization": "IQ2_S",
+   "weight_bytes": 22242347584,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-IQ2_S.gguf",
+     "bytes": 22242347584,
+     "sha256": "ad7ab8ff6c191c323a7e8c526f4ef1e63df3d96c379d57af6e146486fcc563cd"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-iq2_xs",
+   "model_id": "llama31-70b",
+   "quantization": "IQ2_XS",
+   "weight_bytes": 21142112832,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-IQ2_XS.gguf",
+     "bytes": 21142112832,
+     "sha256": "476de912cd03f7f2ca7dde99faa874001063484cb47cbdb9db47d8d30b3098fa"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-iq2_xxs",
+   "model_id": "llama31-70b",
+   "quantization": "IQ2_XXS",
+   "weight_bytes": 19097389632,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-IQ2_XXS.gguf",
+     "bytes": 19097389632,
+     "sha256": "ec83483996bdb323ab1708a9d2fc659238a4f0e1496d281e9e3d9942f3025ce1"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-iq3_m",
+   "model_id": "llama31-70b",
+   "quantization": "IQ3_M",
+   "weight_bytes": 31937038912,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-IQ3_M.gguf",
+     "bytes": 31937038912,
+     "sha256": "e54ccf4e0dcbe56f9889e3403f17f3ba0f6718bc903c6a418cf0c915969d5c02"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-iq3_xs",
+   "model_id": "llama31-70b",
+   "quantization": "IQ3_XS",
+   "weight_bytes": 29307734592,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-IQ3_XS.gguf",
+     "bytes": 29307734592,
+     "sha256": "f0ad4a8a4966898e680d6a9b8bba059d4b8076199071346a9c255452c263b5c9"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-iq4_xs",
+   "model_id": "llama31-70b",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 37902666304,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-IQ4_XS.gguf",
+     "bytes": 37902666304,
+     "sha256": "4a9755870610b3ed7054d61b6e56d310204be95e4cc079da29064494e881474c"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-q2_k",
+   "model_id": "llama31-70b",
+   "quantization": "Q2_K",
+   "weight_bytes": 26375113280,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q2_K.gguf",
+     "bytes": 26375113280,
+     "sha256": "7ef183105996815e1239aefebe2e876b23c7fceff4938125ecb04a31a178a6d2"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-q2_k_l",
+   "model_id": "llama31-70b",
+   "quantization": "Q2_K_L",
+   "weight_bytes": 27401161280,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q2_K_L.gguf",
+     "bytes": 27401161280,
+     "sha256": "1fca0443192a0f778732274da70af109cdc8d6ec37d4863e05c3c2bcffb9f04b"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-q3_k_l",
+   "model_id": "llama31-70b",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 37140597312,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q3_K_L.gguf",
+     "bytes": 37140597312,
+     "sha256": "8b4739753c2303e61ebaad1df621b9696f127c9074afb50da176dc00661f57dc"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-q3_k_m",
+   "model_id": "llama31-70b",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 34267499072,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q3_K_M.gguf",
+     "bytes": 34267499072,
+     "sha256": "78a5ebe1f0434aec97d2b367c4919a854c6385263965238948261e2b9dc6a4a8"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-q3_k_s",
+   "model_id": "llama31-70b",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 30912055872,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q3_K_S.gguf",
+     "bytes": 30912055872,
+     "sha256": "0ca16752daf865ea65cc026e503a334899b05abe89aa7ac92842838be039eb76"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-q3_k_xl",
+   "model_id": "llama31-70b",
+   "quantization": "Q3_K_XL",
+   "weight_bytes": 38059936320,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q3_K_XL.gguf",
+     "bytes": 38059936320,
+     "sha256": "e4befc903ce37d79176c331d3f46224dd6a39404fb086eb85eb3127bd192d208"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-q4_k_l",
+   "model_id": "llama31-70b",
+   "quantization": "Q4_K_L",
+   "weight_bytes": 43300194880,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q4_K_L.gguf",
+     "bytes": 43300194880,
+     "sha256": "672e182172a7373a188de0b186a5ee612e73d973828c60629f7d9f685d406914"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-q4_k_m",
+   "model_id": "llama31-70b",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 42520398400,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q4_K_M.gguf",
+     "bytes": 42520398400,
+     "sha256": "f775c87029be95fb41df9e2882e6e938b73121c30ffc235ac6b6b880add49aa5"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-q4_k_s",
+   "model_id": "llama31-70b",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 40347224640,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q4_K_S.gguf",
+     "bytes": 40347224640,
+     "sha256": "a11957d1956b7738dd178ac4da0d4b383a98c8653fe36a9e2d6deecc1c906b75"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-q5_k_l",
+   "model_id": "llama31-70b",
+   "quantization": "Q5_K_L",
+   "weight_bytes": 50598284032,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q5_K_L/Meta-Llama-3.1-70B-Instruct-Q5_K_L-00001-of-00002.gguf",
+     "bytes": 40004118848,
+     "sha256": "5ad7fd8176967c1d56f4e58f5a892b99153369e5aa2b73f241ab8a55704f225b"
+    },
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q5_K_L/Meta-Llama-3.1-70B-Instruct-Q5_K_L-00002-of-00002.gguf",
+     "bytes": 10594165184,
+     "sha256": "b792adbf9de3a3186703533c75162e7beb0046f2c929786a4b7b8b23dde54e14"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-q5_k_m",
+   "model_id": "llama31-70b",
+   "quantization": "Q5_K_M",
+   "weight_bytes": 49949821696,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q5_K_M/Meta-Llama-3.1-70B-Instruct-Q5_K_M-00001-of-00002.gguf",
+     "bytes": 39875472096,
+     "sha256": "881bef63fc41ab7561dd5fef4fb323d306644b1de3836caec83557a98eb02057"
+    },
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q5_K_M/Meta-Llama-3.1-70B-Instruct-Q5_K_M-00002-of-00002.gguf",
+     "bytes": 10074349600,
+     "sha256": "5c3c92c3628ca3c3ef4286cb25086f920228f3e0c354ab6275d48ae49265a588"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-q5_k_s",
+   "model_id": "llama31-70b",
+   "quantization": "Q5_K_S",
+   "weight_bytes": 48657451584,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q5_K_S.gguf",
+     "bytes": 48657451584,
+     "sha256": "0d16319faac9b16dc04bbfbcb3acbb5e017f52c7b98f74bc4209487c89b7a034"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-q6_k",
+   "model_id": "llama31-70b",
+   "quantization": "Q6_K",
+   "weight_bytes": 57888148224,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q6_K/Meta-Llama-3.1-70B-Instruct-Q6_K-00001-of-00002.gguf",
+     "bytes": 39862703680,
+     "sha256": "1f0bde077076952282925ce9133c6ba26759067e5d8a46e5d9eed071ed03e2ac"
+    },
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q6_K/Meta-Llama-3.1-70B-Instruct-Q6_K-00002-of-00002.gguf",
+     "bytes": 18025444544,
+     "sha256": "c1e59f75caaa7fdfdc69b9a04c48ba0417d18468c8a5a731afa8cf5301bfa2bd"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-q6_k_l",
+   "model_id": "llama31-70b",
+   "quantization": "Q6_K_L",
+   "weight_bytes": 58397068032,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q6_K_L/Meta-Llama-3.1-70B-Instruct-Q6_K_L-00001-of-00002.gguf",
+     "bytes": 39924487680,
+     "sha256": "bebe8106665afd59cfb7044d8eabe07dd2a8ffb6c1189fddfc6410e6c133330e"
+    },
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q6_K_L/Meta-Llama-3.1-70B-Instruct-Q6_K_L-00002-of-00002.gguf",
+     "bytes": 18472580352,
+     "sha256": "eeefba815d893fd53d8cc806ed9cb5a77f7067840753c042835699832899124e"
+    }
+   ]
+  },
+  {
+   "id": "llama31-70b-q8_0",
+   "model_id": "llama31-70b",
+   "quantization": "Q8_0",
+   "weight_bytes": 74975054592,
+   "files": [
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q8_0/Meta-Llama-3.1-70B-Instruct-Q8_0-00001-of-00002.gguf",
+     "bytes": 39808940800,
+     "sha256": "e2550873a3b7189ff35569411f36eb04a5c69d6ecb459874e6943e12b0f54ec9"
+    },
+    {
+     "path": "Meta-Llama-3.1-70B-Instruct-Q8_0/Meta-Llama-3.1-70B-Instruct-Q8_0-00002-of-00002.gguf",
+     "bytes": 35166113792,
+     "sha256": "4fce1532438024d8e1537879156258c3a935783c8dbe75a109c87cfd4dfc38a6"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-iq1_m",
+   "model_id": "llama3-70b",
+   "quantization": "IQ1_M",
+   "weight_bytes": 16751195936,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-IQ1_M.gguf",
+     "bytes": 16751195936,
+     "sha256": "f071ec18bdf9bb94a3a64de2dc87043de6e643011a730de7b6b203df4223eb77"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-iq1_s",
+   "model_id": "llama3-70b",
+   "quantization": "IQ1_S",
+   "weight_bytes": 15343482656,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-IQ1_S.gguf",
+     "bytes": 15343482656,
+     "sha256": "63ac9ca8a01ed0d7d2df385b2ec5cfa5513bf2106876d26372d3bd7af63e3b49"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-iq2_m",
+   "model_id": "llama3-70b",
+   "quantization": "IQ2_M",
+   "weight_bytes": 24119293728,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-IQ2_M.gguf",
+     "bytes": 24119293728,
+     "sha256": "725c685b990335fb1d8a1e52e00bb6d2c04a4e64d042ca1a224180e53e5e0d6b"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-iq2_s",
+   "model_id": "llama3-70b",
+   "quantization": "IQ2_S",
+   "weight_bytes": 22242342688,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-IQ2_S.gguf",
+     "bytes": 22242342688,
+     "sha256": "c0812d186c762b04a16115b8b22254a7367c0ce3c311450d27c3123a2fed7d85"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-iq2_xs",
+   "model_id": "llama3-70b",
+   "quantization": "IQ2_XS",
+   "weight_bytes": 21142107936,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-IQ2_XS.gguf",
+     "bytes": 21142107936,
+     "sha256": "8867a771b629b7abd85f68e9fcb51a20f3bf9eb6eade7dfcc9f8d4086ddd20ca"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-iq2_xxs",
+   "model_id": "llama3-70b",
+   "quantization": "IQ2_XXS",
+   "weight_bytes": 19097384736,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-IQ2_XXS.gguf",
+     "bytes": 19097384736,
+     "sha256": "dcf8e7fc9a03726dc709dae7dd53a634f2443da8fe363dc4f9a96951d240e6e4"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-iq3_m",
+   "model_id": "llama3-70b",
+   "quantization": "IQ3_M",
+   "weight_bytes": 31937034016,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-IQ3_M.gguf",
+     "bytes": 31937034016,
+     "sha256": "680b9f9b621158dfccdbcc953d52d0604366a609416f7fc72138b3631f24fe5e"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-iq3_s",
+   "model_id": "llama3-70b",
+   "quantization": "IQ3_S",
+   "weight_bytes": 30912050976,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-IQ3_S.gguf",
+     "bytes": 30912050976,
+     "sha256": "5271e6839c8e43d721b8b3b76cb81bcd9ee0c17f4380cd4bb2531b00157ada61"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-iq3_xs",
+   "model_id": "llama3-70b",
+   "quantization": "IQ3_XS",
+   "weight_bytes": 29307729696,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-IQ3_XS.gguf",
+     "bytes": 29307729696,
+     "sha256": "a71c35b14669ef117e8e104369303959be0187c53f8268e41d3d2a0d7db0d9d4"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-iq3_xxs",
+   "model_id": "llama3-70b",
+   "quantization": "IQ3_XXS",
+   "weight_bytes": 27469494048,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-IQ3_XXS.gguf",
+     "bytes": 27469494048,
+     "sha256": "291c3238200415174755f0b56e816b96a336f1564dba63823314c0bd60198894"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-iq4_nl",
+   "model_id": "llama3-70b",
+   "quantization": "IQ4_NL",
+   "weight_bytes": 40053618464,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-IQ4_NL.gguf",
+     "bytes": 40053618464,
+     "sha256": "dc9e432dd3f2e987f041dceb4355a4c61aa31ebbda16e3fce06af7d66b3a01a6"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-iq4_xs",
+   "model_id": "llama3-70b",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 37902661408,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-IQ4_XS.gguf",
+     "bytes": 37902661408,
+     "sha256": "b7c0821b45eacaed71d08d061712387880ad538273c32da5021463481921a758"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-q2_k",
+   "model_id": "llama3-70b",
+   "quantization": "Q2_K",
+   "weight_bytes": 26375108384,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-Q2_K.gguf",
+     "bytes": 26375108384,
+     "sha256": "987c41cf85b8ef3a44a4e5fedbaaa0c99f423664a9aacbd62b51c802e0362b6a"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-q2_k_l",
+   "model_id": "llama3-70b",
+   "quantization": "Q2_K_L",
+   "weight_bytes": 29371168544,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-Q2_K_L.gguf",
+     "bytes": 29371168544,
+     "sha256": "2d8eecf8d7cfb658e7aa4d86dafca1465fb06d56c640c69c332399b0ed485cc4"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-q3_k_l",
+   "model_id": "llama3-70b",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 37140592416,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-Q3_K_L.gguf",
+     "bytes": 37140592416,
+     "sha256": "d6097059e2180c9ca39f521343ee82f90011ded8ebf1674554410ec221b2c1dd"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-q3_k_m",
+   "model_id": "llama3-70b",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 34267494176,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-Q3_K_M.gguf",
+     "bytes": 34267494176,
+     "sha256": "fd96573523115fc36f7b69bfbf76e43041d62c944087cba288a1edd5650c598d"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-q3_k_s",
+   "model_id": "llama3-70b",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 30912050976,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-Q3_K_S.gguf",
+     "bytes": 30912050976,
+     "sha256": "98ccf7da30df84414d38ebeee8c9076f2a7d0a13214e2545e5729208116e0da3"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-q3_k_xl",
+   "model_id": "llama3-70b",
+   "quantization": "Q3_K_XL",
+   "weight_bytes": 40029943584,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-Q3_K_XL.gguf",
+     "bytes": 40029943584,
+     "sha256": "7188d1ea9e9420947633d7548509740ea0acdd2e0f72242cd0c774cdd2d69361"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-q4_k_l",
+   "model_id": "llama3-70b",
+   "quantization": "Q4_K_L",
+   "weight_bytes": 45270202144,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-Q4_K_L.gguf",
+     "bytes": 45270202144,
+     "sha256": "f0dd2ec40e95182d7e2ffda67bdf1f783c54058bfa4ff03aa264ec5ae89b4b0d"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-q4_k_m",
+   "model_id": "llama3-70b",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 42520393504,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-Q4_K_M.gguf",
+     "bytes": 42520393504,
+     "sha256": "7b602f72406b1cd28466f84506abe8ff0e67dd867937ff1c393a78de29b8d07e"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-q4_k_s",
+   "model_id": "llama3-70b",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 40347219744,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-Q4_K_S.gguf",
+     "bytes": 40347219744,
+     "sha256": "1e7d6082e0b97745072ec1fbeeceba3951f248555c9f2eb127b83cc2a612ec19"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-q5_k_l",
+   "model_id": "llama3-70b",
+   "quantization": "Q5_K_L",
+   "weight_bytes": 52568291328,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-Q5_K_L.gguf/Meta-Llama-3-70B-Instruct-Q5_K_L-00001-of-00002.gguf",
+     "bytes": 39993594592,
+     "sha256": "49ab6a7e72037f4d74047bb701b45da44abbc33303e48144397dada03412861e"
+    },
+    {
+     "path": "Meta-Llama-3-70B-Instruct-Q5_K_L.gguf/Meta-Llama-3-70B-Instruct-Q5_K_L-00002-of-00002.gguf",
+     "bytes": 12574696736,
+     "sha256": "8634f4b38b4330103f02f7a492b24b69937e621e250654b119a0bf2a17194986"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-q5_k_m",
+   "model_id": "llama3-70b",
+   "quantization": "Q5_K_M",
+   "weight_bytes": 49949816608,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-Q5_K_M.gguf",
+     "bytes": 49949816608,
+     "sha256": "7cb1c17c5b33a8071acf9a715eb4281d9b7ba34e1b8af5a660300d86cbfc8aee"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-q5_k_s",
+   "model_id": "llama3-70b",
+   "quantization": "Q5_K_S",
+   "weight_bytes": 48657446688,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-Q5_K_S.gguf",
+     "bytes": 48657446688,
+     "sha256": "95474bba2401407b4dcf7535066e82ca1272d2aedeb661973767df6770787c1f"
+    }
+   ]
+  },
+  {
+   "id": "llama3-70b-q6_k",
+   "model_id": "llama3-70b",
+   "quantization": "Q6_K",
+   "weight_bytes": 57888143328,
+   "files": [
+    {
+     "path": "Meta-Llama-3-70B-Instruct-Q6_K.gguf/Meta-Llama-3-70B-Instruct-Q6_K-00001-of-00002.gguf",
+     "bytes": 39862698784,
+     "sha256": "1dfcec26081dfc6547498b49266ff2e39880337ff8b85dd5380cbb385137380d"
+    },
+    {
+     "path": "Meta-Llama-3-70B-Instruct-Q6_K.gguf/Meta-Llama-3-70B-Instruct-Q6_K-00002-of-00002.gguf",
+     "bytes": 18025444544,
+     "sha256": "8ac2b8d53e03d2926237214eb2cc15f1cbf92c2281d51bed9c756055e3f11a8c"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-iq2_m",
+   "model_id": "laguna-xs21",
+   "quantization": "IQ2_M",
+   "weight_bytes": 11635506048,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-IQ2_M.gguf",
+     "bytes": 11635506048,
+     "sha256": "e6fb720d06d111bdf808400a03a3143fefbc143e4e1e37dedbdb2012452c6dad"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-iq2_s",
+   "model_id": "laguna-xs21",
+   "quantization": "IQ2_S",
+   "weight_bytes": 10620330880,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-IQ2_S.gguf",
+     "bytes": 10620330880,
+     "sha256": "37f9b10236cd356768741cbafc9016bb5d5a0242ac9d453406c6858d31a4e675"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-iq2_xs",
+   "model_id": "laguna-xs21",
+   "quantization": "IQ2_XS",
+   "weight_bytes": 10386596736,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-IQ2_XS.gguf",
+     "bytes": 10386596736,
+     "sha256": "ebd34405842a82ad751ba98f9d803b1da509f5a20dd19bb5e60ca4c2d6d02020"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-iq2_xxs",
+   "model_id": "laguna-xs21",
+   "quantization": "IQ2_XXS",
+   "weight_bytes": 9404976000,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-IQ2_XXS.gguf",
+     "bytes": 9404976000,
+     "sha256": "8df18048885c9b325e0785d90a8d56d05cb8824d1d618f2a0614082abcec9e50"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-iq3_m",
+   "model_id": "laguna-xs21",
+   "quantization": "IQ3_M",
+   "weight_bytes": 16282120064,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-IQ3_M.gguf",
+     "bytes": 16282120064,
+     "sha256": "d0f2815cd4ce310aaaab388be14f320b97f1ec9cc03d9121c7809ebdd1091ba3"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-iq3_xs",
+   "model_id": "laguna-xs21",
+   "quantization": "IQ3_XS",
+   "weight_bytes": 15563714432,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-IQ3_XS.gguf",
+     "bytes": 15563714432,
+     "sha256": "c9337d716ac47a7cf49524ea295bd5b1d21f2d56013cc8ddd6761de536558cac"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-iq3_xxs",
+   "model_id": "laguna-xs21",
+   "quantization": "IQ3_XXS",
+   "weight_bytes": 14285958016,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-IQ3_XXS.gguf",
+     "bytes": 14285958016,
+     "sha256": "157bcf48262a7d0b9ceeaabeb5f56b19f899b13c1beae8da2aa96d0468aeddd3"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-iq4_nl",
+   "model_id": "laguna-xs21",
+   "quantization": "IQ4_NL",
+   "weight_bytes": 19212625280,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-IQ4_NL.gguf",
+     "bytes": 19212625280,
+     "sha256": "8ba0ba574a485b036b96d517e1c6d19f5461533940dea84da613ae3099664680"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-iq4_xs",
+   "model_id": "laguna-xs21",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 18211212672,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-IQ4_XS.gguf",
+     "bytes": 18211212672,
+     "sha256": "2b50ace5e3d1d2e4216d7824dcd3d699be5ab3bd903058321c42694ef54b1d80"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q2_k",
+   "model_id": "laguna-xs21",
+   "quantization": "Q2_K",
+   "weight_bytes": 12157833600,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q2_K.gguf",
+     "bytes": 12157833600,
+     "sha256": "7d847dbf41fe1c41a633a43fd3603a3d7079e48238e9f06a653da8a4f430149a"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q2_k_l",
+   "model_id": "laguna-xs21",
+   "quantization": "Q2_K_L",
+   "weight_bytes": 12358537600,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q2_K_L.gguf",
+     "bytes": 12358537600,
+     "sha256": "d7bf188938336479d61e3cf60d071d6df6d723433c2eeec11f21e75fc6229e59"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q3_k_l",
+   "model_id": "laguna-xs21",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 16129879936,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q3_K_L.gguf",
+     "bytes": 16129879936,
+     "sha256": "25786dfbc66ad5b619d8e033a448667c58f6b7b56a75e5a3e3161e702b69bc6a"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q3_k_m",
+   "model_id": "laguna-xs21",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 15575904128,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q3_K_M.gguf",
+     "bytes": 15575904128,
+     "sha256": "00dda85ab74afccafa99b66e4d564a6ef76278a8c633d358cad630e7622cf618"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q3_k_s",
+   "model_id": "laguna-xs21",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 14894198656,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q3_K_S.gguf",
+     "bytes": 14894198656,
+     "sha256": "9729f2f31e0b62173b6bf190baa797b72473a730391f7ae2dad35968bbe6088e"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q3_k_xl",
+   "model_id": "laguna-xs21",
+   "quantization": "Q3_K_XL",
+   "weight_bytes": 16309710720,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q3_K_XL.gguf",
+     "bytes": 16309710720,
+     "sha256": "d44d7b8700bc94edbaf22f81d5b3035d57d7a21be38caba4e924f4f8cac20918"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q4_0",
+   "model_id": "laguna-xs21",
+   "quantization": "Q4_0",
+   "weight_bytes": 19210003840,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q4_0.gguf",
+     "bytes": 19210003840,
+     "sha256": "526010deda32e85c34f7780ec0a6e0c6ec39f93797977e2df386b1e152983039"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q4_1",
+   "model_id": "laguna-xs21",
+   "quantization": "Q4_1",
+   "weight_bytes": 21183993216,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q4_1.gguf",
+     "bytes": 21183993216,
+     "sha256": "65f6dfd0c40ada0b221190ff2f4b9cdf82a1d115a8138a342762a7f9f2424f21"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q4_k_l",
+   "model_id": "laguna-xs21",
+   "quantization": "Q4_K_L",
+   "weight_bytes": 20700620160,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q4_K_L.gguf",
+     "bytes": 20700620160,
+     "sha256": "9bb0ec96320ee1137a9c4305fed624ccc10d8bcc264cb0cad9dc0f1d2147dd8d"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q4_k_m",
+   "model_id": "laguna-xs21",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 20548085120,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q4_K_M.gguf",
+     "bytes": 20548085120,
+     "sha256": "239b1417ab36565241b2cb5dd366b89919033b1cf16d6f51b8d870db3491dae6"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q4_k_s",
+   "model_id": "laguna-xs21",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 19781477760,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q4_K_S.gguf",
+     "bytes": 19781477760,
+     "sha256": "a0f6703171c39182d9f6e306e2cb9c3e22fb6b0b9612c82dbfc802e0a620ce91"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q5_k_l",
+   "model_id": "laguna-xs21",
+   "quantization": "Q5_K_L",
+   "weight_bytes": 24131880320,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q5_K_L.gguf",
+     "bytes": 24131880320,
+     "sha256": "f16451481784b3089ed9527d16167364995818b233773091085a54af9cca8f9d"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q5_k_m",
+   "model_id": "laguna-xs21",
+   "quantization": "Q5_K_M",
+   "weight_bytes": 24005035392,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q5_K_M.gguf",
+     "bytes": 24005035392,
+     "sha256": "bee895482c6703afe827557c240add089953b16753f8272d3e9c68323b8a60cd"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q5_k_s",
+   "model_id": "laguna-xs21",
+   "quantization": "Q5_K_S",
+   "weight_bytes": 23226631552,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q5_K_S.gguf",
+     "bytes": 23226631552,
+     "sha256": "ad6e3a68ce3a300f79c1f5b269b150ca67518ee07529f7910469890e72937148"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q6_k",
+   "model_id": "laguna-xs21",
+   "quantization": "Q6_K",
+   "weight_bytes": 29036854144,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q6_K.gguf",
+     "bytes": 29036854144,
+     "sha256": "9e60928790494e66c22dec0bdf8a877a593594cc81f181656177d8cd35787d0b"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q6_k_l",
+   "model_id": "laguna-xs21",
+   "quantization": "Q6_K_L",
+   "weight_bytes": 29136403328,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q6_K_L.gguf",
+     "bytes": 29136403328,
+     "sha256": "9c9acaff0c5892759874ccd8fa489f0d9a839df72a011836a8dc5637c3f4999d"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-q8_0",
+   "model_id": "laguna-xs21",
+   "quantization": "Q8_0",
+   "weight_bytes": 35597116800,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-Q8_0.gguf",
+     "bytes": 35597116800,
+     "sha256": "f8e63721a5ef5473fca6b93b4a9d24449bdf4f2d8a4626a60410f027ee8920b5"
+    }
+   ]
+  },
+  {
+   "id": "laguna-xs21-bf16",
+   "model_id": "laguna-xs21",
+   "quantization": "BF16",
+   "weight_bytes": 66930226496,
+   "files": [
+    {
+     "path": "Laguna-XS-2.1-bf16/Laguna-XS-2.1-bf16-00001-of-00002.gguf",
+     "bytes": 39549806080,
+     "sha256": "b7e3d86dd0a057b3e87e42cb334ef29ae9a51a24488cdcc02f09488bee22ed5a"
+    },
+    {
+     "path": "Laguna-XS-2.1-bf16/Laguna-XS-2.1-bf16-00002-of-00002.gguf",
+     "bytes": 27380420416,
+     "sha256": "819d8b379a6b4f466fa864cab82d6c107af0659d66198bb49668ce0c5bf3a136"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-iq1_m",
+   "model_id": "kimi-linear-48b",
+   "quantization": "IQ1_M",
+   "weight_bytes": 10924162720,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-IQ1_M.gguf",
+     "bytes": 10924162720,
+     "sha256": "1e93e9151480d0a9cd3184488bb12a3dc529e995727db9a24eadebe0f3e0306f"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-iq1_s",
+   "model_id": "kimi-linear-48b",
+   "quantization": "IQ1_S",
+   "weight_bytes": 10489931680,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-IQ1_S.gguf",
+     "bytes": 10489931680,
+     "sha256": "56ef967db9dcf153e6a9dfa568a424b940671e3fc318ba5bec058e295a1ca25f"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-iq2_m",
+   "model_id": "kimi-linear-48b",
+   "quantization": "IQ2_M",
+   "weight_bytes": 15792109472,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-IQ2_M.gguf",
+     "bytes": 15792109472,
+     "sha256": "ed167ea22d1900b78ea0a23a59b31369c3829d7c5ace916e671a6eb665c4021a"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-iq2_s",
+   "model_id": "kimi-linear-48b",
+   "quantization": "IQ2_S",
+   "weight_bytes": 13967426464,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-IQ2_S.gguf",
+     "bytes": 13967426464,
+     "sha256": "c781b3d868e90b41d17abd77d8b9a97560a4be2078bb50f3f8b5bfb0d663ba90"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-iq2_xs",
+   "model_id": "kimi-linear-48b",
+   "quantization": "IQ2_XS",
+   "weight_bytes": 13897237408,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-IQ2_XS.gguf",
+     "bytes": 13897237408,
+     "sha256": "883be5561005ed6558c3f9d58d33bd9df818ea41c18086a49769047278953c0e"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-iq2_xxs",
+   "model_id": "kimi-linear-48b",
+   "quantization": "IQ2_XXS",
+   "weight_bytes": 12129177504,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-IQ2_XXS.gguf",
+     "bytes": 12129177504,
+     "sha256": "38150997ff3affffc1a94caa996336ca0ac2312d2d418a8261afdf30c8b13b78"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-iq3_m",
+   "model_id": "kimi-linear-48b",
+   "quantization": "IQ3_M",
+   "weight_bytes": 22656365984,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-IQ3_M.gguf",
+     "bytes": 22656365984,
+     "sha256": "ad8f76832cf77c0ce97d3d3c285dc9bec04ef7f0a350569dbebe933c99fccdf9"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-iq3_xs",
+   "model_id": "kimi-linear-48b",
+   "quantization": "IQ3_XS",
+   "weight_bytes": 20439715232,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-IQ3_XS.gguf",
+     "bytes": 20439715232,
+     "sha256": "1e02a663ef00f1f1d98b9925ad7c342b607b2051a8eed4a735679718dc9dcd0c"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-iq3_xxs",
+   "model_id": "kimi-linear-48b",
+   "quantization": "IQ3_XXS",
+   "weight_bytes": 19651346336,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-IQ3_XXS.gguf",
+     "bytes": 19651346336,
+     "sha256": "829846f95c35608dd7ea4c58f0b5c51e66ac1ce232e1830d9e5c2a8765ac05bf"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-iq4_nl",
+   "model_id": "kimi-linear-48b",
+   "quantization": "IQ4_NL",
+   "weight_bytes": 27969510048,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-IQ4_NL.gguf",
+     "bytes": 27969510048,
+     "sha256": "263071a708269f56d8387df2f19d6d46e95ac930ba48c2095a618e09b1255dc5"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-iq4_xs",
+   "model_id": "kimi-linear-48b",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 26464880288,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-IQ4_XS.gguf",
+     "bytes": 26464880288,
+     "sha256": "96e3c084c31382539f334b0f18d3a2c1f3713492cfa4d3f7aa61d1e1340da8a8"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q2_k",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q2_K",
+   "weight_bytes": 17533148320,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q2_K.gguf",
+     "bytes": 17533148320,
+     "sha256": "5e42bceedc1aec421dcea69d1ad8c7299b5e7f83251276ec180ef368f6cead52"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q2_k_l",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q2_K_L",
+   "weight_bytes": 17901788320,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q2_K_L.gguf",
+     "bytes": 17901788320,
+     "sha256": "8aa905b504790f2cf2f88c6ea85695d06da7a66fba0f82fc71257d93424bc3d9"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q3_k_l",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 23617811872,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q3_K_L.gguf",
+     "bytes": 23617811872,
+     "sha256": "dd1bc95798656802f87319b23b2d4d3c07c976277a120c24a342138c15bc342c"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q3_k_m",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 22680802720,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q3_K_M.gguf",
+     "bytes": 22680802720,
+     "sha256": "d63efc0d2824059bb1792e2f023cf3644d44173480530350ddf29cbd17dc146d"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q3_k_s",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 21605092768,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q3_K_S.gguf",
+     "bytes": 21605092768,
+     "sha256": "0aa96317f3437d08fbc85d2ecc9b1befbfc465d4bd04a9b448fa7b67f5c35062"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q3_k_xl",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q3_K_XL",
+   "weight_bytes": 23948113312,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q3_K_XL.gguf",
+     "bytes": 23948113312,
+     "sha256": "107c572d75d33fc6a6edad0aee0550304e78eeed0b63552c2826afa191ea3122"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q4_0",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q4_0",
+   "weight_bytes": 28441221792,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q4_0.gguf",
+     "bytes": 28441221792,
+     "sha256": "6da0a60d2ccee4829727442e0a80215d9557459133bc8c0a123ad3aebdb1fe28"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q4_1",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q4_1",
+   "weight_bytes": 30976574112,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q4_1.gguf",
+     "bytes": 30976574112,
+     "sha256": "c5fe22ad283914e8c25422851fd9c585a2d96e553eed0a910644b755008a6367"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q4_k_l",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q4_K_L",
+   "weight_bytes": 30341225120,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q4_K_L.gguf",
+     "bytes": 30341225120,
+     "sha256": "c9ee2c1bf96a68c616c7dd12ce6a29c6eccfecc8de2570cb326935177096e544"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q4_k_m",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 30061058720,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q4_K_M.gguf",
+     "bytes": 30061058720,
+     "sha256": "a1a7d865370652221f937163f7e94c99e1f114861335ba4f8666606843f1620f"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q4_k_s",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 28977060512,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q4_K_S.gguf",
+     "bytes": 28977060512,
+     "sha256": "cb08170f23f077d53af651d643aa24e567ab19e4492782b0b35b722b473a2299"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q5_k_l",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q5_K_L",
+   "weight_bytes": 35330454176,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q5_K_L.gguf",
+     "bytes": 35330454176,
+     "sha256": "7d193d18cb6a92bc1fa8e70a01030cb01734e40c58f63e709d7d3652ac81b618"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q5_k_m",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q5_K_M",
+   "weight_bytes": 35097473696,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q5_K_M.gguf",
+     "bytes": 35097473696,
+     "sha256": "6949319b016090108e44eac44623d87553f1d16af72e4c6b0bb78f25b20416aa"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q5_k_s",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q5_K_S",
+   "weight_bytes": 34013471392,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q5_K_S.gguf",
+     "bytes": 34013471392,
+     "sha256": "df48a6fe5b69614b111e104f83e2216e5afb54728b311eb0ddb3f45519ad5b9c"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q6_k",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q6_K",
+   "weight_bytes": 40460212128,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q6_K.gguf",
+     "bytes": 40460212128,
+     "sha256": "d44b7f92fe57bca9e034456a576a530b57f036c85f9ce615f90bc3e6827fae9a"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q6_k_l",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q6_K_L",
+   "weight_bytes": 40643057568,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q6_K_L.gguf",
+     "bytes": 40643057568,
+     "sha256": "813476761589e4df08d6ff5d969475a37b4671e1b6159a82c438529bd4e838cb"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-q8_0",
+   "model_id": "kimi-linear-48b",
+   "quantization": "Q8_0",
+   "weight_bytes": 52248386432,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q8_0/moonshotai_Kimi-Linear-48B-A3B-Instruct-Q8_0-00001-of-00002.gguf",
+     "bytes": 39761166432,
+     "sha256": "8b9902c6072803a56f89ab515c363d433117b2ba601989565a3aa9c0836771bc"
+    },
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q8_0/moonshotai_Kimi-Linear-48B-A3B-Instruct-Q8_0-00002-of-00002.gguf",
+     "bytes": 12487220000,
+     "sha256": "999d77a85f36d296c557e26a4a0ced2c628c6f1faed79ca3550442d7c02a45c5"
+    }
+   ]
+  },
+  {
+   "id": "kimi-linear-48b-bf16",
+   "model_id": "kimi-linear-48b",
+   "quantization": "BF16",
+   "weight_bytes": 98285393568,
+   "files": [
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-bf16/moonshotai_Kimi-Linear-48B-A3B-Instruct-bf16-00001-of-00003.gguf",
+     "bytes": 39388323616,
+     "sha256": "db9a1667a38a890288118722cf9138366d44d6d9763e7456757b7daba6baefe4"
+    },
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-bf16/moonshotai_Kimi-Linear-48B-A3B-Instruct-bf16-00002-of-00003.gguf",
+     "bytes": 39665281664,
+     "sha256": "c8a5e01663dc8f8048aae03fc15f713f89dead4e72ea4e129118c8e6a7c6d23b"
+    },
+    {
+     "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-bf16/moonshotai_Kimi-Linear-48B-A3B-Instruct-bf16-00003-of-00003.gguf",
+     "bytes": 19231788288,
+     "sha256": "914bc47bdda638a84f12d8104c48359efb7b4a80f38f553a31e7e29bd7186f17"
+    }
+   ]
+  },
+  {
+   "id": "kimi-dev-72b-iq4_xs",
+   "model_id": "kimi-dev-72b",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 40163239520,
+   "files": [
+    {
+     "path": "Kimi-Dev-72B.IQ4_XS.gguf",
+     "bytes": 40163239520,
+     "sha256": "a9a253fe1b4cc1490caa280756e029737286e87ac72cc71a9bcb44c22cb968d3"
+    }
+   ]
+  },
+  {
+   "id": "kimi-dev-72b-q2_k",
+   "model_id": "kimi-dev-72b",
+   "quantization": "Q2_K",
+   "weight_bytes": 29811762784,
+   "files": [
+    {
+     "path": "Kimi-Dev-72B.Q2_K.gguf",
+     "bytes": 29811762784,
+     "sha256": "0477162d7860fff3eb27575b6b67d51373cb28ddf8317b3d5155a86ab7289fe5"
+    }
+   ]
+  },
+  {
+   "id": "kimi-dev-72b-q3_k_l",
+   "model_id": "kimi-dev-72b",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 39505225312,
+   "files": [
+    {
+     "path": "Kimi-Dev-72B.Q3_K_L.gguf",
+     "bytes": 39505225312,
+     "sha256": "fa15b400b0aa612ee1db26acfd8cd623df45c4c0e06aecf529fa193b39597b83"
+    }
+   ]
+  },
+  {
+   "id": "kimi-dev-72b-q3_k_m",
+   "model_id": "kimi-dev-72b",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 37698725472,
+   "files": [
+    {
+     "path": "Kimi-Dev-72B.Q3_K_M.gguf",
+     "bytes": 37698725472,
+     "sha256": "c8b8dce7d31995283c3858c11f9118cd770a9a9f3931b91db8b9f0d0ee06b497"
+    }
+   ]
+  },
+  {
+   "id": "kimi-dev-72b-q3_k_s",
+   "model_id": "kimi-dev-72b",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 34487789152,
+   "files": [
+    {
+     "path": "Kimi-Dev-72B.Q3_K_S.gguf",
+     "bytes": 34487789152,
+     "sha256": "9dacd59dcb41f0771b2a6d6c2e072e2cf393a057bb2305ec077ffbe12b7d8ecd"
+    }
+   ]
+  },
+  {
+   "id": "kimi-dev-72b-q4_k_m",
+   "model_id": "kimi-dev-72b",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 47415715424,
+   "files": [
+    {
+     "path": "Kimi-Dev-72B.Q4_K_M.gguf",
+     "bytes": 47415715424,
+     "sha256": "67b8610bb120fe10256fb2cf94b2a50d590826c46ad18821a22bf083c5b46fa8"
+    }
+   ]
+  },
+  {
+   "id": "kimi-dev-72b-q4_k_s",
+   "model_id": "kimi-dev-72b",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 43889223264,
+   "files": [
+    {
+     "path": "Kimi-Dev-72B.Q4_K_S.gguf",
+     "bytes": 43889223264,
+     "sha256": "6ea1cc676284821bc26fde5164d60e491c373322444a242c901c9c1bf814adeb"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-bf16",
+   "model_id": "qwen38-27b",
+   "quantization": "BF16",
+   "weight_bytes": 54657735616,
+   "files": [
+    {
+     "path": "BF16/Qwen3.8-27B-BF16-00001-of-00002.gguf",
+     "bytes": 49986159616,
+     "sha256": "b9966e82b7a4d87028b5eae061d578ee826305ebf8baea5bfc6e09bad0ba191f"
+    },
+    {
+     "path": "BF16/Qwen3.8-27B-BF16-00002-of-00002.gguf",
+     "bytes": 4671576000,
+     "sha256": "92e3943c4f9bd6292a7bef82369f65fed9bfed088b9df0fb2fa2ce17c9edfa02"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-q4_0",
+   "model_id": "qwen38-27b",
+   "quantization": "Q4_0",
+   "weight_bytes": 16056478688,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-Q4_0.gguf",
+     "bytes": 16056478688,
+     "sha256": "ede16c7b36e578ca87a8c70e011e4b4633a32c831c0ce76d0f474582384e671d"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-q4_1",
+   "model_id": "qwen38-27b",
+   "quantization": "Q4_1",
+   "weight_bytes": 17540705248,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-Q4_1.gguf",
+     "bytes": 17540705248,
+     "sha256": "3e020514545c310dfc511dc8d3ddc23482b645189cb9287816d84bed6eddd4ac"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-q8_0",
+   "model_id": "qwen38-27b",
+   "quantization": "Q8_0",
+   "weight_bytes": 29047086048,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-Q8_0.gguf",
+     "bytes": 29047086048,
+     "sha256": "a680f44a06920e5d689774823782006aa3acc8db95750323373b24139b67e348"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-iq1_m",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-IQ1_M",
+   "weight_bytes": 6729166848,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-IQ1_M.gguf",
+     "bytes": 6729166848,
+     "sha256": "1b5165a7149ea51e683c8eaf23372188ad9fc9d1a795386f7a1b558acf847dc6"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-iq1_s",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-IQ1_S",
+   "weight_bytes": 6192222208,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-IQ1_S.gguf",
+     "bytes": 6192222208,
+     "sha256": "3895b6eaa91e705c06ad1938d16c22e86f073c6a67df86260a1da79be3d1f887"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-iq2_s",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-IQ2_S",
+   "weight_bytes": 8371970048,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-IQ2_S.gguf",
+     "bytes": 8371970048,
+     "sha256": "7897d2c5a5cee46aef50895141b2c8a0803c1185f3d03c4fda4cd137a7ad77fe"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-iq2_xxs",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-IQ2_XXS",
+   "weight_bytes": 7266070528,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-IQ2_XXS.gguf",
+     "bytes": 7266070528,
+     "sha256": "e792d8fb3142fe6d9171876d6da0f71f05a71028718debc72dbec93ff645e67d"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-iq3_s",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-IQ3_S",
+   "weight_bytes": 12040883104,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-IQ3_S.gguf",
+     "bytes": 12040883104,
+     "sha256": "d847e2c1e4aa276e4b7b8e9ad7628050e61e165d49ab995407bc36677a6f3864"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-iq3_xxs",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-IQ3_XXS",
+   "weight_bytes": 10934860704,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-IQ3_XXS.gguf",
+     "bytes": 10934860704,
+     "sha256": "c0b7c3038681ed2e3040456c1dd45f9858b6c2290bed172c70388a94874f3eee"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-iq4_xs",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-IQ4_XS",
+   "weight_bytes": 14252845984,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+     "bytes": 14252845984,
+     "sha256": "40fac4050e940397dbf13087afd50f4734a11805bf9d65ef8ddd7483470e6199"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-q2_k_xl",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-Q2_K_XL",
+   "weight_bytes": 9828981664,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-Q2_K_XL.gguf",
+     "bytes": 9828981664,
+     "sha256": "fd4730dd8aad070517978752b63d530aeb1740d2283cab9fa24f1e404032ddb0"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-q3_k_xl",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-Q3_K_XL",
+   "weight_bytes": 13146393504,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-Q3_K_XL.gguf",
+     "bytes": 13146393504,
+     "sha256": "8c2a45ff85e7674ca185ec8eb6cdeab0e617ed9d8018caed0b64380eb2a67a5e"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-q4_k_m",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-Q4_K_M",
+   "weight_bytes": 16464440224,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-Q4_K_M.gguf",
+     "bytes": 16464440224,
+     "sha256": "322e194ff79741c7baa497c240f677f54b201b0efab44ca8e50f122b39123482"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-q4_k_s",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-Q4_K_S",
+   "weight_bytes": 15358213024,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-Q4_K_S.gguf",
+     "bytes": 15358213024,
+     "sha256": "75bc9c8adba2842e72f0ab5201aaa07133c5010b566305c09187fcbdcd364017"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-q4_k_xl",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-Q4_K_XL",
+   "weight_bytes": 17559178144,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-Q4_K_XL.gguf",
+     "bytes": 17559178144,
+     "sha256": "3f227079003add2511437e5b1e94812e363385225bf6a9b47b0054a72bc8b01e"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-q5_k_m",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-Q5_K_M",
+   "weight_bytes": 19771509664,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-Q5_K_M.gguf",
+     "bytes": 19771509664,
+     "sha256": "2de73110cb254cbf09b54b717578dadff12ef1194e7271527e68202f39ba4bfd"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-q5_k_s",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-Q5_K_S",
+   "weight_bytes": 18665753504,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-Q5_K_S.gguf",
+     "bytes": 18665753504,
+     "sha256": "d8d62ffcf84d42658dd6ccf9782b4d0404700af78b26d750507510c7597b5bfe"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-q5_k_xl",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-Q5_K_XL",
+   "weight_bytes": 20876938144,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-Q5_K_XL.gguf",
+     "bytes": 20876938144,
+     "sha256": "8601193d3d5760c37fb8ce1b43afebc69df5fb24e1fbc5a547c32e2200305276"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-q6_k",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-Q6_K",
+   "weight_bytes": 21983677344,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-Q6_K.gguf",
+     "bytes": 21983677344,
+     "sha256": "c9c206812fbe4ac7b76a729e25928b63f2ae89d37f69da7a71c20aec763cd436"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-q6_k_l",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-Q6_K_L",
+   "weight_bytes": 24193919904,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-Q6_K_L.gguf",
+     "bytes": 24193919904,
+     "sha256": "121355b4c7422771da25adc74090e3c90138f77ce5c92d348687d47824ec80f4"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-q6_k_m",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-Q6_K_M",
+   "weight_bytes": 23088409504,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-Q6_K_M.gguf",
+     "bytes": 23088409504,
+     "sha256": "493301830a596b8ad56dc1329f80bbcb578c8e910da395feafdc9cd8263430bb"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-q6_k_xl",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-Q6_K_XL",
+   "weight_bytes": 25299061664,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-Q6_K_XL.gguf",
+     "bytes": 25299061664,
+     "sha256": "701d8fa9ed214ab21bfc130cd2a7df19ca89bbef7713e2dfb19f3c63696aa917"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-q8_k_l",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-Q8_K_L",
+   "weight_bytes": 28045695904,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-Q8_K_L.gguf",
+     "bytes": 28045695904,
+     "sha256": "2a13bba36d2efa213f9275abc430c40e4d914b145bfde976f30f1bb5b7e23ac2"
+    }
+   ]
+  },
+  {
+   "id": "qwen38-27b-ud-q8_k_xl",
+   "model_id": "qwen38-27b",
+   "quantization": "UD-Q8_K_XL",
+   "weight_bytes": 31457991680,
+   "files": [
+    {
+     "path": "Qwen3.8-27B-UD-Q8_K_XL.gguf",
+     "bytes": 31457991680,
+     "sha256": "af36ecb6b5db1407953345b746c14ac93f0657dda413910b4348683a2d990377"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-iq1_m",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "IQ1_M",
+   "weight_bytes": 9421649728,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-IQ1_M.gguf",
+     "bytes": 9421649728,
+     "sha256": "b5c5134716d5384a097ba31914a6ec3a1a47ee72bb7ccd2a639a9e80174907d8"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-iq2_m",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "IQ2_M",
+   "weight_bytes": 12964403008,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-IQ2_M.gguf",
+     "bytes": 12964403008,
+     "sha256": "bce81eb2a0915447f3594a5f37bfd2707ae33e734bc4e1f1bc56c6d1b3325cee"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-iq2_s",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "IQ2_S",
+   "weight_bytes": 11907962688,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-IQ2_S.gguf",
+     "bytes": 11907962688,
+     "sha256": "b9202358bc0d9d56fd51077484c0c97fd000f6c99900e61527793abce01d9619"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-iq2_xs",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "IQ2_XS",
+   "weight_bytes": 11694831424,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-IQ2_XS.gguf",
+     "bytes": 11694831424,
+     "sha256": "a2536fdf07444823980408a51512ed9cfc8eaa175bccc8cb92b3b5988413e0ed"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-iq2_xxs",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "IQ2_XXS",
+   "weight_bytes": 10676139840,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-IQ2_XXS.gguf",
+     "bytes": 10676139840,
+     "sha256": "479cc80b2500f7ba5f6131986da188ecb406cf7855094c5d8ae0ec332a715105"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-iq3_m",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "IQ3_M",
+   "weight_bytes": 17791661888,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-IQ3_M.gguf",
+     "bytes": 17791661888,
+     "sha256": "1a56509a1c46de8125c369b0c670ea75e7cd5b51867117f6c4007dc69c5cc6f7"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-iq3_xs",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "IQ3_XS",
+   "weight_bytes": 17110087488,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-IQ3_XS.gguf",
+     "bytes": 17110087488,
+     "sha256": "8560fbdb1429e6355a0409488a58ade24caae3ca7203de0417ec24a4fc411018"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-iq3_xxs",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "IQ3_XXS",
+   "weight_bytes": 15761446720,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-IQ3_XXS.gguf",
+     "bytes": 15761446720,
+     "sha256": "c385920c6b956dc8c69c1ec1ebd750615c483734c949ef1f85d916df6cd9752d"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-iq4_nl",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "IQ4_NL",
+   "weight_bytes": 20754978624,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-IQ4_NL.gguf",
+     "bytes": 20754978624,
+     "sha256": "e7da4f18c43d86d09950826d7ee2b305e56ba70a4165bdf4f3e09cd95cabc36b"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-iq4_xs",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 19699554112,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-IQ4_XS.gguf",
+     "bytes": 19699554112,
+     "sha256": "f308de904e2ca05d9893e606511a2fc237851e183594605c0b8ab3a6e7b1bd5f"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q2_k",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q2_K",
+   "weight_bytes": 13506778944,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q2_K.gguf",
+     "bytes": 13506778944,
+     "sha256": "49533d47d170c0dad00e38f3aab0d8a5556654caa8144a7e6f3480c8e6761201"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q2_k_l",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q2_K_L",
+   "weight_bytes": 14003418944,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q2_K_L.gguf",
+     "bytes": 14003418944,
+     "sha256": "00faf16be7d52610e712ac55a1e8d19c02bf155109beb13869f37c48fa9336f6"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q3_k_l",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 17777899328,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q3_K_L.gguf",
+     "bytes": 17777899328,
+     "sha256": "df227017a3cf430361433658966f2f676ab008635365a9505f2763d4d52401c4"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q3_k_m",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 17117951808,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q3_K_M.gguf",
+     "bytes": 17117951808,
+     "sha256": "eaef9194110fa86144b003e22f5058a3fb2810be0828c805ff0bec21601d2db8"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q3_k_s",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 16404920128,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q3_K_S.gguf",
+     "bytes": 16404920128,
+     "sha256": "9c2583f59a8158d211a8c94bf31e1bee6709aadeaba645bbfebfd03e0b5b456a"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q3_k_xl",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q3_K_XL",
+   "weight_bytes": 18222888768,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q3_K_XL.gguf",
+     "bytes": 18222888768,
+     "sha256": "f3da049b734eca555cf6da2d579adda68b8157a6d9399a0fc99e065232ffeea2"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q4_0",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q4_0",
+   "weight_bytes": 20836243264,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q4_0.gguf",
+     "bytes": 20836243264,
+     "sha256": "16c6a0300edeb92b98b3972e38746b29ad07bc2adf3eb9c4ae598189240eb4a0"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q4_1",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q4_1",
+   "weight_bytes": 22868449088,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q4_1.gguf",
+     "bytes": 22868449088,
+     "sha256": "b1601da89b5bcf4c0c7527cd222faf17b5ff5d6e1188a310a16f7f20b8513302"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q4_k_l",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q4_K_L",
+   "weight_bytes": 22662526784,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q4_K_L.gguf",
+     "bytes": 22662526784,
+     "sha256": "240f0e2b4aebddb19cf698534192b693b763082c98e14e4abc30fa6d8e0097eb"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q4_k_m",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 22285080384,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q4_K_M.gguf",
+     "bytes": 22285080384,
+     "sha256": "2f2df1e8b2e92b642c1850ea1734b341cc8ca5098c42cc0a8b8c436a8d4751ab"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q4_k_s",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 21486360384,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q4_K_S.gguf",
+     "bytes": 21486360384,
+     "sha256": "c889bb0b997a0e22d0477bd00a427e2b0e923c2f7eec3bea21091354a7ffb5a7"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q5_k_l",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q5_K_L",
+   "weight_bytes": 26227062592,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q5_K_L.gguf",
+     "bytes": 26227062592,
+     "sha256": "2d4d22772e33fc0264764836474df4fbcf3d7bf40ace11ffd425aa2bea4e00b7"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q5_k_m",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q5_K_M",
+   "weight_bytes": 25913186112,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q5_K_M.gguf",
+     "bytes": 25913186112,
+     "sha256": "0ef826fe6712b44282bb1911fd8c575564fc25efc24d5c734fafe4d03bb8a99c"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q5_k_s",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q5_K_S",
+   "weight_bytes": 25051879232,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q5_K_S.gguf",
+     "bytes": 25051879232,
+     "sha256": "a4c464239c6bd52ac10c8fbcdeaef5a3cc5c6224c2eb0a03936b2ca9fee7a60a"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q6_k",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q6_K",
+   "weight_bytes": 30947309376,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q6_K.gguf",
+     "bytes": 30947309376,
+     "sha256": "affcd3d7f9717e6943d9084cbf47811880ebe78c495b1621c7adc671fa464bf3"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q6_k_l",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q6_K_L",
+   "weight_bytes": 31193642816,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q6_K_L.gguf",
+     "bytes": 31193642816,
+     "sha256": "61112a9ba3021586c2ea339eeef4749ebfb3081797e94ba961e57cb0998a7c33"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-q8_0",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "Q8_0",
+   "weight_bytes": 37812647744,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-Q8_0.gguf",
+     "bytes": 37812647744,
+     "sha256": "aab4d944b2d2cf26bfad662f3ee0a0a55511dfc2eb6d7454c4a172662a9213c8"
+    }
+   ]
+  },
+  {
+   "id": "qwen35-35b-moe-bf16",
+   "model_id": "qwen35-35b-moe",
+   "quantization": "BF16",
+   "weight_bytes": 71065941760,
+   "files": [
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-bf16/Qwen_Qwen3.5-35B-A3B-bf16-00001-of-00002.gguf",
+     "bytes": 39739396128,
+     "sha256": "e50632407c4a71db79a063907368c0fa51020771cca8fec19d6bb331cbcf22e1"
+    },
+    {
+     "path": "Qwen_Qwen3.5-35B-A3B-bf16/Qwen_Qwen3.5-35B-A3B-bf16-00002-of-00002.gguf",
+     "bytes": 31326545632,
+     "sha256": "5ff0de0490844f7610abd01a4575ba7303e92004cb028df1e58fb416b8061abe"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-iq2_m",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "IQ2_M",
+   "weight_bytes": 11264440480,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-IQ2_M.gguf",
+     "bytes": 11264440480,
+     "sha256": "fe09c039ff7a9dbb4b45c2d69117015320eca143438c9e3edb1717631c4facfc"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-iq2_s",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "IQ2_S",
+   "weight_bytes": 10387568800,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-IQ2_S.gguf",
+     "bytes": 10387568800,
+     "sha256": "b35c64a328cb754fda5d758147642e19b7c4c86f82a245dd0f2df95c1a791623"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-iq2_xs",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "IQ2_XS",
+   "weight_bytes": 9957550240,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-IQ2_XS.gguf",
+     "bytes": 9957550240,
+     "sha256": "a8168ec28aa6d9b4d3d0b4980dba3d081c7677840163c1f85e9336ccc3d8a4f0"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-iq2_xxs",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "IQ2_XXS",
+   "weight_bytes": 9028249760,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-IQ2_XXS.gguf",
+     "bytes": 9028249760,
+     "sha256": "8b0c65db4a9ecc9e07eb1cd524a32d4e9f8c2cd95cdc37f76c62e0999ea3e999"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-iq3_m",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "IQ3_M",
+   "weight_bytes": 14810122400,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-IQ3_M.gguf",
+     "bytes": 14810122400,
+     "sha256": "da94a7c4b8f37af1cfeba68279df713b01d200476a77db9244a2e5ade1347175"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-iq3_xs",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "IQ3_XS",
+   "weight_bytes": 13705513120,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-IQ3_XS.gguf",
+     "bytes": 13705513120,
+     "sha256": "3084ca1a2e1c3172c20e42f64f5bd6ad51276a143c9de3abcb3d537c11a0993e"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-iq4_nl",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "IQ4_NL",
+   "weight_bytes": 18682173600,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-IQ4_NL.gguf",
+     "bytes": 18682173600,
+     "sha256": "bb45364875d9e2d8518659aaeadafaadba1574092e0ca9b6d5265d6c47f58a73"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-iq4_xs",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 17693153440,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-IQ4_XS.gguf",
+     "bytes": 17693153440,
+     "sha256": "91eb0de25c80c0b33a3e89777d96040622f8fa70c71610bf13e19dab297be6b6"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q2_k",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q2_K",
+   "weight_bytes": 12313098400,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q2_K.gguf",
+     "bytes": 12313098400,
+     "sha256": "5d3482d2f89bb30c14457ce443441b0c826ac8009d269c4a38a94bd59027126b"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q2_k_l",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q2_K_L",
+   "weight_bytes": 13073418400,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q2_K_L.gguf",
+     "bytes": 13073418400,
+     "sha256": "3bf816aedf36a9ae0cf4cedfcdefb0dbc43921ea20e332529726868102a1dd10"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q3_k_l",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 17247078560,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q3_K_L.gguf",
+     "bytes": 17247078560,
+     "sha256": "70b77e6fd9ca78a0fef2480a9052f21358b8a4f0bcea8962403d05b345f2e6c1"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q3_k_m",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 15935047840,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q3_K_M.gguf",
+     "bytes": 15935047840,
+     "sha256": "4766e528b7e0e16e7304ec228e192a4ee6e776a5b5b5845f00c4576f560aa76a"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q3_k_s",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 14392330400,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q3_K_S.gguf",
+     "bytes": 14392330400,
+     "sha256": "7f83c6b1f689f6ca8b16088b72e9837921140642243ce1b6f467251e45a28b6a"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q3_k_xl",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q3_K_XL",
+   "weight_bytes": 17928325280,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q3_K_XL.gguf",
+     "bytes": 17928325280,
+     "sha256": "5a4fc7e6475446d5d0a43f0a11c4c40d208cee611165a6535286756913486162"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q4_0",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q4_0",
+   "weight_bytes": 18711009440,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q4_0.gguf",
+     "bytes": 18711009440,
+     "sha256": "9aa6a3dd22123fb5705ccbc37b2b2c91d8b994f689ed95e1d8dd1bc32f146f43"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q4_1",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q4_1",
+   "weight_bytes": 20639242400,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q4_1.gguf",
+     "bytes": 20639242400,
+     "sha256": "80ae4b3680e063bfb173c0afb62a87455d2cdcbdeec92dda4625f0e401dde440"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q4_k_l",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q4_K_L",
+   "weight_bytes": 20429179040,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q4_K_L.gguf",
+     "bytes": 20429179040,
+     "sha256": "0208dc13febd723a4ad26482fa405cb55cc0b6d68d06b10271e5c737cb5578e9"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q4_k_m",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 19851335840,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q4_K_M.gguf",
+     "bytes": 19851335840,
+     "sha256": "bed9b0f551f5b95bf9da5888a48f0f87c37ad6b72519c4cbd775f54ac0b9fc62"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q4_k_s",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 18784409760,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q4_K_S.gguf",
+     "bytes": 18784409760,
+     "sha256": "ae5f7e5570239257d554fa1a38ffb8ad634da9dd7e9661e624d1b3bbb6a7b5e8"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q5_k_l",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q5_K_L",
+   "weight_bytes": 23742679200,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q5_K_L.gguf",
+     "bytes": 23742679200,
+     "sha256": "16e9336945d23b7a86ab6e2bd62d555c623cf44807d95466dfc3ced8a1402135"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q5_k_m",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q5_K_M",
+   "weight_bytes": 23262156960,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q5_K_M.gguf",
+     "bytes": 23262156960,
+     "sha256": "9f345fb6721d413669afad82154b177cb45e333f49926e38c3586f01c37dfcca"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q5_k_s",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q5_K_S",
+   "weight_bytes": 22638254240,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q5_K_S.gguf",
+     "bytes": 22638254240,
+     "sha256": "e94e3eeb0ae94955363b32e824ef2d7f1ae8aa973ab71ef6046640dfac7f44d1"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q6_k",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q6_K",
+   "weight_bytes": 26886154400,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q6_K.gguf",
+     "bytes": 26886154400,
+     "sha256": "5a7d8d16853575a625fae0812e11fd021618ec254288f5088fb217268b83a1df"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q6_k_l",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q6_K_L",
+   "weight_bytes": 27263273120,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q6_K_L.gguf",
+     "bytes": 27263273120,
+     "sha256": "2d1dda9ad0affff49d763c2828ffb791299b23c9ced13d0d24587a4381d6cced"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-q8_0",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "Q8_0",
+   "weight_bytes": 34820884352,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-Q8_0.gguf",
+     "bytes": 34820884352,
+     "sha256": "5b321bce035d98e61636e15cd468467e57dfaee4ea28acd42edd7edd1b6098d7"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-32b-bf16",
+   "model_id": "deepseek-r1-32b",
+   "quantization": "BF16",
+   "weight_bytes": 65535969344,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-bf16/DeepSeek-R1-Distill-Qwen-32B-bf16-00001-of-00002.gguf",
+     "bytes": 39880799392,
+     "sha256": "05ecfb6b243833a042bf6e5b24ee359a4b1cee1d15b657dd11e5581fc44e2119"
+    },
+    {
+     "path": "DeepSeek-R1-Distill-Qwen-32B-bf16/DeepSeek-R1-Distill-Qwen-32B-bf16-00002-of-00002.gguf",
+     "bytes": 25655169952,
+     "sha256": "7d7eb11ac21b650a27b55121b1215965109c267defb1dd512ccd6be4d1c477ec"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-iq1_m",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "IQ1_M",
+   "weight_bytes": 16751198368,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-IQ1_M.gguf",
+     "bytes": 16751198368,
+     "sha256": "2ceb17221a51292dac93fa2518bb24ee4a9f8723df9cca29201649b30492f6ba"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-iq2_m",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "IQ2_M",
+   "weight_bytes": 24119296160,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-IQ2_M.gguf",
+     "bytes": 24119296160,
+     "sha256": "614a5cb355ba58883ed6a2a8b4950d9d3c9571e90ff67450c4e14e68bf6cb222"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-iq2_s",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "IQ2_S",
+   "weight_bytes": 22242345120,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-IQ2_S.gguf",
+     "bytes": 22242345120,
+     "sha256": "bec2f0d2516837ec4ed671f57b11e2dfebd4d89fd46f78c4caf064f5fd4969c7"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-iq2_xs",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "IQ2_XS",
+   "weight_bytes": 21142110368,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-IQ2_XS.gguf",
+     "bytes": 21142110368,
+     "sha256": "5191033aacdc857c0f39e5d1e46bcc55f1b9f88074b00c86b7bda229a711d403"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-iq2_xxs",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "IQ2_XXS",
+   "weight_bytes": 19097387168,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-IQ2_XXS.gguf",
+     "bytes": 19097387168,
+     "sha256": "44a8d751ec875182ba40e77a3f35d363cf60f1eb6c8f96d9fa4603f5222b9e47"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-iq3_m",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "IQ3_M",
+   "weight_bytes": 31937036448,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-IQ3_M.gguf",
+     "bytes": 31937036448,
+     "sha256": "31cd7e6241ade7f4bddeb1ab13b23ff56932839b76d09c8cec925dc376d0d575"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-iq3_xxs",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "IQ3_XXS",
+   "weight_bytes": 27469496480,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-IQ3_XXS.gguf",
+     "bytes": 27469496480,
+     "sha256": "128740ac2c0d093b3a50e1812c51e2ef28094da356a6f6a5b0a335b9f95ef620"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-iq4_nl",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "IQ4_NL",
+   "weight_bytes": 40053620896,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-IQ4_NL.gguf",
+     "bytes": 40053620896,
+     "sha256": "921c814392aa411f6de8f7e8a9214887b0921d3809aa9f0c571ae7dec8ffc9fc"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-iq4_xs",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 37902663840,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-IQ4_XS.gguf",
+     "bytes": 37902663840,
+     "sha256": "6e72d7a46a857b7d2e05dda32ee6366eff548bc73f07f6b112e88ff10d3467e5"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-q2_k",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "Q2_K",
+   "weight_bytes": 26375110816,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q2_K.gguf",
+     "bytes": 26375110816,
+     "sha256": "a320278a17145cbfa48120d12bfacbb512165104f8f0b8cf180b03ea9549ba53"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-q2_k_l",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "Q2_K_L",
+   "weight_bytes": 27401158816,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q2_K_L.gguf",
+     "bytes": 27401158816,
+     "sha256": "5cb5412a87b6331a2945c6b49c504fa549a760877d7e0d48a40368240b858652"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-q3_k_l",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 37140594848,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q3_K_L.gguf",
+     "bytes": 37140594848,
+     "sha256": "3a0a66c801fe6fc749dd015f6903bdafbb3b9b42ab878cd56bd15c9f6cea7ff6"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-q3_k_m",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 34267496608,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q3_K_M.gguf",
+     "bytes": 34267496608,
+     "sha256": "3778a253baf5188c056218430eaab3d8ad913ca72a33494c432c536f67349c95"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-q3_k_s",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 30912053408,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q3_K_S.gguf",
+     "bytes": 30912053408,
+     "sha256": "803d1711948c8448002e166e09c44210831123d4bf0790130484af3cc4e8d4cb"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-q3_k_xl",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "Q3_K_XL",
+   "weight_bytes": 38059933856,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q3_K_XL.gguf",
+     "bytes": 38059933856,
+     "sha256": "f2066821111a5a154f34332cf9e54e3da327293747b7f9330bdcdddf7022763e"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-q4_0",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "Q4_0",
+   "weight_bytes": 40116535456,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q4_0.gguf",
+     "bytes": 40116535456,
+     "sha256": "e83a4211707edd912796495927b24ebf77711c6e4160a844c583d76285f6c712"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-q4_1",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "Q4_1",
+   "weight_bytes": 44313591968,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q4_1.gguf",
+     "bytes": 44313591968,
+     "sha256": "5f9a3e34a70d2260d91951750313a043898c097965543ee345a276da1ccb9531"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-q4_k_m",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 42520395936,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q4_K_M.gguf",
+     "bytes": 42520395936,
+     "sha256": "181a82a1d6d2fa24fe4db83a68eee030384986bdbdd4773ba76424e3a6eb9fd8"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-q4_k_s",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 40347222176,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q4_K_S.gguf",
+     "bytes": 40347222176,
+     "sha256": "8b4855bf633aca0f9947d7e4b218bc847090ddb41278a30b0951d0f1c1d4c8e6"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-q5_k_m",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "Q5_K_M",
+   "weight_bytes": 49949819232,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q5_K_M/DeepSeek-R1-Distill-Llama-70B-Q5_K_M-00001-of-00002.gguf",
+     "bytes": 39987552000,
+     "sha256": "fa5da9538c5e2fe599f6d330e2fc09152b22e6f89c0292dbcf4f58838bff54c5"
+    },
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q5_K_M/DeepSeek-R1-Distill-Llama-70B-Q5_K_M-00002-of-00002.gguf",
+     "bytes": 9962267232,
+     "sha256": "af0c9e714ad2ac2297a4087ad97ef8475bb6a8821f364f63f424221cec68c8fe"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-q5_k_s",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "Q5_K_S",
+   "weight_bytes": 48657449120,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q5_K_S.gguf",
+     "bytes": 48657449120,
+     "sha256": "3b170b8a701c55850036a5205d8477b68ac59f34b6ecc28e3c7a9b9b486cbadf"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-q6_k",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "Q6_K",
+   "weight_bytes": 57888145760,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q6_K/DeepSeek-R1-Distill-Llama-70B-Q6_K-00001-of-00002.gguf",
+     "bytes": 39953845152,
+     "sha256": "a0bccdec0e04ea38de33acfa614dcb3d4394df53954e2bd81fefec0b2ef74351"
+    },
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q6_K/DeepSeek-R1-Distill-Llama-70B-Q6_K-00002-of-00002.gguf",
+     "bytes": 17934300608,
+     "sha256": "159bf34c24a7a1ca2a3b0563d534e7e026f8b389ebe88051f92a232c20ed83da"
+    }
+   ]
+  },
+  {
+   "id": "deepseek-r1-70b-q8_0",
+   "model_id": "deepseek-r1-70b",
+   "quantization": "Q8_0",
+   "weight_bytes": 74975051840,
+   "files": [
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q8_0/DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf",
+     "bytes": 39927000896,
+     "sha256": "74e77eeeae9d2348979299ff1e495477c01c8f9d93989fdd7319fbcf2115e441"
+    },
+    {
+     "path": "DeepSeek-R1-Distill-Llama-70B-Q8_0/DeepSeek-R1-Distill-Llama-70B-Q8_0-00002-of-00002.gguf",
+     "bytes": 35048050944,
+     "sha256": "74b567c55fb8d9b9eb958b871f75f55e20d818e51974fb2540cfc33025c0ed7a"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-iq2_m",
+   "model_id": "mistral-small31",
+   "quantization": "IQ2_M",
+   "weight_bytes": 8114052576,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-IQ2_M.gguf",
+     "bytes": 8114052576,
+     "sha256": "54db2ac6b1f4cbbf26a492b7c8483fce12a38759a1bfe51ae362b27e27a73ea3"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-iq2_s",
+   "model_id": "mistral-small31",
+   "quantization": "IQ2_S",
+   "weight_bytes": 7478353376,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-IQ2_S.gguf",
+     "bytes": 7478353376,
+     "sha256": "42164215866526dd8ff156fd1ebfe37911ea5707e62c295c8e896333135e9587"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-iq2_xs",
+   "model_id": "mistral-small31",
+   "quantization": "IQ2_XS",
+   "weight_bytes": 7207034336,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-IQ2_XS.gguf",
+     "bytes": 7207034336,
+     "sha256": "ffd28a59a36e20adbbe4a5da1d0338a1104dbdcadd460e9623a674d08c544835"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-iq2_xxs",
+   "model_id": "mistral-small31",
+   "quantization": "IQ2_XXS",
+   "weight_bytes": 6545120736,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-IQ2_XXS.gguf",
+     "bytes": 6545120736,
+     "sha256": "8e58af73df420951787b479c5f25b6a7445c184af06eb4579a82abce82e86881"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-iq3_m",
+   "model_id": "mistral-small31",
+   "quantization": "IQ3_M",
+   "weight_bytes": 10650951136,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-IQ3_M.gguf",
+     "bytes": 10650951136,
+     "sha256": "205b180b8ba8e79741defc1655c779fc56b3413516ea5f183394ab787d549bf2"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-iq3_xs",
+   "model_id": "mistral-small31",
+   "quantization": "IQ3_XS",
+   "weight_bytes": 9907117536,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-IQ3_XS.gguf",
+     "bytes": 9907117536,
+     "sha256": "4714ad94eebd8dabd575f9155fba27213c6151e77d7a35bab47fc0d73d5e0065"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-iq3_xxs",
+   "model_id": "mistral-small31",
+   "quantization": "IQ3_XXS",
+   "weight_bytes": 9280593376,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-IQ3_XXS.gguf",
+     "bytes": 9280593376,
+     "sha256": "445325fd09bea660114208c661323f61c3a0bf35019f255265c9b24c512fe7eb"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-iq4_nl",
+   "model_id": "mistral-small31",
+   "quantization": "IQ4_NL",
+   "weight_bytes": 13468016096,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-IQ4_NL.gguf",
+     "bytes": 13468016096,
+     "sha256": "6a88b5380be3a876add9ae231c1978b0fc9ea3959a98fd280a52105e163e8091"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-iq4_xs",
+   "model_id": "mistral-small31",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 12758916576,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-IQ4_XS.gguf",
+     "bytes": 12758916576,
+     "sha256": "5c88b5692e7afcfeda6a0227f0a26dbdfbde957ebbbda6f62e2c3d3a4123a81d"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q2_k",
+   "model_id": "mistral-small31",
+   "quantization": "Q2_K",
+   "weight_bytes": 8890326496,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q2_K.gguf",
+     "bytes": 8890326496,
+     "sha256": "47e676c160d12d9c4a2664ba3e2325caf0b083d1056842d92bdec58882e792b3"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q2_k_l",
+   "model_id": "mistral-small31",
+   "quantization": "Q2_K_L",
+   "weight_bytes": 9545686496,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q2_K_L.gguf",
+     "bytes": 9545686496,
+     "sha256": "8ceaa75ecb630857ee561b7cae9ed93729edd349b5d62f02f90a700ad9877fc1"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q3_k_l",
+   "model_id": "mistral-small31",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 12400762336,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q3_K_L.gguf",
+     "bytes": 12400762336,
+     "sha256": "5e933af46926892cec0744b9e207aa3e6483d9060a206c6edb76ccbcda069967"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q3_k_m",
+   "model_id": "mistral-small31",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 11474083296,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q3_K_M.gguf",
+     "bytes": 11474083296,
+     "sha256": "259f6b3773f760a374335aacba2d6fe6fa893a7635a6f8a9d00a7f40c20488e0"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q3_k_s",
+   "model_id": "mistral-small31",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 10400275936,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q3_K_S.gguf",
+     "bytes": 10400275936,
+     "sha256": "8fe4c2768720e3b6cb1da34fdc4c3929e819cbaf70cf2ed23767a25df36a7a8e"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q3_k_xl",
+   "model_id": "mistral-small31",
+   "quantization": "Q3_K_XL",
+   "weight_bytes": 12987964896,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q3_K_XL.gguf",
+     "bytes": 12987964896,
+     "sha256": "05a54603a62860491c025656f9570514a84a621a5828bd94972afc7fa6d9abc8"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q4_0",
+   "model_id": "mistral-small31",
+   "quantization": "Q4_0",
+   "weight_bytes": 13494230496,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q4_0.gguf",
+     "bytes": 13494230496,
+     "sha256": "f9e71cfc59d011d1ff20b8444dcfa9c9fbbdfe9bfb40ebe6ae226be1f7c48d8f"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q4_1",
+   "model_id": "mistral-small31",
+   "quantization": "Q4_1",
+   "weight_bytes": 14873107936,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q4_1.gguf",
+     "bytes": 14873107936,
+     "sha256": "79ec9e50e6019ac1bfbd1127bdedd64ff7677d3a59e3d1db43f027e8854601ab"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q4_k_l",
+   "model_id": "mistral-small31",
+   "quantization": "Q4_K_L",
+   "weight_bytes": 14831984096,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q4_K_L.gguf",
+     "bytes": 14831984096,
+     "sha256": "2c8576e188846703efa3a0081b5763b90fac09744561929f4da735fa60f0ac04"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q4_k_m",
+   "model_id": "mistral-small31",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 14333910496,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q4_K_M.gguf",
+     "bytes": 14333910496,
+     "sha256": "c5743c1bf39db0ae8a5ade5df0374b8e9e492754a199cfdad7ef393c1590f7c0"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q4_k_s",
+   "model_id": "mistral-small31",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 13549280736,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q4_K_S.gguf",
+     "bytes": 13549280736,
+     "sha256": "c17c3bc6107cd3d2a759d254c0b7052b10c7a8858a6722c838d6ffa67a30322b"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q5_k_l",
+   "model_id": "mistral-small31",
+   "quantization": "Q5_K_L",
+   "weight_bytes": 17178172896,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q5_K_L.gguf",
+     "bytes": 17178172896,
+     "sha256": "a014c1a6cc83c48742b8365415a72ab973e707512b2fee3aa4e2f1cbe082ffd8"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q5_k_m",
+   "model_id": "mistral-small31",
+   "quantization": "Q5_K_M",
+   "weight_bytes": 16763985376,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q5_K_M.gguf",
+     "bytes": 16763985376,
+     "sha256": "64553a25b66927d0105c048d10cc96db31174cf05c3846885b2ad50cd4f32bb3"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q5_k_s",
+   "model_id": "mistral-small31",
+   "quantization": "Q5_K_S",
+   "weight_bytes": 16304414176,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q5_K_S.gguf",
+     "bytes": 16304414176,
+     "sha256": "6c68025de70461e1cab6b30ffcea1f25b9e0b79b72bc185bfcb47df6e789f43f"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q6_k",
+   "model_id": "mistral-small31",
+   "quantization": "Q6_K",
+   "weight_bytes": 19345939936,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q6_K.gguf",
+     "bytes": 19345939936,
+     "sha256": "159c8cf1a356ff29897cd76415d5d3a9ea941edeaf649535ab5a423df0c918a4"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q6_k_l",
+   "model_id": "mistral-small31",
+   "quantization": "Q6_K_L",
+   "weight_bytes": 19670998496,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q6_K_L.gguf",
+     "bytes": 19670998496,
+     "sha256": "f8ed4fe13d39da5f989a607b11b87e70b7c334f6484b33e242d867d7d5db8392"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-q8_0",
+   "model_id": "mistral-small31",
+   "quantization": "Q8_0",
+   "weight_bytes": 25054780896,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-Q8_0.gguf",
+     "bytes": 25054780896,
+     "sha256": "d6a6ab1afaae1f79209ec60d92d158b8cd746948fabc956bb1c914760a8554d8"
+    }
+   ]
+  },
+  {
+   "id": "mistral-small31-bf16",
+   "model_id": "mistral-small31",
+   "quantization": "BF16",
+   "weight_bytes": 47153519776,
+   "files": [
+    {
+     "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-bf16.gguf",
+     "bytes": 47153519776,
+     "sha256": "b4b8ae24a7364e3c535b3854de1d2351c5f12e00d7bb5d6fb094183891a37276"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-iq2_m",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "IQ2_M",
+   "weight_bytes": 5110429696,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-IQ2_M.gguf",
+     "bytes": 5110429696,
+     "sha256": "9d5e17775e819c79ed388fc35064f69f96a82cd2757c456f94971cef94aa80e6"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-iq2_s",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "IQ2_S",
+   "weight_bytes": 4731549696,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-IQ2_S.gguf",
+     "bytes": 4731549696,
+     "sha256": "f0f3a21bbf2abbe1915653129138d01487652fdc578d06ed4473b16ca2385fac"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-iq3_m",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "IQ3_M",
+   "weight_bytes": 6913837056,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-IQ3_M.gguf",
+     "bytes": 6913837056,
+     "sha256": "e002c32e625e0b5afcab960904e904fab88046a542efbea9f39019ce13fe340f"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-iq3_xs",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "IQ3_XS",
+   "weight_bytes": 6246701056,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-IQ3_XS.gguf",
+     "bytes": 6246701056,
+     "sha256": "f381ed47df8157d01445e1e867ce5152755b2a62006962e77a6f5deef8fd1e0b"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-iq3_xxs",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "IQ3_XXS",
+   "weight_bytes": 5846685696,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-IQ3_XXS.gguf",
+     "bytes": 5846685696,
+     "sha256": "24e3f84bf8f69ed8ad83f648a0a97d2f4064babb3b91ee25f1e685dc4e4759f9"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-iq4_nl",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "IQ4_NL",
+   "weight_bytes": 8383420416,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-IQ4_NL.gguf",
+     "bytes": 8383420416,
+     "sha256": "e3b67c63315e3c7f4d2b94c301d97ca183c5d93c9bd137af483864658ae8ad78"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-iq4_xs",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "IQ4_XS",
+   "weight_bytes": 7941380096,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-IQ4_XS.gguf",
+     "bytes": 7941380096,
+     "sha256": "0ad83e8a7dd2e22111bf692e14b7a735fd2c211fe4edc4cf2965c72a13475161"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q2_k",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q2_K",
+   "weight_bytes": 5547350016,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q2_K.gguf",
+     "bytes": 5547350016,
+     "sha256": "c6e59da0fbcebb26e28468fec32f77fba2e1545e15db75fbb9380afb7ec39f68"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q2_k_l",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q2_K_L",
+   "weight_bytes": 6049110016,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q2_K_L.gguf",
+     "bytes": 6049110016,
+     "sha256": "ec94f503683c0655694bcd18613453f00aa5abc4ac2254927bcb0ce0df2c39ba"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q3_k_l",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q3_K_L",
+   "weight_bytes": 7930157056,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q3_K_L.gguf",
+     "bytes": 7930157056,
+     "sha256": "84cee8ce09424d3f223e97b834ed44e9b3aacc0c5e705876fc69cd1ed66c12e0"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q3_k_m",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q3_K_M",
+   "weight_bytes": 7363270656,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q3_K_M.gguf",
+     "bytes": 7363270656,
+     "sha256": "9206a0676d392f41213296337f7d7a1b9f72bdc77ec54f84de47e16b7ba3322f"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q3_k_s",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q3_K_S",
+   "weight_bytes": 6504749056,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q3_K_S.gguf",
+     "bytes": 6504749056,
+     "sha256": "92c76b1c3da54aa8d9f4245f55a6a9c3d8d96d0f869c350051f4f6ef555e7b57"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q3_k_xl",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q3_K_XL",
+   "weight_bytes": 8379734016,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q3_K_XL.gguf",
+     "bytes": 8379734016,
+     "sha256": "2c443f998198bf2a9d455b452a9fb4dfe7320d713fe3566785cdfae6512b28ac"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q4_0",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q4_0",
+   "weight_bytes": 8412092416,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q4_0.gguf",
+     "bytes": 8412092416,
+     "sha256": "2c42a4c37b494704fa2b07efee74acd44c716b1c81780dab120334cf763d2bfd"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q4_1",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q4_1",
+   "weight_bytes": 9267501056,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q4_1.gguf",
+     "bytes": 9267501056,
+     "sha256": "e036c910e824ddd5a3ba742f32b2966df363f9beb0cc1835e31749a8af1d900b"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q4_k_l",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q4_K_L",
+   "weight_bytes": 9434454016,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q4_K_L.gguf",
+     "bytes": 9434454016,
+     "sha256": "cd092350c9be7dd53e6770430c507192d6dd9b6b4f9ab9efbef6cef62b6b5da8"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q4_k_m",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q4_K_M",
+   "weight_bytes": 9053116416,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q4_K_M.gguf",
+     "bytes": 9053116416,
+     "sha256": "fcb2cdd14881e20613f56d37f49d0c73ec6c00f9bb4d0e4b161a1621d8517f47"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q4_k_s",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q4_K_S",
+   "weight_bytes": 8440764416,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q4_K_S.gguf",
+     "bytes": 8440764416,
+     "sha256": "cdb71bd12bd3b9db9560d2eba69edd2d2a8fe6b2f3ec6c163a78172a68b8461f"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q5_k_l",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q5_K_L",
+   "weight_bytes": 10921302016,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q5_K_L.gguf",
+     "bytes": 10921302016,
+     "sha256": "f22cd6073e6282614a62be6391a813b301c5338725561d83219ef9f3f49e6c64"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q5_k_m",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q5_K_M",
+   "weight_bytes": 10604189696,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q5_K_M.gguf",
+     "bytes": 10604189696,
+     "sha256": "7d4dd651787f16365d6ceed9bcc42fe76e47204dedf9ac3539a749e1c3f3b6f7"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q5_k_s",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q5_K_S",
+   "weight_bytes": 10151581696,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q5_K_S.gguf",
+     "bytes": 10151581696,
+     "sha256": "110f46f994618b09249a76953559ec2a8401ba44543c2bfb5a699ff2d9dd8118"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q6_k",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q6_K",
+   "weight_bytes": 12030253056,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q6_K.gguf",
+     "bytes": 12030253056,
+     "sha256": "933e90b30332ea305b21e5ab0802a9984d65604193ce348a15e3724b39a64ff6"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q6_k_l",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q6_K_L",
+   "weight_bytes": 12279126016,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q6_K_L.gguf",
+     "bytes": 12279126016,
+     "sha256": "33a7c75dc560aab3e2560e33606e4f4e722702687fc4e131bcc2682024456085"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-q8_0",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "Q8_0",
+   "weight_bytes": 15580502016,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-Q8_0.gguf",
+     "bytes": 15580502016,
+     "sha256": "785eabbff61131ed97f483af9a608953fad8bfc99eb7dbf2df55f07cef2b5baa"
+    }
+   ]
+  },
+  {
+   "id": "phi4-reasoning-plus-bf16",
+   "model_id": "phi4-reasoning-plus",
+   "quantization": "BF16",
+   "weight_bytes": 29323400928,
+   "files": [
+    {
+     "path": "microsoft_Phi-4-reasoning-plus-bf16.gguf",
+     "bytes": 29323400928,
+     "sha256": "7477d516c142b68a6513a777ebba5ad196fa487ba79ee460f8e6e2435313b4e7"
+    }
+   ]
+  }
+ ]
+}

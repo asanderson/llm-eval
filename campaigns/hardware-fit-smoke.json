@@ -1,0 +1,26 @@
+{
+  "schema_version": 2,
+  "id": "hardware-fit-smoke",
+  "inventory": "../configs/targets/local.example.json",
+  "phases": [
+    {
+      "id": "fit",
+      "experiments": [
+        {
+          "id": "hardware-fit",
+          "version": 1,
+          "mode": "projection",
+          "cases": [
+            "projection-smoke"
+          ],
+          "hardware_configs": [
+            "raider-ubuntu"
+          ]
+        }
+      ]
+    }
+  ],
+  "reporting": {
+    "on_experiment_end": true
+  }
+}

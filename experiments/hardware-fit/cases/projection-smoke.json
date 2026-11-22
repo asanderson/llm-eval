@@ -1,0 +1,13 @@
+{
+  "id": "projection-smoke",
+  "parameters": {
+    "identity": {
+      "harness": "projection",
+      "model": "smoke"
+    },
+    "data": "../candidates/smoke.json",
+    "context_tokens": 8192,
+    "disk_free_gib": 500,
+    "synthetic": true
+  }
+}

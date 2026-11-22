@@ -1,0 +1,15 @@
+{
+  "id": "projection-measured-models",
+  "parameters": {
+    "identity": {
+      "harness": "projection",
+      "model": "measured-models-gguf"
+    },
+    "data": "../candidates/measured-models-gguf.json",
+    "context_tokens": 8192,
+    "artifact_root": "../../../models",
+    "policy": {
+      "gpu_baseline_gib": 1.5
+    }
+  }
+}
