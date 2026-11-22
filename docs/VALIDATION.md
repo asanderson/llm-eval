@@ -167,3 +167,25 @@ Open, per host cell (Windows 11 native, WSL2 Ubuntu 26.04, native Ubuntu 26.04).
 - [ ] Missing or skipped host cells marked explicitly in the table above.
 
 The plan's condition for the pilots, quoted from issue 45: "Software smoke is complete at A, the public pilot only when A–G gates are evidenced, and a private pilot is a separate decision." None of these gates is evidenced here.
+
+## Hardware fit
+
+Recorded 2026-11-22 on the MSI Raider under native Windows 11, for the `hardware-fit` experiment and its [guide](../experiments/hardware-fit/README.md). No result of this experiment has been published; the two runs below were made from a revision of the feature branch to check the experiment itself.
+
+### What was verified and how
+
+- CPU-only unit tests in `tests/test_hardware_fit.py`: the candidate set loader, the projection arithmetic and ranking, the validation of both modes, the evidence parser and the verdict rule, the measured mode with a patched GPU reading and backend, and the software smoke through the real worker to a report that passes the publication checks. They run without a GPU, a model file or the network.
+- The software smoke, `python -m llm_eval run --campaign campaigns/hardware-fit-smoke.json`, uses the fictional candidate set and is labelled synthetic.
+- One real projection, `python -m llm_eval run --campaign configs/examples/hardware-fit/raider-windows-projection.json`: the job succeeded without using the GPU and its report was built. It evaluated the 430 artifacts of the candidate set against the Raider profile and read 115.5 GiB of free disk space from the volume of the artifact directory.
+- One real measured run on Ollama 0.40.15 with every layer requested on the GPU: `qwen38-27b` at UD-Q4_K_XL (16.35 GiB of weights, context 8192). The downloaded file matched the size and SHA-256 that the candidate set records. The job succeeded with the verdict `in_vram`:
+  - the backend log reads "offloaded 66/66 layers to GPU", with a 15718 MiB model buffer, a 512 MiB cache and a 150 MiB compute buffer on the GPU, and no cache buffer on the CPU; the evidence record holds the same values;
+  - Ollama reported the whole model in VRAM (`size_vram` equal to `size`);
+  - VRAM use rose from 1994 MiB before the launch to a sampled peak of 18931 MiB of 24463 MiB, which leaves the 2048 MiB reserve free.
+- That run corrected the candidate set. The engine allocated 512 MiB of cache where the first version of the set implied 2.0 GiB, because only 16 of the model's 64 layers keep a cache. The key and value elements per token of every model are now taken from the cache sizes the engine printed in the published model-offloading runs; three models changed (`qwen38-27b`, `qwen35-35b-moe`, `kimi-linear-48b`).
+
+### What was not verified
+
+- A measured run on KoboldCpp, LM Studio, llama.cpp or ik_llama.cpp, and any run under WSL2 or native Ubuntu.
+- A real run that leaves VRAM. The refusal before a launch, the failed verdicts and their reasons are covered by tests with patched readings only.
+- The projection against a measured result for more than the one artifact above. The compute-buffer allowance and the cache estimate for sliding-window models are declared assumptions.
+- The repository's CI matrix (Ubuntu and Windows, Python 3.11, 3.12 and 3.13) before the pull request ran it.

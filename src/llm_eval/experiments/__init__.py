@@ -5,6 +5,7 @@ REGISTRY = {
     'model-offloading': 'llm_eval.experiments.model_offloading',
     'llm-routing': 'llm_eval.experiments.llm_routing',
     'legal-benchmark': 'llm_eval.experiments.legal_benchmark',
+    'hardware-fit': 'llm_eval.experiments.hardware_fit',
 }
 
 

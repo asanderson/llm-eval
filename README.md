@@ -6,6 +6,7 @@ A reproducible lab for running **versioned LLM experiments** across hardware con
 |---|---|---|
 | Model offloading | Quality, latency, throughput, and CPU/GPU/disk placement for models exceeding GPU VRAM | [Original experiment and model catalog](experiments/model-offloading/README.md) |
 | LLM routing | Decision accuracy, replay selection quality, and live downstream quality/latency/API cost | [Routing guide](experiments/llm-routing/README.md) |
+| Hardware fit | The best model artifact for a hardware configuration that stays inside GPU VRAM: projected fit of candidate artifacts from GPU, VRAM, CPU, RAM and disk limits, and measured runs with every layer on the GPU | [Hardware fit guide](experiments/hardware-fit/README.md) |
 | Legal benchmark | Retrieval of applicable law and source-grounded draft screening memos for human review, over a fictional jurisdiction; fictional fixture suite only; four runs on the Windows host and four in WSL2 published (generation and workflow on a served model, score, fixture retrieval), human review pending | [Legal benchmark guide](experiments/legal-benchmark/README.md) |
 
 The original target is the MSI Raider 18 HX AI with RTX 5090 Laptop 24 GiB, 64 GiB RAM, and native Ubuntu, native Windows, or WSL. Additional machines use their own profiles and execution targets. **Fixture tests are not real hardware benchmarks.** See the [validation record](docs/VALIDATION.md) for hardware acceptance gates.

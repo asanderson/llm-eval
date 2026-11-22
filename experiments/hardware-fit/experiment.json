@@ -1,0 +1,13 @@
+{
+  "id": "hardware-fit",
+  "version": 1,
+  "modes": [
+    "projection",
+    "measured"
+  ],
+  "cases": {
+    "projection-smoke": "cases/projection-smoke.json",
+    "projection-measured-models": "cases/projection-measured-models.json",
+    "measured-ollama": "cases/measured-ollama.json"
+  }
+}
