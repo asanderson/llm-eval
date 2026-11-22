@@ -2,10 +2,11 @@
 
 [Results index](../README.md) · [Executive summary](../../README.md)
 
-8 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
+9 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
+| [2026-11-22](../date/2026-11-22.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [lmstudio](../harness/lmstudio.md) | [llama33-70b](../model/llama33-70b.md) | llama33-70b-lmstudio | 2048 | succeeded | 27 | 0 | 0.89–2.65 | 2.26 | 15/27 | – | [report](../../model-offloading/campaign-20261122T090027Z-2fbb4fe0-offload-model-offloading-1/README.md) |
 | [2026-11-17](../date/2026-11-17.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [koboldcpp](../harness/koboldcpp.md) | [llama33-70b](../model/llama33-70b.md) | llama33-70b-koboldcpp | 2048 | succeeded | 27 | 0 | 0.952–2.52 | 2.1–2.38 | 15/27 | – | [report](../../model-offloading/campaign-20261117T210308Z-f839a69f-offload-model-offloading-1/README.md) |
 | [2026-11-17](../date/2026-11-17.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [llama33-70b](../model/llama33-70b.md) | llama33-70b-ollama | 2048 | succeeded | 27 | 0 | 0.771–2.31 | 2.62–2.63 | 15/27 | – | [report](../../model-offloading/campaign-20261117T210308Z-f839a69f-offload-model-offloading-1/README.md) |
 | [2026-11-15](../date/2026-11-15.md) | [model-offloading](../experiment/model-offloading.md) | [raider-windows](../hardware/raider-windows.md) | [koboldcpp](../harness/koboldcpp.md) | [llama33-70b](../model/llama33-70b.md) | llama33-70b-koboldcpp | 2048 | succeeded | 27 | 0 | 1.09–2.63 | 2.05–2.28 | 15/27 | – | [report](../../model-offloading/campaign-20261115T201525Z-d393f04a-offload-model-offloading-1/README.md) |

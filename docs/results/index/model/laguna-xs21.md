@@ -2,10 +2,11 @@
 
 [Results index](../README.md) · [Executive summary](../../README.md)
 
-8 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
+9 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
+| [2026-11-22](../date/2026-11-22.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [lmstudio](../harness/lmstudio.md) | [laguna-xs21](../model/laguna-xs21.md) | laguna-xs21-lmstudio | 2048 | succeeded | 27 | 0 | 11.4–55.7 | 25.6–27.3 | 15/27 | – | [report](../../model-offloading/campaign-20261122T080915Z-a8f825b0-offload-model-offloading-1/README.md) |
 | [2026-11-17](../date/2026-11-17.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [koboldcpp](../harness/koboldcpp.md) | [laguna-xs21](../model/laguna-xs21.md) | laguna-xs21-koboldcpp | 2048 | succeeded | 27 | 0 | 0.531–5.25 | 11.3–25.9 | 3/27 | – | [report](../../model-offloading/campaign-20261117T061720Z-22ef705a-offload-model-offloading-1/README.md) |
 | [2026-11-17](../date/2026-11-17.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [laguna-xs21](../model/laguna-xs21.md) | laguna-xs21-ollama | 2048 | succeeded | 27 | 0 | 8.93–27 | 29.4–29.9 | 21/27 | – | [report](../../model-offloading/campaign-20261117T061720Z-22ef705a-offload-model-offloading-1/README.md) |
 | [2026-11-15](../date/2026-11-15.md) | [model-offloading](../experiment/model-offloading.md) | [raider-windows](../hardware/raider-windows.md) | [koboldcpp](../harness/koboldcpp.md) | [laguna-xs21](../model/laguna-xs21.md) | laguna-xs21-koboldcpp | 2048 | succeeded | 27 | 0 | 0.596–4.73 | 10.6–28.7 | 3/27 | – | [report](../../model-offloading/campaign-20261115T164043Z-6fc5883d-offload-model-offloading-1/README.md) |

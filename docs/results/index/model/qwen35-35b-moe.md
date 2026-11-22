@@ -2,10 +2,11 @@
 
 [Results index](../README.md) · [Executive summary](../../README.md)
 
-8 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
+9 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
+| [2026-11-22](../date/2026-11-22.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [lmstudio](../harness/lmstudio.md) | [qwen35-35b-moe](../model/qwen35-35b-moe.md) | qwen35-35b-moe-lmstudio | 2048 | succeeded | 27 | 0 | 6.02–9.41 | 40.7–42.6 | 27/27 | – | [report](../../model-offloading/campaign-20261122T083921Z-1f20982a-offload-model-offloading-1/README.md) |
 | [2026-11-17](../date/2026-11-17.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [koboldcpp](../harness/koboldcpp.md) | [qwen35-35b-moe](../model/qwen35-35b-moe.md) | qwen35-35b-moe-koboldcpp | 2048 | succeeded | 27 | 0 | 0.523–0.774 | 8.72–13.4 | 18/27 | – | [report](../../model-offloading/campaign-20261117T070552Z-eb1d47f8-offload-model-offloading-1/README.md) |
 | [2026-11-17](../date/2026-11-17.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [qwen35-35b-moe](../model/qwen35-35b-moe.md) | qwen35-35b-moe-ollama | 2048 | succeeded | 27 | 0 | 11.2–14.9 | 27.7–27.9 | 21/27 | – | [report](../../model-offloading/campaign-20261117T070552Z-eb1d47f8-offload-model-offloading-1/README.md) |
 | [2026-11-15](../date/2026-11-15.md) | [model-offloading](../experiment/model-offloading.md) | [raider-windows](../hardware/raider-windows.md) | [koboldcpp](../harness/koboldcpp.md) | [qwen35-35b-moe](../model/qwen35-35b-moe.md) | qwen35-35b-moe-koboldcpp | 2048 | succeeded | 27 | 0 | 0.583–0.682 | 9.36–12.2 | 18/27 | – | [report](../../model-offloading/campaign-20261115T180032Z-22d1b837-offload-model-offloading-1/README.md) |

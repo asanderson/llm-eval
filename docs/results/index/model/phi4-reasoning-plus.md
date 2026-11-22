@@ -2,10 +2,11 @@
 
 [Results index](../README.md) · [Executive summary](../../README.md)
 
-8 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
+9 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
+| [2026-11-22](../date/2026-11-22.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [lmstudio](../harness/lmstudio.md) | [phi4-reasoning-plus](../model/phi4-reasoning-plus.md) | phi4-reasoning-plus-lmstudio | 2048 | succeeded | 27 | 0 | 45.7–179 | 3.78–4.43 | 0/27 | – | [report](../../model-offloading/campaign-20261122T012251Z-02ce34e6-offload-model-offloading-1/README.md) |
 | [2026-11-17](../date/2026-11-17.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [koboldcpp](../harness/koboldcpp.md) | [phi4-reasoning-plus](../model/phi4-reasoning-plus.md) | phi4-reasoning-plus-koboldcpp | 2048 | succeeded | 27 | 0 | 0.587–399 | 3.42–5.12 | 15/27 | – | [report](../../model-offloading/campaign-20261117T101636Z-6ef57688-offload-model-offloading-1/README.md) |
 | [2026-11-17](../date/2026-11-17.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [phi4-reasoning-plus](../model/phi4-reasoning-plus.md) | phi4-reasoning-plus-ollama | 2048 | succeeded | 27 | 0 | 397 | 5.16 | 0/27 | – | [report](../../model-offloading/campaign-20261117T101636Z-6ef57688-offload-model-offloading-1/README.md) |
 | [2026-11-16](../date/2026-11-16.md) | [model-offloading](../experiment/model-offloading.md) | [raider-windows](../hardware/raider-windows.md) | [koboldcpp](../harness/koboldcpp.md) | [phi4-reasoning-plus](../model/phi4-reasoning-plus.md) | phi4-reasoning-plus-koboldcpp | 2048 | succeeded | 27 | 0 | 0.594–392 | 3.43–5.22 | 15/27 | – | [report](../../model-offloading/campaign-20261116T133213Z-8dbe93fd-offload-model-offloading-1/README.md) |
