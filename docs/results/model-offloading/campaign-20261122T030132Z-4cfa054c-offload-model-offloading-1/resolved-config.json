@@ -1,0 +1,200 @@
+{
+  "experiment": {
+    "experiment_run_id": "offload-model-offloading-1",
+    "experiment_id": "model-offloading",
+    "version": 1,
+    "mode": "category-smoke",
+    "job_ids": [
+      "offload-model-offloading-1-3f1d0d5d9170"
+    ],
+    "campaign_id": "matrix-wsl-gemma4-31b",
+    "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce"
+  },
+  "jobs": [
+    {
+      "schema_version": 2,
+      "job_id": "offload-model-offloading-1-3f1d0d5d9170",
+      "experiment_run_id": "offload-model-offloading-1",
+      "experiment_id": "model-offloading",
+      "experiment_version": 1,
+      "mode": "category-smoke",
+      "case_id": "gemma4-31b-lmstudio",
+      "hardware_config_id": "raider-wsl",
+      "hardware": {
+        "target": "raider",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-wsl2-ubuntu-26.04"
+      },
+      "hardware_profile": {
+        "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+        "manufacturer": "MSI",
+        "model": "Raider 18 HX AI A2XWJG-069US",
+        "cpu": {
+          "name": "Intel Core Ultra 9 285HX",
+          "architecture": "Arrow Lake-HX",
+          "p_cores": 8,
+          "e_cores": 16,
+          "threads": 24,
+          "instruction_baseline": "AVX2",
+          "amx": false,
+          "avx512": false,
+          "thread_sweep": [
+            7,
+            8,
+            15,
+            23
+          ],
+          "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+        },
+        "ram": {
+          "installed_gib": 64,
+          "type": "DDR5-6400",
+          "channels": 2
+        },
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "architecture": "Blackwell",
+          "compute_capability": "12.0",
+          "vram_gib": 24,
+          "initial_reserve_gib": 2,
+          "desktop_gpu": false
+        },
+        "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+        "storage": [
+          {
+            "name": "Factory NVMe",
+            "capacity_tb": 2,
+            "model": "not inventoried"
+          },
+          {
+            "name": "WD_BLACK SN7100",
+            "capacity_tb": 4,
+            "interface": "PCIe Gen4 x4",
+            "role": "Model files, artifacts, results; separate swap/offload experiments"
+          }
+        ],
+        "evidence": {
+          "configuration": "user-provided",
+          "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+        },
+        "required_recordings": [
+          "BIOS version",
+          "NVIDIA driver",
+          "GPU power limit/TGP",
+          "AC state",
+          "MSI power/fan profile",
+          "hybrid/MUX setting",
+          "RAM configured speed",
+          "SSD mount and filesystem",
+          "SSD free space and temperature",
+          "OS build/kernel",
+          "WSL version and memory cap if applicable"
+        ],
+        "host_reserve_gib": 12,
+        "os_limits": {
+          "windows-11-wsl2-ubuntu-26.04": {
+            "ram_budget_gib": 46
+          }
+        }
+      },
+      "target_id": "raider",
+      "target": {
+        "transport": "local",
+        "physical_host_id": "raider"
+      },
+      "parameters": {
+        "config": {
+          "schema_version": 1,
+          "model_id": "gemma4-31b",
+          "os_id": "windows-11-wsl2-ubuntu-26.04",
+          "lane": "offload",
+          "context_tokens": 4096,
+          "max_output_tokens": 2048,
+          "repeats": 3,
+          "warmups": 1,
+          "temperature": 0.0,
+          "seed": 20261005,
+          "concurrency": 1,
+          "timeout_s": 900,
+          "load_timeout_s": 1800,
+          "telemetry_interval_s": 1.0,
+          "ram_budget_gib": 46,
+          "gpu_budget_gib": 22,
+          "suite": "[local path omitted]",
+          "backend_version": "0.4.28+2",
+          "tokenizer_revision": "bartowski/google_gemma-4-31B-it-GGUF@619aca7589c72be65dd968de8602ad23d68b5c14 (tokenizer embedded in locked GGUF)",
+          "chat_template_sha256": "ae53464bf3be25802b3a5b37def7fd89667067d7577049b3b2d74c4d8de4c6d4",
+          "placement_notes": "Requested 20 of 61 layers on GPU (arch gemma4, 30.4 GiB weights, policy min(20, floor(18 GiB / per-layer GiB))), 16 CPU threads, LM Studio GPU ratio 0.328 (ratio, not a layer count; thread count is the app default). LM Studio 0.4.28+2 ran as the desktop app from LM-Studio-0.4.28-2-x64.AppImage under WSLg; observed AppImage SHA-256 a3e6cf8233697be0a8ad6871197b424242af3c5a346671aeed59959ed7eebf11 (the vendor publishes none). Actual placement is in the backend log of each attempt.",
+          "hardware_attestation": {
+            "bios": "E1824IMS.317",
+            "os_build": "10.0.26300 (Windows host; guest kernel 6.18.33.2-microsoft-standard-WSL2)",
+            "nvidia_driver": "610.74",
+            "ac_connected": true,
+            "ram_configured_mhz": [
+              6400,
+              6400
+            ],
+            "msi_power_fan_profile": "Best Performance (user-reported, MSI Center)",
+            "mux_hybrid_setting": "MSHybrid (observed: Intel Graphics and NVIDIA both active display adapters, Intel drives internal 3840px panel; MSI Center GPU Switch not read directly)",
+            "gpu_tgp_power_limit": "nvidia-smi power.limit N/A; default 95 W, max 175 W",
+            "model_ssd_filesystem": "ext4 on the WSL virtual disk in the Linux home, on the Windows C: NVMe volume",
+            "carried_from_windows_attestation": "bios, ram_configured_mhz, msi_power_fan_profile, mux_hybrid_setting and gpu_tgp_power_limit are the operator attestations of the native Windows runs of 2026-11-08 on the same machine; they were not read again for the WSL runs",
+            "wsl_version": "2.7.12.0, kernel 6.18.33.2-microsoft-standard-WSL2",
+            "wsl_memory_cap": "guest MemTotal 51.0 GiB at the start of this run; swap 0 MiB (see wsl_config)",
+            "wsl_config": "[local path omitted]",
+            "model_path": "[local path omitted]",
+            "other_workloads": "LM Studio harness-by-model matrix on WSL2 Ubuntu 26.04 (guest of this Windows host); the LM Studio desktop app (Linux AppImage) is open in the guest under WSLg, as its managed runs require. Notable Windows programs running at the start: consumer Ollama tray app, a Windows Ollama server, Microsoft Teams, VMware tray, VMware authorization service, ProtonVPN client, ChatGPT desktop app, Claude desktop app."
+          },
+          "save_outputs": false,
+          "cache_condition": "warm_process_repeated_prompt; prefix-cache policy must be recorded",
+          "speculative_decoding": "disabled",
+          "reasoning_mode": "model default; OpenAI-protocol harnesses may return reasoning inline in content",
+          "platform": "lmstudio",
+          "protocol": "openai",
+          "served_model": "llm-eval-gemma4-31b",
+          "request_usage": true,
+          "request_options": {},
+          "hardware_profile": "msi-raider-18-hx-ai",
+          "launch": {
+            "model_file": "google_gemma-4-31B-it-Q8_0.gguf",
+            "gpu_offload": "0.328",
+            "import_mode": "hard-link"
+          }
+        },
+        "server_mode": "managed",
+        "categories": [
+          "reasoning",
+          "coding",
+          "math"
+        ]
+      },
+      "depends_on": [],
+      "resources": [
+        "raider"
+      ],
+      "status": "planned",
+      "reason": null,
+      "config_sha256": "8d8f6a12fda5a873463bf0e0126610fa358b19500bb32de3afe7ab09092698eb",
+      "input_files": [
+        {
+          "path": "[local path omitted]",
+          "sha256": "26892545cadcda503b23da4ec13e63820ea43f8c605b9a9e2e248d6049800bd2"
+        },
+        {
+          "path": "[local path omitted]",
+          "sha256": "1d34c567a4c77160af2c21cf6920191bcaf7f009fc0bc588e46a31301067689a"
+        }
+      ]
+    }
+  ],
+  "input_hashes": [
+    "305c26cf709393f1bffb2bd4110ee3c47f3e898c45b3e680d17a9c92a551c33f",
+    "cfafc16469a842bbb45f547b323ab49f5e2ae828a989fe4073b98682a69c14fa",
+    "c11fe651925908ad8b6970426e929440c26f01a97a0db4c5b4bbfcd0720b7347",
+    "71b1702fdccfeebc84539d4fceccc686bb0ded67d86cf631d7e01f6c09c01e76",
+    "3564f68fe9abc1b21329748e3c58b8e9530332e32379bdfc99335b1eb5621496",
+    "9939e1bc67f0af5bda168e4e0092e5378e2471d9bf6299905cb1a0b3dfb8cb6a",
+    "26892545cadcda503b23da4ec13e63820ea43f8c605b9a9e2e248d6049800bd2",
+    "1d34c567a4c77160af2c21cf6920191bcaf7f009fc0bc588e46a31301067689a"
+  ]
+}

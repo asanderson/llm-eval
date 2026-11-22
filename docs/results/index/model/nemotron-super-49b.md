@@ -2,10 +2,11 @@
 
 [Results index](../README.md) · [Executive summary](../../README.md)
 
-8 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
+9 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
+| [2026-11-22](../date/2026-11-22.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [lmstudio](../harness/lmstudio.md) | [nemotron-super-49b](../model/nemotron-super-49b.md) | nemotron-super-49b-lmstudio | 2048 | succeeded | 27 | 0 | 185–363 | 2.62–2.64 | 12/27 | – | [report](../../model-offloading/campaign-20261122T051919Z-18802dd7-offload-model-offloading-1/README.md) |
 | [2026-11-17](../date/2026-11-17.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [koboldcpp](../harness/koboldcpp.md) | [nemotron-super-49b](../model/nemotron-super-49b.md) | nemotron-super-49b-koboldcpp | 2048 | succeeded | 27 | 0 | 174–229 | 2.88–2.97 | 15/27 | – | [report](../../model-offloading/campaign-20261117T152529Z-a4c8f742-offload-model-offloading-1/README.md) |
 | [2026-11-17](../date/2026-11-17.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [nemotron-super-49b](../model/nemotron-super-49b.md) | nemotron-super-49b-ollama | 2048 | succeeded | 27 | 0 | 136–281 | 3.01–3.04 | 12/27 | – | [report](../../model-offloading/campaign-20261117T152529Z-a4c8f742-offload-model-offloading-1/README.md) |
 | [2026-11-16](../date/2026-11-16.md) | [model-offloading](../experiment/model-offloading.md) | [raider-windows](../hardware/raider-windows.md) | [koboldcpp](../harness/koboldcpp.md) | [nemotron-super-49b](../model/nemotron-super-49b.md) | nemotron-super-49b-koboldcpp | 2048 | succeeded | 27 | 0 | 168–265 | 3.02–3.04 | 15/27 | – | [report](../../model-offloading/campaign-20261116T201001Z-56cd5073-offload-model-offloading-1/README.md) |

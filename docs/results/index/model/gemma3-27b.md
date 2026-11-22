@@ -2,10 +2,11 @@
 
 [Results index](../README.md) · [Executive summary](../../README.md)
 
-8 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
+9 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
+| [2026-11-22](../date/2026-11-22.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [lmstudio](../harness/lmstudio.md) | [gemma3-27b](../model/gemma3-27b.md) | gemma3-27b-lmstudio | 2048 | succeeded | 27 | 0 | 1.51–15.3 | 2.21–2.81 | 18/27 | – | [report](../../model-offloading/campaign-20261122T004854Z-df06d9cb-offload-model-offloading-1/README.md) |
 | [2026-11-17](../date/2026-11-17.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [koboldcpp](../harness/koboldcpp.md) | [gemma3-27b](../model/gemma3-27b.md) | gemma3-27b-koboldcpp | 2048 | succeeded | 27 | 0 | 1.03–3.75 | 2.82–3.46 | 18/27 | – | [report](../../model-offloading/campaign-20261117T073753Z-bee9d8ce-offload-model-offloading-1/README.md) |
 | [2026-11-17](../date/2026-11-17.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [gemma3-27b](../model/gemma3-27b.md) | gemma3-27b-ollama | 2048 | succeeded | 27 | 0 | 1.13–3.78 | 2.69–3.44 | 18/27 | – | [report](../../model-offloading/campaign-20261117T073753Z-bee9d8ce-offload-model-offloading-1/README.md) |
 | [2026-11-15](../date/2026-11-15.md) | [model-offloading](../experiment/model-offloading.md) | [raider-windows](../hardware/raider-windows.md) | [koboldcpp](../harness/koboldcpp.md) | [gemma3-27b](../model/gemma3-27b.md) | gemma3-27b-koboldcpp | 2048 | succeeded | 27 | 0 | 1.05–3.68 | 2.94–3.53 | 18/27 | – | [report](../../model-offloading/campaign-20261115T193835Z-720b0164-offload-model-offloading-1/README.md) |

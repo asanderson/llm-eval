@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "experiment_id": "model-offloading",
+  "experiment_run_id": "offload-model-offloading-1",
+  "publication_id": "campaign-20261122T094709Z-cbbdfa68-offload-model-offloading-1",
+  "campaign_id": "matrix-wsl-llama3-70b",
+  "created_utc": "2026-11-22T09:47:09.688631+00:00",
+  "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce",
+  "status": "complete",
+  "synthetic": false,
+  "coverage": [
+    {
+      "job_id": "offload-model-offloading-1-d4a0e8e8470a",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    }
+  ],
+  "raw_records": 494,
+  "removed_fields": [
+    "absolute_path_values",
+    "artifact_lock",
+    "artifact_root",
+    "backend_pid",
+    "endpoint",
+    "host",
+    "lock_root",
+    "offload_dir",
+    "python"
+  ],
+  "files": {
+    "diagrams/results/model-offloading/campaign-20261122T094709Z-cbbdfa68-offload-model-offloading-1/latency.png": "797a0e236ee60d6ccd0e827895c77ea3fc58f9566d9c10148c5e735f3a6a8e78",
+    "docs/results/model-offloading/campaign-20261122T094709Z-cbbdfa68-offload-model-offloading-1/README.md": "63d4138dc13c4662d2dc5a992f98ff0a852673863df141b386a6d57cb6af5fa1",
+    "docs/results/model-offloading/campaign-20261122T094709Z-cbbdfa68-offload-model-offloading-1/benchmark-summary.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/results/model-offloading/campaign-20261122T094709Z-cbbdfa68-offload-model-offloading-1/benchmark-summary.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "docs/results/model-offloading/campaign-20261122T094709Z-cbbdfa68-offload-model-offloading-1/raw/measurements.jsonl.gz": "d776cb473e3763274b63242e439bfabb2914de2514a5ed065427901a29a5bb2a",
+    "docs/results/model-offloading/campaign-20261122T094709Z-cbbdfa68-offload-model-offloading-1/resolved-config.json": "3ec69f46c241238bda730b1b8a1786a121400a0906525d611a5786d53bd18286",
+    "docs/results/model-offloading/campaign-20261122T094709Z-cbbdfa68-offload-model-offloading-1/summary.csv": "f88cc24448b5e8ad80c0ff2afaa56ee6f3892278b1e49eb3d8cc404f30ce9938",
+    "docs/results/model-offloading/campaign-20261122T094709Z-cbbdfa68-offload-model-offloading-1/summary.json": "f69637a115d3577579e400bbe660294fa8996588fb0557ea925a8db0e03db8fc"
+  },
+  "report_fingerprint": "06894b9a4a3bee991466206325b3804516ee16593d4bfdb430dc19f931e919f0"
+}

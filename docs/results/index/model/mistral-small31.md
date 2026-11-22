@@ -2,10 +2,11 @@
 
 [Results index](../README.md) · [Executive summary](../../README.md)
 
-8 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
+9 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
+| [2026-11-22](../date/2026-11-22.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [lmstudio](../harness/lmstudio.md) | [mistral-small31](../model/mistral-small31.md) | mistral-small31-lmstudio | 2048 | succeeded | 27 | 0 | 1.25–7.05 | 2.4–2.41 | 6/27 | – | [report](../../model-offloading/campaign-20261122T122121Z-ad75034c-offload-model-offloading-1/README.md) |
 | [2026-11-17](../date/2026-11-17.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [koboldcpp](../harness/koboldcpp.md) | [mistral-small31](../model/mistral-small31.md) | mistral-small31-koboldcpp | 2048 | succeeded | 27 | 0 | 1.24–9.39 | 2.43–2.77 | 6/27 | – | [report](../../model-offloading/campaign-20261117T195001Z-d94a644a-offload-model-offloading-1/README.md) |
 | [2026-11-17](../date/2026-11-17.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [mistral-small31](../model/mistral-small31.md) | mistral-small31-ollama | 2048 | succeeded | 27 | 0 | 1.07–5.96 | 2.84–2.85 | 6/27 | – | [report](../../model-offloading/campaign-20261117T195001Z-d94a644a-offload-model-offloading-1/README.md) |
 | [2026-11-15](../date/2026-11-15.md) | [model-offloading](../experiment/model-offloading.md) | [raider-windows](../hardware/raider-windows.md) | [koboldcpp](../harness/koboldcpp.md) | [mistral-small31](../model/mistral-small31.md) | mistral-small31-koboldcpp | 2048 | succeeded | 27 | 0 | 1.28–9.42 | 2.21–2.34 | 6/27 | – | [report](../../model-offloading/campaign-20261115T184931Z-b2407d9b-offload-model-offloading-1/README.md) |

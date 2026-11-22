@@ -2,10 +2,11 @@
 
 [Results index](../README.md) · [Executive summary](../../README.md)
 
-9 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
+10 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
+| [2026-11-22](../date/2026-11-22.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [lmstudio](../harness/lmstudio.md) | [kimi-dev-72b](../model/kimi-dev-72b.md) | kimi-dev-72b-lmstudio | 2048 | succeeded | 27 | 0 | 111–150 | 1.9–1.91 | 0/27 | – | [report](../../model-offloading/campaign-20261122T124804Z-80069b0a-offload-model-offloading-1/README.md) |
 | [2026-11-18](../date/2026-11-18.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [kimi-dev-72b](../model/kimi-dev-72b.md) | kimi-dev-72b-ollama | 2048 | succeeded | 27 | 0 | 88.5–201 | 2.32–2.33 | 0/27 | – | [report](../../model-offloading/campaign-20261118T091847Z-e5ed63b4-offload-model-offloading-1/README.md) |
 | [2026-11-18](../date/2026-11-18.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [koboldcpp](../harness/koboldcpp.md) | [kimi-dev-72b](../model/kimi-dev-72b.md) | kimi-dev-72b-koboldcpp | 2048 | succeeded | 27 | 0 | 101–157 | 2.23–2.27 | 0/27 | – | [report](../../model-offloading/campaign-20261118T014808Z-cc8eec8c-offload-model-offloading-1/README.md) |
 | [2026-11-18](../date/2026-11-18.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [kimi-dev-72b](../model/kimi-dev-72b.md) | kimi-dev-72b-ollama | 2048 | failed | 27 | 0 | 88.5–202 | 2.31–2.33 | 0/27 | – | [report](../../model-offloading/campaign-20261118T014808Z-cc8eec8c-offload-model-offloading-1/README.md) |
