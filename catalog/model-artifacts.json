@@ -1,0 +1,251 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-11-22",
+  "scope": "Quantized artifact each measured catalog model loads in the next run. A revision is a full commit of the artifact repository; files are the selected quantization. Updated by the nightly model pin check through a pull request; see docs/MODELS.md.",
+  "new_models_since": "2026-11-22",
+  "artifacts": [
+    {
+      "model_id": "nemotron-nano-30b",
+      "base_model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+      "source_repo": "bartowski/nvidia_Nemotron-3-Nano-30B-A3B-GGUF",
+      "source_revision": "1fc64d5b160654ec892df2708aa893b0e96e6491",
+      "precision": "Q8_0",
+      "files": [
+        {
+          "path": "nvidia_Nemotron-3-Nano-30B-A3B-Q8_0.gguf",
+          "bytes": 33585500096,
+          "sha256": "b74f731e2832bc271420def4033edeefe3bb9664ad1d344a04b090e64aae026b"
+        }
+      ]
+    },
+    {
+      "model_id": "nemotron-super-49b",
+      "base_model": "nvidia/Llama-3_3-Nemotron-Super-49B-v1_5",
+      "source_repo": "bartowski/nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-GGUF",
+      "source_revision": "98fc9722ebffe74e41685c477cf2982012d3f0ad",
+      "precision": "Q5_K_M",
+      "files": [
+        {
+          "path": "nvidia_Llama-3_3-Nemotron-Super-49B-v1_5-Q5_K_M.gguf",
+          "bytes": 35391612416,
+          "sha256": "aa7f328484eed0e539b8f1297c8984f669840cc79479ab461616ede8a16ac758"
+        }
+      ]
+    },
+    {
+      "model_id": "gemma4-31b",
+      "base_model": "google/gemma-4-31B-it",
+      "source_repo": "bartowski/google_gemma-4-31B-it-GGUF",
+      "source_revision": "619aca7589c72be65dd968de8602ad23d68b5c14",
+      "precision": "Q8_0",
+      "files": [
+        {
+          "path": "google_gemma-4-31B-it-Q8_0.gguf",
+          "bytes": 32635677024,
+          "sha256": "b2021742dad920260eea1a2fe3f7ebacc6f4963b4242ea3211f6bdb46e494a8e"
+        }
+      ]
+    },
+    {
+      "model_id": "gemma4-26b-moe",
+      "base_model": "google/gemma-4-26B-A4B-it",
+      "source_repo": "bartowski/google_gemma-4-26B-A4B-it-GGUF",
+      "source_revision": "10f3b41bcf8d3047f4e136e7197ffc2dd1654c9d",
+      "precision": "BF16",
+      "files": [
+        {
+          "path": "google_gemma-4-26B-A4B-it-bf16/google_gemma-4-26B-A4B-it-bf16-00001-of-00002.gguf",
+          "bytes": 39538690528,
+          "sha256": "4d82522edff064ee9305dd078f7e37bb8ed31d0ebb2773791ca103a2fb5b53fb"
+        },
+        {
+          "path": "google_gemma-4-26B-A4B-it-bf16/google_gemma-4-26B-A4B-it-bf16-00002-of-00002.gguf",
+          "bytes": 10966444896,
+          "sha256": "3f2790e5db81b60f45cab2a7fbd5d531a08f7a6f8360bd03c851164f43a3c4c9"
+        }
+      ]
+    },
+    {
+      "model_id": "gemma3-27b",
+      "base_model": "google/gemma-3-27b-it",
+      "source_repo": "bartowski/google_gemma-3-27b-it-GGUF",
+      "source_revision": "4a05c54413bd0d87d77a97af403266f69cec0ee6",
+      "precision": "Q8_0",
+      "files": [
+        {
+          "path": "google_gemma-3-27b-it-Q8_0.gguf",
+          "bytes": 28707605120,
+          "sha256": "f997aef7f4ed368819f8bcd3e66262612eab4b9ecd562efbad2a7fdebc872693"
+        }
+      ]
+    },
+    {
+      "model_id": "llama33-70b",
+      "base_model": "meta-llama/Llama-3.3-70B-Instruct",
+      "source_repo": "bartowski/Llama-3.3-70B-Instruct-GGUF",
+      "source_revision": "b6c5c9f176f3279204034e1d16d393105e95cb88",
+      "precision": "Q4_K_M",
+      "files": [
+        {
+          "path": "Llama-3.3-70B-Instruct-Q4_K_M.gguf",
+          "bytes": 42520398816,
+          "sha256": "32df3baccb556f9840059b2528b2dee4d3d516b24afdfb9d0c56ff5f63e3a664"
+        }
+      ]
+    },
+    {
+      "model_id": "llama31-70b",
+      "base_model": "meta-llama/Llama-3.1-70B-Instruct",
+      "source_repo": "bartowski/Meta-Llama-3.1-70B-Instruct-GGUF",
+      "source_revision": "83fb6e83d0a8aada42d499259bc929d922e9a558",
+      "precision": "Q4_K_M",
+      "files": [
+        {
+          "path": "Meta-Llama-3.1-70B-Instruct-Q4_K_M.gguf",
+          "bytes": 42520398400,
+          "sha256": "f775c87029be95fb41df9e2882e6e938b73121c30ffc235ac6b6b880add49aa5"
+        }
+      ]
+    },
+    {
+      "model_id": "llama3-70b",
+      "base_model": "meta-llama/Meta-Llama-3-70B-Instruct",
+      "source_repo": "bartowski/Meta-Llama-3-70B-Instruct-GGUF",
+      "source_revision": "60662f1eb60bb4843d98e2bac32f9d5b407084db",
+      "precision": "Q4_K_M",
+      "files": [
+        {
+          "path": "Meta-Llama-3-70B-Instruct-Q4_K_M.gguf",
+          "bytes": 42520393504,
+          "sha256": "7b602f72406b1cd28466f84506abe8ff0e67dd867937ff1c393a78de29b8d07e"
+        }
+      ]
+    },
+    {
+      "model_id": "laguna-xs21",
+      "base_model": "poolside/Laguna-XS-2.1",
+      "source_repo": "bartowski/Laguna-XS-2.1-GGUF",
+      "source_revision": "8f7579d6ab7d3122716100116cf1a62f490ab6f3",
+      "precision": "Q8_0",
+      "files": [
+        {
+          "path": "Laguna-XS-2.1-Q8_0.gguf",
+          "bytes": 35597116800,
+          "sha256": "f8e63721a5ef5473fca6b93b4a9d24449bdf4f2d8a4626a60410f027ee8920b5"
+        }
+      ]
+    },
+    {
+      "model_id": "kimi-linear-48b",
+      "base_model": "moonshotai/Kimi-Linear-48B-A3B-Instruct",
+      "source_repo": "bartowski/moonshotai_Kimi-Linear-48B-A3B-Instruct-GGUF",
+      "source_revision": "228dbe476e5a02091624a19068f4c962caa8a1c5",
+      "precision": "Q6_K",
+      "files": [
+        {
+          "path": "moonshotai_Kimi-Linear-48B-A3B-Instruct-Q6_K.gguf",
+          "bytes": 40460212128,
+          "sha256": "d44b7f92fe57bca9e034456a576a530b57f036c85f9ce615f90bc3e6827fae9a"
+        }
+      ]
+    },
+    {
+      "model_id": "kimi-dev-72b",
+      "base_model": "moonshotai/Kimi-Dev-72B",
+      "source_repo": "mradermacher/Kimi-Dev-72B-GGUF",
+      "source_revision": "a1c3c37eb57c84de93e381860272ab0c63391d8f",
+      "precision": "Q4_K_M",
+      "files": [
+        {
+          "path": "Kimi-Dev-72B.Q4_K_M.gguf",
+          "bytes": 47415715424,
+          "sha256": "67b8610bb120fe10256fb2cf94b2a50d590826c46ad18821a22bf083c5b46fa8"
+        }
+      ]
+    },
+    {
+      "model_id": "qwen38-27b",
+      "base_model": "Qwen/Qwen3.8-27B",
+      "source_repo": "unsloth/Qwen3.8-27B-GGUF",
+      "source_revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+      "precision": "Q8_0",
+      "files": [
+        {
+          "path": "Qwen3.8-27B-Q8_0.gguf",
+          "bytes": 29047086048,
+          "sha256": "a680f44a06920e5d689774823782006aa3acc8db95750323373b24139b67e348"
+        }
+      ]
+    },
+    {
+      "model_id": "qwen35-35b-moe",
+      "base_model": "Qwen/Qwen3.5-35B-A3B",
+      "source_repo": "bartowski/Qwen_Qwen3.5-35B-A3B-GGUF",
+      "source_revision": "3d2a22d4eb631b9c8fd2be94599dc2fd84b4a595",
+      "precision": "Q8_0",
+      "files": [
+        {
+          "path": "Qwen_Qwen3.5-35B-A3B-Q8_0.gguf",
+          "bytes": 37812647744,
+          "sha256": "aab4d944b2d2cf26bfad662f3ee0a0a55511dfc2eb6d7454c4a172662a9213c8"
+        }
+      ]
+    },
+    {
+      "model_id": "deepseek-r1-32b",
+      "base_model": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+      "source_repo": "bartowski/DeepSeek-R1-Distill-Qwen-32B-GGUF",
+      "source_revision": "1dc8cf9ffa5dd333057ea1b09ccf4772d8726dec",
+      "precision": "Q8_0",
+      "files": [
+        {
+          "path": "DeepSeek-R1-Distill-Qwen-32B-Q8_0.gguf",
+          "bytes": 34820884352,
+          "sha256": "5b321bce035d98e61636e15cd468467e57dfaee4ea28acd42edd7edd1b6098d7"
+        }
+      ]
+    },
+    {
+      "model_id": "deepseek-r1-70b",
+      "base_model": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+      "source_repo": "bartowski/DeepSeek-R1-Distill-Llama-70B-GGUF",
+      "source_revision": "1842c5f7280f933ead58adf8afd078672c9f6cd0",
+      "precision": "Q4_K_M",
+      "files": [
+        {
+          "path": "DeepSeek-R1-Distill-Llama-70B-Q4_K_M.gguf",
+          "bytes": 42520395936,
+          "sha256": "181a82a1d6d2fa24fe4db83a68eee030384986bdbdd4773ba76424e3a6eb9fd8"
+        }
+      ]
+    },
+    {
+      "model_id": "mistral-small31",
+      "base_model": "mistralai/Mistral-Small-3.1-24B-Instruct-2503",
+      "source_repo": "bartowski/mistralai_Mistral-Small-3.1-24B-Instruct-2503-GGUF",
+      "source_revision": "f73dfd9e812922fb503a993e3fa5671424f486d3",
+      "precision": "BF16",
+      "files": [
+        {
+          "path": "mistralai_Mistral-Small-3.1-24B-Instruct-2503-bf16.gguf",
+          "bytes": 47153519776,
+          "sha256": "b4b8ae24a7364e3c535b3854de1d2351c5f12e00d7bb5d6fb094183891a37276"
+        }
+      ]
+    },
+    {
+      "model_id": "phi4-reasoning-plus",
+      "base_model": "microsoft/Phi-4-reasoning-plus",
+      "source_repo": "bartowski/microsoft_Phi-4-reasoning-plus-GGUF",
+      "source_revision": "96b602db19694b8323c8638ad771289fb5be0863",
+      "precision": "BF16",
+      "files": [
+        {
+          "path": "microsoft_Phi-4-reasoning-plus-bf16.gguf",
+          "bytes": 29323400928,
+          "sha256": "7477d516c142b68a6513a777ebba5ad196fa487ba79ee460f8e6e2435313b4e7"
+        }
+      ]
+    }
+  ]
+}

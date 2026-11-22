@@ -19,6 +19,8 @@ The job first runs the offline tests, then the script with `contents: read`, `is
 
 Locally, `python3 scripts/model_discovery.py` prints a plain report and writes nothing. `--help` lists the output flags; `--release ID` forces a release.
 
+The model pin check, the nightly job that runs after this one (07:17 UTC), follows new revisions of the quantized artifacts the measured models load and lists new repositories of their publishers that are neither catalogued nor covered by an `hf:` decision, without judging their size or license; see [MODELS.md](MODELS.md#artifact-pins).
+
 ## What a listed line claims
 
 A candidate in the issue makes four claims, each with a source:
