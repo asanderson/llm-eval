@@ -4,6 +4,8 @@ Every bundle (docs/results/EXPERIMENT/PUBLICATION/) carries manifest.json, resol
 raw measurements. From those this writes:
 
 - docs/results/index/: one page per hardware configuration, experiment, harness, model and UTC date, plus an overview;
+- docs/results/index/recommended/: the recommended setup, harness and model per hardware configuration and experiment
+  (`recommend.py`);
 - diagrams/results/summary/: one comparison chart per experiment and hardware configuration;
 - the three marked blocks of docs/results/README.md: the top combinations with their charts (executive summary),
   the navigation matrices, and the list of published reports. Text outside the markers is hand-written and kept.
@@ -44,6 +46,7 @@ Each report includes raw measurements, summaries and reproducibility metadata. S
 {LIST_END}
 """
 CHARTS = 'diagrams/results/summary'
+RECOMMENDED = 'Recommended setup, harness and model per hardware configuration and experiment: [recommended setups]({link}).'
 CATEGORIES = (('hardware', 'Hardware configuration'), ('experiment', 'Experiment'), ('harness', 'Harness'),
               ('model', 'Model'), ('date', 'Date (UTC)'))
 
@@ -402,14 +405,16 @@ def write_results_index(root):
 
     note = ('Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the '
             'lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.')
-    save(index / 'README.md', '# Results index\n\n' + note + '\n\n## Navigate\n\n' + overview(records, '', '../') +
-         '\n\n## All results\n\n' + table(records, '', '../') + '\n')
+    save(index / 'README.md', '# Results index\n\n' + note + '\n\n' + RECOMMENDED.format(link='recommended/README.md') +
+         '\n\n## Navigate\n\n' + overview(records, '', '../') + '\n\n## All results\n\n' + table(records, '', '../') + '\n')
     for category, title in CATEGORIES:
         for value in sorted({r[category] for r in records}):
             chosen = [r for r in records if r[category] == value]
             save(index / category / (slug(value) + '.md'),
                  f"# {title}: {_cell(value)}\n\n[Results index](../README.md) · [Executive summary](../../README.md)\n\n"
                  f"{len(chosen)} published result(s). {note}\n\n" + table(chosen, '../', '../../') + '\n')
+    from .recommend import write_recommendations      # imported here: that module imports this one
+    write_recommendations(root, records, index)
     readme = results / 'README.md'
     text = readme.read_text(encoding='utf-8') if readme.exists() else ''
     if not text or (LEGACY_LIST_HEADER in text and LIST_START not in text):      # absent, or the fully generated list of earlier versions
@@ -418,7 +423,7 @@ def write_results_index(root):
         text = _fill(text, TOP_START, TOP_END, ranking(records, 'index/', '', charts=write_charts(root, records)))
     cohorts = cohort_results(records, 'index/', '')
     text = _fill(text, START, END, navigation(records, 'index/', '') + ('\n\n' + cohorts if cohorts else '') +
-                 '\n\nFull table and per-category pages: [results index](index/README.md).')
+                 '\n\nFull table and per-category pages: [results index](index/README.md). ' + RECOMMENDED.format(link='index/recommended/README.md'))
     text = _fill(text, LIST_START, LIST_END, listing(root))
     save(readme, text)
     return len(records)
