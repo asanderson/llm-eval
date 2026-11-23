@@ -170,7 +170,7 @@ The plan's condition for the pilots, quoted from issue 45: "Software smoke is co
 
 ## Hardware fit
 
-Recorded 2026-11-22 on the MSI Raider under native Windows 11, for the `hardware-fit` experiment and its [guide](../experiments/hardware-fit/README.md). No result of this experiment has been published; the two runs below were made from a revision of the feature branch to check the experiment itself.
+Recorded 2026-11-22 on the MSI Raider under native Windows 11, for the `hardware-fit` experiment and its [guide](../experiments/hardware-fit/README.md). The two runs of that day were made from a revision of the feature branch to check the experiment itself and are not published. The first published results are the WSL2 runs of 2026-11-23, recorded at the end of this section.
 
 ### What was verified and how
 
@@ -185,9 +185,19 @@ Recorded 2026-11-22 on the MSI Raider under native Windows 11, for the `hardware
 
 ### What was not verified
 
-- A measured run on KoboldCpp, LM Studio, llama.cpp or ik_llama.cpp, and any run under WSL2 or native Ubuntu.
+- A measured run on LM Studio, llama.cpp or ik_llama.cpp, and any run under native Ubuntu. KoboldCpp and WSL2 are covered by the runs of 2026-11-23 below.
 - A real run that leaves VRAM. The refusal before a launch, the failed verdicts and their reasons are covered by tests with patched readings only.
 - A host with more than one GPU. That the card of `launch.gpu` is the one read is covered by tests with scripted readings only.
-- A backend that loads the model more than once in one job. The rule that judges every load is covered by a fixture log only; the measured run above loaded the model once.
-- The projection against a measured result for more than the one artifact above. The compute-buffer allowance and the cache estimate for sliding-window models are declared assumptions.
+- A backend that loads the model more than once in one job. The rule that judges every load is covered by a fixture log only; both measured runs loaded the model once.
+- The projection against a measured result for more than one artifact. The compute-buffer allowance and the cache estimate for sliding-window models are declared assumptions.
 - The repository's CI matrix (Ubuntu and Windows, Python 3.11, 3.12 and 3.13) before the pull request ran it.
+
+### WSL2 runs of 2026-11-23
+
+Recorded 2026-11-23 on the same machine in WSL2 with Ubuntu 26.04, on revision `2695cba`, which holds the review fixes. These runs are published; the figures and their limits are in the [results](results/README.md#hardware-fit-in-wsl2-of-2026-11-23).
+
+- One projection campaign through the real worker with two cases. The shipped case, with its `gpu_baseline_gib` of 2.06, calls 183 of the 430 artifacts fitting. A second case declares the baseline read on that day and measures the Windows volume instead of the guest's virtual disk; with 18.7 GiB free there, none fits.
+- One measured run on KoboldCpp 1.124.2 with every layer requested on the GPU: the same `qwen38-27b` artifact at UD-Q4_K_XL, loaded from the Windows volume through `/mnt/c`. The job succeeded with the verdict `in_vram`: 66 of 66 layers, one model load and no partial one, no cache buffer on the CPU, and a sampled peak of 19071 MiB of 24463 MiB after 2899 MiB before the launch.
+- The run exercised three rules of the review fixes on real inputs: the label was checked against the precision of the real artifact lock, the GPU row was selected by index, and the evidence record carries `model_loads` and `partial_loads`.
+
+What these runs do not show: a run that leaves VRAM, a second GPU, a reloaded model, and any harness other than KoboldCpp in WSL2. Ollama and LM Studio were not run there because each needs a second copy of the weights and the disk had no room for one.

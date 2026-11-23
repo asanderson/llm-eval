@@ -1,0 +1,257 @@
+{
+  "experiment": {
+    "experiment_run_id": "fit-hardware-fit-1",
+    "experiment_id": "hardware-fit",
+    "version": 1,
+    "mode": "projection",
+    "job_ids": [
+      "fit-hardware-fit-1-350a43aad20a",
+      "fit-hardware-fit-1-f008c633e429"
+    ],
+    "campaign_id": "fit-wsl-projection",
+    "code_revision": "2695cba457664b269921edfcf5afa430e2222330"
+  },
+  "jobs": [
+    {
+      "schema_version": 2,
+      "job_id": "fit-hardware-fit-1-350a43aad20a",
+      "experiment_run_id": "fit-hardware-fit-1",
+      "experiment_id": "hardware-fit",
+      "experiment_version": 1,
+      "mode": "projection",
+      "case_id": "projection-measured-models",
+      "hardware_config_id": "raider-wsl",
+      "hardware": {
+        "target": "raider",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-wsl2-ubuntu-26.04"
+      },
+      "hardware_profile": {
+        "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+        "manufacturer": "MSI",
+        "model": "Raider 18 HX AI A2XWJG-069US",
+        "cpu": {
+          "name": "Intel Core Ultra 9 285HX",
+          "architecture": "Arrow Lake-HX",
+          "p_cores": 8,
+          "e_cores": 16,
+          "threads": 24,
+          "instruction_baseline": "AVX2",
+          "amx": false,
+          "avx512": false,
+          "thread_sweep": [
+            7,
+            8,
+            15,
+            23
+          ],
+          "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+        },
+        "ram": {
+          "installed_gib": 64,
+          "type": "DDR5-6400",
+          "channels": 2
+        },
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "architecture": "Blackwell",
+          "compute_capability": "12.0",
+          "vram_gib": 24,
+          "initial_reserve_gib": 2,
+          "desktop_gpu": false
+        },
+        "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+        "storage": [
+          {
+            "name": "Factory NVMe",
+            "capacity_tb": 2,
+            "model": "not inventoried"
+          },
+          {
+            "name": "WD_BLACK SN7100",
+            "capacity_tb": 4,
+            "interface": "PCIe Gen4 x4",
+            "role": "Model files, artifacts, results; separate swap/offload experiments"
+          }
+        ],
+        "evidence": {
+          "configuration": "user-provided",
+          "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+        },
+        "required_recordings": [
+          "BIOS version",
+          "NVIDIA driver",
+          "GPU power limit/TGP",
+          "AC state",
+          "MSI power/fan profile",
+          "hybrid/MUX setting",
+          "RAM configured speed",
+          "SSD mount and filesystem",
+          "SSD free space and temperature",
+          "OS build/kernel",
+          "WSL version and memory cap if applicable"
+        ],
+        "host_reserve_gib": 12,
+        "os_limits": {
+          "windows-11-wsl2-ubuntu-26.04": {
+            "ram_budget_gib": 46
+          }
+        }
+      },
+      "target_id": "raider",
+      "target": {
+        "transport": "local",
+        "physical_host_id": "raider"
+      },
+      "parameters": {
+        "identity": {
+          "harness": "projection",
+          "model": "measured-models-gguf"
+        },
+        "data": "[local path omitted]",
+        "context_tokens": 8192,
+        "policy": {
+          "gpu_baseline_gib": 2.06
+        }
+      },
+      "depends_on": [],
+      "resources": [
+        "raider"
+      ],
+      "status": "planned",
+      "reason": null,
+      "config_sha256": "6de23e518010bd5db6c3fe20ead452284e9dcc476173a88f23fe51145d2bce18",
+      "input_files": [
+        {
+          "path": "[local path omitted]",
+          "sha256": "de65fbdf4f2668fb1035359b75280620242e7e70337e3b8a5cfb2ef86748f1e5"
+        }
+      ]
+    },
+    {
+      "schema_version": 2,
+      "job_id": "fit-hardware-fit-1-f008c633e429",
+      "experiment_run_id": "fit-hardware-fit-1",
+      "experiment_id": "hardware-fit",
+      "experiment_version": 1,
+      "mode": "projection",
+      "case_id": "projection-measured-models-as-found",
+      "hardware_config_id": "raider-wsl",
+      "hardware": {
+        "target": "raider",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-wsl2-ubuntu-26.04"
+      },
+      "hardware_profile": {
+        "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+        "manufacturer": "MSI",
+        "model": "Raider 18 HX AI A2XWJG-069US",
+        "cpu": {
+          "name": "Intel Core Ultra 9 285HX",
+          "architecture": "Arrow Lake-HX",
+          "p_cores": 8,
+          "e_cores": 16,
+          "threads": 24,
+          "instruction_baseline": "AVX2",
+          "amx": false,
+          "avx512": false,
+          "thread_sweep": [
+            7,
+            8,
+            15,
+            23
+          ],
+          "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+        },
+        "ram": {
+          "installed_gib": 64,
+          "type": "DDR5-6400",
+          "channels": 2
+        },
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "architecture": "Blackwell",
+          "compute_capability": "12.0",
+          "vram_gib": 24,
+          "initial_reserve_gib": 2,
+          "desktop_gpu": false
+        },
+        "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+        "storage": [
+          {
+            "name": "Factory NVMe",
+            "capacity_tb": 2,
+            "model": "not inventoried"
+          },
+          {
+            "name": "WD_BLACK SN7100",
+            "capacity_tb": 4,
+            "interface": "PCIe Gen4 x4",
+            "role": "Model files, artifacts, results; separate swap/offload experiments"
+          }
+        ],
+        "evidence": {
+          "configuration": "user-provided",
+          "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+        },
+        "required_recordings": [
+          "BIOS version",
+          "NVIDIA driver",
+          "GPU power limit/TGP",
+          "AC state",
+          "MSI power/fan profile",
+          "hybrid/MUX setting",
+          "RAM configured speed",
+          "SSD mount and filesystem",
+          "SSD free space and temperature",
+          "OS build/kernel",
+          "WSL version and memory cap if applicable"
+        ],
+        "host_reserve_gib": 12,
+        "os_limits": {
+          "windows-11-wsl2-ubuntu-26.04": {
+            "ram_budget_gib": 46
+          }
+        }
+      },
+      "target_id": "raider",
+      "target": {
+        "transport": "local",
+        "physical_host_id": "raider"
+      },
+      "parameters": {
+        "identity": {
+          "harness": "projection",
+          "model": "measured-models-gguf-as-found"
+        },
+        "data": "[local path omitted]",
+        "context_tokens": 8192,
+        "policy": {
+          "gpu_baseline_gib": 2.98
+        }
+      },
+      "depends_on": [],
+      "resources": [
+        "raider"
+      ],
+      "status": "planned",
+      "reason": null,
+      "config_sha256": "281fe19f42593f9ff00bdefed0ee4920324cee078a0a285ea2a46cdb1dd5899a",
+      "input_files": [
+        {
+          "path": "[local path omitted]",
+          "sha256": "de65fbdf4f2668fb1035359b75280620242e7e70337e3b8a5cfb2ef86748f1e5"
+        }
+      ]
+    }
+  ],
+  "input_hashes": [
+    "67440e2d3acbfcf3fab96e13f8eb048c6104b6c754f1da148c0402140f0f7cb8",
+    "cfafc16469a842bbb45f547b323ab49f5e2ae828a989fe4073b98682a69c14fa",
+    "fc052abf37226d236f6c3646f2d57cebdfa6b17dd23a20700b7a4bf33533e94c",
+    "f7fcc42acaedc904edfa36a069610f0762506e01c7ed00a2bc9d02e790fdc038",
+    "9939e1bc67f0af5bda168e4e0092e5378e2471d9bf6299905cb1a0b3dfb8cb6a",
+    "a60ef85299974af2f03a6671cc5c626427a123710c8409a006e28906453d839b",
+    "de65fbdf4f2668fb1035359b75280620242e7e70337e3b8a5cfb2ef86748f1e5"
+  ]
+}

@@ -12,6 +12,12 @@ Tables and charts between `results-*` markers are generated from the published b
 
 Ranked by share of checks passed (correct decisions for routing experiments, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians. Where a model repeats among the best combinations, a second table ranks the models, each by its best combination.
 
+**[hardware-fit](index/experiment/hardware-fit.md) on [raider-wsl](index/hardware/raider-wsl.md)**
+
+| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
+|---:|---|---|---:|---:|---:|---|
+| 1 | [koboldcpp](index/harness/koboldcpp.md) | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 2.78 | 27.2 | [2026-11-23 cap 2048](hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) |
+
 **[model-offloading](index/experiment/model-offloading.md) on [raider-wsl](index/hardware/raider-wsl.md)**
 
 | Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
@@ -119,6 +125,9 @@ MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 285HX, NVIDIA RTX 5090 Laptop (24
 
 The laptop of `raider-windows` (MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 285HX, NVIDIA RTX 5090 Laptop, 63.4 GiB RAM, Windows 11 Pro 10.0.26300, AC power, MSI Center "Best Performance", MUX in MSHybrid mode), measured inside WSL2 with Ubuntu 26.04 (WSL 2.7.12.0, kernel 6.18.33.2-microsoft-standard-WSL2, NVIDIA driver 610.74 as read in the guest). Model files and the Ollama and KoboldCpp runtimes live on the ext4 virtual disk of the guest, on the same NVMe volume; LM Studio runs from the vendor AppImage installed in the guest. The guest memory limit differs between two groups of Ollama and KoboldCpp jobs and is stated in the [WSL2 table](#wsl2-measurement-of-2026-11-17-and-2026-11-18); every LM Studio job ran with the 52 GB limit ([LM Studio section](#wsl2-lm-studio-measurement-of-2026-11-22)).
 
+<!-- hardware-fit-wsl-2026-11-23-bullet:start -->
+- **Hardware fit in WSL2 of 2026-11-23** ([tables and notes](#hardware-fit-in-wsl2-of-2026-11-23)). `qwen38-27b` at UD-Q4_K_XL (16.35 GiB of weights) ran on KoboldCpp 1.124.2 with every layer requested on the GPU and stayed inside VRAM: 66 of 66 layers offloaded, no cache on the CPU, a sampled peak of 19,071 of 24,463 MiB. It passes 24 of 27 checks at 2.6 to 3.1 s per request and about 27 output tokens per second. The projection calls 183 of the 430 candidate artifacts fitting under the shipped policy. With the disk and the GPU as found on that day none fits, because the 18.7 GiB of free disk space is less than the policy asks for any artifact that fits VRAM.
+<!-- hardware-fit-wsl-2026-11-23-bullet:end -->
 <!-- wsl-lmstudio-2026-11-22-bullet:start -->
 - **WSL2 LM Studio measurement of 2026-11-22** ([table and notes](#wsl2-lm-studio-measurement-of-2026-11-22)). LM Studio 0.4.28+2 ran all seventeen models of the matrix in WSL2 without a failed job, which completes the WSL2 matrix on three harnesses. 14 of 17 models pass the same number of checks as on Windows. Median wall time per request differs by 7.4 % and median output rate by 5.2 % from the Windows LM Studio runs.
 <!-- wsl-lmstudio-2026-11-22-bullet:end -->
@@ -129,6 +138,53 @@ The laptop of `raider-windows` (MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 2
 #### `raider-ubuntu`
 
 Synthetic fixture run only. No conclusions.
+
+<!-- hardware-fit-wsl-2026-11-23:start -->
+
+### Hardware fit in WSL2 of 2026-11-23
+
+The [hardware-fit experiment](../../experiments/hardware-fit/README.md) asks which model artifact is the best fit for one hardware configuration when the weights, the cache and the compute buffers must stay inside GPU VRAM. Its first published results come from WSL2 (Ubuntu 26.04) on the host of `raider-windows`, on 2026-11-23 (UTC), on code revision `2695cba`: one measured job and one projection campaign with two cases. No result of this experiment is published for native Windows or native Ubuntu.
+
+**Measured job** ([report](hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md)). `qwen38-27b` at UD-Q4_K_XL, one SHA256-locked GGUF of 17,559,178,144 bytes, on KoboldCpp 1.124.2 with every layer requested on the GPU (`launch.gpu_layers` 999), context 8192 and 16 threads. The three smoke categories ran with one warm-up and three measured repetitions per task, temperature 0 and a 2,048-token output cap. The job succeeded with the verdict `in_vram`.
+
+| Evidence | Value |
+|---|---|
+| Layers offloaded | 66 of 66. The model has 64 layers; the engine's placement line counts two more. |
+| Model loads in the backend log | 1, none partial |
+| Model buffer | 15,718 MiB on the GPU, 682 MiB on the host |
+| Cache buffer | 528 MiB on the GPU, none on the CPU |
+| Compute buffer | 533 MiB on the GPU |
+| VRAM in use before the launch | 2,899 MiB |
+| Sampled peak | 19,071 of 24,463 MiB. The capacity rule allows 22,415 MiB, which keeps the 2,048 MiB reserve free. |
+| Rise | 16,172 MiB, 97 % of the 16,746 MiB of weights |
+
+| Category | Checks | Median wall s | Median output tok/s | Median first output s |
+|---|---:|---:|---:|---:|
+| coding | 9/9 | 2.58 | 26.9 | 0.52 |
+| math | 9/9 | 2.78 | 27.2 | 0.52 |
+| reasoning | 6/9 | 3.07 | 27.4 | 0.52 |
+
+**Projection** ([report](hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md)). Both cases evaluate the 430 GGUF artifacts of the candidate set `measured-models-gguf` at context 8192 against the Raider profile with the WSL limits: 24 GiB of VRAM with 2 GiB reserved, a 46 GiB RAM budget and 24 threads. The report is the generic one. It lists the candidates per verdict as requests under the heading "Measurements"; every one of these rows is projected and none is measured.
+
+| Case | VRAM baseline (`gpu_baseline_gib`) | Free disk space | Fits | Exceeds VRAM | Exceeds disk | Shortlist |
+|---|---:|---:|---:|---:|---:|---|
+| `measured-models-gguf`, the shipped case | 2.06 GiB, declared | 854.3 GiB, measured on the virtual disk of the guest | 183 | 247 | 0 | Nine artifacts, led by `qwen35-35b-moe-iq4_xs`, `laguna-xs21-iq4_xs` and `deepseek-r1-32b-q3_k_xl` |
+| `measured-models-gguf-as-found` | 2.98 GiB, from the reading before the run | 18.7 GiB, measured on the Windows volume | 0 | 268 | 162 | Empty |
+
+What to keep in mind:
+
+- **The free disk space of the guest is virtual.** The guest's filesystem is a virtual disk that grows on the Windows volume. It reported 854 GiB free while the Windows volume that backs it had 18.7 GiB. The as-found case measures the Windows volume, where the model file of the measured job lies. With 18.7 GiB free, no artifact that fits VRAM passes the disk rule of the policy, which asks for two copies of the artifact and 10 GiB of headroom, so nothing fits. The shipped case shows what fits once the disk has room.
+- **The as-found baseline is higher.** Both baselines include the 113 MiB by which the profile's nominal 24 GiB exceeds the 24,463 MiB the card reports. To that the shipped case adds the 1,994 MiB that were in use before the Windows validation run. The as-found case adds the 2,931 MiB in use when it was written: the Windows desktop, the LM Studio desktop app that is open in the guest, and other programs. The higher baseline moves 21 more artifacts above the VRAM limit.
+- **The measured artifact is not the shortlisted one.** For each model the shortlist names the fitting artifact with the most bits per weight. For `qwen38-27b` that is UD-Q5_K_M, with 0.03 GiB of projected headroom under the shipped case. The measured job ran UD-Q4_K_XL, the artifact that was already on disk, for which the shipped case projects 2.09 GiB of headroom.
+- **Projected and reported VRAM for the measured artifact.** The projection asks 17.85 GiB for it: 16.35 GiB of weights, 0.50 GiB of cache and the 1 GiB compute allowance. The buffers in the evidence record add up to 16.39 GiB on the GPU: 15.35 GiB of model, 0.52 GiB of cache and 0.52 GiB of compute. The backend log, which is not part of the bundle, shows one more GPU buffer of 0.15 GiB for recurrent state. The projection was on the safe side by about 1.3 GiB: about 1 GiB of the file is not placed in the GPU model buffer (682 MiB of it stay in a host buffer), and the compute buffer is half the allowance.
+- **The VRAM counter covers every program.** It read 2,899 MiB before the launch and 1,840 MiB a few seconds after the job, so other programs held about 1 GiB less after the run than before it. The rise of 16,172 MiB may therefore understate what the model took. The verdict does not rest on the rise alone: the layer line and the peak decide too.
+- **The model file was not copied into the guest.** KoboldCpp loaded it from the Windows NTFS volume through `/mnt/c`. The harness verifies the artifact before the launch and before each of the three category runs, so with the load the 16.35 GiB file was read five times. The job took 12 minutes.
+- **Programs running on the host.** The bundle attests the consumer Ollama tray app, a Windows Ollama server, Microsoft Teams, the VMware tray and authorization service, a running VMware virtual machine, the ChatGPT and Claude desktop apps and VS Code, and the LM Studio desktop app open in the guest with no model loaded. The virtual machine was idle and held most of the host memory: about 600 MiB of 63 GiB was available on the Windows host before the run.
+- **Host paging.** A sampler on the Windows host (`typeperf`, every 2 s) saw pages written out in 14 of the 361 samples of the run, about 0.05 GiB in total, and none in the last four minutes. Available host memory fell to 5 MiB while the model file was first read and stayed between 3.6 and 4.3 GiB from the sixth minute on. The sampler's file is not part of the bundle.
+- **One harness and one artifact.** Ollama imports a copy of the weights into its store, and LM Studio's hard-link import needs the file on the guest's own disk. A second 16.35 GiB copy would have left the Windows volume about 2 GiB, so these two harnesses were not run. llama.cpp and ik_llama.cpp are not installed in the guest.
+- **No platform comparison.** The only native Windows run of this experiment is the unpublished validation run that [docs/VALIDATION.md](../VALIDATION.md#hardware-fit) records: the same artifact on Ollama 0.40.15, also `in_vram` with 66 of 66 layers, 24 of 27 checks at about 33 output tokens per second. Harness and platform both differ from the job above, so the two rates do not compare the platforms.
+
+<!-- hardware-fit-wsl-2026-11-23:end -->
 
 <!-- rerun-2026-11-15:start -->
 
@@ -379,11 +435,21 @@ The four legal benchmark runs that ran on the Windows host on 2026-11-15 ran aga
 
 | Category | Indexes (results) |
 |---|---|
-| Hardware configuration | [raider-ubuntu](index/hardware/raider-ubuntu.md) (1) · [raider-windows](index/hardware/raider-windows.md) (114) · [raider-wsl](index/hardware/raider-wsl.md) (59) |
-| Experiment | [legal-benchmark](index/experiment/legal-benchmark.md) (8) · [llm-routing](index/experiment/llm-routing.md) (7) · [model-offloading](index/experiment/model-offloading.md) (159) |
-| Harness | [category](index/harness/category.md) (1) · [fixture](index/harness/fixture.md) (2) · [koboldcpp](index/harness/koboldcpp.md) (51) · [lmstudio](index/harness/lmstudio.md) (51) · [ollama](index/harness/ollama.md) (69) |
-| Model | [category](index/model/category.md) (1) · [deepseek-r1-32b](index/model/deepseek-r1-32b.md) (12) · [deepseek-r1-70b](index/model/deepseek-r1-70b.md) (9) · [fixture](index/model/fixture.md) (2) · [gemma3-27b](index/model/gemma3-27b.md) (9) · [gemma4-26b-moe](index/model/gemma4-26b-moe.md) (10) · [gemma4-31b](index/model/gemma4-31b.md) (10) · [kimi-dev-72b](index/model/kimi-dev-72b.md) (10) · [kimi-linear-48b](index/model/kimi-linear-48b.md) (9) · [laguna-xs21](index/model/laguna-xs21.md) (9) · [llama3-70b](index/model/llama3-70b.md) (9) · [llama31-70b](index/model/llama31-70b.md) (9) · [llama33-70b](index/model/llama33-70b.md) (9) · [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) (6) · [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) (3) · [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) (3) · [mistral-small31](index/model/mistral-small31.md) (9) · [nemotron-nano-30b](index/model/nemotron-nano-30b.md) (9) · [nemotron-super-49b](index/model/nemotron-super-49b.md) (9) · [phi4-reasoning-plus](index/model/phi4-reasoning-plus.md) (9) · [qwen35-35b-moe](index/model/qwen35-35b-moe.md) (9) · [qwen38-27b](index/model/qwen38-27b.md) (9) |
-| Date (UTC) | [2026-11-22](index/date/2026-11-22.md) (17) · [2026-11-18](index/date/2026-11-18.md) (12) · [2026-11-17](index/date/2026-11-17.md) (30) · [2026-11-16](index/date/2026-11-16.md) (12) · [2026-11-15](index/date/2026-11-15.md) (45) · [2026-11-11](index/date/2026-11-11.md) (3) · [2026-11-10](index/date/2026-11-10.md) (30) · [2026-11-09](index/date/2026-11-09.md) (19) · [2026-11-08](index/date/2026-11-08.md) (6) |
+| Hardware configuration | [raider-ubuntu](index/hardware/raider-ubuntu.md) (1) · [raider-windows](index/hardware/raider-windows.md) (114) · [raider-wsl](index/hardware/raider-wsl.md) (62) |
+| Experiment | [hardware-fit](index/experiment/hardware-fit.md) (3) · [legal-benchmark](index/experiment/legal-benchmark.md) (8) · [llm-routing](index/experiment/llm-routing.md) (7) · [model-offloading](index/experiment/model-offloading.md) (159) |
+| Harness | [category](index/harness/category.md) (1) · [fixture](index/harness/fixture.md) (2) · [koboldcpp](index/harness/koboldcpp.md) (52) · [lmstudio](index/harness/lmstudio.md) (51) · [ollama](index/harness/ollama.md) (69) · [projection](index/harness/projection.md) (2) |
+| Model | [category](index/model/category.md) (1) · [deepseek-r1-32b](index/model/deepseek-r1-32b.md) (12) · [deepseek-r1-70b](index/model/deepseek-r1-70b.md) (9) · [fixture](index/model/fixture.md) (2) · [gemma3-27b](index/model/gemma3-27b.md) (9) · [gemma4-26b-moe](index/model/gemma4-26b-moe.md) (10) · [gemma4-31b](index/model/gemma4-31b.md) (10) · [kimi-dev-72b](index/model/kimi-dev-72b.md) (10) · [kimi-linear-48b](index/model/kimi-linear-48b.md) (9) · [laguna-xs21](index/model/laguna-xs21.md) (9) · [llama3-70b](index/model/llama3-70b.md) (9) · [llama31-70b](index/model/llama31-70b.md) (9) · [llama33-70b](index/model/llama33-70b.md) (9) · [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) (6) · [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) (3) · [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) (3) · [measured-models-gguf](index/model/measured-models-gguf.md) (1) · [measured-models-gguf-as-found](index/model/measured-models-gguf-as-found.md) (1) · [mistral-small31](index/model/mistral-small31.md) (9) · [nemotron-nano-30b](index/model/nemotron-nano-30b.md) (9) · [nemotron-super-49b](index/model/nemotron-super-49b.md) (9) · [phi4-reasoning-plus](index/model/phi4-reasoning-plus.md) (9) · [qwen35-35b-moe](index/model/qwen35-35b-moe.md) (9) · [qwen38-27b](index/model/qwen38-27b.md) (9) · [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) (1) |
+| Date (UTC) | [2026-11-23](index/date/2026-11-23.md) (3) · [2026-11-22](index/date/2026-11-22.md) (17) · [2026-11-18](index/date/2026-11-18.md) (12) · [2026-11-17](index/date/2026-11-17.md) (30) · [2026-11-16](index/date/2026-11-16.md) (12) · [2026-11-15](index/date/2026-11-15.md) (45) · [2026-11-11](index/date/2026-11-11.md) (3) · [2026-11-10](index/date/2026-11-10.md) (30) · [2026-11-09](index/date/2026-11-09.md) (19) · [2026-11-08](index/date/2026-11-08.md) (6) |
+
+### hardware-fit: models by harness
+
+Each cell links to the report of every published run of that model on that harness, newest first. Models are ordered by their newest run.
+
+| Model | [koboldcpp](index/harness/koboldcpp.md) | [projection](index/harness/projection.md) |
+|---|---|---|
+| [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | [2026-11-23 raider-wsl cap 2048](hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) | – |
+| [measured-models-gguf](index/model/measured-models-gguf.md) | – | [2026-11-23 raider-wsl](hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
+| [measured-models-gguf-as-found](index/model/measured-models-gguf-as-found.md) | – | [2026-11-23 raider-wsl](hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
 
 ### model-offloading: models by harness
 
@@ -1390,6 +1456,8 @@ Declared for hardware configuration `raider-ubuntu`, [run of 2026-11-08 01:38](l
 
 | Experiment | Run time UTC | Status | Synthetic | Results |
 |---|---|---|---|---|
+| hardware-fit | 2026-11-23T06:04:54.502356+00:00 | complete | False | [Report](hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) |
+| hardware-fit | 2026-11-23T06:01:20.669483+00:00 | complete | False | [Report](hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
 | model-offloading | 2026-11-22T14:37:02.810790+00:00 | complete | False | [Report](model-offloading/campaign-20261122T143702Z-f61498fb-offload-model-offloading-1/README.md) |
 | model-offloading | 2026-11-22T12:48:04.925010+00:00 | complete | False | [Report](model-offloading/campaign-20261122T124804Z-80069b0a-offload-model-offloading-1/README.md) |
 | model-offloading | 2026-11-22T12:21:21.407264+00:00 | complete | False | [Report](model-offloading/campaign-20261122T122121Z-ad75034c-offload-model-offloading-1/README.md) |
