@@ -4,6 +4,8 @@
 
 The leaderboard source is [livebench.ai](https://livebench.ai/) itself. The GitHub repository `LiveBench/new-livebench` that the evidence files cite answers 404 since 2026-11-08; the tables it held are served byte-identical at `livebench.ai/v1/`, which is where calibration now checks them.
 
+What the nightly run cannot see: models that LiveBench does not score (every decision model, and new releases before LiveBench adds them) and models published by an organization the discovery does not allowlist (Thinking Machines Lab, Reflection AI, Ornith AI, and Meta's `meta-models` organization, for example). The [candidate review](MODEL_CANDIDATES.md) covers them by hand from the Ollama library, Hugging Face and LM Studio's catalog, and says how to repeat it.
+
 ## What runs and when
 
 The [model discovery workflow](../.github/workflows/model-discovery.yml) runs:

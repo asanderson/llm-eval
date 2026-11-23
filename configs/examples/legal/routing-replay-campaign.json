@@ -12,7 +12,7 @@
       "id": "replay",
       "experiments": [
         {
-          "id": "llm-routing",
+          "id": "decision-models",
           "version": 1,
           "mode": "replay",
           "cases": [

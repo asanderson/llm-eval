@@ -314,7 +314,7 @@ class RulesTest(Base):
         bundle(root, 'campaign-odd', NEWER_RUN, {'jobs': 'are not a list'})
         bundle(root, 'campaign-odd-date', 'last week', [offload_job('model-g', 'org/G-GUFF', NEW, 'g.gguf')])
         bundle(root, 'campaign-routing', '2026-12-31T00:00:00+00:00', [offload_job('model-h', 'org/H-GGUF', NEW, 'h.gguf')],
-               experiment='llm-routing')
+               experiment='decision-models')
         self.assertEqual(mp.published_use(root), {'model-a': (NEWER_RUN, 'org/A-GGUF', NEWER_STILL, 'sub/a-00001-of-00002.gguf'),
                                                   'model-b': (OLDER_RUN, 'org/B-GGUF', NEW, 'b.gguf')})
 

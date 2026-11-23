@@ -1239,8 +1239,8 @@ class ReplayTests(ReplayCase):
         self.assertEqual(sorted(p.relative_to(self.path).as_posix() for p in self.path.rglob('*')), before)
 
     def test_replay_manifest_validates_in_the_routing_experiment(self):
-        from llm_eval.experiments import llm_routing
-        from llm_eval.experiments.llm_routing.evaluation import execute as replay_execute
+        from llm_eval.experiments import decision_models
+        from llm_eval.experiments.decision_models.evaluation import execute as replay_execute
         suite_path, manifest_path, _, candidates_path = self.replay()
         manifest = read_json(manifest_path)
         self.assertEqual(set(manifest), {'suite_sha256', 'candidate_fingerprints', 'rows'})
@@ -1250,7 +1250,7 @@ class ReplayTests(ReplayCase):
         self.assertTrue(all(isinstance(x['quality'], float) and 0 <= x['quality'] <= 1 and x['cost_usd'] == 0 for x in manifest['rows']))
         case = {'suite': str(suite_path), 'replay': str(manifest_path), 'router': {'kind': 'fixed', 'choice': 'lexical-eligible'},
                 'candidates': read_json(candidates_path), 'policy': {'fallback': 'no-context'}}
-        self.assertIsNone(llm_routing.validate(case, ROOT, 'replay'))
+        self.assertIsNone(decision_models.validate(case, ROOT, 'replay'))
         result = replay_execute({'mode': 'replay', 'parameters': case}, self.path / 'routing-attempt', ROOT)
         self.assertEqual(result['status'], 'succeeded')
         rows = lines(self.path / 'routing-attempt/requests.jsonl')
@@ -1473,7 +1473,7 @@ class ReplayTests(ReplayCase):
             'candidates': read_json(candidates_path), 'policy': {'fallback': 'no-context'}}})
         self.inventory()
         write_json(self.path / 'routing-campaign.json', {'schema_version': 2, 'id': 'legal-replay', 'inventory': 'inventory.json', 'phases': [
-            {'id': 'routing', 'experiments': [{'id': 'llm-routing', 'version': 1, 'mode': 'replay', 'cases': ['routing-case.json'],
+            {'id': 'routing', 'experiments': [{'id': 'decision-models', 'version': 1, 'mode': 'replay', 'cases': ['routing-case.json'],
                                                'hardware_configs': ['native']}]}]})
         plan = compile_campaign(self.path / 'routing-campaign.json', ROOT)
 
@@ -1496,7 +1496,7 @@ class ReplayTests(ReplayCase):
         shutil.copytree(report / 'bundle' / spec['report_path'], bundle)
         records = index.collect(self.path / 'site')
         (record,) = records
-        self.assertEqual((record['experiment'], record['synthetic'], record['status']), ('llm-routing', False, 'succeeded'))
+        self.assertEqual((record['experiment'], record['synthetic'], record['status']), ('decision-models', False, 'succeeded'))
         self.assertFalse(record['score'])
         self.assertEqual(index.ranked(records), {})
         for name in ('routing-replay-campaign.json', 'score-campaign.json'):
@@ -1552,7 +1552,7 @@ class ReadinessTests(TempCase):
         self.assertEqual((routing_smoke['runtimes'], routing_smoke['needs_gpu']), ({}, False))
         # A non-synthetic job of a plugin without the hook still counts, whatever its parameters say.
         jobs = [{'hardware_config_id': 'a', 'hardware': {'os_id': 'ubuntu-26.04-native', 'hardware_profile': 'msi-raider-18-hx-ai'}, 'target': {'transport': 'local'},
-                 'parameters': {'router': {'kind': 'fixed'}, 'roles': {'generator': {'accelerator': 'cpu'}}}, 'mode': 'decision', 'experiment_id': 'llm-routing'}]
+                 'parameters': {'router': {'kind': 'fixed'}, 'roles': {'generator': {'accelerator': 'cpu'}}}, 'mode': 'decision', 'experiment_id': 'decision-models'}]
         with patch('llm_eval.orchestration.planner.compile_campaign', return_value={'jobs': jobs}):
             self.assertTrue(readiness.select(self.args('--campaign', 'c.json'), ROOT)['needs_gpu'])
             jobs[0]['parameters']['synthetic'] = True

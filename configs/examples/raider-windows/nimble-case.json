@@ -1,7 +1,7 @@
 {
   "id": "ollama-nimble",
   "parameters": {
-    "suite": "../../../experiments/llm-routing/workloads/decisions.json",
+    "suite": "../../../experiments/decision-models/workloads/decisions.json",
     "router": {
       "kind": "systemone",
       "platform": "ollama",

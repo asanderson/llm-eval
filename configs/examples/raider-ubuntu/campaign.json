@@ -31,7 +31,7 @@
       ],
       "experiments": [
         {
-          "id": "llm-routing",
+          "id": "decision-models",
           "version": 1,
           "mode": "decision",
           "cases": [

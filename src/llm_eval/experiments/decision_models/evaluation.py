@@ -72,7 +72,7 @@ def execute(job, output, root):
             if corpus['candidate_fingerprints'].get(cid)!=candidate_fingerprint(c):raise ValueError('Replay candidate fingerprint mismatch')
         baseline=baseline_scores(replay,suite['tasks'],candidates,objective)
         atomic_json(output/'replay-outcomes.json',corpus)
-    meta={'schema_version':2,'experiment_id':'llm-routing','mode':mode,'config':case,
+    meta={'schema_version':2,'experiment_id':'decision-models','mode':mode,'config':case,
           'suite_sha256':digest(suite),'synthetic':case.get('synthetic',False),'benchmark':suite.get('benchmark','routing'),
           'policy_sha256':digest(policy),'status':'running','baseline':baseline}
     atomic_json(output/'routing-metadata.json',meta)

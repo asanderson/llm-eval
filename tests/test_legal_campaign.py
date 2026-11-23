@@ -868,7 +868,7 @@ class LegalCampaignTests(unittest.TestCase):
         shipped = compile_campaign(ROOT / 'campaigns/legal-smoke.json', ROOT)
         self.assertEqual({k: v for k, v in reporting_policy('legal-benchmark', shipped['jobs']).items() if k != 'reason'},
                          {'report': True, 'publish': False, 'include_outputs': False})
-        self.assertEqual(reporting_policy('llm-routing', [])['publish'], True)
+        self.assertEqual(reporting_policy('decision-models', [])['publish'], True)
         self.assertEqual(reporting_policy('legal-benchmark', [])['report'], False)
         # A copied suite with one changed revision is a different, declared suite: it runs and gets a local, reduced report.
         relock(self.suite, revision='operator-copy')
@@ -934,7 +934,7 @@ class LegalCampaignTests(unittest.TestCase):
         self.assertNotIn('pull_request', receipt)
         # Relabelling the bundle as another experiment does not help: its manifest and resolved jobs still say legal.
         spec = read_json(report / 'publication.json')
-        spec['experiment_id'] = 'llm-routing'
+        spec['experiment_id'] = 'decision-models'
         write_json(report / 'publication.json', spec)
         with self.assertRaisesRegex(ValueError, 'Publication is not available for legal-benchmark: bundle_mismatch'):
             publish_report(report, ROOT, dry_run=True)
@@ -1056,9 +1056,9 @@ class LegalGuardTests(unittest.TestCase):
         report = self.shipped_report()
         pristine = report.parent / 'pristine-report'
         shutil.copytree(report, pristine)
-        cases = [('every label edited', 'llm-routing', None, 'Publication'),
-                 ('metadata records removed from the raw archive', 'llm-routing', 'drop-metadata', 'Publication'),
-                 ('raw archive deleted', 'llm-routing', 'delete', 'raw measurements archive'),
+        cases = [('every label edited', 'decision-models', None, 'Publication'),
+                 ('metadata records removed from the raw archive', 'decision-models', 'drop-metadata', 'Publication'),
+                 ('raw archive deleted', 'decision-models', 'delete', 'raw measurements archive'),
                  ('relabelled to an unregistered id', 'unregistered-fixture', None, 'unregistered experiment')]
         for name, label, raw, message in cases:
             with self.subTest(name):
@@ -1069,7 +1069,7 @@ class LegalGuardTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, message):
                     publish_report(report, ROOT, dry_run=True)
         legal_refusal = '^Publication identity mismatch: the bundle carries a legal benchmark name$'      # its own message (fixlist-F2 C1)
-        mode_refusal = 'Publication identity mismatch: mode smoke is not a mode of llm-routing'
+        mode_refusal = 'Publication identity mismatch: mode smoke is not a mode of decision-models'
         # Each case is caught by exactly one check: the job mode, the normalised claim, the raw request rows, the summaries.
         moved = [('consistent relabel, benchmark renamed', dict(raw_benchmark='routing-smoke', summary_benchmark='routing-smoke'), mode_refusal),
                  ('consistent relabel, benchmark deleted', dict(raw_benchmark=self.DELETE, summary_benchmark=self.DELETE), mode_refusal),
@@ -1089,9 +1089,9 @@ class LegalGuardTests(unittest.TestCase):
             with self.subTest(name):
                 shutil.rmtree(report)
                 shutil.copytree(pristine, report)
-                self.move_and_relabel(report, 'llm-routing', **change)
+                self.move_and_relabel(report, 'decision-models', **change)
                 spec = read_json(report / 'publication.json')
-                self.assertTrue(spec['report_path'].startswith('docs/results/llm-routing/'))
+                self.assertTrue(spec['report_path'].startswith('docs/results/decision-models/'))
                 validate_bundle(report)
                 with self.assertRaisesRegex(ValueError, message):
                     publish_report(report, ROOT, dry_run=True)
@@ -1176,7 +1176,7 @@ class LegalGuardTests(unittest.TestCase):
         # Package F: the declared copy got a local, reduced report at finalization; the relabelled record must not replace it.
         before = {p.relative_to(experiment).as_posix(): sha256_file(p) for p in sorted((experiment / 'report').rglob('*')) if p.is_file()}
         record = read_json(experiment / 'experiment.json')
-        record['experiment_id'] = 'llm-routing'
+        record['experiment_id'] = 'decision-models'
         write_json(experiment / 'experiment.json', record)
         with self.assertRaisesRegex(ValueError, 'Experiment identity does not match its planned jobs'):
             build_report(experiment)

@@ -367,11 +367,11 @@ class GateTests(Base):
             self.resume(directory)
         self.assertEqual(read_json(directory / 'campaign.json')['status'], 'ready')      # refused before anything ran
         # A hand-built plan without the digest runs, and enabling a target changes campaign.json, not the plan.
-        job = {'job_id': '0', 'experiment_run_id': 'run', 'experiment_id': 'llm-routing', 'mode': 'decision', 'parameters': {'synthetic': True},
+        job = {'job_id': '0', 'experiment_run_id': 'run', 'experiment_id': 'decision-models', 'mode': 'decision', 'parameters': {'synthetic': True},
                'target': {'transport': 'local', 'physical_host_id': 'a', 'available': False}, 'target_id': 'native', 'resources': ['a'],
                'status': 'blocked', 'reason': None, 'depends_on': []}
         hand = {'campaign_id': 'test', 'root': str(ROOT), 'code_revision': revision(ROOT), 'inputs': {}, 'jobs': [job],
-                'targets': {'native': job['target']}, 'experiments': [{'experiment_run_id': 'run', 'experiment_id': 'llm-routing', 'job_ids': ['0']}],
+                'targets': {'native': job['target']}, 'experiments': [{'experiment_run_id': 'run', 'experiment_id': 'decision-models', 'job_ids': ['0']}],
                 'execution': {'max_parallel_jobs': 1, 'on_failure': 'continue-independent'}, 'reporting': {'on_experiment_end': False}}
         for with_digest in (False, True):
             with self.subTest(with_digest=with_digest):
@@ -386,7 +386,7 @@ class GateTests(Base):
                 self.assertEqual(read_json(hand_dir / 'plan.json'), value)
 
     def test_campaigns_written_before_the_drift_check_resume_and_report(self):
-        """Campaign directories of model-offloading and llm-routing written without the drift check resume and report exactly
+        """Campaign directories of model-offloading and decision-models written without the drift check resume and report exactly
         as a run of the same campaign from start to finish without it."""
         for name in ('a', 'b'):
             write_json(self.path / (name + '.json'), {'id': name, 'parameters': {'config': str(ROOT / 'configs/runs/ollama.example.json')}})
@@ -396,10 +396,10 @@ class GateTests(Base):
         campaigns = {
             'model-offloading': {'schema_version': 2, 'id': 'offload', 'inventory': 'fixed-inventory.json', 'phases': [
                 {'id': 'offload', 'experiments': [{'id': 'model-offloading', 'version': 1, 'cases': ['a.json', 'b.json'], 'hardware_configs': ['native']}]}]},
-            'llm-routing': {'schema_version': 2, 'id': 'routing', 'inventory': 'fixed-inventory.json', 'phases': [
-                {'id': 'routing', 'experiments': [{'id': 'llm-routing', 'version': 1, 'mode': 'decision', 'cases': ['category-smoke'],
+            'decision-models': {'schema_version': 2, 'id': 'routing', 'inventory': 'fixed-inventory.json', 'phases': [
+                {'id': 'routing', 'experiments': [{'id': 'decision-models', 'version': 1, 'mode': 'decision', 'cases': ['category-smoke'],
                                                    'hardware_configs': ['native']}]},
-                {'id': 'again', 'depends_on': ['routing'], 'experiments': [{'id': 'llm-routing', 'version': 1, 'mode': 'decision',
+                {'id': 'again', 'depends_on': ['routing'], 'experiments': [{'id': 'decision-models', 'version': 1, 'mode': 'decision',
                                                                             'cases': ['category-smoke'], 'hardware_configs': ['native']}]}]}}
 
         def rpc(stop):
@@ -500,7 +500,7 @@ class GateTests(Base):
                 patch('llm_eval.orchestration.transport.collect', side_effect=lambda *a, **k: collected.append(a)):
             executed = scheduler._execute(remote, dict(attempt), {**plan, 'targets': {}}, self.path)
             reconciled = scheduler._reconcile(remote, dict(attempt), {**plan, 'targets': {}}, self.path)
-            routing = {'job_id': 'r', 'experiment_id': 'llm-routing', 'mode': 'decision', 'parameters': {'synthetic': True},
+            routing = {'job_id': 'r', 'experiment_id': 'decision-models', 'mode': 'decision', 'parameters': {'synthetic': True},
                        'target': dict(SSH), 'resources': ['remote-test-host']}
             routed = scheduler._execute(routing, dict(attempt), {**plan, 'targets': {}}, self.path)
         self.assertEqual((executed['status'], executed['collect']), ('succeeded', 'refused'))
@@ -525,7 +525,7 @@ class GateTests(Base):
             self.assertNotIn('candidate-outputs', str(raised.exception))
         routing_dir = self.path / 'routing-work' / 'jobs' / ('c' * 32)
         (routing_dir / 'local').mkdir(parents=True)
-        atomic_json(routing_dir / 'job.json', {'job_id': 'r', 'experiment_id': 'llm-routing', 'mode': 'decision', 'parameters': {'synthetic': True}})
+        atomic_json(routing_dir / 'job.json', {'job_id': 'r', 'experiment_id': 'decision-models', 'mode': 'decision', 'parameters': {'synthetic': True}})
         (routing_dir / 'local/x.jsonl').write_text('{}\n', encoding='utf-8')
         plain = self.path / 'plain'
         plain.mkdir()
@@ -581,7 +581,7 @@ class GateTests(Base):
         write_json(self.path / 'routing-inventory.json', {'targets': {'remote': SSH}, 'hardware_configs': {
             'remote': {'target': 'remote', 'hardware_profile': 'msi-raider-18-hx-ai', 'os_id': 'ubuntu-26.04-native'}}})
         write_json(self.path / 'routing.json', {'schema_version': 2, 'id': 'routing', 'inventory': 'routing-inventory.json', 'phases': [
-            {'id': 'routing', 'experiments': [{'id': 'llm-routing', 'version': 1, 'mode': 'decision', 'cases': ['category-smoke'],
+            {'id': 'routing', 'experiments': [{'id': 'decision-models', 'version': 1, 'mode': 'decision', 'cases': ['category-smoke'],
                                                'hardware_configs': ['remote']}]}]})
         plan = compile_campaign(self.path / 'routing.json', ROOT)
         self.assertEqual(plan['jobs'][0]['status'], 'planned')
@@ -1511,7 +1511,7 @@ class ContentTests(Base):
         case = {'suite': suite_file, 'synthetic': True, 'router': {'kind': 'fixed', 'choice': 'lexical-eligible'}}
         write_json(self.path / f'{name}-case.json', {'id': name, 'parameters': case})
         write_json(self.path / f'{name}-campaign.json', {'schema_version': 2, 'id': name, 'inventory': 'inventory.json', 'phases': [
-            {'id': 'routing', 'experiments': [{'id': 'llm-routing', 'version': 1, 'mode': 'decision', 'cases': [f'{name}-case.json'],
+            {'id': 'routing', 'experiments': [{'id': 'decision-models', 'version': 1, 'mode': 'decision', 'cases': [f'{name}-case.json'],
                                                'hardware_configs': ['native']}]}]})
         directory, _ = self.run_plan(compile_campaign(self.path / f'{name}-campaign.json', ROOT), name)
         return directory / self.receipt(directory)['report']
@@ -1551,7 +1551,7 @@ class ContentTests(Base):
                             'rows': [{'task_id': 'f1-ledger-a', 'candidate': 'no-context', 'quality': 1.0, 'latency_s': 1.0, 'cost_usd': 0}]})
         self.assertTrue(lr._legal_file(replay, lr._markers()))
         # The routing experiment's own bundle publishes as before.
-        report = self.routing_bundle(str(ROOT / 'experiments/llm-routing/workloads/decisions.json'), name='own')
+        report = self.routing_bundle(str(ROOT / 'experiments/decision-models/workloads/decisions.json'), name='own')
         self.assertTrue(publish_report(report, ROOT, dry_run=True)['dry_run'])
 
     def test_a_campaign_moved_under_a_scanned_directory_is_refused(self):
@@ -1632,7 +1632,7 @@ class LineageTests(CohortCase):
 
 # 8. Review fixes (fixlist-F) -------------------------------------------------------------------------------------------
 
-def relabel(report, target, experiment='llm-routing', mode='decision', benchmark='smoke', category=None, rename_ids=False):
+def relabel(report, target, experiment='decision-models', mode='decision', benchmark='smoke', category=None, rename_ids=False):
     """A legal report rewritten by hand into a bundle of another experiment: copied to `target`, every label and the benchmark
     renamed, the projection marker, canonical flag, input hashes and job input files stripped, a benchmark summary added,
     hashes and fingerprint recomputed. The bundle is self-consistent (`validate_bundle` passes)."""
@@ -2113,7 +2113,7 @@ class SchemaTests(Base):
                     job['mode'] = name
                 write_json(dest / 'resolved-config.json', resolved)
                 PublicationTests.remanifest(case.report)
-                with self.assertRaisesRegex(ValueError, f'Publication identity mismatch: mode {mode} is not a mode of llm-routing') as raised:
+                with self.assertRaisesRegex(ValueError, f'Publication identity mismatch: mode {mode} is not a mode of decision-models') as raised:
                     publish_report(case.report, ROOT, dry_run=True)
                 self.assertNotIn(CANARY, str(raised.exception))
 
@@ -2164,7 +2164,7 @@ class GateDetailTests(Base):
                 (plain / 'job.json').write_text(text, encoding='utf-8')
                 with self.assertRaisesRegex(ValueError, 'Collection refused by data policy: .*job.json'):
                     worker.handle({'action': 'collect', 'output': str(plain)})
-        write_json(plain / 'job.json', {'job_id': 'r', 'experiment_id': 'llm-routing'})      # a valid generic job collects as before
+        write_json(plain / 'job.json', {'job_id': 'r', 'experiment_id': 'decision-models'})      # a valid generic job collects as before
         self.assertEqual(sorted(f['path'] for f in worker.handle({'action': 'collect', 'output': str(plain)})['files']), ['job.json', 'x.bin'])
 
     def test_markers_fail_closed_and_codes_are_closed(self):
@@ -2206,7 +2206,7 @@ def scrub(report):
     names replaced in every text file and in the raw archive, the legal summary and the structural keys removed, task ids
     renamed. The result is what a person who rewrites the whole bundle produces."""
     dest, spec = bundle_dir(report)
-    names = ((b'legal-original-smoke', b'smoke'), (b'legal-benchmark', b'llm-routing'), (b'legal-smoke', b'smoke'))
+    names = ((b'legal-original-smoke', b'smoke'), (b'legal-benchmark', b'decision-models'), (b'legal-smoke', b'smoke'))
 
     def clean(data):
         for old, new in names:
@@ -2274,7 +2274,7 @@ def edit_generic(report, rows=None, manifest=None):
 
 
 def generic_report(directory, experiment, mode, rows, metadata=None):
-    """A report of `model-offloading` or `llm-routing` built as tests/test_reporting.py builds one: one finished attempt with `rows`."""
+    """A report of `model-offloading` or `decision-models` built as tests/test_reporting.py builds one: one finished attempt with `rows`."""
     job = {'job_id': 'job', 'experiment_id': experiment, 'experiment_run_id': 'run', 'case_id': 'fixed', 'mode': mode,
            'hardware_config_id': 'fixture', 'hardware': {'os_id': 'fixture'}, 'parameters': {'synthetic': True, 'router': {'kind': 'fixed'}},
            'status': 'planned', 'reason': None}
@@ -2296,7 +2296,7 @@ def generic_report(directory, experiment, mode, rows, metadata=None):
 class PublicLegalBenchmarkTests(unittest.TestCase):
     """Owner decision of 2026-11-13: a generic bundle that measures a public legal benchmark (LegalBench, say) publishes; only this
     plugin's own benchmark names and legal content refuse it."""
-    GENERIC = (('model-offloading', 'category-smoke'), ('llm-routing', 'decision'))
+    GENERIC = (('model-offloading', 'category-smoke'), ('decision-models', 'decision'))
 
     def setUp(self):
         tmp = tempfile.TemporaryDirectory()
@@ -2400,10 +2400,10 @@ class SecondRelabelTests(CohortCase):
         shutil.rmtree(inplace)
         shutil.copytree(scrubbed, inplace)
         plan = read_json(directory / 'plan.json')
-        text = json.dumps(plan).replace('"experiment_id": "legal-benchmark"', '"experiment_id": "llm-routing"')
+        text = json.dumps(plan).replace('"experiment_id": "legal-benchmark"', '"experiment_id": "decision-models"')
         write_plan(directory, json.loads(text))
         record = read_json(inplace.parent / 'experiment.json')
-        write_json(inplace.parent / 'experiment.json', {**record, 'experiment_id': 'llm-routing'})
+        write_json(inplace.parent / 'experiment.json', {**record, 'experiment_id': 'decision-models'})
         self.refused(inplace, 'the campaign record names legal-benchmark')
         for name in ('job.json', 'metadata.json'):      # each attempt file alone is enough
             with self.subTest(attempt_file=name):
@@ -2499,7 +2499,7 @@ class WorkerAndRefTests(Base):
         (attempt / 'local/sub').mkdir(parents=True)
         atomic_json(attempt / 'job.json', job)
         (attempt / 'local/sub/secret.jsonl').write_text(CANARY, encoding='utf-8')
-        write_json(attempt / 'local/sub/job.json', {'experiment_id': 'llm-routing', 'job_id': 'x'})      # a nearer generic job planted
+        write_json(attempt / 'local/sub/job.json', {'experiment_id': 'decision-models', 'job_id': 'x'})      # a nearer generic job planted
         for call in ({'action': 'file-chunk', 'output': str(attempt), 'path': 'local/sub/secret.jsonl', 'offset': 0},
                      {'action': 'collect', 'output': str(attempt / 'local/sub')}):
             with self.subTest(call=call['action']), self.assertRaisesRegex(ValueError, 'Collection refused by data policy: .*' + 'd' * 32):
@@ -2510,7 +2510,7 @@ class WorkerAndRefTests(Base):
             worker.handle({'action': 'file-chunk', 'output': str(attempt), 'path': 'local/sub/secret.jsonl', 'offset': 0})
         generic = self.path / 'g' / ('e' * 32)
         (generic / 'local').mkdir(parents=True)
-        write_json(generic / 'job.json', {'experiment_id': 'llm-routing', 'job_id': 'r'})
+        write_json(generic / 'job.json', {'experiment_id': 'decision-models', 'job_id': 'r'})
         (generic / 'local/x.jsonl').write_text('{}\n', encoding='utf-8')
         self.assertEqual(sorted(f['path'] for f in worker.handle({'action': 'collect', 'output': str(generic)})['files']), ['job.json', 'local/x.jsonl'])
 

@@ -1,14 +1,35 @@
-# LLM routing experiment
+# Decision models experiment
 
-This experiment measures decision quality and the quality, latency and API cost of the selected generator. Version 1 supports `decision`, `replay` and `live` modes. It uses one active request per job and can participate in campaigns spanning multiple hardware configurations.
+This experiment measures decision models: models that answer typed questions about a text (a choice from a list, a yes/no probability or a score on a rubric) with a probability for every allowed answer, instead of generating text. It measures their decision accuracy and latency, and, when a decision routes a request, the quality, latency and API cost of the selected generator. Version 1 supports `decision`, `replay` and `live` modes. It uses one active request per job and can participate in campaigns spanning multiple hardware configurations.
+
+Its id is `decision-models`; until 2026-11-23 it was `llm-routing`. Campaigns planned and results published under the former id keep it: their reports and published results resolve to this experiment, and the [results index](../../docs/results/README.md) lists them under the new id. A new campaign must name `decision-models`; the planner refuses the former id.
 
 ## Routers
 
 - `fixed`: always select the configured `choice`; useful as a baseline.
 - `category`: match configured `keywords` against the prompt, with a `default_category`. It never reads a task's reference label to choose a route.
-- `systemone`: send named choice criteria to an Ollama/Jev-compatible `/v1/systemone` endpoint and validate the returned choice/probabilities. The [Ollama API announcement](https://ollama.com/blog/ollama-now-supports-jev-style-decision-models) documents this protocol. The existing installer pins Ollama 0.35.1.
+- `systemone`: send named choice criteria to an Ollama/Jev-compatible `/v1/systemone` endpoint and validate the returned choice/probabilities. The [Ollama API announcement](https://ollama.com/blog/ollama-now-supports-jev-style-decision-models) documents this protocol. The installer catalog pins Ollama 0.40.17.
 
-[Nimble](cases/ollama-nimble.json) and [Tev1](cases/ollama-tev1.json) are templates. Prepare their local service/model yourself and replace `model_revision` with the actual loaded artifact digest. Templates do not establish that an external service loaded the claimed model; preserve operator attestations. No weights are downloaded automatically.
+## Decision models and case templates
+
+Each case below is a template for one decision model of the Ollama library. Prepare the local service and model yourself and replace `model_revision` with the actual loaded artifact digest. Templates do not establish that an external service loaded the claimed model; preserve operator attestations. No weights are downloaded automatically. The [candidate review](../../docs/MODEL_CANDIDATES.md#decision-models) lists the developer, base model, sizes and license of each and how they were found; the US column follows the [model origins](../../docs/MODELS.md#model-origins).
+
+| Case | Ollama tag | Developer | Base model | US model | Published runs |
+|---|---|---|---|---|---|
+| [ollama-nimble](cases/ollama-nimble.json) | `nimble` | Bespoke Labs | Qwen3.5-9B | no | Windows and WSL2 |
+| [ollama-tev1](cases/ollama-tev1.json) | `tev1` (4B) | Together AI | Qwen3.5 | no | Windows and WSL2 |
+| [ollama-tev1-0.8b](cases/ollama-tev1-0.8b.json) | `tev1:0.8b` | Together AI | Qwen3.5 | no | none |
+| [ollama-nimble-v3](cases/ollama-nimble-v3.json) | `nimble-v3` | Bespoke Labs | Qwen3.5-9B | no | none; noncommercial license (CC BY-NC 4.0) |
+| [ollama-pplx-decider](cases/ollama-pplx-decider.json) | `pplx-decider` (27B) | Perplexity | Qwen3.8-27B | no | none |
+| [ollama-pplx-decider-flash](cases/ollama-pplx-decider-flash.json) | `pplx-decider-flash` (4B) | Perplexity | Qwen3.5-4B | no | none |
+| [ollama-clef](cases/ollama-clef.json) | `clef` (27B) | Cloudflare | Qwen3.8-27B | no | none |
+| [ollama-clef-flash](cases/ollama-clef-flash.json) | `clef-flash` (9B) | Cloudflare | Qwen3.5-9B | no | none |
+| [ollama-d1](cases/ollama-d1.json) | `d1` (3B) | Liquid AI | LFM2.5-VL-3B | yes | none |
+| [ollama-d1-omni](cases/ollama-d1-omni.json) | `d1-omni` (600M) | Liquid AI | LFM2.5-Encoder-350M | yes | none |
+| [ollama-autotrust-jev](cases/ollama-autotrust-jev.json) | `autotrust-jev` | AutoTrust | not stated | not recorded | none |
+| [ollama-laya](cases/ollama-laya.json) | `laya` (421M) | Convai Innovations | ModernBERT-large | not recorded | none |
+
+`strands-decider` (Strands Agents) has no template: it runs only with MLX on Apple silicon. LM Studio's catalog lists no decision model, and the other platforms here have no SystemOne endpoint, so every decision model runs on Ollama.
 
 The [category smoke case](cases/category-smoke.json) is deliberately synthetic. Its two original checks verify harness behavior; they are not LiveBench scores or model rankings.
 

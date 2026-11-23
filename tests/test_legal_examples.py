@@ -304,7 +304,7 @@ class ExampleTests(unittest.TestCase):
             self.assertEqual([name for name, _ in selection['runtimes']], ['ollama'])
         plan = compile_campaign(ROOT / 'campaigns/routing-smoke.json', ROOT)
         self.assertEqual([(j['experiment_id'], j['mode'], j['status'], j['parameters'].get('synthetic')) for j in plan['jobs']],
-                         [('llm-routing', 'decision', 'planned', True)])
+                         [('decision-models', 'decision', 'planned', True)])
         self.assertEqual(plan['reporting'], {'on_experiment_end': True})
 
     def test_readiness_derives_no_runtime_for_legal_jobs(self):

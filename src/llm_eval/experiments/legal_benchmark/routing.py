@@ -28,8 +28,8 @@ import time
 
 from llm_eval.common import digest, finite_number, sha256_file
 from llm_eval.core.contracts import fields, identifier
-from llm_eval.experiments.llm_routing.decision import decide, select
-from llm_eval.experiments.llm_routing.evaluation import candidate_fingerprint, corpus_index, utility
+from llm_eval.experiments.decision_models.decision import decide, select
+from llm_eval.experiments.decision_models.evaluation import candidate_fingerprint, corpus_index, utility
 from llm_eval.runner import load_suite as load_task_suite
 
 from . import contracts, grading, profiles, retrieval
@@ -55,7 +55,7 @@ OUTCOME_KEYS = ('decision_correct', 'false_charge', 'dangerous_commitment', 'all
 ROUTE_KEYS = ('routed', 'route_choice', 'route_selected', 'route_fallback', 'route_confidence', 'router_s', 'route_error_type')
 DECISION_KEYS = ('matter_id', 'repetition', 'messages_sha256', 'choice', 'selected', 'action', 'selector_abstained', 'fallback_used',
                  'reason_codes', 'confidence', 'router_s')
-# A recipe candidate of the `--candidates` file is exactly the fixed generator's identity (keys an `llm-routing` case accepts).
+# A recipe candidate of the `--candidates` file is exactly the fixed generator's identity (keys a `decision-models` case accepts).
 GENERATOR_FIELDS = ('model', 'model_revision', 'platform', 'backend_version', 'protocol', 'quantization', 'template_sha256', 'context_tokens')
 CANDIDATE_KEYS = GENERATOR_FIELDS
 OBJECTIVE_KEYS = ('quality_weight', 'latency_weight', 'cost_weight')
@@ -931,7 +931,7 @@ def evaluate(manifest, tasks, strategies, objective, seed=1, switching=None, out
 # Operator files and commands ------------------------------------------------------------------------------------------
 
 def read_candidates(path) -> dict:
-    """The `--candidates` file: {arm id: candidate}, in the shape of the `candidates` of an `llm-routing` case."""
+    """The `--candidates` file: {arm id: candidate}, in the shape of the `candidates` of a `decision-models` case."""
     value, _ = contracts.read_json_strict(path)
     if not isinstance(value, dict) or not value:
         raise ValueError('The candidates file maps arm ids to candidates')
@@ -971,7 +971,7 @@ def main(argv=None) -> int:
     replay.add_argument('--candidates', required=True)
     replay.add_argument('--output', required=True)
     replay.add_argument('--calibration', help='the calibration record whose threshold a selector strategy uses; its digest is recorded')
-    verify = commands.add_parser('verify', help='verify a replay manifest and its sidecar before any llm-routing replay')
+    verify = commands.add_parser('verify', help='verify a replay manifest and its sidecar before any decision-models replay')
     verify.add_argument('--suite', required=True)
     verify.add_argument('--replay', required=True)
     verify.add_argument('--routing-suite', required=True)

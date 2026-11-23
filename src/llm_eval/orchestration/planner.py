@@ -7,7 +7,7 @@ import subprocess
 
 from llm_eval.common import read_json, sha256_file
 from llm_eval.core.contracts import fields, identifier, integer, no_credentials, config_hash
-from llm_eval.experiments import data_policy, get_experiment, reporting_policy
+from llm_eval.experiments import RENAMED, data_policy, get_experiment, reporting_policy
 
 PATH_KEYS = {'suite', 'artifact_root', 'artifact_lock', 'offload_dir', 'installation_state', 'replay', 'data', 'benchmark_registry',
              'output_manifest', 'review_file', 'review_key', 'serving_profile', 'calibration_file'}
@@ -62,6 +62,8 @@ def compile_campaign(path, root, max_parallel_jobs=None):
         phase_jobs = []
         for index, selection in enumerate(phase['experiments']):
             fields(selection, {'id', 'version', 'mode', 'cases', 'hardware_configs'}, ['id', 'version', 'cases', 'hardware_configs'])
+            if selection['id'] in RENAMED:      # a former id: the campaign file predates the rename
+                raise ValueError(f"Experiment {selection['id']} was renamed {RENAMED[selection['id']]}: use the new id in the campaign")
             experiment = get_experiment(selection['id'])
             manifest = experiment.MANIFEST
             mode = selection.get('mode', manifest['modes'][0])
