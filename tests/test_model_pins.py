@@ -626,6 +626,12 @@ class CheckTest(Base):
         self.assertEqual(len(result['new_models']), mp.NEW_MODELS_LIMIT - 1)
         self.assertFalse(any(r.name.startswith('new models from') for r in result['rows']))
         self.assertEqual(mp.NEW_MODELS_LIMIT, 50)
+        # An oldest entry created on the date itself is still a new repository: older ones may exist and were not read.
+        net.listings[ORG][-1]['createdAt'] = day(0)
+        result = self.run_check(root, net)
+        self.assertEqual(result['rows'][-1].name, f'new models from `{ORG}`')
+        self.assertIn('older ones were not read', result['rows'][-1].detail)
+        self.assertEqual(len(result['new_models']), mp.NEW_MODELS_LIMIT + 1)
 
     def test_new_models_since_must_be_a_date(self):
         def no_date(pins):
@@ -750,6 +756,66 @@ class SummaryTest(Base):
             self.assertEqual(text.count('\n'), 4 + len(result['rows']))
             self.assertNotIn('###', text)
 
+    def crowded(self, per_org):
+        """A run in which every publisher org of the pins lists `per_org` new repositories that nobody has decided on."""
+        orgs = []
+        for entry in ARTIFACTS:      # as the script derives them: the org of each base model, once, whatever its case
+            org = entry['base_model'].split('/')[0]
+            if org.casefold() not in {seen.casefold() for seen in orgs}:
+                orgs.append(org)
+        net = FakeNet()
+        for org in orgs:
+            net.listings[org] = [{'id': f'{org}/Recent-{i}', 'createdAt': day(60 - i)} for i in range(per_org)]
+        return orgs, self.run_check(self.fixture(), net)
+
+    def test_a_report_longer_than_github_accepts_counts_the_new_models_per_org(self):
+        self.assertEqual(mp.BODY_CAP, 60_000)      # GitHub refuses a pull request or issue body above 65,536 characters
+        orgs, result = self.crowded(mp.NEW_MODELS_LIMIT)      # the most one run can list: 50 repositories and one note per org
+        self.assertEqual(len(result['new_models']), len(orgs) * (mp.NEW_MODELS_LIMIT + 1))
+        self.assertGreater(len(mp.summary_text(result, True, result['rows'])), 65_536)      # named one by one, the body is refused
+        first, last = day(60 - mp.NEW_MODELS_LIMIT + 1)[:10], day(60)[:10]
+        for issue in (False, True):
+            text = mp.markdown_summary(result, issue=issue)
+            self.assertLessEqual(len(text), mp.BODY_CAP)
+            self.assertNotIn('Recent-', text)
+            lines = text.splitlines()
+            self.assertEqual([line for line in lines if line.startswith('#')], ['## Model pin check', '### Needs a manual decision'])
+            for org in orgs:
+                counted = (f'50 repositories created from {first} to {last} are not in the catalog and have no recorded decision; this report is '
+                           'too long to name each: the log of the run and a local `python3 scripts/model_pins.py` list them')
+                self.assertIn(f'| 50 new models from `{org}` | `none` | `50 new` | manual | {counted} |', lines)
+                self.assertIn(f'- **50 new models from `{org}`**: pinned `none`, upstream `50 new`: {counted}', lines)
+                # The note that older repositories were not read is a row of its own and stays.
+                self.assertTrue(any(line.startswith(f"| new models from `{org}` | `since {PINS['new_models_since']}` | `50 listed` | manual | ") for line in lines))
+            self.assertEqual(len([line for line in lines if line.startswith('| ')]), 1 + 2 * len(ARTIFACTS) + 2 * len(orgs))
+            for line in lines:
+                if line.startswith('| '):
+                    self.assertEqual(len(re.findall(r'(?<!\\)\|', line)), 6, line)
+            self.assertIn(mp.NEW_MODELS_NOTE, lines)
+            self.assertTrue(text.endswith('\n') and not text.endswith('\n\n'))
+        self.assertEqual(len(result['new_models']), len(orgs) * (mp.NEW_MODELS_LIMIT + 1))      # the result itself is not shortened
+        # A report under the limit names every repository, as before.
+        orgs, result = self.crowded(5)
+        text = mp.markdown_summary(result)
+        self.assertLess(len(text), mp.BODY_CAP)
+        self.assertEqual(text, mp.summary_text(result, False, result['rows']))
+        self.assertEqual(text.count('| new model `'), 5 * len(orgs))
+        self.assertNotIn('new models from', text)
+
+    def test_a_report_that_no_rule_shortens_enough_is_cut_at_a_line_end(self):
+        orgs, result = self.crowded(5)
+        counted = mp.summary_text(result, False, mp.counted_per_org(result['rows']))
+        with mock.patch.object(mp, 'BODY_CAP', 3000):
+            self.assertGreater(len(counted), 3000)
+            text = mp.markdown_summary(result)
+        self.assertLessEqual(len(text), 3000)
+        self.assertGreater(len(text), 2500)      # cut at the limit, not far below it
+        lines = text.splitlines()
+        self.assertEqual(lines[-2:], ['', mp.CUT_NOTE])
+        self.assertEqual(lines[:-2], counted.splitlines()[:len(lines) - 2])      # whole lines of the report, from its start
+        self.assertTrue(text.endswith(mp.CUT_NOTE + '\n'))
+        self.assertIn('`python3 scripts/model_pins.py`', mp.CUT_NOTE)
+
     def test_a_hostile_repository_id_is_never_rendered(self):
         hostile = f'{ORG}/x`|<img src=x onerror=alert(1)>\n## Injected heading\n| a | b |\n@someone [link](https://example.com)'
         root = self.fixture()
@@ -850,6 +916,14 @@ class DownloadSpecTest(Base):
             entry['accept_license'] = True
         path.write_text(json.dumps(manifest), encoding='utf-8')
         self.assertEqual(len(validate_download_spec(ROOT, path, selected=chosen)), 2)      # as setup passes its --models
+
+    def test_a_missing_target_directory_is_created(self):
+        with tempfile.TemporaryDirectory(prefix='model-pins-') as tmp:
+            path = Path(tmp) / 'configs' / 'local' / 'download.json'      # the documented target; a fresh clone has no configs/local/
+            with contextlib.redirect_stdout(io.StringIO()):
+                code = mp.main(['--download-spec', str(path), '--models', FIRST['model_id']], net=mock.Mock(spec_set=[]), root=ROOT)
+            self.assertEqual(code, 0)
+            self.assertEqual([e['model_id'] for e in json.loads(path.read_text(encoding='utf-8'))['models']], [FIRST['model_id']])
 
     def test_an_unknown_id_or_a_mixed_command_exits_2_with_a_message_and_writes_nothing(self):
         unpinned = next(m['id'] for m in MODELS if m['id'] not in {e['model_id'] for e in ARTIFACTS})
@@ -1046,8 +1120,11 @@ class NetTest(unittest.TestCase):
         req = urllib.request.Request(self.URL, headers={'Authorization': 'Bearer x'})
         same = handler.redirect_request(req, io.BytesIO(), 307, 'moved', email.message.Message(), 'https://huggingface.co/api/models/a/c/revision/main')
         self.assertEqual(same.full_url, 'https://huggingface.co/api/models/a/c/revision/main')
+        # A target with userinfo names huggingface.co as its host for urlsplit, yet urllib would send the request, with the
+        # token, to the literal text before the path. The check every request passes refuses it.
         for target in ('https://cdn-lfs.example.net/a/b', 'http://huggingface.co/api/models/a/c', 'https://huggingface.co.evil.net/x',
-                       'https://huggingface.co:8443/api/models/a/c'):
+                       'https://huggingface.co:8443/api/models/a/c', 'https://evil.example@huggingface.co/x',
+                       'https://evil.example\\@huggingface.co/x', 'https://user:secret@huggingface.co/x', 'https://huggingface.co:port/x'):
             with self.subTest(target=target), self.assertRaises(mp.UpstreamError) as ctx:
                 handler.redirect_request(req, io.BytesIO(), 302, 'found', email.message.Message(), target)
             self.assertIn('unexpected redirect to', str(ctx.exception))
@@ -1088,6 +1165,10 @@ class NetTest(unittest.TestCase):
         net.now = lambda: dt.datetime(2026, 11, 8, 12, 0, 0, tzinfo=dt.timezone.utc)
         self.assertEqual(net.get(self.URL)[1], [])
         self.assertEqual(net.sleeps, [7, 120, 30, 40])
+        net = self.net(http_error(self.URL, 429, {'Retry-After': 'Sun, 08 Nov 2026 11:59:00 GMT'}), FakeResponse(b'[]'))
+        net.now = lambda: dt.datetime(2026, 11, 8, 12, 0, 0, tzinfo=dt.timezone.utc)
+        self.assertEqual(net.get(self.URL)[1], [])
+        self.assertEqual(net.sleeps, [0])      # a date in the past is no wait, never a negative one
         net = self.net(*[http_error(self.URL, 504)] * 5)
         with self.assertRaises(mp.UpstreamError) as ctx:
             net.get(self.URL)
@@ -1133,6 +1214,20 @@ class NetTest(unittest.TestCase):
         self.assertEqual(net.opener.requests[0][1], 10.0)      # no attempt outlives the deadline
         start = mp.Net(env={})
         self.assertAlmostEqual(start.deadline - start.clock(), mp.RUN_DEADLINE, delta=5)
+
+    def test_a_body_read_is_cut_at_the_run_deadline(self):
+        clock = [0.0]
+
+        class Slow(FakeResponse):
+            def read(self, n=-1):
+                clock[0] += 400.0      # every chunk takes 400 of the 900 seconds the run has
+                return self._body.read(1)
+        net = self.net(Slow(b'[1, 2, 3]'))
+        net.clock, net.deadline = (lambda: clock[0]), 900.0
+        with self.assertRaises(mp.UpstreamError) as ctx:
+            net.get(self.URL)
+        self.assertIn('TimeoutError; no time left before the run deadline of 900 s', str(ctx.exception))
+        self.assertEqual((len(net.opener.requests), net.sleeps), (1, []))
 
     def test_a_body_that_is_not_json_or_is_too_large_is_an_upstream_error(self):
         for body in (b'<html>busy</html>', b'\xff\xfe', b''):

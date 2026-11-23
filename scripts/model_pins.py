@@ -80,6 +80,7 @@ NEW_MODELS_LIMIT = 50             # newest repositories read per publisher org
 GONE_STATUSES = (401, 403, 404, 410)
 STRING_CAP = 120
 EXCERPT_CAP = 200
+BODY_CAP = 60_000                 # GitHub refuses a pull request or issue body above 65,536 characters
 
 REPO_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9_.-]+")
 ORG_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*")
@@ -108,6 +109,8 @@ NEW_MODELS_NOTE = (
     "its creation date. This check does not judge size or license: the model discovery issue \"LiveBench models "
     "needing a catalog decision\" does that for the models LiveBench ranks (`docs/MODEL_DISCOVERY.md`).")
 FAILED_NOTE = "A failed lookup settles nothing: the pin stays as it is, and this run does not close the tracking issue."
+CUT_NOTE = ("This report was cut to fit the size GitHub accepts. The log of the run and a local "
+            "`python3 scripts/model_pins.py` print every row.")
 
 
 # --- sanitization: every string that upstream controls reaches a report only through md_code -----------
@@ -157,7 +160,12 @@ class SameHostRedirect(urllib.request.HTTPRedirectHandler):
 
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         old, new = urllib.parse.urlsplit(req.full_url), urllib.parse.urlsplit(newurl)
-        if new.scheme != "https" or new.hostname != old.hostname or new.port != old.port:
+        try:                           # the target passes the check every request passes: no userinfo, no other port
+            Net.check_url(newurl)
+            same = new.hostname == old.hostname and new.port == old.port
+        except ValueError:
+            same = False
+        if not same:
             raise UpstreamError(f"unexpected redirect to {new.hostname or '?'} (HTTP {code})")
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
@@ -405,6 +413,7 @@ class Row:
         self.name, self.pinned, self.policy = name, pinned, policy
         self.latest, self.status, self.detail = None, "pending", ""
         self.changed = False
+        self.org = None               # the publisher org of a new-model row; a long report counts such rows per org
 
     def done(self, latest, status, detail=""):
         self.latest, self.status, self.detail = latest, status, detail
@@ -562,6 +571,7 @@ def report_new_models(net: Net, pins: dict, catalog: dict, decisions: list, toda
             else:
                 continue
             rows.append(Row(f"new model {md_code(repo)}", "none", "report").done(created, "manual", detail))
+            rows[-1].org = org
         if len(entries) >= NEW_MODELS_LIMIT and listing and min(created for _, created in listing) >= since:
             rows.append(Row(f"new models from {md_code(org)}", f"since {since}", "report").done(
                 f"{NEW_MODELS_LIMIT} listed", "manual",
@@ -603,11 +613,30 @@ def run(net: Net, root: pathlib.Path, apply: bool, today: str):
             "manual": manual, "failures": failures, "moved": moved, "new_models": new_models}
 
 
-def markdown_summary(result: dict, issue: bool = False) -> str:
-    """The pull request body; with issue=True the tracking-issue body, which leaves out the section that only
-    describes the pull request's diff."""
+def counted_per_org(rows: list) -> list:
+    """`rows` with the new-model rows of each publisher org replaced by one row that counts them."""
+    groups = {}
+    for row in rows:
+        if row.org is not None:
+            groups.setdefault(row.org, []).append(row.latest)
+    out = []
+    for row in rows:
+        if row.org is None:
+            out.append(row)
+        elif row.org in groups:
+            created = sorted(groups.pop(row.org))
+            out.append(Row(f"{len(created)} new models from {md_code(row.org)}", "none", "report").done(
+                f"{len(created)} new", "manual",
+                f"{len(created)} repositories created from {created[0]} to {created[-1]} are not in the catalog and "
+                "have no recorded decision; this report is too long to name each: the log of the run and a local "
+                "`python3 scripts/model_pins.py` list them"))
+    return out
+
+
+def summary_text(result: dict, issue: bool, rows: list) -> str:
+    manual = [r for r in rows if r.status == "manual"]
     lines = ["## Model pin check", "", "| Pin | Pinned | Upstream | Status | Detail |", "|---|---|---|---|---|"]
-    for r in result["rows"]:
+    for r in rows:
         status = {"bump": "bumped" if r.changed else "bump available"}.get(r.status, r.status)
         lines.append(f"| {r.name} | {md_code(r.pinned)} | {md_code(r.latest or '?')} | {status} | {r.detail} |")
     if result["moved"] and not issue:
@@ -616,16 +645,32 @@ def markdown_summary(result: dict, issue: bool = False) -> str:
         lines += ["", MOVED_NOTE]
         if result["touched"]:
             lines += ["", "Rewritten: " + ", ".join(f"`{rel}`" for rel in result["touched"]) + "."]
-    if result["manual"]:
+    if manual:
         lines += ["", "### Needs a manual decision", ""]
         lines += [f"- **{r.name}**: pinned {md_code(r.pinned)}, upstream {md_code(r.latest or '?')}: {r.detail}"
-                  for r in result["manual"]]
+                  for r in manual]
         if result["new_models"]:
             lines += ["", NEW_MODELS_NOTE]
     if result["failures"]:
         lines += ["", "### Failed lookups", ""] + [f"- **{r.name}**: {r.detail}" for r in result["failures"]]
         lines += ["", FAILED_NOTE]
     return "\n".join(lines) + "\n"
+
+
+def markdown_summary(result: dict, issue: bool = False) -> str:
+    """The pull request body; with issue=True the tracking-issue body, which leaves out the section that only
+    describes the pull request's diff.
+
+    At most BODY_CAP characters, because GitHub refuses a longer body and the nightly job would then fail every
+    night: a report above the cap counts the new models per publisher org instead of naming each one, and a report
+    that is still above it is cut at a line end."""
+    text = summary_text(result, issue, result["rows"])
+    if len(text) > BODY_CAP:
+        text = summary_text(result, issue, counted_per_org(result["rows"]))
+    if len(text) > BODY_CAP:
+        kept = text[:BODY_CAP - len(CUT_NOTE) - 2]
+        text = kept[:kept.rfind("\n") + 1] + "\n" + CUT_NOTE + "\n"
+    return text
 
 
 def download_spec(pins: dict, selected=None) -> dict:
@@ -650,7 +695,9 @@ def download_spec(pins: dict, selected=None) -> dict:
 
 # --- CLI ----------------------------------------------------------------------------------------------------
 def write(path, text):
-    pathlib.Path(path).write_text(text, encoding="utf-8", newline="\n")
+    path = pathlib.Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)      # configs/local/ of the documented command is absent in a fresh clone
+    path.write_text(text, encoding="utf-8", newline="\n")
 
 
 def emit(text, stream=None):
