@@ -10,6 +10,12 @@ Recommended setup, harness and model per hardware configuration and experiment: 
 
 Ranked by share of checks passed (correct decisions for routing experiments, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians. Where a model repeats among the best combinations, a second table ranks the models, each by its best combination.
 
+**[hardware-fit](experiment/hardware-fit.md) on [raider-wsl](hardware/raider-wsl.md)**
+
+| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
+|---:|---|---|---:|---:|---:|---|
+| 1 | [koboldcpp](harness/koboldcpp.md) | [qwen38-27b-ud-q4_k_xl](model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 2.78 | 27.2 | [2026-11-23 cap 2048](../hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) |
+
 **[model-offloading](experiment/model-offloading.md) on [raider-wsl](hardware/raider-wsl.md)**
 
 | Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
@@ -72,11 +78,21 @@ No measured run with scored checks has been published yet.
 
 | Category | Indexes (results) |
 |---|---|
-| Hardware configuration | [raider-ubuntu](hardware/raider-ubuntu.md) (1) · [raider-windows](hardware/raider-windows.md) (114) · [raider-wsl](hardware/raider-wsl.md) (59) |
-| Experiment | [legal-benchmark](experiment/legal-benchmark.md) (8) · [llm-routing](experiment/llm-routing.md) (7) · [model-offloading](experiment/model-offloading.md) (159) |
-| Harness | [category](harness/category.md) (1) · [fixture](harness/fixture.md) (2) · [koboldcpp](harness/koboldcpp.md) (51) · [lmstudio](harness/lmstudio.md) (51) · [ollama](harness/ollama.md) (69) |
-| Model | [category](model/category.md) (1) · [deepseek-r1-32b](model/deepseek-r1-32b.md) (12) · [deepseek-r1-70b](model/deepseek-r1-70b.md) (9) · [fixture](model/fixture.md) (2) · [gemma3-27b](model/gemma3-27b.md) (9) · [gemma4-26b-moe](model/gemma4-26b-moe.md) (10) · [gemma4-31b](model/gemma4-31b.md) (10) · [kimi-dev-72b](model/kimi-dev-72b.md) (10) · [kimi-linear-48b](model/kimi-linear-48b.md) (9) · [laguna-xs21](model/laguna-xs21.md) (9) · [llama3-70b](model/llama3-70b.md) (9) · [llama31-70b](model/llama31-70b.md) (9) · [llama33-70b](model/llama33-70b.md) (9) · [llm-eval-kimi-linear-48b:locked](model/llm-eval-kimi-linear-48b-locked.md) (6) · [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) (3) · [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) (3) · [mistral-small31](model/mistral-small31.md) (9) · [nemotron-nano-30b](model/nemotron-nano-30b.md) (9) · [nemotron-super-49b](model/nemotron-super-49b.md) (9) · [phi4-reasoning-plus](model/phi4-reasoning-plus.md) (9) · [qwen35-35b-moe](model/qwen35-35b-moe.md) (9) · [qwen38-27b](model/qwen38-27b.md) (9) |
-| Date (UTC) | [2026-11-22](date/2026-11-22.md) (17) · [2026-11-18](date/2026-11-18.md) (12) · [2026-11-17](date/2026-11-17.md) (30) · [2026-11-16](date/2026-11-16.md) (12) · [2026-11-15](date/2026-11-15.md) (45) · [2026-11-11](date/2026-11-11.md) (3) · [2026-11-10](date/2026-11-10.md) (30) · [2026-11-09](date/2026-11-09.md) (19) · [2026-11-08](date/2026-11-08.md) (6) |
+| Hardware configuration | [raider-ubuntu](hardware/raider-ubuntu.md) (1) · [raider-windows](hardware/raider-windows.md) (114) · [raider-wsl](hardware/raider-wsl.md) (62) |
+| Experiment | [hardware-fit](experiment/hardware-fit.md) (3) · [legal-benchmark](experiment/legal-benchmark.md) (8) · [llm-routing](experiment/llm-routing.md) (7) · [model-offloading](experiment/model-offloading.md) (159) |
+| Harness | [category](harness/category.md) (1) · [fixture](harness/fixture.md) (2) · [koboldcpp](harness/koboldcpp.md) (52) · [lmstudio](harness/lmstudio.md) (51) · [ollama](harness/ollama.md) (69) · [projection](harness/projection.md) (2) |
+| Model | [category](model/category.md) (1) · [deepseek-r1-32b](model/deepseek-r1-32b.md) (12) · [deepseek-r1-70b](model/deepseek-r1-70b.md) (9) · [fixture](model/fixture.md) (2) · [gemma3-27b](model/gemma3-27b.md) (9) · [gemma4-26b-moe](model/gemma4-26b-moe.md) (10) · [gemma4-31b](model/gemma4-31b.md) (10) · [kimi-dev-72b](model/kimi-dev-72b.md) (10) · [kimi-linear-48b](model/kimi-linear-48b.md) (9) · [laguna-xs21](model/laguna-xs21.md) (9) · [llama3-70b](model/llama3-70b.md) (9) · [llama31-70b](model/llama31-70b.md) (9) · [llama33-70b](model/llama33-70b.md) (9) · [llm-eval-kimi-linear-48b:locked](model/llm-eval-kimi-linear-48b-locked.md) (6) · [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) (3) · [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) (3) · [measured-models-gguf](model/measured-models-gguf.md) (1) · [measured-models-gguf-as-found](model/measured-models-gguf-as-found.md) (1) · [mistral-small31](model/mistral-small31.md) (9) · [nemotron-nano-30b](model/nemotron-nano-30b.md) (9) · [nemotron-super-49b](model/nemotron-super-49b.md) (9) · [phi4-reasoning-plus](model/phi4-reasoning-plus.md) (9) · [qwen35-35b-moe](model/qwen35-35b-moe.md) (9) · [qwen38-27b](model/qwen38-27b.md) (9) · [qwen38-27b-ud-q4_k_xl](model/qwen38-27b-ud-q4_k_xl.md) (1) |
+| Date (UTC) | [2026-11-23](date/2026-11-23.md) (3) · [2026-11-22](date/2026-11-22.md) (17) · [2026-11-18](date/2026-11-18.md) (12) · [2026-11-17](date/2026-11-17.md) (30) · [2026-11-16](date/2026-11-16.md) (12) · [2026-11-15](date/2026-11-15.md) (45) · [2026-11-11](date/2026-11-11.md) (3) · [2026-11-10](date/2026-11-10.md) (30) · [2026-11-09](date/2026-11-09.md) (19) · [2026-11-08](date/2026-11-08.md) (6) |
+
+### hardware-fit: models by harness
+
+Each cell links to the report of every published run of that model on that harness, newest first. Models are ordered by their newest run.
+
+| Model | [koboldcpp](harness/koboldcpp.md) | [projection](harness/projection.md) |
+|---|---|---|
+| [qwen38-27b-ud-q4_k_xl](model/qwen38-27b-ud-q4_k_xl.md) | [2026-11-23 raider-wsl cap 2048](../hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) | – |
+| [measured-models-gguf](model/measured-models-gguf.md) | – | [2026-11-23 raider-wsl](../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
+| [measured-models-gguf-as-found](model/measured-models-gguf-as-found.md) | – | [2026-11-23 raider-wsl](../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
 
 ### model-offloading: models by harness
 
@@ -152,6 +168,9 @@ These results are not ranked with other experiments. Two runs are comparable onl
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
+| [2026-11-23](date/2026-11-23.md) | [hardware-fit](experiment/hardware-fit.md) | [raider-wsl](hardware/raider-wsl.md) | [koboldcpp](harness/koboldcpp.md) | [qwen38-27b-ud-q4_k_xl](model/qwen38-27b-ud-q4_k_xl.md) | qwen38-27b-ud-q4_k_xl-koboldcpp | 2048 | succeeded | 27 | 0 | 2.58–3.07 | 26.9–27.4 | 24/27 | – | [report](../hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) |
+| [2026-11-23](date/2026-11-23.md) | [hardware-fit](experiment/hardware-fit.md) | [raider-wsl](hardware/raider-wsl.md) | [projection](harness/projection.md) | [measured-models-gguf](model/measured-models-gguf.md) | projection-measured-models | – | succeeded | 430 | 0 | – | – | – | – | [report](../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
+| [2026-11-23](date/2026-11-23.md) | [hardware-fit](experiment/hardware-fit.md) | [raider-wsl](hardware/raider-wsl.md) | [projection](harness/projection.md) | [measured-models-gguf-as-found](model/measured-models-gguf-as-found.md) | projection-measured-models-as-found | – | succeeded | 430 | 0 | – | – | – | – | [report](../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
 | [2026-11-22](date/2026-11-22.md) | [model-offloading](experiment/model-offloading.md) | [raider-wsl](hardware/raider-wsl.md) | [lmstudio](harness/lmstudio.md) | [gemma4-26b-moe](model/gemma4-26b-moe.md) | gemma4-26b-moe-lmstudio | 2048 | succeeded | 27 | 0 | 13.3–14.6 | 13.5–13.8 | 21/27 | – | [report](../model-offloading/campaign-20261122T143702Z-f61498fb-offload-model-offloading-1/README.md) |
 | [2026-11-22](date/2026-11-22.md) | [model-offloading](experiment/model-offloading.md) | [raider-wsl](hardware/raider-wsl.md) | [lmstudio](harness/lmstudio.md) | [kimi-dev-72b](model/kimi-dev-72b.md) | kimi-dev-72b-lmstudio | 2048 | succeeded | 27 | 0 | 111–150 | 1.9–1.91 | 0/27 | – | [report](../model-offloading/campaign-20261122T124804Z-80069b0a-offload-model-offloading-1/README.md) |
 | [2026-11-22](date/2026-11-22.md) | [model-offloading](experiment/model-offloading.md) | [raider-wsl](hardware/raider-wsl.md) | [lmstudio](harness/lmstudio.md) | [mistral-small31](model/mistral-small31.md) | mistral-small31-lmstudio | 2048 | succeeded | 27 | 0 | 1.25–7.05 | 2.4–2.41 | 6/27 | – | [report](../model-offloading/campaign-20261122T122121Z-ad75034c-offload-model-offloading-1/README.md) |

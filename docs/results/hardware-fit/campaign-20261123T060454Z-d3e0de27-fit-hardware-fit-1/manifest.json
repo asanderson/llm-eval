@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "experiment_id": "hardware-fit",
+  "experiment_run_id": "fit-hardware-fit-1",
+  "publication_id": "campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1",
+  "campaign_id": "fit-wsl-measured-qwen38-27b-ud-q4_k_xl",
+  "created_utc": "2026-11-23T06:04:54.502356+00:00",
+  "code_revision": "2695cba457664b269921edfcf5afa430e2222330",
+  "status": "complete",
+  "synthetic": false,
+  "coverage": [
+    {
+      "job_id": "fit-hardware-fit-1-1479e5e031a5",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    }
+  ],
+  "raw_records": 721,
+  "removed_fields": [
+    "absolute_path_values",
+    "artifact_lock",
+    "artifact_root",
+    "backend_pid",
+    "endpoint",
+    "host",
+    "lock_root",
+    "offload_dir",
+    "python"
+  ],
+  "files": {
+    "diagrams/results/hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/latency.png": "5500f73a906adc5bc6f4376fab8ab3b3ba0f03ab96befac47bef75a623b97b99",
+    "docs/results/hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md": "3a07aeedc54219916ab3c692a5ff48af5a6fdb0fde0189c292ac41145fb71e62",
+    "docs/results/hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/benchmark-summary.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/results/hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/benchmark-summary.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "docs/results/hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/raw/measurements.jsonl.gz": "ecb0134c2eeb0bc911b5e02005ef62ded8d943b3cf2f65d2b53399a32dcf76fa",
+    "docs/results/hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/resolved-config.json": "fce336e370ffbf83fce80ff09c8c9421783a495bd4b0c7605503132fce5b94cd",
+    "docs/results/hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/summary.csv": "a06365857bcba502d9ad00b08d5707005fd5e49b61832699333a242fc01f3d7f",
+    "docs/results/hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/summary.json": "88e329eb0b808071e9598fc4460406d80e5d753ba2ae07a8246b27fac3c9e8c9"
+  },
+  "report_fingerprint": "618b1b0f0d63baf0ef2c5e4a4733830de8bd2475262e7c557dcba2386755f629"
+}

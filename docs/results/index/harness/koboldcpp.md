@@ -2,10 +2,11 @@
 
 [Results index](../README.md) · [Executive summary](../../README.md)
 
-51 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
+52 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
+| [2026-11-23](../date/2026-11-23.md) | [hardware-fit](../experiment/hardware-fit.md) | [raider-wsl](../hardware/raider-wsl.md) | [koboldcpp](../harness/koboldcpp.md) | [qwen38-27b-ud-q4_k_xl](../model/qwen38-27b-ud-q4_k_xl.md) | qwen38-27b-ud-q4_k_xl-koboldcpp | 2048 | succeeded | 27 | 0 | 2.58–3.07 | 26.9–27.4 | 24/27 | – | [report](../../hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) |
 | [2026-11-18](../date/2026-11-18.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [koboldcpp](../harness/koboldcpp.md) | [gemma4-26b-moe](../model/gemma4-26b-moe.md) | gemma4-26b-moe-koboldcpp | 2048 | succeeded | 27 | 0 | 0.523–0.524 | 3.82–5.74 | 21/27 | – | [report](../../model-offloading/campaign-20261118T050451Z-60d1fe39-offload-model-offloading-1/README.md) |
 | [2026-11-18](../date/2026-11-18.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [koboldcpp](../harness/koboldcpp.md) | [kimi-dev-72b](../model/kimi-dev-72b.md) | kimi-dev-72b-koboldcpp | 2048 | succeeded | 27 | 0 | 101–157 | 2.23–2.27 | 0/27 | – | [report](../../model-offloading/campaign-20261118T014808Z-cc8eec8c-offload-model-offloading-1/README.md) |
 | [2026-11-17](../date/2026-11-17.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [koboldcpp](../harness/koboldcpp.md) | [deepseek-r1-70b](../model/deepseek-r1-70b.md) | deepseek-r1-70b-koboldcpp | 2048 | succeeded | 27 | 0 | 94.9–185 | 2.58–2.59 | 3/27 | – | [report](../../model-offloading/campaign-20261117T220944Z-fb65881a-offload-model-offloading-1/README.md) |
