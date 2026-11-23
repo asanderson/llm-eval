@@ -2,9 +2,9 @@
 
 LM Studio's engine runs inside the desktop app or the ``llmster`` daemon, which
 ``lms`` starts detached from this process. The ``serve`` command therefore acts
-as the owned backend process: it imports the locked GGUF, loads it with explicit
-context/GPU placement, starts the loopback server, and stays alive until it is
-terminated. ``cleanup`` releases exactly what ``serve`` recorded in its state
+as the owned backend process: it imports the locked GGUF, waits until LM Studio
+lists the import, loads it with explicit context/GPU placement, starts the
+loopback server, and stays alive until it is terminated. ``cleanup`` releases exactly what ``serve`` recorded in its state
 file, so it is safe to run after an abrupt termination. Commands are argument
 arrays, never shell text.
 """
@@ -22,6 +22,8 @@ from .common import read_json, write_json
 
 GPU_VALUES = {'off', 'max'}
 IMPORT_MODES = ('symbolic-link', 'hard-link', 'copy')
+LIST_TIMEOUT_S = 300      # longest wait for LM Studio to list a new import before `lms load`
+LIST_POLL_S = 1.0         # seconds between two `lms ls --json` checks
 
 
 def gpu_offload(value):
@@ -60,6 +62,39 @@ def model_key(artifact_id, model_file):
     return f'llm-eval/{artifact_id}/{Path(model_file).name}'
 
 
+def listed_paths(text):
+    """Model paths in the answer of ``lms ls --json``: a JSON array whose entries carry the path that ``lms load
+    --exact`` takes in ``path`` and in ``indexedModelIdentifier``. Anything else gives an empty set."""
+    decoder = json.JSONDecoder()
+    for index, char in enumerate(text):      # the first JSON array; a notice printed before it is skipped
+        if char != '[':
+            continue
+        try:
+            models, _ = decoder.raw_decode(text, index)
+        except ValueError:
+            continue
+        return {m[field].replace('\\', '/') for m in models if isinstance(m, dict)
+                for field in ('path', 'indexedModelIdentifier') if isinstance(m.get(field), str)}
+    return set()
+
+
+def wait_until_listed(lms, key, timeout):
+    """True once ``lms ls`` lists ``key``, False when ``timeout`` seconds pass first. LM Studio indexes a new import
+    asynchronously, so ``lms load --exact`` run as soon as ``lms import`` returns can answer that no model has that path
+    (seen on Windows on 2026-11-09 and in WSL2 on 2026-11-23)."""
+    deadline = time.monotonic() + timeout
+    while True:
+        try:
+            code, out = run([lms, 'ls', '--json'], timeout=120)
+        except subprocess.TimeoutExpired:
+            code, out = 1, ''
+        if code == 0 and key in listed_paths(out):
+            return True
+        if time.monotonic() >= deadline:
+            return False
+        time.sleep(LIST_POLL_S)
+
+
 def serve(args, load_args):
     state_path = Path(args.state)
     state = {'daemon_started': False, 'daemon_pid': None, 'server_started': False, 'loaded': None}
@@ -91,6 +126,9 @@ def serve(args, load_args):
                      '--yes', '--' + args.import_mode], timeout=args.load_timeout)
     if code and 'already exists' not in out:
         return fail('lms import failed\n' + out[-2000:])
+    wait = min(LIST_TIMEOUT_S, args.load_timeout)
+    if not wait_until_listed(args.lms, key, wait):
+        return fail(f'LM Studio did not list the imported model {key} within {wait} s; `lms ls --json` shows the models it has indexed')
     argv = [args.lms, 'load', key, '--identifier', args.identifier, '--context-length', str(args.context_length),
             '--gpu', args.gpu, '--parallel', '1', '--exact', '--yes', *load_args]
     code, out = run(argv, timeout=args.load_timeout)

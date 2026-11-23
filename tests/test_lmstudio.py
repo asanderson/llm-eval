@@ -22,10 +22,12 @@ PINNED = read_json(ROOT / 'catalog/installers.json')['platforms']['lmstudio']['v
 class FakeLms:
     """Scripted lms CLI: records argument arrays and answers status/version queries."""
 
-    def __init__(self, version=PINNED, daemon_running=False, server_running=False, import_exit=0, load_exit=0):
+    def __init__(self, version=PINNED, daemon_running=False, server_running=False, import_exit=0, load_exit=0, listed_after=0):
         self.calls = []
         self.version, self.daemon_running, self.server_running = version, daemon_running, server_running
         self.import_exit, self.load_exit = import_exit, load_exit
+        # `lms ls` answers this many times without the new import before it lists it; None: it never lists it.
+        self.listed_after, self.imported, self.listings = listed_after, False, 0
 
     def __call__(self, argv, **kwargs):
         self.calls.append(argv[1:])
@@ -43,6 +45,15 @@ class FakeLms:
         elif argv[1] == 'import':
             code = self.import_exit
             out = 'Target file already exists: x' if code else ''
+            self.imported = True
+        elif argv[1] == 'ls':      # the shape LM Studio 0.4.28 answers: one entry per indexed model
+            self.listings += 1
+            models = [{'type': 'embedding', 'modelKey': 'text-embedding-nomic-embed-text-v1.5',
+                       'path': 'nomic-ai/nomic-embed-text-v1.5-GGUF/nomic-embed-text-v1.5.Q4_K_M.gguf'}]
+            if self.imported and self.listed_after is not None and self.listings > self.listed_after:
+                models.append({'type': 'llm', 'modelKey': 'abc123', 'path': 'llm-eval/abc123/model.gguf',
+                               'indexedModelIdentifier': 'llm-eval/abc123/model.gguf'})
+            out = json.dumps(models)
         elif argv[1] == 'load':
             code = self.load_exit
         elif command == 'server start':
@@ -59,9 +70,11 @@ class SupervisorTests(unittest.TestCase):
             argv += ['--' + key.replace('_', '-'), value]
         return argv
 
-    def run_serve(self, tmp, fake, argv=None):
-        with patch.object(lmstudio.subprocess, 'run', side_effect=fake), patch.object(lmstudio.time, 'sleep', side_effect=KeyboardInterrupt), \
-                contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+    def run_serve(self, tmp, fake, argv=None, sleep=KeyboardInterrupt, stderr=None):
+        """Run `serve` against a scripted lms. By default every sleep ends the run: the first one is the hold loop after
+        the server started, because the scripted lms lists a new import at once."""
+        with patch.object(lmstudio.subprocess, 'run', side_effect=fake), patch.object(lmstudio.time, 'sleep', side_effect=sleep), \
+                contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(stderr or io.StringIO()):
             try:
                 return lmstudio.main(argv or self.args(tmp))
             except KeyboardInterrupt:
@@ -73,7 +86,7 @@ class SupervisorTests(unittest.TestCase):
             self.assertEqual(self.run_serve(tmp, fake), 'held')
             commands = [' '.join(c[:2]) for c in fake.calls]
             self.assertEqual(commands, ['daemon status', 'daemon up', 'server status', 'import ' + str(Path(tmp) / 'model.gguf'),
-                                        'load llm-eval/abc123/model.gguf', 'server start'])
+                                        'ls --json', 'load llm-eval/abc123/model.gguf', 'server start'])
             load = next(c for c in fake.calls if c[0] == 'load')
             self.assertEqual(load[1:], ['llm-eval/abc123/model.gguf', '--identifier', 'eval-model', '--context-length', '8192',
                                         '--gpu', '0.5', '--parallel', '1', '--exact', '--yes'])
@@ -116,6 +129,74 @@ class SupervisorTests(unittest.TestCase):
             self.assertEqual(load[-1], '--flash-attention')
             self.assertNotIn(['server', 'start', '--port', '1234', '--bind', '127.0.0.1'], fake.calls)
             self.assertEqual(fake.calls[-1], ['daemon', 'down'])
+
+    def test_load_waits_until_lm_studio_lists_the_import(self):
+        # LM Studio indexes a new import asynchronously: `lms load --exact` at once can answer that no model has the path.
+        for name, import_exit in (('new import', 0), ('existing import', 1)):
+            with self.subTest(name), tempfile.TemporaryDirectory() as tmp, patch.object(lmstudio, 'LIST_POLL_S', 0.25):
+                fake = FakeLms(import_exit=import_exit, listed_after=3)      # listed at the fourth check
+                slept = []
+
+                def sleep(seconds):
+                    if seconds != 0.25:      # the hold loop after the server started
+                        raise KeyboardInterrupt
+                    slept.append(seconds)
+                self.assertEqual(self.run_serve(tmp, fake, sleep=sleep), 'held')
+                commands = [' '.join(c[:2]) for c in fake.calls]
+                self.assertEqual(commands[3:], ['import ' + str(Path(tmp) / 'model.gguf')] + ['ls --json'] * 4 +
+                                 ['load llm-eval/abc123/model.gguf', 'server start'])
+                self.assertEqual(slept, [0.25] * 3)
+                self.assertEqual(read_json(Path(tmp) / 'state.json')['loaded'], 'eval-model')
+
+    def test_an_import_that_is_never_listed_fails_before_any_load_and_cleans_up(self):
+        for name, extra, limit in (('the listing limit', {}, 3), ('a shorter load timeout', {'load_timeout': '2'}, 2)):
+            with self.subTest(name), tempfile.TemporaryDirectory() as tmp, patch.object(lmstudio, 'LIST_TIMEOUT_S', 3), \
+                    patch.object(lmstudio, 'LIST_POLL_S', 1.0):
+                fake = FakeLms(listed_after=None)
+                clock = [100.0]
+
+                def sleep(seconds):
+                    if seconds != 1.0:
+                        raise KeyboardInterrupt
+                    clock[0] += seconds
+                err = io.StringIO()
+                with patch.object(lmstudio.time, 'monotonic', side_effect=lambda: clock[0]):
+                    self.assertEqual(self.run_serve(tmp, fake, self.args(tmp, **extra), sleep=sleep, stderr=err), 1)
+                self.assertFalse(any(c[0] == 'load' for c in fake.calls))
+                self.assertEqual(sum(c[0] == 'ls' for c in fake.calls), limit + 1)      # at 0, 1, ... and `limit` seconds
+                self.assertIn(f'LM Studio did not list the imported model llm-eval/abc123/model.gguf within {limit} s', err.getvalue())
+                self.assertNotIn(['server', 'start', '--port', '1234', '--bind', '127.0.0.1'], fake.calls)
+                self.assertEqual(fake.calls[-1], ['daemon', 'down'])
+                self.assertFalse((Path(tmp) / 'state.json').exists())
+
+    def test_a_failed_or_slow_listing_counts_as_not_listed(self):
+        key = 'llm-eval/abc123/model.gguf'
+        answers = [subprocess.TimeoutExpired(['lms', 'ls'], 120), (1, 'error'), (0, 'not json'), (0, json.dumps([{'path': key}]))]
+
+        def run(argv, timeout=900):
+            self.assertEqual(argv, ['lms', 'ls', '--json'])
+            answer = answers.pop(0)
+            if isinstance(answer, BaseException):
+                raise answer
+            return answer
+        with patch.object(lmstudio, 'run', side_effect=run), patch.object(lmstudio.time, 'sleep') as sleep:
+            self.assertTrue(lmstudio.wait_until_listed('lms', key, 60))
+        self.assertEqual((sleep.call_count, answers), (3, []))
+
+    def test_listed_paths_reads_the_json_array_of_lms_ls(self):
+        sample = [{'type': 'llm', 'modelKey': 'd44b7f92fe57', 'format': 'gguf', 'path': 'llm-eval/d44b7f92fe57/model-Q6_K.gguf',
+                   'indexedModelIdentifier': 'llm-eval/d44b7f92fe57/model-Q6_K.gguf'},
+                  {'type': 'embedding', 'modelKey': 'text-embedding-nomic-embed-text-v1.5',
+                   'path': 'nomic-ai/nomic-embed-text-v1.5-GGUF/nomic-embed-text-v1.5.Q4_K_M.gguf'}]
+        paths = {'llm-eval/d44b7f92fe57/model-Q6_K.gguf', 'nomic-ai/nomic-embed-text-v1.5-GGUF/nomic-embed-text-v1.5.Q4_K_M.gguf'}
+        self.assertEqual(lmstudio.listed_paths(json.dumps(sample)), paths)
+        self.assertEqual(lmstudio.listed_paths('[info] a notice before the answer\n' + json.dumps(sample)), paths)
+        self.assertEqual(lmstudio.listed_paths(json.dumps([{'indexedModelIdentifier': 'llm-eval\\abc123\\model.gguf'}])),
+                         {'llm-eval/abc123/model.gguf'})      # a Windows separator compares as the path `lms load` takes
+        for text in ('', 'No models found', '[not json', json.dumps({'path': 'x'}), json.dumps(['x', 1, None]),
+                     json.dumps([{'modelKey': 'abc123'}]), json.dumps([{'path': 7}])):
+            with self.subTest(text=text):
+                self.assertEqual(lmstudio.listed_paths(text), set())
 
     def test_gpu_offload_values(self):
         for value in ('off', 'max', '0', '1', '0.5'):
