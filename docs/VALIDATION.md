@@ -180,7 +180,8 @@ Recorded 2026-11-22 on the MSI Raider under native Windows 11, for the `hardware
 - One real measured run on Ollama 0.40.15 with every layer requested on the GPU: `qwen38-27b` at UD-Q4_K_XL (16.35 GiB of weights, context 8192). The downloaded file matched the size and SHA-256 that the candidate set records. The job succeeded with the verdict `in_vram`:
   - the backend log reads "offloaded 66/66 layers to GPU", with a 15718 MiB model buffer, a 512 MiB cache and a 150 MiB compute buffer on the GPU, and no cache buffer on the CPU; the evidence record holds the same values;
   - Ollama reported the whole model in VRAM (`size_vram` equal to `size`);
-  - VRAM use rose from 1994 MiB before the launch to a sampled peak of 18931 MiB of 24463 MiB, which leaves the 2048 MiB reserve free.
+  - VRAM use rose from 1994 MiB before the launch to a sampled peak of 18931 MiB of 24463 MiB, which leaves the 2048 MiB reserve free;
+  - 24 of the 27 checks passed, at about 33 output tokens per second in each category.
 - That run corrected the candidate set. The engine allocated 512 MiB of cache where the first version of the set implied 2.0 GiB, because only 16 of the model's 64 layers keep a cache. The key and value elements per token of every model are now taken from the cache sizes the engine printed in the published model-offloading runs; three models changed (`qwen38-27b`, `qwen35-35b-moe`, `kimi-linear-48b`).
 
 ### What was not verified
@@ -198,6 +199,6 @@ Recorded 2026-11-23 on the same machine in WSL2 with Ubuntu 26.04, on revision `
 
 - One projection campaign through the real worker with two cases. The shipped case, with its `gpu_baseline_gib` of 2.06, calls 183 of the 430 artifacts fitting. A second case declares the baseline read on that day and measures the Windows volume instead of the guest's virtual disk; with 18.7 GiB free there, none fits.
 - One measured run on KoboldCpp 1.124.2 with every layer requested on the GPU: the same `qwen38-27b` artifact at UD-Q4_K_XL, loaded from the Windows volume through `/mnt/c`. The job succeeded with the verdict `in_vram`: 66 of 66 layers, one model load and no partial one, no cache buffer on the CPU, and a sampled peak of 19071 MiB of 24463 MiB after 2899 MiB before the launch.
-- The run exercised three rules of the review fixes on real inputs: the label was checked against the precision of the real artifact lock, the GPU row was selected by index, and the evidence record carries `model_loads` and `partial_loads`.
+- The run exercised two rules of the review fixes on real inputs: the label was checked against the precision of the real artifact lock, and the evidence record carries `model_loads` and `partial_loads`. The host has one GPU, so the run cannot tell the selection of the GPU row by index from the earlier rule.
 
-What these runs do not show: a run that leaves VRAM, a second GPU, a reloaded model, and any harness other than KoboldCpp in WSL2. Ollama and LM Studio were not run there because each needs a second copy of the weights and the disk had no room for one.
+What these runs do not show: a run that leaves VRAM, a second GPU, a reloaded model, and any harness other than KoboldCpp in WSL2. Ollama was not run there because it imports a copy of the weights, and a second 16.35 GiB copy would have left the Windows volume about 2 GiB. LM Studio was not run either; its symbolic-link import, which needs no copy, was not tried.
