@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_on": "2026-11-22",
+  "checked_on": "2026-11-23",
   "scope": "Quantized artifact each measured catalog model loads in the next run. A revision is a full commit of the artifact repository; files are the selected quantization. Updated by the nightly model pin check through a pull request; see docs/MODELS.md.",
   "new_models_since": "2026-11-22",
   "artifacts": [
@@ -167,7 +167,7 @@
       "model_id": "qwen38-27b",
       "base_model": "Qwen/Qwen3.8-27B",
       "source_repo": "unsloth/Qwen3.8-27B-GGUF",
-      "source_revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+      "source_revision": "4af51b3542f775b0a8e4b310bfb3f17e01c306c9",
       "precision": "Q8_0",
       "files": [
         {
