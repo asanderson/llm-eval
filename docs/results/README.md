@@ -12,6 +12,24 @@ Tables and charts between `results-*` markers are generated from the published b
 
 Ranked by share of checks passed (correct decisions for routing experiments, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians. Where a model repeats among the best combinations, a second table ranks the models, each by its best combination.
 
+**[hardware-fit](index/experiment/hardware-fit.md) on [raider-wsl](index/hardware/raider-wsl.md)**
+
+| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
+|---:|---|---|---:|---:|---:|---|
+| 1 | [lmstudio](index/harness/lmstudio.md) | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 0.886 | 68.6 | [2026-11-23 cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
+| 2 | [ollama](index/harness/ollama.md) | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 1.97 | 33.6 | [2026-11-23 cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
+| 3 | [koboldcpp](index/harness/koboldcpp.md) | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 2.78 | 27.2 | [2026-11-23 cap 2048](hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) |
+
+Top 5 models, each on its best-ranked harness:
+
+| Rank | Model | Harness | Checks passed | Median wall s | Output tok/s | Run |
+|---:|---|---|---:|---:|---:|---|
+| 1 | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | [lmstudio](index/harness/lmstudio.md) | 24/27 | 0.886 | 68.6 | [2026-11-23 cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
+
+![hardware-fit on raider-wsl: harness and model combinations compared](../../diagrams/results/summary/hardware-fit-raider-wsl.png)
+
+Chart: every ranked combination, best-ranked model first, one color per harness. Each panel has its own axis; wall time is on a log scale. Exact values are in the tables of this page and in the linked reports.
+
 **[model-offloading](index/experiment/model-offloading.md) on [raider-wsl](index/hardware/raider-wsl.md)**
 
 | Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
@@ -35,12 +53,6 @@ Top 5 models, each on its best-ranked harness:
 ![model-offloading on raider-wsl: harness and model combinations compared](../../diagrams/results/summary/model-offloading-raider-wsl.png)
 
 Chart: every ranked combination, best-ranked model first, one color per harness. Each panel has its own axis; wall time is on a log scale. Exact values are in the tables of this page and in the linked reports.
-
-**[hardware-fit](index/experiment/hardware-fit.md) on [raider-wsl](index/hardware/raider-wsl.md)**
-
-| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---:|---:|---:|---|
-| 1 | [koboldcpp](index/harness/koboldcpp.md) | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 2.78 | 27.2 | [2026-11-23 cap 2048](hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) |
 
 **[llm-routing](index/experiment/llm-routing.md) on [raider-wsl](index/hardware/raider-wsl.md)**
 
@@ -125,6 +137,9 @@ MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 285HX, NVIDIA RTX 5090 Laptop (24
 
 The laptop of `raider-windows` (MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 285HX, NVIDIA RTX 5090 Laptop, 63.4 GiB RAM, Windows 11 Pro 10.0.26300, AC power, MSI Center "Best Performance", MUX in MSHybrid mode), measured inside WSL2 with Ubuntu 26.04 (WSL 2.7.12.0, kernel 6.18.33.2-microsoft-standard-WSL2, NVIDIA driver 610.74 as read in the guest). Model files and the Ollama and KoboldCpp runtimes live on the ext4 virtual disk of the guest, on the same NVMe volume; LM Studio runs from the vendor AppImage installed in the guest. The guest memory limit differs between two groups of Ollama and KoboldCpp jobs and is stated in the [WSL2 table](#wsl2-measurement-of-2026-11-17-and-2026-11-18); every LM Studio job ran with the 52 GB limit ([LM Studio section](#wsl2-lm-studio-measurement-of-2026-11-22)). One exception: the model file of the hardware-fit job of 2026-11-23 stayed on the Windows volume and was read through `/mnt/c` ([hardware-fit section](#hardware-fit-in-wsl2-of-2026-11-23)).
 
+<!-- hardware-fit-wsl-ollama-lmstudio-2026-11-23-bullet:start -->
+- **Hardware fit on Ollama and LM Studio in WSL2 of 2026-11-23** ([tables and notes](#hardware-fit-on-ollama-and-lm-studio-in-wsl2-of-2026-11-23)). The `qwen38-27b` UD-Q4_K_XL artifact of the KoboldCpp job below also stayed inside VRAM on Ollama 0.40.16 and LM Studio 0.4.28+2, and all three harnesses pass the same 24 of 27 checks. LM Studio is the fastest of the three: category medians of 0.75 to 0.97 s per request and 62 to 69 output tokens per second, against 1.4 to 2.0 s and about 33 on Ollama and 2.6 to 3.1 s and about 27 on KoboldCpp. The results index now recommends LM Studio for this experiment on `raider-wsl`.
+<!-- hardware-fit-wsl-ollama-lmstudio-2026-11-23-bullet:end -->
 <!-- wsl-gemma4-ollama-2026-11-23-bullet:start -->
 - **WSL2 rerun of `gemma4-26b-moe` on Ollama of 2026-11-23** ([table and notes](#wsl2-rerun-of-gemma4-26b-moe-on-ollama-of-2026-11-23)). This was the one pair of the WSL2 matrix whose only succeeded job came from a second checkout in the guest, at the commit that changed the launcher. It now has a succeeded job from the main guest checkout on `main` at `2695cba`: 24 of 27 checks, as on 2026-11-18, with a median of 12.55 s per request and 15.94 output tokens per second (12.60 s and 15.87 then).
 <!-- wsl-gemma4-ollama-2026-11-23-bullet:end -->
@@ -141,6 +156,47 @@ The laptop of `raider-windows` (MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 2
 #### `raider-ubuntu`
 
 Synthetic fixture run only. No conclusions.
+
+<!-- hardware-fit-wsl-ollama-lmstudio-2026-11-23:start -->
+
+### Hardware fit on Ollama and LM Studio in WSL2 of 2026-11-23
+
+The first measured hardware-fit job ([section below](#hardware-fit-in-wsl2-of-2026-11-23)) ran on KoboldCpp only, because Ollama's import copy did not fit on the disk at the time. Once the disk had room, the same artifact was measured on Ollama 0.40.16 and LM Studio 0.4.28+2 in one campaign ([report](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md)), later on 2026-11-23 (UTC). The campaign uses the same code revision, `2695cba`, and the same settings as the KoboldCpp job: `qwen38-27b` at UD-Q4_K_XL, every layer requested on the GPU, context 8192, the three smoke categories with one warm-up and three measured repetitions per task, temperature 0 and a 2,048-token output cap. Both jobs succeeded with the verdict `in_vram`.
+
+| Evidence | Ollama 0.40.16 | LM Studio 0.4.28+2 | KoboldCpp 1.124.2, [section below](#hardware-fit-in-wsl2-of-2026-11-23) |
+|---|---|---|---|
+| Placement in the backend log | 66 of 66 layers, one model load, no cache on the CPU | none: the managed launch keeps no placement lines | 66 of 66 layers, one model load, no cache on the CPU |
+| GPU buffers in the backend log | model 15,718 MiB, cache 512 MiB, compute 150 MiB | none | model 15,718 MiB, cache 528 MiB, compute 533 MiB |
+| What the server reports | the whole model, 17,333,087,108 bytes, in VRAM (`size_vram` equal to `size`) | nothing | nothing |
+| VRAM in use before the launch | 1,553 MiB | 1,553 MiB | 2,899 MiB |
+| Sampled peak, of 24,463 MiB | 18,390 MiB | 19,390 MiB | 19,071 MiB |
+| Rise in the evidence record | 16,837 MiB, 101 % of the 16,746 MiB of weights | 17,837 MiB, 107 % of the weights | 16,172 MiB, 97 %, which understates the model's share |
+
+Checks are those passed out of the measured requests of each category; the other figures are medians over them.
+
+| Harness | Category | Checks | Median wall s | Median output tok/s | Median first output s |
+|---|---|---:|---:|---:|---:|
+| LM Studio | coding | 9/9 | 0.75 | 61.6 | 0.10 |
+| LM Studio | math | 9/9 | 0.97 | 69.1 | 0.10 |
+| LM Studio | reasoning | 6/9 | 0.89 | 68.6 | 0.10 |
+| Ollama | coding | 9/9 | 1.99 | 33.7 | 0.10 |
+| Ollama | math | 9/9 | 1.97 | 33.6 | 0.10 |
+| Ollama | reasoning | 6/9 | 1.43 | 32.9 | 0.11 |
+| KoboldCpp | coding | 9/9 | 2.58 | 26.9 | 0.52 |
+| KoboldCpp | math | 9/9 | 2.78 | 27.2 | 0.52 |
+| KoboldCpp | reasoning | 6/9 | 3.07 | 27.4 | 0.52 |
+
+What to keep in mind:
+
+- **The same checks pass on all three harnesses.** On each, the three repetitions of `reasoning-logic` fail and every other check passes. The answers are of similar length: a median of 61 to 76 completion tokens, most of them a short reasoning trace before an answer of two to four characters.
+- **LM Studio decodes about twice as fast as Ollama here.** The bundles do not show why. With the same checks on all three, the results index ranks LM Studio first by its lower wall time, and the recommended setup page for this experiment on `raider-wsl` now names LM Studio.
+- **LM Studio's verdict rests on the VRAM counter.** Its managed launch keeps no placement lines, so the placement check had nothing to read, and the capacity and rise checks decided. A rise of 107 % of the weights fits the weights, the cache and the compute buffers all on the GPU, but it is not a per-layer measurement.
+- **The VRAM counter was steady.** It read 1,553 MiB before each launch, never less before the model's buffers appeared, and 1,553 MiB again in the last sample of each job. Unlike in the KoboldCpp job, other programs did not release memory during the launch, so the recorded rise does not understate the model's share.
+- **LM Studio's first attempt failed.** `lms load` answered "Model not found". The managed launcher imports the model and loads it at once, and LM Studio lists a new import only a few seconds after `lms import` returns. The WSL2 LM Studio matrix of 2026-11-22 avoided this by importing each model before its campaign. After the same import by hand, the failed job was retried in the same campaign with `llm-eval resume --retry-failed` and succeeded. The failed attempt stays in the raw data of the bundle; the summaries use the retry. The launcher itself has not been changed.
+- **Where each harness read the model.** LM Studio imported a symbolic link to the file on the Windows NTFS volume, so it loaded the file through `/mnt/c`. Ollama imported a copy of the 16.35 GiB file into its private store on the guest's virtual disk; the copy was deleted after the campaign.
+- **Programs and host memory.** No virtual machine was running. The bundle attests the consumer Ollama tray app, a Windows Ollama server, Microsoft Teams, the VMware tray and authorization service, the ChatGPT and Claude desktop apps and VS Code, and the LM Studio desktop app open in the guest, as LM Studio's managed runs require. The guest's page cache was dropped before the campaign and before the retry. A sampler on the Windows host (`typeperf`, every 2 s) saw pages written out in 2 of the 418 samples of the two runs, about 0.04 GiB in total, and at least 25 GiB of host memory available throughout. The sampler's file is not part of the bundle.
+
+<!-- hardware-fit-wsl-ollama-lmstudio-2026-11-23:end -->
 
 <!-- wsl-gemma4-ollama-2026-11-23:start -->
 
@@ -206,7 +262,7 @@ What to keep in mind:
 - **The model file was not copied into the guest, which departs from the OS profile.** KoboldCpp loaded it from the Windows NTFS volume through `/mnt/c`. The metadata of each category run copies the OS profile of the catalog, whose `model_filesystem` entry describes the usual setup: the guest's virtual disk, "not /mnt/c". For this job the attestation in the resolved configuration is the accurate statement. The harness verifies the artifact before the launch and before each of the three category runs, so with the load the 16.35 GiB file was read five times, and the job took 12 minutes. Request times are measured after the load.
 - **Programs running on the host.** The bundle attests the consumer Ollama tray app, a Windows Ollama server, Microsoft Teams, the VMware tray and authorization service, a running VMware virtual machine, the ChatGPT and Claude desktop apps and VS Code, and the LM Studio desktop app open in the guest with no model loaded. The virtual machine was idle and held most of the host memory: about 600 MiB of 63 GiB was available on the Windows host before the run.
 - **Host paging.** A sampler on the Windows host (`typeperf`, every 2 s) saw pages written out in 14 of the 361 samples of the run, about 0.05 GiB in total, and none in its last four minutes. In the eight seconds after the job ended it saw about 1.25 GiB written out. Available host memory fell to 5 MiB when the backend started, between the first read of the model file and its load, and stayed between 3.5 and 4.2 GiB from the sixth minute on. The sampler's file is not part of the bundle.
-- **One harness and one artifact.** Ollama imports a copy of the weights into its store, and a second 16.35 GiB copy would have left the Windows volume about 2 GiB, so it was not run. LM Studio was not run either. The earlier WSL2 runs imported its models by hard link, which needs the file on the guest's own disk; its symbolic-link import, which needs no copy, was not tried. llama.cpp and ik_llama.cpp are not installed in the guest.
+- **One harness at first.** Ollama imports a copy of the weights into its store, and a second 16.35 GiB copy would have left the Windows volume about 2 GiB, so it was not run in this campaign, and neither was LM Studio. Both were measured later that day, once the disk had room ([section above](#hardware-fit-on-ollama-and-lm-studio-in-wsl2-of-2026-11-23)). llama.cpp and ik_llama.cpp are not installed in the guest.
 - **No platform comparison.** The only native Windows measured run of this experiment is the unpublished validation run that [docs/VALIDATION.md](../VALIDATION.md#hardware-fit) records: the same artifact on Ollama 0.40.15, also `in_vram` with 66 of 66 layers, 24 of 27 checks at about 33 output tokens per second. Harness and platform both differ from the job above, so the two rates do not compare the platforms.
 
 <!-- hardware-fit-wsl-2026-11-23:end -->
@@ -460,11 +516,21 @@ The four legal benchmark runs that ran on the Windows host on 2026-11-15 ran aga
 
 | Category | Indexes (results) |
 |---|---|
-| Hardware configuration | [raider-ubuntu](index/hardware/raider-ubuntu.md) (1) · [raider-windows](index/hardware/raider-windows.md) (114) · [raider-wsl](index/hardware/raider-wsl.md) (63) |
-| Experiment | [hardware-fit](index/experiment/hardware-fit.md) (3) · [legal-benchmark](index/experiment/legal-benchmark.md) (8) · [llm-routing](index/experiment/llm-routing.md) (7) · [model-offloading](index/experiment/model-offloading.md) (160) |
-| Harness | [category](index/harness/category.md) (1) · [fixture](index/harness/fixture.md) (2) · [koboldcpp](index/harness/koboldcpp.md) (52) · [lmstudio](index/harness/lmstudio.md) (51) · [ollama](index/harness/ollama.md) (70) · [projection](index/harness/projection.md) (2) |
-| Model | [category](index/model/category.md) (1) · [deepseek-r1-32b](index/model/deepseek-r1-32b.md) (12) · [deepseek-r1-70b](index/model/deepseek-r1-70b.md) (9) · [fixture](index/model/fixture.md) (2) · [gemma3-27b](index/model/gemma3-27b.md) (9) · [gemma4-26b-moe](index/model/gemma4-26b-moe.md) (11) · [gemma4-31b](index/model/gemma4-31b.md) (10) · [kimi-dev-72b](index/model/kimi-dev-72b.md) (10) · [kimi-linear-48b](index/model/kimi-linear-48b.md) (9) · [laguna-xs21](index/model/laguna-xs21.md) (9) · [llama3-70b](index/model/llama3-70b.md) (9) · [llama31-70b](index/model/llama31-70b.md) (9) · [llama33-70b](index/model/llama33-70b.md) (9) · [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) (6) · [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) (3) · [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) (3) · [measured-models-gguf](index/model/measured-models-gguf.md) (1) · [measured-models-gguf-as-found](index/model/measured-models-gguf-as-found.md) (1) · [mistral-small31](index/model/mistral-small31.md) (9) · [nemotron-nano-30b](index/model/nemotron-nano-30b.md) (9) · [nemotron-super-49b](index/model/nemotron-super-49b.md) (9) · [phi4-reasoning-plus](index/model/phi4-reasoning-plus.md) (9) · [qwen35-35b-moe](index/model/qwen35-35b-moe.md) (9) · [qwen38-27b](index/model/qwen38-27b.md) (9) · [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) (1) |
-| Date (UTC) | [2026-11-23](index/date/2026-11-23.md) (4) · [2026-11-22](index/date/2026-11-22.md) (17) · [2026-11-18](index/date/2026-11-18.md) (12) · [2026-11-17](index/date/2026-11-17.md) (30) · [2026-11-16](index/date/2026-11-16.md) (12) · [2026-11-15](index/date/2026-11-15.md) (45) · [2026-11-11](index/date/2026-11-11.md) (3) · [2026-11-10](index/date/2026-11-10.md) (30) · [2026-11-09](index/date/2026-11-09.md) (19) · [2026-11-08](index/date/2026-11-08.md) (6) |
+| Hardware configuration | [raider-ubuntu](index/hardware/raider-ubuntu.md) (1) · [raider-windows](index/hardware/raider-windows.md) (114) · [raider-wsl](index/hardware/raider-wsl.md) (65) |
+| Experiment | [hardware-fit](index/experiment/hardware-fit.md) (5) · [legal-benchmark](index/experiment/legal-benchmark.md) (8) · [llm-routing](index/experiment/llm-routing.md) (7) · [model-offloading](index/experiment/model-offloading.md) (160) |
+| Harness | [category](index/harness/category.md) (1) · [fixture](index/harness/fixture.md) (2) · [koboldcpp](index/harness/koboldcpp.md) (52) · [lmstudio](index/harness/lmstudio.md) (52) · [ollama](index/harness/ollama.md) (71) · [projection](index/harness/projection.md) (2) |
+| Model | [category](index/model/category.md) (1) · [deepseek-r1-32b](index/model/deepseek-r1-32b.md) (12) · [deepseek-r1-70b](index/model/deepseek-r1-70b.md) (9) · [fixture](index/model/fixture.md) (2) · [gemma3-27b](index/model/gemma3-27b.md) (9) · [gemma4-26b-moe](index/model/gemma4-26b-moe.md) (11) · [gemma4-31b](index/model/gemma4-31b.md) (10) · [kimi-dev-72b](index/model/kimi-dev-72b.md) (10) · [kimi-linear-48b](index/model/kimi-linear-48b.md) (9) · [laguna-xs21](index/model/laguna-xs21.md) (9) · [llama3-70b](index/model/llama3-70b.md) (9) · [llama31-70b](index/model/llama31-70b.md) (9) · [llama33-70b](index/model/llama33-70b.md) (9) · [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) (6) · [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) (3) · [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) (3) · [measured-models-gguf](index/model/measured-models-gguf.md) (1) · [measured-models-gguf-as-found](index/model/measured-models-gguf-as-found.md) (1) · [mistral-small31](index/model/mistral-small31.md) (9) · [nemotron-nano-30b](index/model/nemotron-nano-30b.md) (9) · [nemotron-super-49b](index/model/nemotron-super-49b.md) (9) · [phi4-reasoning-plus](index/model/phi4-reasoning-plus.md) (9) · [qwen35-35b-moe](index/model/qwen35-35b-moe.md) (9) · [qwen38-27b](index/model/qwen38-27b.md) (9) · [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) (3) |
+| Date (UTC) | [2026-11-23](index/date/2026-11-23.md) (6) · [2026-11-22](index/date/2026-11-22.md) (17) · [2026-11-18](index/date/2026-11-18.md) (12) · [2026-11-17](index/date/2026-11-17.md) (30) · [2026-11-16](index/date/2026-11-16.md) (12) · [2026-11-15](index/date/2026-11-15.md) (45) · [2026-11-11](index/date/2026-11-11.md) (3) · [2026-11-10](index/date/2026-11-10.md) (30) · [2026-11-09](index/date/2026-11-09.md) (19) · [2026-11-08](index/date/2026-11-08.md) (6) |
+
+### hardware-fit: models by harness
+
+Each cell links to the report of every published run of that model on that harness, newest first. Models are ordered by their newest run.
+
+| Model | [koboldcpp](index/harness/koboldcpp.md) | [lmstudio](index/harness/lmstudio.md) | [ollama](index/harness/ollama.md) | [projection](index/harness/projection.md) |
+|---|---|---|---|---|
+| [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | [2026-11-23 raider-wsl cap 2048](hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) | [2026-11-23 raider-wsl cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) | [2026-11-23 raider-wsl cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) | – |
+| [measured-models-gguf](index/model/measured-models-gguf.md) | – | – | – | [2026-11-23 raider-wsl](hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
+| [measured-models-gguf-as-found](index/model/measured-models-gguf-as-found.md) | – | – | – | [2026-11-23 raider-wsl](hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
 
 ### model-offloading: models by harness
 
@@ -489,16 +555,6 @@ Each cell links to the report of every published run of that model on that harne
 | [gemma3-27b](index/model/gemma3-27b.md) | [2026-11-17 raider-wsl cap 2048](model-offloading/campaign-20261117T073753Z-bee9d8ce-offload-model-offloading-1/README.md)<br>[2026-11-15 raider-windows cap 2048](model-offloading/campaign-20261115T193835Z-720b0164-offload-model-offloading-1/README.md)<br>[2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T171430Z-c1c4ab49-offload-model-offloading-1/README.md) | [2026-11-22 raider-wsl cap 2048](model-offloading/campaign-20261122T004854Z-df06d9cb-offload-model-offloading-1/README.md)<br>[2026-11-15 raider-windows cap 2048](model-offloading/campaign-20261115T193835Z-720b0164-offload-model-offloading-1/README.md)<br>[2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T171430Z-c1c4ab49-offload-model-offloading-1/README.md) | [2026-11-17 raider-wsl cap 2048](model-offloading/campaign-20261117T073753Z-bee9d8ce-offload-model-offloading-1/README.md)<br>[2026-11-15 raider-windows cap 2048](model-offloading/campaign-20261115T193835Z-720b0164-offload-model-offloading-1/README.md)<br>[2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T171430Z-c1c4ab49-offload-model-offloading-1/README.md) |
 | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | [2026-11-17 raider-wsl cap 2048](model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/README.md)<br>[2026-11-15 raider-windows cap 2048](model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md)<br>[2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T174915Z-128e3dcf-offload-model-offloading-1/README.md) | [2026-11-22 raider-wsl cap 2048](model-offloading/campaign-20261122T003348Z-8d8d894b-offload-model-offloading-1/README.md)<br>[2026-11-15 raider-windows cap 2048](model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md)<br>[2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T174915Z-128e3dcf-offload-model-offloading-1/README.md) | [2026-11-17 raider-wsl cap 2048](model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/README.md)<br>[2026-11-15 raider-windows cap 2048](model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md)<br>[2026-11-09 raider-windows cap 2048](model-offloading/campaign-20261109T174915Z-128e3dcf-offload-model-offloading-1/README.md) |
 | [kimi-linear-48b](index/model/kimi-linear-48b.md) | [2026-11-17 raider-wsl cap 2048](model-offloading/campaign-20261117T043857Z-d2cbbd81-offload-model-offloading-1/README.md)<br>[2026-11-15 raider-windows cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md)<br>[2026-11-10 raider-windows cap 2048](model-offloading/campaign-20261110T111300Z-172c453b-offload-model-offloading-1/README.md) | [2026-11-22 raider-wsl cap 2048](model-offloading/campaign-20261122T001756Z-e1adff6b-offload-model-offloading-1/README.md)<br>[2026-11-15 raider-windows cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md)<br>[2026-11-10 raider-windows cap 2048](model-offloading/campaign-20261110T111300Z-172c453b-offload-model-offloading-1/README.md) | [2026-11-17 raider-wsl cap 2048](model-offloading/campaign-20261117T043857Z-d2cbbd81-offload-model-offloading-1/README.md)<br>[2026-11-15 raider-windows cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md)<br>[2026-11-10 raider-windows cap 2048](model-offloading/campaign-20261110T111300Z-172c453b-offload-model-offloading-1/README.md) |
-
-### hardware-fit: models by harness
-
-Each cell links to the report of every published run of that model on that harness, newest first. Models are ordered by their newest run.
-
-| Model | [koboldcpp](index/harness/koboldcpp.md) | [projection](index/harness/projection.md) |
-|---|---|---|
-| [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | [2026-11-23 raider-wsl cap 2048](hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) | – |
-| [measured-models-gguf](index/model/measured-models-gguf.md) | – | [2026-11-23 raider-wsl](hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
-| [measured-models-gguf-as-found](index/model/measured-models-gguf-as-found.md) | – | [2026-11-23 raider-wsl](hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
 
 ### legal-benchmark: models by harness
 
@@ -1481,6 +1537,7 @@ Declared for hardware configuration `raider-ubuntu`, [run of 2026-11-08 01:38](l
 
 | Experiment | Run time UTC | Status | Synthetic | Results |
 |---|---|---|---|---|
+| hardware-fit | 2026-11-23T12:06:32.733902+00:00 | complete | False | [Report](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
 | model-offloading | 2026-11-23T10:47:21.531863+00:00 | complete | False | [Report](model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/README.md) |
 | hardware-fit | 2026-11-23T06:04:54.502356+00:00 | complete | False | [Report](hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) |
 | hardware-fit | 2026-11-23T06:01:20.669483+00:00 | complete | False | [Report](hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |

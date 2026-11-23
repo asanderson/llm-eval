@@ -1,0 +1,388 @@
+{
+  "experiment": {
+    "experiment_run_id": "fit-hardware-fit-1",
+    "experiment_id": "hardware-fit",
+    "version": 1,
+    "mode": "measured",
+    "job_ids": [
+      "fit-hardware-fit-1-aca7cd52ca80",
+      "fit-hardware-fit-1-4b1c74ff0cbf"
+    ],
+    "campaign_id": "fit-wsl-measured2-qwen38-27b-ud-q4_k_xl",
+    "code_revision": "2695cba457664b269921edfcf5afa430e2222330"
+  },
+  "jobs": [
+    {
+      "schema_version": 2,
+      "job_id": "fit-hardware-fit-1-aca7cd52ca80",
+      "experiment_run_id": "fit-hardware-fit-1",
+      "experiment_id": "hardware-fit",
+      "experiment_version": 1,
+      "mode": "measured",
+      "case_id": "qwen38-27b-ud-q4_k_xl-ollama",
+      "hardware_config_id": "raider-wsl",
+      "hardware": {
+        "target": "raider",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-wsl2-ubuntu-26.04"
+      },
+      "hardware_profile": {
+        "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+        "manufacturer": "MSI",
+        "model": "Raider 18 HX AI A2XWJG-069US",
+        "cpu": {
+          "name": "Intel Core Ultra 9 285HX",
+          "architecture": "Arrow Lake-HX",
+          "p_cores": 8,
+          "e_cores": 16,
+          "threads": 24,
+          "instruction_baseline": "AVX2",
+          "amx": false,
+          "avx512": false,
+          "thread_sweep": [
+            7,
+            8,
+            15,
+            23
+          ],
+          "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+        },
+        "ram": {
+          "installed_gib": 64,
+          "type": "DDR5-6400",
+          "channels": 2
+        },
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "architecture": "Blackwell",
+          "compute_capability": "12.0",
+          "vram_gib": 24,
+          "initial_reserve_gib": 2,
+          "desktop_gpu": false
+        },
+        "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+        "storage": [
+          {
+            "name": "Factory NVMe",
+            "capacity_tb": 2,
+            "model": "not inventoried"
+          },
+          {
+            "name": "WD_BLACK SN7100",
+            "capacity_tb": 4,
+            "interface": "PCIe Gen4 x4",
+            "role": "Model files, artifacts, results; separate swap/offload experiments"
+          }
+        ],
+        "evidence": {
+          "configuration": "user-provided",
+          "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+        },
+        "required_recordings": [
+          "BIOS version",
+          "NVIDIA driver",
+          "GPU power limit/TGP",
+          "AC state",
+          "MSI power/fan profile",
+          "hybrid/MUX setting",
+          "RAM configured speed",
+          "SSD mount and filesystem",
+          "SSD free space and temperature",
+          "OS build/kernel",
+          "WSL version and memory cap if applicable"
+        ],
+        "host_reserve_gib": 12,
+        "os_limits": {
+          "windows-11-wsl2-ubuntu-26.04": {
+            "ram_budget_gib": 46
+          }
+        }
+      },
+      "target_id": "raider",
+      "target": {
+        "transport": "local",
+        "physical_host_id": "raider"
+      },
+      "parameters": {
+        "identity": {
+          "harness": "ollama",
+          "model": "qwen38-27b-ud-q4_k_xl"
+        },
+        "config": {
+          "schema_version": 1,
+          "model_id": "qwen38-27b",
+          "os_id": "windows-11-wsl2-ubuntu-26.04",
+          "lane": "control",
+          "context_tokens": 8192,
+          "max_output_tokens": 2048,
+          "repeats": 3,
+          "warmups": 1,
+          "temperature": 0.0,
+          "seed": 20261005,
+          "concurrency": 1,
+          "timeout_s": 900,
+          "load_timeout_s": 1800,
+          "telemetry_interval_s": 1.0,
+          "ram_budget_gib": 46,
+          "gpu_budget_gib": 22,
+          "suite": "[local path omitted]",
+          "backend_version": "0.40.16",
+          "tokenizer_revision": "unsloth/Qwen3.8-27B-GGUF@4ca720788d1e01f1bff70c033e0d0028fd02e502 (tokenizer embedded in locked GGUF)",
+          "chat_template_sha256": "12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce",
+          "placement_notes": "Requested every layer on the GPU (launch.gpu_layers 999), 16 CPU threads, context 8192. Ollama imports the GGUF into its private store before the load. Observed placement is in the backend log and in fit/metadata.json of the attempt.",
+          "hardware_attestation": {
+            "bios": "E1824IMS.317",
+            "os_build": "10.0.26300 (Windows host; guest kernel 6.18.33.2-microsoft-standard-WSL2)",
+            "nvidia_driver": "610.74",
+            "ac_connected": true,
+            "ram_configured_mhz": [
+              6400,
+              6400
+            ],
+            "msi_power_fan_profile": "Best Performance (user-reported, MSI Center)",
+            "mux_hybrid_setting": "MSHybrid (observed: Intel Graphics and NVIDIA both active display adapters, Intel drives internal 3840px panel; MSI Center GPU Switch not read directly)",
+            "gpu_tgp_power_limit": "nvidia-smi power.limit N/A; default 95 W, max 175 W",
+            "model_ssd_filesystem": "NTFS on the Windows C: NVMe volume (Phison 2TB NVMe ESR02TBTLCA3-E1J-2MS), read from the WSL guest through /mnt/c (9p). Ollama imports a copy into its private store on the ext4 virtual disk of the guest, on the same volume; LM Studio imports a symbolic link to the file, so it loads the file through /mnt/c.",
+            "carried_from_windows_attestation": "bios, ram_configured_mhz, msi_power_fan_profile, mux_hybrid_setting and gpu_tgp_power_limit are the operator attestations of the native Windows runs of 2026-11-08 on the same machine; they were not read again for the WSL runs",
+            "wsl_version": "2.7.12.0, kernel 6.18.33.2-microsoft-standard-WSL2",
+            "wsl_memory_cap": "guest MemTotal 51.0 GiB at the start of this run; swap 0 MiB (see wsl_config)",
+            "wsl_config": "[local path omitted]",
+            "model_path": "[local path omitted]",
+            "other_workloads": "Hardware-fit measured runs on WSL2 Ubuntu 26.04 (guest of this Windows host): Ollama, then LM Studio, in one campaign. The model file is on the Windows NTFS volume and is read from the guest through /mnt/c; Ollama imports a copy into its private store on the guest disk, LM Studio imports a symbolic link to the file. The LM Studio desktop app (Linux AppImage) is open in the guest under WSLg, as its managed runs require. Notable Windows programs running at the start: consumer Ollama tray app, a Windows Ollama server, Microsoft Teams, VMware tray, VMware authorization service, ChatGPT desktop app, Claude desktop app, VS Code."
+          },
+          "save_outputs": false,
+          "cache_condition": "warm_process_repeated_prompt; prefix-cache policy must be recorded",
+          "speculative_decoding": "disabled",
+          "reasoning_mode": "model default; reasoning may be returned inline in content",
+          "platform": "ollama",
+          "protocol": "ollama",
+          "served_model": "llm-eval-qwen38-27b-ud-q4_k_xl:fit",
+          "request_usage": true,
+          "request_options": {
+            "keep_alive": "30m"
+          },
+          "hardware_profile": "msi-raider-18-hx-ai",
+          "launch": {
+            "model_file": "Qwen3.8-27B-UD-Q4_K_XL.gguf",
+            "threads": 16,
+            "gpu_layers": 999
+          }
+        },
+        "server_mode": "managed",
+        "categories": [
+          "reasoning",
+          "coding",
+          "math"
+        ]
+      },
+      "depends_on": [],
+      "resources": [
+        "raider"
+      ],
+      "status": "planned",
+      "reason": null,
+      "config_sha256": "37c493c2969402d125a8a9ab93ffc27101a7212b4867810ba7d1f67087618149",
+      "input_files": [
+        {
+          "path": "[local path omitted]",
+          "sha256": "26892545cadcda503b23da4ec13e63820ea43f8c605b9a9e2e248d6049800bd2"
+        },
+        {
+          "path": "[local path omitted]",
+          "sha256": "543e986551bcec15e549069fba9bb1a89148e25abe976ccbfa9678578e7f8f3d"
+        }
+      ]
+    },
+    {
+      "schema_version": 2,
+      "job_id": "fit-hardware-fit-1-4b1c74ff0cbf",
+      "experiment_run_id": "fit-hardware-fit-1",
+      "experiment_id": "hardware-fit",
+      "experiment_version": 1,
+      "mode": "measured",
+      "case_id": "qwen38-27b-ud-q4_k_xl-lmstudio",
+      "hardware_config_id": "raider-wsl",
+      "hardware": {
+        "target": "raider",
+        "hardware_profile": "msi-raider-18-hx-ai",
+        "os_id": "windows-11-wsl2-ubuntu-26.04"
+      },
+      "hardware_profile": {
+        "id": "msi-raider-18-hx-ai-a2xwjg-069us",
+        "manufacturer": "MSI",
+        "model": "Raider 18 HX AI A2XWJG-069US",
+        "cpu": {
+          "name": "Intel Core Ultra 9 285HX",
+          "architecture": "Arrow Lake-HX",
+          "p_cores": 8,
+          "e_cores": 16,
+          "threads": 24,
+          "instruction_baseline": "AVX2",
+          "amx": false,
+          "avx512": false,
+          "thread_sweep": [
+            7,
+            8,
+            15,
+            23
+          ],
+          "affinity_policy": "Discover actual P/E topology; never hard-code logical CPU IDs"
+        },
+        "ram": {
+          "installed_gib": 64,
+          "type": "DDR5-6400",
+          "channels": 2
+        },
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "architecture": "Blackwell",
+          "compute_capability": "12.0",
+          "vram_gib": 24,
+          "initial_reserve_gib": 2,
+          "desktop_gpu": false
+        },
+        "igpu": "Intel Graphics; display duties only in CUDA comparisons",
+        "storage": [
+          {
+            "name": "Factory NVMe",
+            "capacity_tb": 2,
+            "model": "not inventoried"
+          },
+          {
+            "name": "WD_BLACK SN7100",
+            "capacity_tb": 4,
+            "interface": "PCIe Gen4 x4",
+            "role": "Model files, artifacts, results; separate swap/offload experiments"
+          }
+        ],
+        "evidence": {
+          "configuration": "user-provided",
+          "cpu": "https://www.intel.com/content/www/us/en/products/sku/242297/intel-core-ultra-9-processor-285hx-36m-cache-up-to-5-50-ghz/specifications.html"
+        },
+        "required_recordings": [
+          "BIOS version",
+          "NVIDIA driver",
+          "GPU power limit/TGP",
+          "AC state",
+          "MSI power/fan profile",
+          "hybrid/MUX setting",
+          "RAM configured speed",
+          "SSD mount and filesystem",
+          "SSD free space and temperature",
+          "OS build/kernel",
+          "WSL version and memory cap if applicable"
+        ],
+        "host_reserve_gib": 12,
+        "os_limits": {
+          "windows-11-wsl2-ubuntu-26.04": {
+            "ram_budget_gib": 46
+          }
+        }
+      },
+      "target_id": "raider",
+      "target": {
+        "transport": "local",
+        "physical_host_id": "raider"
+      },
+      "parameters": {
+        "identity": {
+          "harness": "lmstudio",
+          "model": "qwen38-27b-ud-q4_k_xl"
+        },
+        "config": {
+          "schema_version": 1,
+          "model_id": "qwen38-27b",
+          "os_id": "windows-11-wsl2-ubuntu-26.04",
+          "lane": "control",
+          "context_tokens": 8192,
+          "max_output_tokens": 2048,
+          "repeats": 3,
+          "warmups": 1,
+          "temperature": 0.0,
+          "seed": 20261005,
+          "concurrency": 1,
+          "timeout_s": 900,
+          "load_timeout_s": 1800,
+          "telemetry_interval_s": 1.0,
+          "ram_budget_gib": 46,
+          "gpu_budget_gib": 22,
+          "suite": "[local path omitted]",
+          "backend_version": "0.4.28+2",
+          "tokenizer_revision": "unsloth/Qwen3.8-27B-GGUF@4ca720788d1e01f1bff70c033e0d0028fd02e502 (tokenizer embedded in locked GGUF)",
+          "chat_template_sha256": "12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce",
+          "placement_notes": "Requested every layer on the GPU (launch.gpu_offload max; the thread count is the app default), context 8192. LM Studio 0.4.28+2 ran as the desktop app from LM-Studio-0.4.28-2-x64.AppImage under WSLg; observed AppImage SHA-256 a3e6cf8233697be0a8ad6871197b424242af3c5a346671aeed59959ed7eebf11 (the vendor publishes none). The managed launch keeps no placement lines in its log; the evidence is the VRAM telemetry in fit/metadata.json of the attempt.",
+          "hardware_attestation": {
+            "bios": "E1824IMS.317",
+            "os_build": "10.0.26300 (Windows host; guest kernel 6.18.33.2-microsoft-standard-WSL2)",
+            "nvidia_driver": "610.74",
+            "ac_connected": true,
+            "ram_configured_mhz": [
+              6400,
+              6400
+            ],
+            "msi_power_fan_profile": "Best Performance (user-reported, MSI Center)",
+            "mux_hybrid_setting": "MSHybrid (observed: Intel Graphics and NVIDIA both active display adapters, Intel drives internal 3840px panel; MSI Center GPU Switch not read directly)",
+            "gpu_tgp_power_limit": "nvidia-smi power.limit N/A; default 95 W, max 175 W",
+            "model_ssd_filesystem": "NTFS on the Windows C: NVMe volume (Phison 2TB NVMe ESR02TBTLCA3-E1J-2MS), read from the WSL guest through /mnt/c (9p). Ollama imports a copy into its private store on the ext4 virtual disk of the guest, on the same volume; LM Studio imports a symbolic link to the file, so it loads the file through /mnt/c.",
+            "carried_from_windows_attestation": "bios, ram_configured_mhz, msi_power_fan_profile, mux_hybrid_setting and gpu_tgp_power_limit are the operator attestations of the native Windows runs of 2026-11-08 on the same machine; they were not read again for the WSL runs",
+            "wsl_version": "2.7.12.0, kernel 6.18.33.2-microsoft-standard-WSL2",
+            "wsl_memory_cap": "guest MemTotal 51.0 GiB at the start of this run; swap 0 MiB (see wsl_config)",
+            "wsl_config": "[local path omitted]",
+            "model_path": "[local path omitted]",
+            "other_workloads": "Hardware-fit measured runs on WSL2 Ubuntu 26.04 (guest of this Windows host): Ollama, then LM Studio, in one campaign. The model file is on the Windows NTFS volume and is read from the guest through /mnt/c; Ollama imports a copy into its private store on the guest disk, LM Studio imports a symbolic link to the file. The LM Studio desktop app (Linux AppImage) is open in the guest under WSLg, as its managed runs require. Notable Windows programs running at the start: consumer Ollama tray app, a Windows Ollama server, Microsoft Teams, VMware tray, VMware authorization service, ChatGPT desktop app, Claude desktop app, VS Code."
+          },
+          "save_outputs": false,
+          "cache_condition": "warm_process_repeated_prompt; prefix-cache policy must be recorded",
+          "speculative_decoding": "disabled",
+          "reasoning_mode": "model default; OpenAI-protocol harnesses may return reasoning inline in content",
+          "platform": "lmstudio",
+          "protocol": "openai",
+          "served_model": "llm-eval-qwen38-27b-ud-q4_k_xl",
+          "request_usage": true,
+          "request_options": {},
+          "hardware_profile": "msi-raider-18-hx-ai",
+          "launch": {
+            "model_file": "Qwen3.8-27B-UD-Q4_K_XL.gguf",
+            "gpu_offload": "max",
+            "import_mode": "symbolic-link"
+          }
+        },
+        "server_mode": "managed",
+        "categories": [
+          "reasoning",
+          "coding",
+          "math"
+        ]
+      },
+      "depends_on": [],
+      "resources": [
+        "raider"
+      ],
+      "status": "planned",
+      "reason": null,
+      "config_sha256": "e77d82686d0b942a95da059cfae496a244cabc4ad0d41ced5caad0be1cd737f9",
+      "input_files": [
+        {
+          "path": "[local path omitted]",
+          "sha256": "26892545cadcda503b23da4ec13e63820ea43f8c605b9a9e2e248d6049800bd2"
+        },
+        {
+          "path": "[local path omitted]",
+          "sha256": "543e986551bcec15e549069fba9bb1a89148e25abe976ccbfa9678578e7f8f3d"
+        }
+      ]
+    }
+  ],
+  "input_hashes": [
+    "e67553578ed66eead478ddaa0b158c7cbac3f8c6cb3e7e01fe6a57435912d02f",
+    "cfafc16469a842bbb45f547b323ab49f5e2ae828a989fe4073b98682a69c14fa",
+    "fc052abf37226d236f6c3646f2d57cebdfa6b17dd23a20700b7a4bf33533e94c",
+    "2b57b8f52cdd9dfa9ea2f3191ba80f5232404a6d2912a6bb751e3b1da6e704a3",
+    "4a2fa48b7f7ea49d08d3b43d599a32f58da7eee6ef235657fc319e1aceb0611a",
+    "9939e1bc67f0af5bda168e4e0092e5378e2471d9bf6299905cb1a0b3dfb8cb6a",
+    "21c8191d63f5d8d41cd303e94c731b1556ccbc452e513d869a4543ab82102788",
+    "bb70675347a96c1398c1bf9edcfb6747b258323031311939310d83c57e575577",
+    "26892545cadcda503b23da4ec13e63820ea43f8c605b9a9e2e248d6049800bd2",
+    "543e986551bcec15e549069fba9bb1a89148e25abe976ccbfa9678578e7f8f3d"
+  ]
+}
