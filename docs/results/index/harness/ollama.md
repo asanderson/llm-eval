@@ -2,10 +2,11 @@
 
 [Results index](../README.md) · [Executive summary](../../README.md)
 
-69 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
+70 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
+| [2026-11-23](../date/2026-11-23.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [gemma4-26b-moe](../model/gemma4-26b-moe.md) | gemma4-26b-moe-ollama | 2048 | succeeded | 27 | 0 | 11.8–14.7 | 15.9–16 | 24/27 | – | [report](../../model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/README.md) |
 | [2026-11-18](../date/2026-11-18.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [gemma4-26b-moe](../model/gemma4-26b-moe.md) | gemma4-26b-moe-ollama | 2048 | succeeded | 27 | 0 | 11.8–14.8 | 15.9 | 24/27 | – | [report](../../model-offloading/campaign-20261118T120658Z-2f4fa5af-offload-model-offloading-1/README.md) |
 | [2026-11-18](../date/2026-11-18.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [kimi-dev-72b](../model/kimi-dev-72b.md) | kimi-dev-72b-ollama | 2048 | succeeded | 27 | 0 | 88.5–201 | 2.32–2.33 | 0/27 | – | [report](../../model-offloading/campaign-20261118T091847Z-e5ed63b4-offload-model-offloading-1/README.md) |
 | [2026-11-18](../date/2026-11-18.md) | [legal-benchmark](../experiment/legal-benchmark.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](../model/llm-eval-kimi-linear-48b-locked.md) | legal-score | – | succeeded (score-only) | 32 | 3 | – | – | 0/32 | – | [report](../../legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/README.md) |

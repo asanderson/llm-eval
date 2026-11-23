@@ -2,10 +2,11 @@
 
 [Results index](../README.md) · [Executive summary](../../README.md)
 
-62 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
+63 published result(s). Generated from the published bundles by `llm-eval index-results`; do not edit by hand. Ranges are the lowest and highest category medians of a job. Quality and decision counts are passes over applicable checks.
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
+| [2026-11-23](../date/2026-11-23.md) | [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [gemma4-26b-moe](../model/gemma4-26b-moe.md) | gemma4-26b-moe-ollama | 2048 | succeeded | 27 | 0 | 11.8–14.7 | 15.9–16 | 24/27 | – | [report](../../model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/README.md) |
 | [2026-11-23](../date/2026-11-23.md) | [hardware-fit](../experiment/hardware-fit.md) | [raider-wsl](../hardware/raider-wsl.md) | [koboldcpp](../harness/koboldcpp.md) | [qwen38-27b-ud-q4_k_xl](../model/qwen38-27b-ud-q4_k_xl.md) | qwen38-27b-ud-q4_k_xl-koboldcpp | 2048 | succeeded | 27 | 0 | 2.58–3.07 | 26.9–27.4 | 24/27 | – | [report](../../hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) |
 | [2026-11-23](../date/2026-11-23.md) | [hardware-fit](../experiment/hardware-fit.md) | [raider-wsl](../hardware/raider-wsl.md) | [projection](../harness/projection.md) | [measured-models-gguf](../model/measured-models-gguf.md) | projection-measured-models | – | succeeded | 430 | 0 | – | – | – | – | [report](../../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
 | [2026-11-23](../date/2026-11-23.md) | [hardware-fit](../experiment/hardware-fit.md) | [raider-wsl](../hardware/raider-wsl.md) | [projection](../harness/projection.md) | [measured-models-gguf-as-found](../model/measured-models-gguf-as-found.md) | projection-measured-models-as-found | – | succeeded | 430 | 0 | – | – | – | – | [report](../../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
