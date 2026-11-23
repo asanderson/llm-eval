@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_on": "2026-11-22",
+  "checked_on": "2026-11-23",
   "qualification": "Recipe pins, not verified laptop installations. Transitive Python dependencies are captured with pip freeze after installation; not a fully hashed dependency lock.",
   "harness_packages": [
     "psutil==7.2.2"
@@ -22,7 +22,7 @@
     "ik_llama.cpp": {
       "kind": "cmake",
       "repository": "https://github.com/ikawrakow/ik_llama.cpp.git",
-      "revision": "3ed960ed3b9debf22e4e833f492a275b593072b0"
+      "revision": "1180df7edc2349470b651b64cade01341b52e0af"
     },
     "ktransformers": {
       "kind": "pip",
@@ -53,18 +53,18 @@
     },
     "koboldcpp": {
       "kind": "executable",
-      "version": "1.124.2",
+      "version": "1.125.1",
       "assets": {
         "linux": {
-          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.124.2/koboldcpp-linux-x64",
-          "sha256": "c66ae0106673c7d9c41bafcc92c95bc5a6256709e9d853e5e2255bf536c1b069",
-          "bytes": 628981944,
+          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.125.1/koboldcpp-linux-x64",
+          "sha256": "9b553b0ddab4af10ca39b20ed125f7673a8bbf048323e4b7c1cbd2f27ad3ac9e",
+          "bytes": 666620328,
           "filename": "koboldcpp-linux-x64"
         },
         "windows": {
-          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.124.2/koboldcpp.exe",
-          "sha256": "e306b58f9770fbca5265c7a0a6cc1c096d1bc3535a6d7e1f8e78c6810564faf7",
-          "bytes": 622841516,
+          "url": "https://github.com/LostRuins/koboldcpp/releases/download/v1.125.1/koboldcpp.exe",
+          "sha256": "7c5b28ef064a8e3671884947bb6814215b6b78d77ac41ee5e44caa71f3d7d5a9",
+          "bytes": 659164749,
           "filename": "koboldcpp.exe"
         }
       }
@@ -99,7 +99,7 @@
     "strata": {
       "kind": "strata",
       "repository": "https://github.com/Niko1221/Strata.git",
-      "revision": "6e38f588a646c0ee6948a74afbe670eb75896106"
+      "revision": "a34979fc94f3d126b9bb8210f4ad311345688b52"
     },
     "lmstudio": {
       "kind": "lmstudio",
