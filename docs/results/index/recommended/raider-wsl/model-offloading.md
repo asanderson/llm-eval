@@ -2,7 +2,7 @@
 
 [Recommended setups](../README.md) · [Results index](../../README.md) · [Executive summary](../../../README.md)
 
-Generated from the published bundles by `llm-eval index-results`; do not edit by hand. 53 published result(s) for this experiment and hardware configuration; 51 harness and model combination(s) are ranked.
+Generated from the published bundles by `llm-eval index-results`; do not edit by hand. 54 published result(s) for this experiment and hardware configuration; 51 harness and model combination(s) are ranked.
 
 ## Recommendation
 
@@ -73,6 +73,7 @@ The rank is the position in the ranking of this pair.
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
+| [2026-11-23](../../date/2026-11-23.md) | [model-offloading](../../experiment/model-offloading.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [gemma4-26b-moe](../../model/gemma4-26b-moe.md) | gemma4-26b-moe-ollama | 2048 | succeeded | 27 | 0 | 11.8–14.7 | 15.9–16 | 24/27 | – | [report](../../../model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/README.md) |
 | [2026-11-22](../../date/2026-11-22.md) | [model-offloading](../../experiment/model-offloading.md) | [raider-wsl](../../hardware/raider-wsl.md) | [lmstudio](../../harness/lmstudio.md) | [gemma4-26b-moe](../../model/gemma4-26b-moe.md) | gemma4-26b-moe-lmstudio | 2048 | succeeded | 27 | 0 | 13.3–14.6 | 13.5–13.8 | 21/27 | – | [report](../../../model-offloading/campaign-20261122T143702Z-f61498fb-offload-model-offloading-1/README.md) |
 | [2026-11-22](../../date/2026-11-22.md) | [model-offloading](../../experiment/model-offloading.md) | [raider-wsl](../../hardware/raider-wsl.md) | [lmstudio](../../harness/lmstudio.md) | [kimi-dev-72b](../../model/kimi-dev-72b.md) | kimi-dev-72b-lmstudio | 2048 | succeeded | 27 | 0 | 111–150 | 1.9–1.91 | 0/27 | – | [report](../../../model-offloading/campaign-20261122T124804Z-80069b0a-offload-model-offloading-1/README.md) |
 | [2026-11-22](../../date/2026-11-22.md) | [model-offloading](../../experiment/model-offloading.md) | [raider-wsl](../../hardware/raider-wsl.md) | [lmstudio](../../harness/lmstudio.md) | [mistral-small31](../../model/mistral-small31.md) | mistral-small31-lmstudio | 2048 | succeeded | 27 | 0 | 1.25–7.05 | 2.4–2.41 | 6/27 | – | [report](../../../model-offloading/campaign-20261122T122121Z-ad75034c-offload-model-offloading-1/README.md) |

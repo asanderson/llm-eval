@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "experiment_id": "model-offloading",
+  "experiment_run_id": "offload-model-offloading-1",
+  "publication_id": "campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1",
+  "campaign_id": "matrix-wsl-gemma4-26b-moe",
+  "created_utc": "2026-11-23T10:47:21.531863+00:00",
+  "code_revision": "2695cba457664b269921edfcf5afa430e2222330",
+  "status": "complete",
+  "synthetic": false,
+  "coverage": [
+    {
+      "job_id": "offload-model-offloading-1-a5de5a44d6b9",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    }
+  ],
+  "raw_records": 550,
+  "removed_fields": [
+    "absolute_path_values",
+    "artifact_lock",
+    "artifact_root",
+    "backend_pid",
+    "endpoint",
+    "host",
+    "lock_root",
+    "offload_dir",
+    "python"
+  ],
+  "files": {
+    "diagrams/results/model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/latency.png": "0227d94a054b04f71f1141c633a01774fc05f106c3487dcc9d6280fde1c4d24f",
+    "docs/results/model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/README.md": "4e96350e66489d8fb0f1fc38d40db1aaa6b2b246f36bbee44f492f38694b2129",
+    "docs/results/model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/benchmark-summary.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/results/model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/benchmark-summary.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "docs/results/model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/raw/measurements.jsonl.gz": "e16b57a86957b0ef1f8ec5a62232c4db82b0c21d9f859b3f7183bf173790ba75",
+    "docs/results/model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/resolved-config.json": "975221dc4348edf3bb8b0f36dc15dc6dc53184bfb5c194d7e091355399d8a65c",
+    "docs/results/model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/summary.csv": "8b15e9646792b4801840361906519e613b77ef8de138c724a3bca9d5cfdf7fe4",
+    "docs/results/model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/summary.json": "a921b61e1b5ee1bb23a87600c8502bb2bbaa714427baa2f4b26fa58d74017deb"
+  },
+  "report_fingerprint": "032ea1c2d198837d2d9c7b3857d6645f9c72147675a9636cd16309aa82a9fce0"
+}
