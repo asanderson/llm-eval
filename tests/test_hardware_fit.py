@@ -106,6 +106,17 @@ class TempCase(unittest.TestCase):
         write_json(campaign / 'campaign.json', state)
         return build_report(campaign / 'experiments/fit')
 
+    def template(self):
+        """The case path of a byte copy of the shipped measured template, laid out in the temp directory as in the checkout.
+
+        Planned from the checkout, the template's artifact lock is <checkout>/artifacts/selected.lock.json: the file the
+        model-offloading guide tells an operator to write. A test must not depend on it."""
+        case = 'experiments/hardware-fit/cases/measured-ollama.json'
+        for name in (case, 'experiments/hardware-fit/runs/ollama.example.json', 'workloads/smoke.json'):
+            (self.path / name).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / name, self.path / name)
+        return case
+
 
 class CandidateSetTests(TempCase):
     def test_shipped_sets_load(self):
@@ -135,13 +146,10 @@ class CandidateSetTests(TempCase):
                 # The parameter count llama.cpp printed is within 6 % of the catalog's published figure.
                 self.assertAlmostEqual(model['parameters'] / 1e9 / catalog[model['model_id']]['parameters_b'], 1, delta=0.06)
         for candidate in real['candidates']:
-            with self.subTest(candidate['id']):
-                self.assertTrue(candidate['id'].startswith(candidate['model_id'] + '-'))
-                self.assertEqual(candidate['weight_bytes'], sum(f['bytes'] for f in candidate['files']))
+            with self.subTest(candidate['id']):      # the label a measured case uses: the model id and the quantization in lower case
+                self.assertEqual(candidate['id'], candidate['model_id'] + '-' + candidate['quantization'].lower())
                 for file in candidate['files']:
-                    self.assertRegex(file['sha256'], r'^[0-9a-f]{64}$')
                     self.assertTrue(file['path'].endswith('.gguf'))
-                    self.assertGreater(file['bytes'], 0)
         # Sizes are artifact sizes, not planning arithmetic: bits per weight span the published quantization range.
         bits = [c['weight_bytes'] * 8 / next(m for m in real['models'] if m['model_id'] == c['model_id'])['parameters']
                 for c in real['candidates']]
@@ -164,6 +172,7 @@ class CandidateSetTests(TempCase):
             ('duplicate candidate id', edit(('candidates', 1, 'id'), first['id']), 'Duplicate candidate id: fixture-small-7b-q4_k_m'),
             ('duplicate model id', edit(('models', 1, 'model_id'), 'fixture-small-7b'), 'Duplicate model_id in candidate set: fixture-small-7b'),
             ('undeclared model', edit(('candidates', 0, 'model_id'), 'fixture-other'), 'names an undeclared model_id'),
+            ('model id shape', edit(('candidates', 0, 'model_id'), ['fixture-small-7b']), 'names an undeclared model_id'),
             ('byte sum', edit(('candidates', 4, 'weight_bytes'), 32212254721), 'weight_bytes does not equal the sum of its files'),
             ('revision', edit(('models', 0, 'source_revision'), 'main'), 'Pin source_revision to a full 40-character repository commit'),
             ('sha256', edit(('candidates', 0, 'files', 0, 'sha256'), 'A' * 64), 'sha256 must be 64 lowercase hexadecimal digits'),
@@ -174,6 +183,8 @@ class CandidateSetTests(TempCase):
             ('missing key', edit(('size_basis',), KeyError), 'Missing fields: size_basis'),
             ('missing model key', edit(('models', 0, 'layers'), KeyError), 'Missing fields: layers'),
             ('schema version', edit(('schema_version',), 2), 'Candidate set schema_version must be 1'),
+            ('boolean schema version', edit(('schema_version',), True), 'Candidate set schema_version must be 1'),
+            ('fractional schema version', edit(('schema_version',), 1.0), 'Candidate set schema_version must be 1'),
             ('set id', edit(('id',), 'Smoke'), 'Expected a lowercase identifier'),
             ('candidate id', edit(('candidates', 0, 'id'), 'has space'), 'Expected a lowercase identifier'),
             ('date', edit(('retrieved_on',), '22 November 2026'), 'retrieved_on must be a date written as YYYY-MM-DD'),
@@ -189,6 +200,10 @@ class CandidateSetTests(TempCase):
             ('absolute path', edit(('candidates', 0, 'files', 0, 'path'), '/models/x.gguf'), 'must be a relative POSIX path without ..'),
             ('windows path', edit(('candidates', 0, 'files', 0, 'path'), 'split\\x.gguf'), 'must be a relative POSIX path without ..'),
             ('drive path', edit(('candidates', 0, 'files', 0, 'path'), 'C:/x.gguf'), 'must be a relative POSIX path without ..'),
+            ('path not in normal form', edit(('candidates', 0, 'files', 0, 'path'), './x.gguf'), 'must be a relative POSIX path without ..'),
+            ('directory path', edit(('candidates', 0, 'files', 0, 'path'), '.'), 'must be a relative POSIX path without ..'),
+            ('blank path', edit(('candidates', 0, 'files', 0, 'path'), ' '), 'must be a relative POSIX path without ..'),
+            ('empty path', edit(('candidates', 0, 'files', 0, 'path'), ''), 'must be a relative POSIX path without ..'),
             ('repeated file', edit(('candidates', 4, 'files', 1, 'path'), 'split/fixture-large-30b-Q8_0-00001-of-00002.gguf'), 'lists a file twice'),
             ('no files', edit(('candidates', 0, 'files'), []), 'needs at least one file'),
             ('no models', edit(('models',), []), 'Candidate set needs at least one model'),
@@ -273,14 +288,13 @@ class ProjectionArithmeticTests(TempCase):
 
     def test_row_values_are_rounded_gib_and_bits(self):
         row = self.rows({'c': ('m', 10)})['c']
-        self.assertEqual(row, {
+        self.assertEqual(row, {      # no quality_pass key: a projection carries no scored check and must not enter the measured ranking
             'task_id': 'c', 'category': 'fits', 'benchmark': 'fit-projection', 'status': 'ok', 'warmup': False, 'repetition': 0,
             'synthetic': False, 'elapsed_s': None, 'quality_check_applicable': False, 'model_id': 'm', 'quantization': 'Q',
             'parameters_b': 8.0, 'bits_per_weight': 10.7374, 'weight_gib': 10.0, 'kv_cache_gib': 1.0, 'compute_buffer_gib': 1.0,
             'vram_required_gib': 12.0, 'vram_available_gib': 22.0, 'vram_headroom_gib': 10.0, 'ram_required_gib': 8.0,
             'disk_required_gib': 30.0, 'limits': [], 'fits': True, 'model_best': True, 'rank': 1})
         self.assertEqual(self.rows({'c': ('m', 20.5)})['c']['vram_headroom_gib'], -0.5)
-        self.assertNotIn('quality_pass', row)      # no scored check: a projection must not enter the measured ranking
 
     def test_a_models_best_is_its_most_precise_fit(self):
         rows = self.rows({'m-q3': ('m', 3.5), 'm-q5': ('m', 5), 'm-q8': ('m', 8), 'm-f16': ('m', 21)})
@@ -306,6 +320,10 @@ class ProjectionArithmeticTests(TempCase):
         self.assertEqual(self.rows(weights, min_bits_per_weight=3.5)['m-q3']['rank'], 1)
         rows = self.rows(weights, min_bits_per_weight=0)
         self.assertEqual((rows['m-q3']['rank'], rows['m-q2']['rank']), (1, None))
+        # The floor itself is shortlisted: 4 GiB of weights for 2^33 parameters are exactly 4 bits per weight.
+        exact = {'m': 8 * GIB}
+        self.assertEqual(self.rows({'m-q4': ('m', 4)}, exact)['m-q4']['rank'], 1)
+        self.assertIsNone(self.rows({'m-q4': ('m', 3.999)}, exact)['m-q4']['rank'])
 
     def test_shortlist_length_cuts_the_ranks_not_the_bests(self):
         models = {'a': 9_000_000_000, 'b': 8_000_000_000, 'c': 7_000_000_000}
@@ -319,9 +337,16 @@ class ProjectionArithmeticTests(TempCase):
             'host_ram_weight_fraction': 0.0, 'disk_copies': 2, 'disk_headroom_gib': 10.0, 'threads': None, 'min_bits_per_weight': 4.0,
             'shortlist': 10})
         self.assertEqual(projection.check_policy({'threads': None, 'shortlist': 3})['shortlist'], 3)
+        # The four allowances end at one pebibyte, so their byte counts stay finite numbers that JSON can carry.
+        for key in ('compute_buffer_gib', 'gpu_baseline_gib', 'host_ram_overhead_gib', 'disk_headroom_gib'):
+            with self.subTest(key=key):
+                self.assertEqual(projection.check_policy({key: 2 ** 20})[key], 2 ** 20)
+                for value in (2 ** 20 + 1, 1e300):
+                    with self.assertRaisesRegex(ValueError, 'policy.' + key + r' must be in \[0, 1048576\]'):
+                        projection.check_policy({key: value})
         for change, message in (({'kv_bits': 16}, 'Unknown fields: kv_bits'), ({'kv_bytes_per_element': 0}, r'policy.kv_bytes_per_element must be in \[0.5, 4\]'),
                                 ({'kv_bytes_per_element': 8}, r'policy.kv_bytes_per_element must be in \[0.5, 4\]'),
-                                ({'compute_buffer_gib': -1}, r'policy.compute_buffer_gib must be in \[0, inf\]'),
+                                ({'compute_buffer_gib': -1}, r'policy.compute_buffer_gib must be in \[0, 1048576\]'),
                                 ({'compute_buffer_gib': float('nan')}, 'policy.compute_buffer_gib must be a finite number'),
                                 ({'gpu_baseline_gib': '1'}, 'policy.gpu_baseline_gib must be a finite number'),
                                 ({'host_ram_overhead_gib': -0.1}, 'policy.host_ram_overhead_gib must be in'),
@@ -411,7 +436,8 @@ llama_kv_cache:      CUDA0 KV buffer size =   676.00 MiB
 sched_reserve:      CUDA0 compute buffer size =   554.01 MiB
 sched_reserve:        CPU compute buffer size =    38.02 MiB
 """
-# Ollama wraps the same llama.cpp lines in its own log lines and loads the model twice here: the last load counts.
+# Ollama wraps the same llama.cpp lines in its own log lines. Here it loads the model twice: the figures are those of the
+# last load, and the first load, which left layers and cache on the CPU, is counted as a partial load.
 LOG_OLLAMA = """\
 time=2026-11-22T10:00:00.000-06:00 level=INFO source=routes.go:1298 msg="Listening on 127.0.0.1:11434 (version 0.40.17)"
 time=2026-11-22T10:00:05.000-06:00 level=INFO source=server.go:105 msg="system memory" total="63.5 GiB" free="48.1 GiB"
@@ -436,31 +462,42 @@ sched_reserve:      CUDA0 compute buffer size =   530.00 MiB
 """
 # The managed LM Studio launch logs only its supervisor's line: the output of the model load is not kept.
 LOG_LMSTUDIO = 'lmstudio supervisor: llm-eval/1a2b3c4d5e6f/model.gguf loaded as fit:locked; server on 127.0.0.1:1234\n'
-NO_LOG = dict.fromkeys(('layers_offloaded', 'layers_total', 'model_layers', 'gpu_model_buffer_mib', 'host_model_buffer_mib',
-                        'gpu_kv_buffer_mib', 'cpu_kv_buffer_mib', 'gpu_compute_buffer_mib', 'device_free_mib_at_load'))
+NO_LOG = dict.fromkeys(('layers_offloaded', 'layers_total', 'model_layers', 'model_loads', 'partial_loads', 'gpu_model_buffer_mib',
+                        'host_model_buffer_mib', 'gpu_kv_buffer_mib', 'cpu_kv_buffer_mib', 'gpu_compute_buffer_mib', 'device_free_mib_at_load'))
 
 
 class EvidenceTests(unittest.TestCase):
     def test_partial_offload_with_split_kv_caches(self):
         self.assertEqual(evidence.parse_backend_log(LOG_PARTIAL), {
-            'layers_offloaded': 20, 'layers_total': 63, 'model_layers': 62, 'gpu_model_buffer_mib': 9378.46,
-            'host_model_buffer_mib': 19421.02, 'gpu_kv_buffer_mib': 336.0, 'cpu_kv_buffer_mib': 680.0,
+            'layers_offloaded': 20, 'layers_total': 63, 'model_layers': 62, 'model_loads': 1, 'partial_loads': 1,
+            'gpu_model_buffer_mib': 9378.46, 'host_model_buffer_mib': 19421.02, 'gpu_kv_buffer_mib': 336.0, 'cpu_kv_buffer_mib': 680.0,
             'gpu_compute_buffer_mib': 554.01, 'device_free_mib_at_load': 23151.0})
 
     def test_full_offload(self):
         parsed = evidence.parse_backend_log(LOG_FULL)
         self.assertEqual((parsed['layers_offloaded'], parsed['layers_total'], parsed['model_layers']), (63, 63, 62))
+        self.assertEqual((parsed['model_loads'], parsed['partial_loads']), (1, 0))
         self.assertEqual((parsed['gpu_model_buffer_mib'], parsed['host_model_buffer_mib']), (15480.25, 525.13))
         self.assertEqual((parsed['gpu_kv_buffer_mib'], parsed['cpu_kv_buffer_mib']), (1016.0, None))      # no CPU cache line at all
         self.assertEqual(parsed['gpu_compute_buffer_mib'], 554.01)      # the host's compute buffer is not GPU memory
 
-    def test_the_last_model_load_of_an_ollama_log_counts(self):
-        self.assertEqual(evidence.parse_backend_log(LOG_OLLAMA), {
-            'layers_offloaded': 65, 'layers_total': 65, 'model_layers': 64, 'gpu_model_buffer_mib': 16700.5,
-            'host_model_buffer_mib': 100.25, 'gpu_kv_buffer_mib': 272.0, 'cpu_kv_buffer_mib': None,
+    def test_a_reloaded_model_gives_the_last_loads_figures_and_counts_the_partial_load(self):
+        parsed = evidence.parse_backend_log(LOG_OLLAMA)
+        self.assertEqual(parsed, {
+            'layers_offloaded': 65, 'layers_total': 65, 'model_layers': 64, 'model_loads': 2, 'partial_loads': 1,
+            'gpu_model_buffer_mib': 16700.5, 'host_model_buffer_mib': 100.25, 'gpu_kv_buffer_mib': 272.0, 'cpu_kv_buffer_mib': None,
             'gpu_compute_buffer_mib': 530.0, 'device_free_mib_at_load': 22890.0})
         crlf = evidence.parse_backend_log(LOG_OLLAMA.replace('\n', '\r\n'))      # a log written on Windows
-        self.assertEqual(crlf, evidence.parse_backend_log(LOG_OLLAMA))
+        self.assertEqual(crlf, parsed)
+        # Requests answered between the two loads ran with 25 layers on the CPU: the run did not stay inside VRAM.
+        self.assertEqual(evidence.placement(parsed, {'size': None, 'size_vram': None}), 'layers_on_cpu')
+        # Each load is judged by its own lines: a CPU cache buffer makes a load partial although its layer line is complete.
+        first, second = LOG_OLLAMA.split('time=2026-11-22T10:06:00', 1)
+        swapped = evidence.parse_backend_log(second + first.replace('offloaded 40/65', 'offloaded 65/65'))
+        self.assertEqual((swapped['model_loads'], swapped['partial_loads'], swapped['cpu_kv_buffer_mib']), (2, 1, 104.0))
+        twice = evidence.parse_backend_log(LOG_FULL + LOG_FULL)
+        self.assertEqual((twice['model_loads'], twice['partial_loads']), (2, 0))
+        self.assertEqual(evidence.placement(twice, {'size': None, 'size_vram': None}), 'all_layers_on_gpu')
 
     def test_logs_without_placement_lines_give_nulls(self):
         for name, text in (('empty', ''), ('lmstudio supervisor', LOG_LMSTUDIO), ('other text', 'offloaded layers to GPU: all\nn_layer_norm = 3\n')):
@@ -486,8 +523,15 @@ class EvidenceTests(unittest.TestCase):
         rows = [{'index': '0', 'name': 'Intel Arc', 'total_mib': 8000.0, 'used_mib': 10.0},
                 {'index': '1', 'name': 'NVIDIA GeForce RTX 5090 Laptop GPU', 'total_mib': 24463.0, 'used_mib': 1000.0},
                 {'index': '2', 'name': 'NVIDIA GeForce RTX 5090 Laptop GPU', 'total_mib': 24463.0, 'used_mib': 5.0}]
-        self.assertEqual(evidence.device(rows, 'NVIDIA GeForce RTX 5090 Laptop GPU')['index'], '1')      # the first row that carries the profile name
-        self.assertIsNone(evidence.device(rows, 'NVIDIA GeForce RTX 4090'))
+        # The row with the index the launch selects, when it carries the profile name: never another card of that name.
+        self.assertEqual(evidence.device(rows, 'NVIDIA GeForce RTX 5090 Laptop GPU', 1)['used_mib'], 1000.0)
+        self.assertEqual(evidence.device(rows, 'NVIDIA GeForce RTX 5090 Laptop GPU', 2)['used_mib'], 5.0)
+        self.assertEqual(evidence.device(rows, 'NVIDIA GeForce RTX 5090 Laptop GPU', '2')['index'], '2')
+        self.assertIsNone(evidence.device(rows, 'NVIDIA GeForce RTX 5090 Laptop GPU'))      # index 0, the default, is another card
+        self.assertIsNone(evidence.device(rows, 'NVIDIA GeForce RTX 5090 Laptop GPU', 3))
+        self.assertIsNone(evidence.device(rows, 'NVIDIA GeForce RTX 5090 Laptop GPU', '1,2'))
+        self.assertEqual(evidence.device(rows, 'Intel Arc')['total_mib'], 8000.0)
+        self.assertIsNone(evidence.device(rows, 'NVIDIA GeForce RTX 4090', 1))
         self.assertIsNone(evidence.device([], 'NVIDIA GeForce RTX 5090 Laptop GPU'))
         samples = [{'gpus': rows}, {'gpus': []}, {'gpus': [{'index': '1', 'used_mib': None}]}, {'sensor_error': 'OSError', 'gpus': []},
                    {'gpus': [{'index': '0', 'used_mib': 7000.0}, {'index': '1', 'used_mib': 17500.5}]}, {'gpus': [{'index': '1', 'used_mib': 16000.0}]}]
@@ -524,6 +568,7 @@ class EvidenceTests(unittest.TestCase):
             ('fewer layers than the model has', dict(log={'layers_offloaded': 20, 'layers_total': 63}), 'layers_on_cpu', 'layers_on_cpu'),
             ('cache on the CPU', dict(log={**full, 'cpu_kv_buffer_mib': 238.0}), 'layers_on_cpu', 'layers_on_cpu'),
             ('cache on the CPU, no layer line', dict(log={'cpu_kv_buffer_mib': 238.0}), 'layers_on_cpu', 'layers_on_cpu'),
+            ('an earlier load left layers on the CPU', dict(log={**full, 'model_loads': 2, 'partial_loads': 1}), 'layers_on_cpu', 'layers_on_cpu'),
             ('ollama reports part in RAM', dict(ps={'size': 17_000_000_000, 'size_vram': 9_000_000_000}), 'reported_partly_in_ram', 'layers_on_cpu'),
             ('GPU use rose by less than the weights', dict(log=full, peak_used_mib=14000.0), 'all_layers_on_gpu', 'gpu_use_below_weights'),
             ('no placement evidence where it is required', dict(require_layer_evidence=True), 'unobserved', 'placement_unobserved'),
@@ -645,6 +690,12 @@ class ProjectionValidationTests(TempCase):
             ('data malformed', dict(data=str(self.candidates(lambda d: d.update(schema_version=3)))), 'Candidate set schema_version must be 1'),
             ('synthetic set in a real case', dict(synthetic=False), 'A synthetic candidate set needs a synthetic case'),
             ('synthetic set, flag absent', dict(synthetic=KeyError), 'A synthetic candidate set needs a synthetic case'),
+            # Shapes that a shared check does not expect are reported as an invalid case too, never as another exception type.
+            ('context beyond float range', dict(context_tokens=10 ** 400), 'Invalid hardware-fit case: OverflowError'),
+            ('disk beyond float range', dict(disk_free_gib=10 ** 400), 'Invalid hardware-fit case: OverflowError'),
+            ('policy value beyond float range', dict(policy={'compute_buffer_gib': 10 ** 400}), 'Invalid hardware-fit case: OverflowError'),
+            ('candidate model id shape', dict(data=str(self.candidates(lambda d: d['candidates'][0].update(model_id={'id': 'fixture-small-7b'}), 'shape.json'))),
+             'names an undeclared model_id'),
         ]
         for name, changes, message in cases:
             with self.subTest(name):
@@ -675,8 +726,8 @@ class MeasuredCase(TempCase):
         case = {'identity': {'harness': 'ollama', 'model': 'qwen38-27b-q4_k_m'}, 'config': config or self.config(), 'server_mode': 'managed', **changes}
         return {k: v for k, v in case.items() if v is not KeyError}
 
-    def lock(self, weight_bytes):
-        lock = {'schema_version': 1, 'source_repo': 'fictional-lab/fixture-GGUF', 'source_revision': '1' * 40, 'precision': 'Q4_K_M',
+    def lock(self, weight_bytes, precision='Q4_K_M'):
+        lock = {'schema_version': 1, 'source_repo': 'fictional-lab/fixture-GGUF', 'source_revision': '1' * 40, 'precision': precision,
                 'weight_bytes': weight_bytes, 'files': [], 'base_model_repo': 'fictional-lab/fixture'}
         write_json(self.path / 'artifact.lock.json', lock)
         return lock
@@ -723,8 +774,13 @@ class MeasuredValidationTests(MeasuredCase):
              'hardware-fit does not measure platform vllm in this version; supported: ik_llama.cpp, koboldcpp, llama.cpp, lmstudio, ollama'),
             ('harness', self.case(identity={'harness': 'koboldcpp', 'model': label}), 'identity.harness must equal config.platform'),
             ('label without a quantization', self.case(identity={'harness': 'ollama', 'model': 'qwen38-27b'}),
-             'identity.model must be config.model_id followed by the quantization, for example qwen38-27b-q4_k_m'),
+             'identity.model must be config.model_id followed by the quantization, for example qwen38-27b-ud-q4_k_xl'),
+            ('label with an empty quantization', self.case(identity={'harness': 'ollama', 'model': 'qwen38-27b-'}),
+             'identity.model must be config.model_id followed by the quantization'),
             ('label of another model', self.case(identity={'harness': 'ollama', 'model': 'gemma3-27b-q4_k_m'}), 'identity.model must be config.model_id'),
+            ('no served model', self.case({k: v for k, v in self.config().items() if k != 'served_model'}), 'served_model must name the model the backend serves'),
+            ('served model shape', self.case(self.config(served_model=7)), 'served_model must name the model the backend serves'),
+            ('empty served model', self.case(self.config(served_model='')), 'served_model must name the model the backend serves'),
             ('launch default layers', self.case(self.config(launch={k: v for k, v in launch.items() if k != 'gpu_layers'})), 'set launch.gpu_layers to 999'),
             ('some layers', self.case(self.config(launch={**launch, 'gpu_layers': 20})), 'hardware-fit asks for every layer on the GPU: set launch.gpu_layers to 999'),
             ('engine default layers', self.case(self.config(launch={**launch, 'gpu_layers': -1})), 'set launch.gpu_layers to 999'),
@@ -746,11 +802,39 @@ class MeasuredValidationTests(MeasuredCase):
             ('threshold value', self.case(fit={'min_gpu_weight_fraction': 1.5}), r'fit.min_gpu_weight_fraction must be in \[0, 1\]'),
             ('threshold flag', self.case(fit={'require_layer_evidence': 'yes'}), 'fit.require_layer_evidence must be true or false'),
             ('thresholds shape', self.case(fit=[]), 'Expected an object'),
+            # Shapes that the shared run-config check does not expect are reported as an invalid case, never as another exception type.
+            ('launch as text', self.case(self.config(launch='gpu_layers=999')), 'Invalid hardware-fit case: AttributeError'),
+            ('launch as a list', self.case(self.config(launch=[999])), 'Invalid hardware-fit case: AttributeError'),
+            ('lane shape', self.case(self.config(lane=['control'])), 'Invalid hardware-fit case: TypeError'),
+            ('platform shape', self.case(self.config(platform=['ollama'])), 'Invalid hardware-fit case: TypeError'),
+            ('run config without repeats', self.case({k: v for k, v in self.config().items() if k != 'repeats'}),
+             "Invalid hardware-fit case: KeyError: 'repeats'"),
+            ('threshold beyond float range', self.case(fit={'min_gpu_weight_fraction': 10 ** 400}), 'Invalid hardware-fit case: OverflowError'),
         ]
         for name, case, message in cases:
             with self.subTest(name):
                 with self.assertRaisesRegex(ValueError, message):
                     fit.validate(case, ROOT, 'measured')
+
+    def test_the_label_names_the_locked_precision(self):
+        q8 = self.case(identity={'harness': 'ollama', 'model': 'qwen38-27b-q8_0'})
+        self.assertIsNone(fit.validate(q8, ROOT, 'measured'))      # no lock file yet: only the shape of the label is checked
+        self.lock(16 * GIB)      # precision Q4_K_M
+        self.assertIsNone(fit.validate(self.case(), ROOT, 'measured'))
+        for name, label in (('another quantization', 'qwen38-27b-q8_0'), ('a longer label', 'qwen38-27b-q4_k_m-v2'), ('a shorter label', 'qwen38-27b-q4')):
+            with self.subTest(name):
+                with self.assertRaisesRegex(ValueError, 'followed by the precision of the artifact lock in lower case: qwen38-27b-q4_k_m$'):
+                    fit.validate(self.case(identity={'harness': 'ollama', 'model': label}), ROOT, 'measured')
+        self.assertIsNone(fit.validate(self.case(identity={'harness': 'ollama', 'model': 'qwen38-27b-q8_0'}, server_mode='external', synthetic=True),
+                                       ROOT, 'measured'))      # a fixture run reads no lock
+        # The label of the shipped template is the id of a shipped candidate, and the lock of that artifact carries its quantization.
+        label = read_json(X / 'cases/measured-ollama.json')['parameters']['identity']['model']
+        (candidate,) = [c for c in read_json(REAL)['candidates'] if c['id'] == label]
+        self.lock(candidate['weight_bytes'], candidate['quantization'])
+        self.assertIsNone(fit.validate(self.case(identity={'harness': 'ollama', 'model': label}), ROOT, 'measured'))
+        write_json(self.path / 'artifact.lock.json', {'weight_bytes': 16 * GIB})      # a lock without a precision names no artifact
+        with self.assertRaisesRegex(ValueError, 'followed by the precision of the artifact lock in lower case: qwen38-27b-$'):
+            fit.validate(self.case(), ROOT, 'measured')
 
     def test_skip_reasons(self):
         excluded = self.case(self.config(model_id='grok-1'), identity={'harness': 'ollama', 'model': 'grok-1-q4_k_m'})
@@ -829,7 +913,6 @@ class ProjectionExecuteTests(TempCase):
         removed = set()
         self.assertEqual(sanitize(rows + [metadata, result], removed), rows + [metadata, result])
         self.assertEqual(removed, set())
-        self.assertFalse({'error', 'output', 'worker_output', 'stage', 'started_utc'} & set(result))
 
     def test_same_inputs_give_the_same_bytes(self):
         for name in ('first', 'second'):
@@ -957,13 +1040,15 @@ class MeasuredRunTests(MeasuredCase):
         return self.case(self.config(**values), **changes)
 
     def run_real(self, case, used=(1000.0, 18500.0), log=LOG_FULL, statuses=('completed',), failure=None, readings=None, out='attempt'):
-        """Execute a real measured job with scripted GPU readings (before, while loaded), a scripted backend and a scripted runner."""
+        """Execute a real measured job with scripted GPU readings (before, while loaded), a scripted backend and a scripted runner.
+
+        `readings` replaces the one-card readings: the rows of every reading, or a function of whether the model is loaded."""
         self.events, self.out, loaded, runs = [], self.path / out, [], []
 
         def snapshot():
             self.events.append('reading')
             if readings is not None:
-                return readings
+                return readings(bool(loaded)) if callable(readings) else readings
             return [{'index': '0', 'name': GPU_NAME, 'driver_version': '999.99', 'total_mib': 24463.0, 'used_mib': used[1] if loaded else used[0],
                      'utilization_pct': 0.0, 'power_w': None, 'temperature_c': None, 'sm_clock_mhz': None}]
 
@@ -1028,7 +1113,6 @@ class MeasuredRunTests(MeasuredCase):
         case = self.real_case()
         result = self.run_real(case)
         self.assertEqual(result, {'status': 'succeeded', 'result_path': 'measurements', 'benchmark': 'category-smoke'})
-        self.assertFalse({'error', 'output', 'worker_output', 'stage', 'started_utc'} & set(result))
         self.verified.assert_called_once_with(case['config']['artifact_root'], self.locked, False, 24)
         self.assertEqual(self.launched.call_args.args[2], self.out / 'backend')
         self.assertEqual((self.launched.call_count, [(r[0]['suite'], r[1]) for r in self.runs]), (1, [(case['config']['suite'], False)]))
@@ -1040,13 +1124,14 @@ class MeasuredRunTests(MeasuredCase):
         record = self.evidence()
         self.assertEqual({k: record[k] for k in (
             'experiment', 'record', 'synthetic', 'verdict', 'reason', 'weight_bytes', 'weight_mib', 'gpu_name', 'total_mib', 'reserve_mib', 'baseline_used_mib',
-            'peak_used_mib', 'gpu_rise_mib', 'capacity_ok', 'rise_ok', 'placement', 'layers_offloaded', 'layers_total', 'model_layers', 'gpu_model_buffer_mib',
-            'cpu_kv_buffer_mib', 'ollama_size_bytes', 'ollama_size_vram_bytes', 'error_type', 'evidence_basis', 'min_gpu_weight_fraction',
-            'require_layer_evidence')}, {
+            'peak_used_mib', 'gpu_rise_mib', 'capacity_ok', 'rise_ok', 'placement', 'layers_offloaded', 'layers_total', 'model_layers', 'model_loads',
+            'partial_loads', 'gpu_model_buffer_mib', 'cpu_kv_buffer_mib', 'ollama_size_bytes', 'ollama_size_vram_bytes', 'error_type', 'evidence_basis',
+            'min_gpu_weight_fraction', 'require_layer_evidence')}, {
             'experiment': 'hardware-fit', 'record': 'fit-evidence', 'synthetic': False, 'verdict': 'in_vram', 'reason': None, 'weight_bytes': 16 * GIB,
             'weight_mib': 16384.0, 'gpu_name': GPU_NAME, 'total_mib': 24463.0, 'reserve_mib': 2048, 'baseline_used_mib': 1000.0, 'peak_used_mib': 18500.0,
             'gpu_rise_mib': 17500.0, 'capacity_ok': True, 'rise_ok': True, 'placement': 'all_layers_on_gpu', 'layers_offloaded': 63, 'layers_total': 63,
-            'model_layers': 62, 'gpu_model_buffer_mib': 15480.25, 'cpu_kv_buffer_mib': None, 'ollama_size_bytes': 17_500_000_000,
+            'model_layers': 62, 'model_loads': 1, 'partial_loads': 0, 'gpu_model_buffer_mib': 15480.25, 'cpu_kv_buffer_mib': None,
+            'ollama_size_bytes': 17_500_000_000,
             'ollama_size_vram_bytes': 17_500_000_000, 'error_type': None, 'evidence_basis': ['gpu_telemetry', 'backend_log', 'ollama_ps'],
             'min_gpu_weight_fraction': 0.8, 'require_layer_evidence': False})
         self.assertEqual(self.handler.gets, 1)
@@ -1075,11 +1160,37 @@ class MeasuredRunTests(MeasuredCase):
         self.assertEqual([p.relative_to(self.out).as_posix() for p in sorted(self.out.rglob('*'))], ['fit', 'fit/metadata.json'])
         # 21415 MiB are free after the reserve and the 1000 MiB baseline: weights of exactly that size are still launched.
         self.assertEqual(self.run_real(self.real_case(21415 * 2 ** 20), used=(1000.0, 22400.0), out='boundary')['status'], 'succeeded')
+        # The reserve counts before the launch too: 24463 - 6500 MiB would hold the 16384 MiB of weights, 24463 - 2048 - 6500 MiB do not.
+        self.assertEqual(self.run_real(self.real_case(), used=(6500.0, 6500.0), out='reserve'), {'status': 'failed', 'reason': 'artifact_exceeds_free_vram'})
+        self.launched.assert_not_called()
+
+    def test_the_card_the_launch_selects_is_the_one_judged(self):
+        def cards(loaded):      # two cards of the profile's model: another job holds 20000 MiB on the first, the launch selects the second
+            return [{'index': '0', 'name': GPU_NAME, 'total_mib': 24463.0, 'used_mib': 20000.0},
+                    {'index': '1', 'name': GPU_NAME, 'total_mib': 24463.0, 'used_mib': 18500.0 if loaded else 1000.0}]
+        second = {'launch': {**self.config()['launch'], 'gpu': 1}}
+        self.assertEqual(self.run_real(self.real_case(config=second), readings=cards)['status'], 'succeeded')
+        self.assertEqual(self.evidence('verdict', 'baseline_used_mib', 'peak_used_mib', 'gpu_rise_mib'),
+                         {'verdict': 'in_vram', 'baseline_used_mib': 1000.0, 'peak_used_mib': 18500.0, 'gpu_rise_mib': 17500.0})
+        # Without launch.gpu the engine sees the first card only, and that card has no room for the weights.
+        self.assertEqual(self.run_real(self.real_case(), readings=cards, out='first'), {'status': 'failed', 'reason': 'artifact_exceeds_free_vram'})
+        self.assertEqual(self.evidence('baseline_used_mib'), {'baseline_used_mib': 20000.0})
+        self.launched.assert_not_called()
+
+    def test_the_rise_threshold_of_the_case_is_used(self):
+        # VRAM use rises by 10000 MiB for 16384 MiB of weights: below the default share of 0.8, above a declared share of 0.5.
+        self.assertEqual(self.run_real(self.real_case(), used=(1000.0, 11000.0))['reason'], 'gpu_use_below_weights')
+        result = self.run_real(self.real_case(fit={'min_gpu_weight_fraction': 0.5}), used=(1000.0, 11000.0), out='declared')
+        self.assertEqual(result['status'], 'succeeded')
+        self.assertEqual(self.evidence('verdict', 'rise_ok', 'gpu_rise_mib', 'min_gpu_weight_fraction'),
+                         {'verdict': 'in_vram', 'rise_ok': True, 'gpu_rise_mib': 10000.0, 'min_gpu_weight_fraction': 0.5})
 
     def test_no_gpu_reading_fails_before_any_launch(self):
         other = [{'index': '0', 'name': 'NVIDIA GeForce RTX 4090', 'total_mib': 24564.0, 'used_mib': 500.0}]
         unread = [{'index': '0', 'name': GPU_NAME, 'total_mib': 24463.0, 'used_mib': None}]
-        for name, readings in (('nvidia-smi gave nothing', []), ('another GPU', other), ('memory not reported', unread)):
+        elsewhere = [*other, {'index': '1', 'name': GPU_NAME, 'total_mib': 24463.0, 'used_mib': 1000.0}]      # the launch selects index 0
+        for name, readings in (('nvidia-smi gave nothing', []), ('another GPU', other), ('memory not reported', unread),
+                               ('the profile GPU at another index', elsewhere)):
             with self.subTest(name):
                 result = self.run_real(self.real_case(), readings=readings, out=name.replace(' ', '-'))
                 self.assertEqual(result, {'status': 'failed', 'reason': 'gpu_memory_unobserved'})
@@ -1089,6 +1200,7 @@ class MeasuredRunTests(MeasuredCase):
 
     def test_a_run_that_left_vram_fails_with_the_reason(self):
         cases = [('layers on the CPU', dict(log=LOG_PARTIAL), 'layers_on_cpu', 'layers_on_cpu'),
+                 ('a reload after a load that left layers on the CPU', dict(log=LOG_OLLAMA), 'layers_on_cpu', 'layers_on_cpu'),
                  ('peak above total minus reserve', dict(used=(1000.0, 22500.0)), 'all_layers_on_gpu', 'vram_reserve_exceeded'),
                  ('memory use did not rise', dict(used=(1000.0, 1200.0)), 'all_layers_on_gpu', 'gpu_use_below_weights'),
                  ('ollama reports part in RAM', dict(log=''), 'reported_partly_in_ram', 'layers_on_cpu')]
@@ -1111,6 +1223,11 @@ class MeasuredRunTests(MeasuredCase):
         self.assertEqual(self.launched.call_count, 1)      # one backend, one workdir, for every suite of the job
         self.assertEqual(self.evidence('verdict', 'reason'), {'verdict': 'in_vram', 'reason': None})
         self.assertEqual(self.run_real(case, statuses=('skipped', 'skipped'), out='skipped')['status'], 'skipped')
+        # Failed requests stay the result when the run also left VRAM: the verdict is recorded, the job carries no fit reason.
+        result = self.run_real(case, statuses=('completed', 'completed_with_errors'), log=LOG_PARTIAL, out='both')
+        self.assertEqual(result, {'status': 'failed', 'result_path': 'measurements', 'benchmark': 'category-smoke'})
+        self.assertEqual(self.evidence('verdict', 'reason'), {'verdict': 'not_in_vram', 'reason': 'layers_on_cpu'})
+        self.assertEqual(self.run_real(case, statuses=('skipped', 'skipped'), log=LOG_PARTIAL, out='skipped-partial')['status'], 'skipped')
 
     def test_lmstudio_rests_on_telemetry_unless_layer_evidence_is_required(self):
         config = dict(platform='lmstudio', protocol='openai', endpoint=self.endpoint.replace('/api/chat', '/v1/chat/completions'),
@@ -1181,7 +1298,7 @@ class PreflightTests(TempCase):
 
     def test_a_real_projection_needs_no_gpu_and_a_measured_run_needs_the_profile_gpu(self):
         (projected,) = compile_campaign(ROOT / 'configs/examples/hardware-fit/raider-windows-projection.json', ROOT)['jobs']
-        (run,) = self.plan('measured', ['measured-ollama'])['jobs']      # planned first: `handle` replaces the process launcher
+        (run,) = self.plan('measured', [self.template()])['jobs']      # planned first: `handle` replaces the process launcher
         self.assertNotIn('synthetic', projected['parameters'])
         # The scripted host has no GPU. Preflight passes and the (scripted) child is started; it writes no result.
         self.assertEqual(self.handle(projected)['error_type'], 'WorkerExited')
@@ -1222,7 +1339,7 @@ class CampaignTests(TempCase):
         self.assertEqual(raider['hardware_profile']['gpu']['vram_gib'], 24)
 
     def test_readiness_and_setup_follow_the_hooks(self):
-        template = self.plan('measured', ['measured-ollama'])
+        template = self.plan('measured', [self.template()])
         for path, os_id in ((self.SMOKE_CAMPAIGN, 'ubuntu-26.04-native'), (self.RAIDER_CAMPAIGN, 'windows-11-native')):
             selection = readiness.select(readiness.parser().parse_args(['--campaign', str(path)]), ROOT)
             self.assertEqual((selection['os_id'], selection['runtimes'], selection['needs_gpu']), (os_id, {}, False))
@@ -1242,29 +1359,35 @@ class CampaignTests(TempCase):
         self.assertIn(('setup', 'ollama'), calls)
 
     def test_measured_template_plans_and_refuses_to_run_with_placeholders(self):
-        (job,) = self.plan('measured', ['measured-ollama'])['jobs']
+        (job,) = self.plan('measured', [self.template()])['jobs']
         self.assertEqual((job['status'], job['reason'], job['mode'], job['case_id']), ('planned', None, 'measured', 'measured-ollama'))
         config = job['parameters']['config']
         self.assertEqual((config['platform'], config['model_id'], config['lane'], config['launch']['gpu_layers'], config['hardware_profile'], config['os_id']),
                          ('ollama', 'qwen38-27b', 'control', 999, 'msi-raider-18-hx-ai', 'ubuntu-26.04-native'))
-        self.assertEqual(job['parameters']['identity'], {'harness': 'ollama', 'model': 'qwen38-27b-q4_k_m'})
-        self.assertEqual(Path(config['suite']), (ROOT / 'workloads/smoke.json').resolve())
+        self.assertEqual(job['parameters']['identity'], {'harness': 'ollama', 'model': 'qwen38-27b-ud-q4_k_xl'})
+        # The template's relative paths lead to the checkout's own directories: three levels above the run config.
+        self.assertEqual((Path(config['suite']), Path(config['artifact_lock'])),
+                         (self.path / 'workloads/smoke.json', self.path / 'artifacts/selected.lock.json'))
         for key in ('served_model', 'backend_version', 'tokenizer_revision', 'chat_template_sha256', 'placement_notes'):
             self.assertIn('REPLACE_WITH_', config[key])
         self.assertIn('REPLACE_WITH_', config['launch']['model_file'])
         with patch('llm_eval.launch.managed_backend', side_effect=AssertionError('a template starts no backend')):
             with self.assertRaisesRegex(ValueError, 'Record an exact backend_version before benchmarking'):
                 fit.execute(job, self.path / 'attempt', ROOT)
+        # A lock an operator wrote for an artifact above VRAM, as the model-offloading guide describes, skips the job at plan time.
+        write_json(self.path / 'artifacts/selected.lock.json', {'weight_bytes': 29047086048, 'precision': 'UD-Q4_K_XL'})
+        (skipped,) = self.plan('measured', [self.template()])['jobs']
+        self.assertEqual((skipped['status'], skipped['reason']), ('skipped', 'artifact_exceeds_gpu_vram_budget'))
 
     def test_locked_weights_above_the_vram_budget_are_skipped_at_plan_time(self):
         config = read_json(X / 'runs/ollama.example.json')
         config.update(suite=str(ROOT / 'workloads/smoke.json'), artifact_lock='selected.lock.json')
         write_json(self.path / 'run.json', config)
         case = {'identity': {'harness': 'ollama', 'model': 'qwen38-27b-q8_0'}, 'config': 'run.json', 'server_mode': 'managed'}
-        write_json(self.path / 'selected.lock.json', {'weight_bytes': 29047086048})      # the Q8_0 artifact of the published offload runs
+        write_json(self.path / 'selected.lock.json', {'weight_bytes': 29047086048, 'precision': 'Q8_0'})      # the Q8_0 artifact of the published offload runs
         (job,) = self.plan('measured', [case])['jobs']
         self.assertEqual((job['status'], job['reason']), ('skipped', 'artifact_exceeds_gpu_vram_budget'))
-        write_json(self.path / 'selected.lock.json', {'weight_bytes': 16 * GIB})
+        write_json(self.path / 'selected.lock.json', {'weight_bytes': 16 * GIB, 'precision': 'Q8_0'})
         (job,) = self.plan('measured', [case])['jobs']
         self.assertEqual((job['status'], job['reason']), ('planned', None))
 

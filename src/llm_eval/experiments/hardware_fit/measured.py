@@ -83,7 +83,7 @@ def execute(job, output, root):
     runner.validate_host(config, root)
     profile = job.get('hardware_profile') or hardware.profile(config, root)
     weight_bytes = verify_artifact(config['artifact_root'], read_json(config['artifact_lock']), False, profile['gpu']['vram_gib'])
-    device = evidence.device(telemetry.gpu_snapshot(), profile['gpu']['name']) or {}
+    device = evidence.device(telemetry.gpu_snapshot(), profile['gpu']['name'], launch.get('gpu', 0)) or {}
     total_mib, baseline_mib = device.get('total_mib'), device.get('used_mib')
     reserve_mib = profile['gpu'].get('initial_reserve_gib', 0) * 1024
     record.update(weight_bytes=weight_bytes, weight_mib=weight_bytes / 2 ** 20, gpu_name=device.get('name'), total_mib=total_mib,

@@ -3,7 +3,7 @@
   "parameters": {
     "identity": {
       "harness": "ollama",
-      "model": "qwen38-27b-q4_k_m"
+      "model": "qwen38-27b-ud-q4_k_xl"
     },
     "config": "../runs/ollama.example.json",
     "server_mode": "managed",
