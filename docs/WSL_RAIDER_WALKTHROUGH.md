@@ -9,9 +9,9 @@ This walkthrough installs the harness and a private Ollama runtime, prepares rea
 | Phase | Experiment and mode | Cases | Workload |
 |---|---|---|---|
 | 1: `offload` | Model offloading / `category-smoke` | DeepSeek-R1-Distill-Qwen-32B, GGUF Q8_0, through Ollama | Reasoning, coding and mathematics: three tasks per category |
-| 2: `routing` | LLM routing / `decision` | Nimble and Tev1 through Ollama's SystemOne API | Two labeled category decisions per router |
+| 2: `routing` | Decision models / `decision` | Nimble and Tev1 through Ollama's SystemOne API | Two labeled category decisions per router |
 
-Each task has one warmup and three measured repetitions: 27 measured offload requests and six measured decisions per router if all requests complete. Warmups remain in raw data and are excluded from summaries. These small original workloads demonstrate the workflow; they do **not** produce a full LiveBench score. Decision mode checks the routing choice without generating a downstream answer. See the [routing guide](../experiments/llm-routing/README.md) for replay/live modes.
+Each task has one warmup and three measured repetitions: 27 measured offload requests and six measured decisions per router if all requests complete. Warmups remain in raw data and are excluded from summaries. These small original workloads demonstrate the workflow; they do **not** produce a full LiveBench score. Decision mode checks the routing choice without generating a downstream answer. See the [routing guide](../experiments/decision-models/README.md) for replay/live modes.
 
 The selected Q8_0 artifact is approximately 34.8 decimal GB (32.4 GiB), exceeding the GPU's capacity. It is an offload candidate, not a demonstrated fit. Initial settings are 4,096 context tokens, 16 CPU threads, 20 GPU layers and a 22 GiB GPU planning budget. The WSL RAM planning budget is 46 GiB within a configured 52 GiB guest memory cap. Budgets are not hard process limits; confirm actual placement and paging before measuring.
 
@@ -185,8 +185,8 @@ Verified planner projection:
 
 ```text
 offload-model-offloading-1-3fc97a7bd950 deepseek-r1-32b-q8 raider-wsl planned
-routing-llm-routing-1-ac901abb4fcd ollama-nimble raider-wsl planned
-routing-llm-routing-1-c6e41214da48 ollama-tev1 raider-wsl planned
+routing-decision-models-1-ac901abb4fcd ollama-nimble raider-wsl planned
+routing-decision-models-1-c6e41214da48 ollama-tev1 raider-wsl planned
 ```
 
 `plan` normally prints the full resolved JSON; redirection above saves it. It makes no installation, download or inference calls. The job selection can be `planned` while model provenance still contains placeholders. Real execution requires the preparation below. The router jobs depend on the offload job, and all three share one physical-host reservation.
@@ -493,8 +493,8 @@ The CLI prints the full journal. An illustrative projection while offloading run
 
 ```text
 offload-model-offloading-1-3fc97a7bd950 running 1
-routing-llm-routing-1-ac901abb4fcd planned 0
-routing-llm-routing-1-c6e41214da48 planned 0
+routing-decision-models-1-ac901abb4fcd planned 0
+routing-decision-models-1-c6e41214da48 planned 0
 Reports: {}
 ```
 
@@ -551,9 +551,9 @@ This retries missing/failed finalization or reuses its completed receipts. Illus
     "report": "experiments/offload-model-offloading-1/report",
     "result_signature": "<actual result signature>"
   },
-  "routing-llm-routing-1": {
+  "routing-decision-models-1": {
     "status": "generated",
-    "report": "experiments/routing-llm-routing-1/report",
+    "report": "experiments/routing-decision-models-1/report",
     "result_signature": "<actual result signature>"
   }
 }
@@ -562,7 +562,7 @@ This retries missing/failed finalization or reuses its completed receipts. Illus
 There are two experiment reports; the routing report contains both routers. Regenerate them individually and locate the output:
 
 ```bash
-for experiment in offload-model-offloading-1 routing-llm-routing-1; do
+for experiment in offload-model-offloading-1 routing-decision-models-1; do
     EXPERIMENT_DIR="$CAMPAIGN_DIR/experiments/$experiment"
     "$PY" scripts/report_experiment.py --experiment-dir "$EXPERIMENT_DIR"
     "$PY" - "$EXPERIMENT_DIR/report" <<'PY'
@@ -616,13 +616,13 @@ The pointer file selects the most recent logger segment. For earlier segments fr
 Automatic publication, if enabled before the run, already records PR URLs in the report receipts. Otherwise, preview and publish each local report explicitly:
 
 ```bash
-for experiment in offload-model-offloading-1 routing-llm-routing-1; do
+for experiment in offload-model-offloading-1 routing-decision-models-1; do
     "$PY" -m llm_eval publish-results --input "$CAMPAIGN_DIR/experiments/$experiment/report" --dry-run
 done
 read -r -s -p 'GitHub token with contents/PR write permissions: ' GH_TOKEN
 printf '\n'
 export GH_TOKEN
-for experiment in offload-model-offloading-1 routing-llm-routing-1; do
+for experiment in offload-model-offloading-1 routing-decision-models-1; do
     "$PY" -m llm_eval publish-results --input "$CAMPAIGN_DIR/experiments/$experiment/report"
 done
 unset GH_TOKEN

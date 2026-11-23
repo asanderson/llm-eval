@@ -11,9 +11,9 @@ The same campaign is also documented for [WSL2 / Ubuntu 26.04](WSL_RAIDER_WALKTH
 | Phase | Experiment and mode | Cases | Workload |
 |---|---|---|---|
 | 1: `offload` | Model offloading / `category-smoke` | DeepSeek-R1-Distill-Qwen-32B, GGUF Q8_0, through Ollama | Reasoning, coding and mathematics: three tasks per category |
-| 2: `routing` | LLM routing / `decision` | Nimble and Tev1 through Ollama's SystemOne API | Two labeled category decisions per router |
+| 2: `routing` | Decision models / `decision` | Nimble and Tev1 through Ollama's SystemOne API | Two labeled category decisions per router |
 
-Each task has one warmup and three measured repetitions. If every request completes, this produces 27 measured offload requests and six measured decisions per router. Warmups remain in raw data but are excluded from summaries. These small original workloads demonstrate the workflow; they do **not** produce a full LiveBench score. Decision mode evaluates the routing choice without generating a downstream answer. See the [routing guide](../experiments/llm-routing/README.md) for replay and live modes.
+Each task has one warmup and three measured repetitions. If every request completes, this produces 27 measured offload requests and six measured decisions per router. Warmups remain in raw data but are excluded from summaries. These small original workloads demonstrate the workflow; they do **not** produce a full LiveBench score. Decision mode evaluates the routing choice without generating a downstream answer. See the [routing guide](../experiments/decision-models/README.md) for replay and live modes.
 
 The Q8_0 file selected below is approximately 34.8 decimal GB, exceeding this GPU's 24 GiB capacity. This makes it an offload candidate, not a demonstrated fit. Initial settings are 4,096 context tokens, 16 CPU threads, 20 GPU layers, a 22 GiB GPU planning budget and a 52 GiB RAM planning budget. Budgets are not hard process limits. Inspect placement, memory and paging before interpreting a successful response as a useful configuration.
 
@@ -104,8 +104,8 @@ Verified planner projection; PowerShell column spacing may differ:
 job_id                                      case_id              hardware_config_id status
 ------                                      -------              ------------------ ------
 offload-model-offloading-1-db17c5930ec0       deepseek-r1-32b-q8    raider-windows     planned
-routing-llm-routing-1-389a241fd7b8            ollama-nimble        raider-windows     planned
-routing-llm-routing-1-25eff864a7d1            ollama-tev1          raider-windows     planned
+routing-decision-models-1-389a241fd7b8            ollama-nimble        raider-windows     planned
+routing-decision-models-1-25eff864a7d1            ollama-tev1          raider-windows     planned
 ```
 
 Without the projection, `plan` prints the complete resolved JSON, including dependencies, paths, input hashes and hardware settings. It does not install, download or launch anything. `planned` means the selection is valid; the placeholder provenance fields still prevent real execution until you populate them below.
@@ -366,8 +366,8 @@ The CLI prints the full JSON journal. An illustrative projection while the first
 Job                                         Status  Attempts
 ---                                         ------  --------
 offload-model-offloading-1-db17c5930ec0        running        1
-routing-llm-routing-1-389a241fd7b8             planned        0
-routing-llm-routing-1-25eff864a7d1             planned        0
+routing-decision-models-1-389a241fd7b8             planned        0
+routing-decision-models-1-25eff864a7d1             planned        0
 ```
 
 After a successful run all three show `succeeded`, normally with one attempt each. Experiment report states appear separately in `campaign.json.reports` as `generated` or `published`. A `failed` report receipt does not erase completed model measurements.
@@ -421,9 +421,9 @@ Illustrative output with local-only publication:
     "report": "experiments/offload-model-offloading-1/report",
     "result_signature": "<actual result signature>"
   },
-  "routing-llm-routing-1": {
+  "routing-decision-models-1": {
     "status": "generated",
-    "report": "experiments/routing-llm-routing-1/report",
+    "report": "experiments/routing-decision-models-1/report",
     "result_signature": "<actual result signature>"
   }
 }
@@ -433,7 +433,7 @@ Path separators may be backslashes in Windows JSON. There are **two reports**, o
 
 ```powershell
 $OffloadDir = Join-Path $CampaignDir 'experiments\offload-model-offloading-1'
-$RoutingDir = Join-Path $CampaignDir 'experiments\routing-llm-routing-1'
+$RoutingDir = Join-Path $CampaignDir 'experiments\routing-decision-models-1'
 foreach ($ExperimentDir in @($OffloadDir,$RoutingDir)) {
     & $Py scripts/report_experiment.py --experiment-dir $ExperimentDir
     if ($LASTEXITCODE -ne 0) { throw 'Report generation failed.' }

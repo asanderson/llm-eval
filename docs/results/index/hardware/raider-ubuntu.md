@@ -6,4 +6,4 @@
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
-| [2026-11-08](../date/2026-11-08.md) | [llm-routing](../experiment/llm-routing.md) | [raider-ubuntu](../hardware/raider-ubuntu.md) | [category](../harness/category.md) | [category](../model/category.md) | category-smoke | – | succeeded (synthetic) | 2 | 0 | 1.81e-05–4.97e-05 | – | – | 2/2 | [report](../../llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md) |
+| [2026-11-08](../date/2026-11-08.md) | [decision-models](../experiment/decision-models.md) | [raider-ubuntu](../hardware/raider-ubuntu.md) | [category](../harness/category.md) | [category](../model/category.md) | category-smoke | – | succeeded (synthetic) | 2 | 0 | 1.81e-05–4.97e-05 | – | – | 2/2 | [report](../../llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md) |

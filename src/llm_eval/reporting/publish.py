@@ -125,8 +125,9 @@ def _campaign_names(report):
                         if isinstance(data,dict):names|={data.get('experiment_id'),data.get('experiment')}
     except (OSError,ValueError,AttributeError,TypeError):
         raise ValueError('Malformed campaign record') from None
-    from llm_eval.experiments import REGISTRY
-    return {n for n in names if isinstance(n,str) and n in REGISTRY}      # only experiment ids count: metadata holds other strings too
+    from llm_eval.experiments import canonical, registered
+    # Only experiment ids count (metadata holds other strings too), each by its current id: a renamed experiment's former id is the same experiment.
+    return {canonical(n) for n in names if isinstance(n,str) and registered(n)}
 
 
 @contextlib.contextmanager
@@ -140,7 +141,7 @@ def publish_report(report,root,dry_run=False,api=None):
     report=Path(report).resolve();root=Path(root).resolve()
     spec,manifest,size=validate_bundle(report)
     # Decided from every experiment identity the bundle carries, not from one label a caller could edit.
-    from llm_eval.experiments import REGISTRY, get_experiment, plugin_hook, reporting_policy
+    from llm_eval.experiments import REGISTRY, canonical, get_experiment, plugin_hook, reporting_policy
     dest=report/'bundle'/spec['report_path'];raw=dest/'raw/measurements.jsonl.gz'
     if not raw.is_file():raise ValueError('Publication needs the raw measurements archive')
     # The generic build always writes both summaries; a projected (canonical) bundle has its plugin summary instead.
@@ -163,7 +164,8 @@ def publish_report(report,root,dry_run=False,api=None):
         if not all(isinstance(j,dict) and isinstance(j.get('experiment_id'),str) for j in jobs):raise TypeError
     except (IndexError,TypeError,KeyError,AttributeError):raise ValueError('Malformed publication bundle') from None
     for name in sorted(names,key=str):      # the name is not echoed: it is text from the bundle
-        if name not in REGISTRY:raise ValueError('Publication is not available for an unregistered experiment')
+        if canonical(name) not in REGISTRY:raise ValueError('Publication is not available for an unregistered experiment')
+    names={canonical(n) for n in names}      # a renamed experiment's former id (a bundle of a campaign planned before the rename) is the same experiment
     claims={e:getattr(get_experiment(e),'claims_benchmark',None) for e in REGISTRY}
     claimed={e for e,claim in claims.items() if claim for b in benchmarks if isinstance(b,str) and claim(b)}
     if claimed-names:      # a benchmark name another experiment's plugin writes: its own refusal, before any verification
@@ -236,12 +238,14 @@ def publish_report(report,root,dry_run=False,api=None):
                     if merge.returncode:
                         conflicts=git(worktree,'diff','--name-only','--diff-filter=U',env=env).splitlines()
                         generated=('docs/results/index/','diagrams/results/summary/')
-                        if any(c!='docs/results/README.md' and not c.startswith(generated) for c in conflicts):
+                        readmes=('docs/results/README.md','README.md')
+                        if any(c not in readmes and not c.startswith(generated) for c in conflicts):
                             git(worktree,'merge','--abort',env=env,check=False);raise RuntimeError('Results branch needs conflict resolution')
-                        if 'docs/results/README.md' in conflicts:
-                            # A results branch only ever changes the generated blocks, so the base copy carries the
-                            # hand-written text; the blocks are regenerated below.
-                            git(worktree,'checkout','--theirs','--','docs/results/README.md',env=env)
+                        for name in readmes:
+                            if name in conflicts:
+                                # A results branch only ever changes the generated blocks, so the base copy carries the
+                                # hand-written text; the blocks are regenerated below.
+                                git(worktree,'checkout','--theirs','--',name,env=env)
                 charts=[spec['chart_path']] if (report/'bundle'/spec['chart_path']).exists() else []      # a projected bundle has none
                 for relative in [spec['report_path'],*charts]:
                     shutil.copytree(report/'bundle'/relative,worktree/relative,dirs_exist_ok=True)

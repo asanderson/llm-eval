@@ -28,8 +28,8 @@ import time
 
 from llm_eval.common import digest, finite_number, sha256_file
 from llm_eval.core.contracts import fields, identifier
-from llm_eval.experiments.llm_routing.decision import decide, select
-from llm_eval.experiments.llm_routing.evaluation import candidate_fingerprint, corpus_index, utility
+from llm_eval.experiments.decision_models.decision import decide, select
+from llm_eval.experiments.decision_models.evaluation import candidate_fingerprint, corpus_index, utility
 from llm_eval.runner import load_suite as load_task_suite
 
 from . import contracts, grading, profiles, retrieval
@@ -55,7 +55,7 @@ OUTCOME_KEYS = ('decision_correct', 'false_charge', 'dangerous_commitment', 'all
 ROUTE_KEYS = ('routed', 'route_choice', 'route_selected', 'route_fallback', 'route_confidence', 'router_s', 'route_error_type')
 DECISION_KEYS = ('matter_id', 'repetition', 'messages_sha256', 'choice', 'selected', 'action', 'selector_abstained', 'fallback_used',
                  'reason_codes', 'confidence', 'router_s')
-# A recipe candidate of the `--candidates` file is exactly the fixed generator's identity (keys an `llm-routing` case accepts).
+# A recipe candidate of the `--candidates` file is exactly the fixed generator's identity (keys a `decision-models` case accepts).
 GENERATOR_FIELDS = ('model', 'model_revision', 'platform', 'backend_version', 'protocol', 'quantization', 'template_sha256', 'context_tokens')
 CANDIDATE_KEYS = GENERATOR_FIELDS
 OBJECTIVE_KEYS = ('quality_weight', 'latency_weight', 'cost_weight')
@@ -453,7 +453,7 @@ def export_suite(lock_path, path) -> str:
 
 
 def build_replay(task_suite, candidates, scored) -> dict:
-    """The replay manifest of the routing experiment: `suite_sha256`, `candidate_fingerprints` and one row per task and
+    """The replay manifest of the decision-models experiment: `suite_sha256`, `candidate_fingerprints` and one row per task and
     candidate that was scored, sorted by (task_id, candidate). A scored row without a valid output has quality 0.0."""
     if 'reference' in candidates:
         raise ValueError('The reference arm is not a routing candidate')
@@ -515,7 +515,7 @@ def _in_range(row):
 
 
 def verify_replay(manifest, provenance, task_suite, candidates, suite, attempts=None) -> None:
-    """Everything the routing experiment does not check: orphan rows, values out of range, stale scores, outcomes that do
+    """Everything the decision-models experiment does not check: orphan rows, values out of range, stale scores, outcomes that do
     not match the rows, candidates that are not the fixed generator and the originating attempts. With `attempts`, the
     manifest and the sidecar must equal a fresh build from those attempts' pinned outputs."""
     _check_provenance(provenance)
@@ -528,7 +528,7 @@ def verify_replay(manifest, provenance, task_suite, candidates, suite, attempts=
     for row in manifest['rows']:
         if row.get('task_id') not in tasks or row.get('candidate') not in candidates:
             raise ValueError('Orphan replay row')
-    corpus_index(manifest, task_suite)      # the routing experiment's own duplicate rule
+    corpus_index(manifest, task_suite)      # the decision-models experiment's own duplicate rule
     keys = [(o['task_id'], o['candidate']) for o in provenance['outcomes']]
     if len(set(keys)) != len(keys):
         raise ValueError('Duplicate replay outcome')
@@ -931,7 +931,7 @@ def evaluate(manifest, tasks, strategies, objective, seed=1, switching=None, out
 # Operator files and commands ------------------------------------------------------------------------------------------
 
 def read_candidates(path) -> dict:
-    """The `--candidates` file: {arm id: candidate}, in the shape of the `candidates` of an `llm-routing` case."""
+    """The `--candidates` file: {arm id: candidate}, in the shape of the `candidates` of a `decision-models` case."""
     value, _ = contracts.read_json_strict(path)
     if not isinstance(value, dict) or not value:
         raise ValueError('The candidates file maps arm ids to candidates')
@@ -971,7 +971,7 @@ def main(argv=None) -> int:
     replay.add_argument('--candidates', required=True)
     replay.add_argument('--output', required=True)
     replay.add_argument('--calibration', help='the calibration record whose threshold a selector strategy uses; its digest is recorded')
-    verify = commands.add_parser('verify', help='verify a replay manifest and its sidecar before any llm-routing replay')
+    verify = commands.add_parser('verify', help='verify a replay manifest and its sidecar before any decision-models replay')
     verify.add_argument('--suite', required=True)
     verify.add_argument('--replay', required=True)
     verify.add_argument('--routing-suite', required=True)

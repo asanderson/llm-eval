@@ -28,10 +28,10 @@ class FakeGitHub:
 class ReportingTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.root=Path(self.tmp.name)
-        job={'job_id':'job','experiment_id':'llm-routing','experiment_run_id':'routing','case_id':'fixed','mode':'decision',
+        job={'job_id':'job','experiment_id':'decision-models','experiment_run_id':'routing','case_id':'fixed','mode':'decision',
              'hardware_config_id':'fixture','hardware':{'os_id':'fixture'},'parameters':{'synthetic':True,'router':{'kind':'fixed'}},'status':'planned','reason':None}
         plan={'campaign_id':'fixture','root':str(ROOT),'code_revision':revision(ROOT),'inputs':{},'jobs':[job],
-              'experiments':[{'experiment_id':'llm-routing','experiment_run_id':'routing','job_ids':['job']}],
+              'experiments':[{'experiment_id':'decision-models','experiment_run_id':'routing','job_ids':['job']}],
               'reporting':{'on_experiment_end':True}}
         self.campaign=initialize(plan,self.root);state=read_json(self.campaign/'campaign.json')
         rel='experiments/routing/jobs/job/attempt';out=self.campaign/rel;out.mkdir(parents=True)
@@ -108,14 +108,15 @@ class ReportingTests(unittest.TestCase):
         self.assertEqual(receipt['status'],'generated')
         self.assertEqual(validate_bundle(directory/receipt['report'])[1]['status'],'complete')
 
-def fixed_routing_report(root):
-    """A generic llm-routing report built from fixed inputs (fixed campaign name, time, revision, attempt): every byte of its
-    text files is a function of the reporting code alone."""
+def fixed_routing_report(root, experiment='llm-routing'):
+    """A generic decision-models report built from fixed inputs (fixed campaign name, time, revision, attempt): every byte of its
+    text files is a function of the reporting code alone. `experiment` is the id its campaign was planned with: by default
+    `llm-routing`, the experiment's former id, which the pinned digests below were computed for."""
     from llm_eval.core.contracts import atomic_json
     campaign=Path(root)/'campaign-20261112T000000Z-0000abcd';rel='experiments/routing/jobs/job/attempt';out=campaign/rel;out.mkdir(parents=True)
-    job={'job_id':'job','experiment_id':'llm-routing','experiment_run_id':'routing','case_id':'fixed','mode':'decision','hardware_config_id':'fixture',
+    job={'job_id':'job','experiment_id':experiment,'experiment_run_id':'routing','case_id':'fixed','mode':'decision','hardware_config_id':'fixture',
          'hardware':{'os_id':'fixture'},'parameters':{'synthetic':True,'router':{'kind':'fixed'}},'status':'planned','reason':None}
-    exp={'experiment_id':'llm-routing','experiment_run_id':'routing','job_ids':['job'],'version':1,'mode':'decision'}
+    exp={'experiment_id':experiment,'experiment_run_id':'routing','job_ids':['job'],'version':1,'mode':'decision'}
     atomic_json(campaign/'plan.json',{'campaign_id':'fixture','root':str(ROOT),'code_revision':'a'*40,'inputs':{'/fixture/case.json':'b'*64},'jobs':[job],
                                       'experiments':[exp],'reporting':{'on_experiment_end':True}})
     atomic_json(campaign/'campaign.json',{'schema_version':2,'campaign_id':'fixture','created_utc':'2026-11-12T00:00:00+00:00','status':'incomplete','reports':{},
@@ -142,7 +143,7 @@ def text_digests(report):
 
 
 PUBLICATION='docs/results/llm-routing/campaign-20261112T000000Z-0000abcd-routing/'
-# Computed with the reporting code before package F (d3c7cc7) for fixed_routing_report.
+# Computed with the reporting code before package F (d3c7cc7) for fixed_routing_report, whose campaign names the former id.
 BASE_TEXT_DIGESTS={k:v for k,v in {
     PUBLICATION+'README.md':'f1a6550e5d04b8bea7f2de1f9b224eb008a27885a3ea4b64c9b75042edd9454b',
     PUBLICATION+'benchmark-summary.csv':'8333f1dca0f881692f30a4b843dee3428c8162741bb4b1dac8e5b663689732d1',
@@ -156,6 +157,18 @@ BASE_TEXT_DIGESTS={k:v for k,v in {
 
 class ProjectionTests(unittest.TestCase):
     setUp=ReportingTests.setUp
+    def test_the_renamed_experiment_changes_only_its_id_in_the_bundle(self):
+        """A campaign planned before the rename (former id `llm-routing`) still reports the pinned bundle; one planned with
+        `decision-models` gives the same bundle with the new id in its paths and text, and nothing else changed."""
+        def texts(report,experiment):
+            return {p.relative_to(report/'bundle').as_posix().replace(experiment,'ID'):
+                    (gzip.decompress(p.read_bytes()) if p.suffix=='.gz' else p.read_bytes()).replace(b'\r\n',b'\n').replace(experiment.encode(),b'ID')
+                    for p in sorted((report/'bundle').rglob('*')) if p.is_file() and p.suffix!='.png' and p.name!='manifest.json'}
+        with tempfile.TemporaryDirectory() as old,tempfile.TemporaryDirectory() as new:
+            former,current=fixed_routing_report(old),fixed_routing_report(new,'decision-models')
+            self.assertEqual(text_digests(former),BASE_TEXT_DIGESTS)
+            self.assertTrue(read_json(current/'publication.json')['report_path'].startswith('docs/results/decision-models/'))
+            self.assertEqual(texts(former,'llm-routing'),texts(current,'decision-models'))
     def test_generic_experiments_keep_their_bundle(self):
         # Pinned against the digests the reporting code produced before package F (d3c7cc7) for the same fixed inputs.
         with tempfile.TemporaryDirectory() as tmp:

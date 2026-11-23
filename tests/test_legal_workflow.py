@@ -832,7 +832,7 @@ class PreflightTests(unittest.TestCase):
 
     def test_existing_jobs_keep_the_gpu_and_os_checks(self):
         from llm_eval.runner import validate_host
-        for experiment, mode, parameters in (('llm-routing', 'decision', {'suite': str(self.input), 'router': {'kind': 'fixed', 'choice': 'a'}}),
+        for experiment, mode, parameters in (('decision-models', 'decision', {'suite': str(self.input), 'router': {'kind': 'fixed', 'choice': 'a'}}),
                                              ('model-offloading', 'category-smoke', {'config': {}})):
             with self.subTest(experiment):
                 self.assertIsNone(getattr(get_experiment(experiment), 'host_requirements', None))
@@ -853,7 +853,7 @@ class PreflightTests(unittest.TestCase):
     def test_new_path_keys_cannot_be_route_labels(self):
         from llm_eval.orchestration import planner
         self.assertTrue({'output_manifest', 'review_file', 'review_key'} <= planner.PATH_KEYS)
-        shutil.copy(ROOT / 'experiments/llm-routing/workloads/decisions.json', self.path / 'decisions.json')
+        shutil.copy(ROOT / 'experiments/decision-models/workloads/decisions.json', self.path / 'decisions.json')
         write_json(self.path / 'case.json', {'id': 'labels', 'parameters': {
             'suite': 'decisions.json', 'synthetic': True,
             'router': {'kind': 'systemone', 'platform': 'fake', 'model': 'fake-router', 'model_revision': 'r1',
@@ -864,7 +864,7 @@ class PreflightTests(unittest.TestCase):
             'targets': {'local': {'transport': 'local', 'physical_host_id': 'legal-test-host'}},
             'hardware_configs': {'native': {'target': 'local', 'hardware_profile': 'msi-raider-18-hx-ai', 'os_id': 'ubuntu-26.04-native'}}})
         write_json(self.path / 'campaign.json', {'schema_version': 2, 'id': 'labels', 'inventory': 'inventory.json', 'phases': [
-            {'id': 'routing', 'experiments': [{'id': 'llm-routing', 'version': 1, 'mode': 'decision', 'cases': ['case.json'],
+            {'id': 'routing', 'experiments': [{'id': 'decision-models', 'version': 1, 'mode': 'decision', 'cases': ['case.json'],
                                                'hardware_configs': ['native']}]}]})
         (job,) = compile_campaign(self.path / 'campaign.json', ROOT)['jobs']
         self.assertEqual(job['parameters']['router']['criteria'], {'review': 'Requests that ask for a review', 'score': 'Other requests'})
@@ -1872,7 +1872,7 @@ class ScoreTests(CampaignBase):
 
         def other_experiment(directory):
             job = read_json(directory / 'job.json')
-            write_json(directory / 'job.json', {**job, 'experiment_id': 'llm-routing'})
+            write_json(directory / 'job.json', {**job, 'experiment_id': 'decision-models'})
             refile(directory, 'job.json')
 
         def failed_result(directory):

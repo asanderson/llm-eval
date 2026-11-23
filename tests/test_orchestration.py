@@ -20,11 +20,11 @@ class OrchestrationTests(unittest.TestCase):
     def plan(self,hosts):
         jobs=[]
         for i,host in enumerate(hosts):
-            jobs.append({'job_id':str(i),'experiment_run_id':'run','experiment_id':'llm-routing','mode':'decision',
+            jobs.append({'job_id':str(i),'experiment_run_id':'run','experiment_id':'decision-models','mode':'decision',
                          'parameters':{'synthetic':True},'target':{'transport':'local','physical_host_id':host},
                          'resources':[host],'status':'planned','reason':None,'depends_on':[]})
         return {'campaign_id':'test','root':str(ROOT),'code_revision':revision(ROOT),'inputs':{},
-                'jobs':jobs,'experiments':[{'experiment_run_id':'run','experiment_id':'llm-routing','job_ids':[j['job_id'] for j in jobs]}],
+                'jobs':jobs,'experiments':[{'experiment_run_id':'run','experiment_id':'decision-models','job_ids':[j['job_id'] for j in jobs]}],
                 'execution':{'max_parallel_jobs':3,'on_failure':'continue-independent'},'reporting':{'on_experiment_end':False}}
 
     def test_parallel_hosts_and_serial_shared_host(self):

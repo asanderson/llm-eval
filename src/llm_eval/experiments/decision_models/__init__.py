@@ -1,12 +1,12 @@
-"""Routing experiment contract and preflight validation."""
+"""Decision models experiment contract and preflight validation."""
 from pathlib import Path
 from llm_eval.core.contracts import fields, integer
 from llm_eval.common import finite_number, read_json
 from llm_eval.adapters import configured_endpoint
 from llm_eval.runner import load_suite
 
-MANIFEST={'id':'llm-routing','version':1,'modes':['decision','replay','live'],
-          'description':'Decision quality and downstream routing quality, latency and cost'}
+MANIFEST={'id':'decision-models','version':1,'modes':['decision','replay','live'],
+          'description':'Decision model accuracy, and the quality, latency and cost of the generators they route to'}
 
 
 def validate(case, root, mode='decision'):

@@ -1,4 +1,4 @@
-# Recommended setup, harness and model: llm-routing on raider-wsl
+# Recommended setup, harness and model: decision-models on raider-wsl
 
 [Recommended setups](../README.md) · [Results index](../../README.md) · [Executive summary](../../../README.md)
 
@@ -16,7 +16,7 @@ Generated from the published bundles by `llm-eval index-results`; do not edit by
 | Output tokens per second | – |
 | Measured | [2026-11-18](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
 
-This is the best-ranked combination of the results index for this pair. Ranked by share of checks passed (correct decisions for routing experiments, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians. Where a model repeats among the best combinations, a second table ranks the models, each by its best combination.
+This is the best-ranked combination of the results index for this pair. Ranked by share of checks passed (correct decisions for decision models, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians. Where a model repeats among the best combinations, a second table ranks the models, each by its best combination.
 
 2 combinations pass the same share of checks as the recommended one; the order among them is by median wall time, then by output rate.
 
@@ -46,5 +46,5 @@ Read from the resolved configuration of the run's report. To reproduce it, use t
 
 | Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
 |---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
-| [2026-11-18](../../date/2026-11-18.md) | [llm-routing](../../experiment/llm-routing.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-nimble:locked](../../model/llm-eval-nimble-locked.md) | ollama-nimble | – | succeeded | 6 | 0 | 0.0507–0.0554 | – | – | 6/6 | [report](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
-| [2026-11-18](../../date/2026-11-18.md) | [llm-routing](../../experiment/llm-routing.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-tev1:locked](../../model/llm-eval-tev1-locked.md) | ollama-tev1 | – | succeeded | 6 | 0 | 0.0245–0.0261 | – | – | 6/6 | [report](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
+| [2026-11-18](../../date/2026-11-18.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-nimble:locked](../../model/llm-eval-nimble-locked.md) | ollama-nimble | – | succeeded | 6 | 0 | 0.0507–0.0554 | – | – | 6/6 | [report](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
+| [2026-11-18](../../date/2026-11-18.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-tev1:locked](../../model/llm-eval-tev1-locked.md) | ollama-tev1 | – | succeeded | 6 | 0 | 0.0245–0.0261 | – | – | 6/6 | [report](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |

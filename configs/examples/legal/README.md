@@ -13,7 +13,7 @@ Every inventory here names the target `raider` with `physical_host_id: raider`, 
 | `qualification-campaign.json`, `legal-offload-case.json`, `legal-offload-run.json` | `model-offloading` over the legal-shaped workload `experiments/legal-benchmark/workloads/qualification/legal-shaped.json`, external serving. Plans as shipped |
 | `evaluation-campaign.json`, `retrieval-case.json`, `generation-case.json`, `workflow-case.json` | The frozen legal evaluation: `retrieval` (a fixture run), then `generation`, then `workflow`. External, GPU-served roles on a loopback endpoint with placeholder revisions and `"qualification": null`. Plans as shipped; a run stops at the placeholder revisions |
 | `score-campaign.json`, `score-case.json` | Template: `score` over the output manifest of an earlier generation or workflow attempt. Does not plan until `REPLACE_WITH_...` is filled |
-| `routing-replay-campaign.json`, `routing-replay-case.json` | Template: an `llm-routing` `replay` over an exported routing suite and a verified replay manifest. Does not plan until `REPLACE_WITH_...` is filled |
+| `routing-replay-campaign.json`, `routing-replay-case.json` | Template: a `decision-models` `replay` over an exported routing suite and a verified replay manifest. Does not plan until `REPLACE_WITH_...` is filled |
 | `raider-windows/`, `raider-wsl/`, `raider-ubuntu/` | Per host OS: `inventory.json` (the hardware configuration of `configs/examples/raider-<os>/inventory.json` with the same target entry: target `raider`, `physical_host_id: raider`, and on WSL the `lock_root` placeholder `REPLACE_WITH_SHARED_WINDOWS_LOCK_ROOT` that [the WSL walkthrough](../../../docs/WSL_RAIDER_WALKTHROUGH.md#share-the-windows-physical-host-reservation) fills) and `legal-evaluation-campaign.json` (the phases of `evaluation-campaign.json` with the cases above, on that host's hardware configuration). Plan as shipped; the generation and workflow jobs of a run stop at the placeholder revisions |
 
 Every campaign file has `"publish": {"mode": "none"}`.
@@ -40,7 +40,7 @@ Every campaign file has `"publish": {"mode": "none"}`.
    python -m llm_eval.experiments.legal_benchmark.routing verify --suite SUITE_LOCK --replay PRIVATE_DIR/replay.json --routing-suite PRIVATE_DIR/routing-suite.json --candidates PRIVATE_DIR/candidates.json --attempt ATTEMPT_DIR
    ```
 
-   `verify` takes the same `--attempt` directories and rebuilds the manifest from their pinned outputs. Run `routing verify` before any replay campaign: the routing experiment itself checks only the suite hash, the candidate fingerprints and duplicates, and would accept a manifest built before a rubric or scorer change. Then fill `routing-replay-case.json` and plan `routing-replay-campaign.json`.
+   `verify` takes the same `--attempt` directories and rebuilds the manifest from their pinned outputs. Run `routing verify` before any replay campaign: the `decision-models` experiment itself checks only the suite hash, the candidate fingerprints and duplicates, and would accept a manifest built before a rubric or scorer change. Then fill `routing-replay-case.json` and plan `routing-replay-campaign.json`.
 
 A selector threshold also needs a calibration: run a routed attempt (no threshold) and an attempt of its fallback arm on `original-packets`, `routing calibrate` them, and name the record, the suite and both output manifests in the case's `selector.calibration` block (`calibration_file`, `suite`, `routed.output_manifest`, `fallback.output_manifest`); planning re-derives the record from those attempts.
 

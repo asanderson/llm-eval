@@ -15,13 +15,13 @@ The rules this page refers to are stated once, in the [experiment README](../exp
 
 ## What this walkthrough runs
 
-Three experiments take part: `model-offloading` (stage 1), `legal-benchmark` (stages 3 to 5) and, optionally, `llm-routing` (a replay in stage 3). Each stage pins its inputs by digest and writes an explicit output that a later stage names by file.
+Three experiments take part: `model-offloading` (stage 1), `legal-benchmark` (stages 3 to 5) and, optionally, `decision-models` (a replay in stage 3). Each stage pins its inputs by digest and writes an explicit output that a later stage names by file.
 
 | Stage | Experiment and mode | Pinned input | Explicit stage output |
 |---|---|---|---|
 | 1. Offload calibration | `model-offloading`, `category-smoke` on the legal-shaped workload | `experiments/legal-benchmark/workloads/qualification/legal-shaped.json`, artifact lock | one succeeded attempt directory |
 | 2. Locked serving profile | operator command `profiles freeze` with the observed placement attested | campaign directory, job id, attempt id (all explicit) | `serving-profile.json` and its SHA-256 |
-| 3. Routing calibration and replay (optional) | on the calibration suite: `legal-benchmark` `generation` per recipe and one routed run, then `routing calibrate`; on the evaluation suite: `routing export`, `routing replay`, `routing verify`, then `llm-routing` `replay` or `routing evaluate` | both suite locks, locked profile | calibration file, routing suite, replay manifest, sidecar provenance |
+| 3. Routing calibration and replay (optional) | on the calibration suite: `legal-benchmark` `generation` per recipe and one routed run, then `routing calibrate`; on the evaluation suite: `routing export`, `routing replay`, `routing verify`, then `decision-models` `replay` or `routing evaluate` | both suite locks, locked profile | calibration file, routing suite, replay manifest, sidecar provenance |
 | 4. Frozen legal evaluation | `legal-benchmark` `retrieval`, `generation`, `workflow` (with the pinned calibration file when a threshold is used), then `score` in a later campaign | suite lock, locked profile, calibration file (only with a threshold), output manifest | attempts with rows, private `local/` detail, output manifest |
 | 5. Local report | `llm-eval report` | campaign directory | projected local bundle (exact fixture export for an approved fixture suite, reduced projection for any other suite); no publication |
 
@@ -100,7 +100,7 @@ python -m llm_eval.experiments.legal_benchmark.routing evaluate --suite experime
 ```
 
 - Exports, replays and calibrations exist only for a suite listed in [`approved-suites.json`](../experiments/legal-benchmark/approved-suites.json) (the two shipped fixture suites); any other suite gets `Export is limited to approved fixture suites`.
-- `routing verify` must pass before a replay campaign: the routing experiment itself checks only the suite hash, the candidate fingerprints and duplicates. Then fill [`routing-replay-case.json`](../configs/examples/legal/routing-replay-case.json) and plan [`routing-replay-campaign.json`](../configs/examples/legal/routing-replay-campaign.json).
+- `routing verify` must pass before a replay campaign: the `decision-models` experiment itself checks only the suite hash, the candidate fingerprints and duplicates. Then fill [`routing-replay-case.json`](../configs/examples/legal/routing-replay-case.json) and plan [`routing-replay-campaign.json`](../configs/examples/legal/routing-replay-campaign.json).
 - Replay manifests, sidecars and calibration records hold per-matter values derived from the gold. They are local operator files and never public.
 - A routing or offload report built from a legal export is refused by `publish-results` when it carries a legal benchmark name (`Publication identity mismatch: the bundle carries a legal benchmark name`) or legal content the plugin recognises (`Publication identity mismatch: the bundle carries content of legal-benchmark (<class>)`). The legal benchmark names are the plugin's own (`legal-smoke`, `legal-routing`, `legal-shaped` and the benchmark ids of approved suites); a public legal benchmark such as `LegalBench` under a generic experiment is publishable. The content check has a stated limit: a replay export with renamed ids and a foreign `suite_sha256` is not recognised (see [Known limits](VALIDATION.md#known-limits)).
 - With the shipped data a threshold is calibrated on `original-packets` (2 families) and used on `original-smoke`; nothing calibrated on them supports adopting a selector.

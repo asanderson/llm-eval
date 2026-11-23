@@ -8,7 +8,8 @@ Recommended setup, harness and model per hardware configuration and experiment: 
 
 ### Top 5 harness and model combinations per experiment and hardware configuration
 
-Ranked by share of checks passed (correct decisions for routing experiments, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians. Where a model repeats among the best combinations, a second table ranks the models, each by its best combination.
+Ranked by share of checks passed (correct decisions for decision models, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians. Where a model repeats among the best combinations, a second table ranks the models, each by its best combination.
+Each pair then ranks US models alone. US models only, by the same ranking: models whose developer, and the developer of every base model they were fine-tuned, distilled or pruned from, are headquartered in the United States ([model origins](../../MODELS.md#model-origins)).
 
 **[hardware-fit](experiment/hardware-fit.md) on [raider-wsl](hardware/raider-wsl.md)**
 
@@ -23,6 +24,10 @@ Top 5 models, each on its best-ranked harness:
 | Rank | Model | Harness | Checks passed | Median wall s | Output tok/s | Run |
 |---:|---|---|---:|---:|---:|---|
 | 1 | [qwen38-27b-ud-q4_k_xl](model/qwen38-27b-ud-q4_k_xl.md) | [lmstudio](harness/lmstudio.md) | 24/27 | 0.886 | 68.6 | [2026-11-23 cap 2048](../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
+
+Top 5 harness and model combinations of US models:
+
+No measured run of a US model with scored checks has been published for this pair.
 
 **[model-offloading](experiment/model-offloading.md) on [raider-wsl](hardware/raider-wsl.md)**
 
@@ -44,12 +49,36 @@ Top 5 models, each on its best-ranked harness:
 | 4 | [qwen38-27b](model/qwen38-27b.md) | [lmstudio](harness/lmstudio.md) | 24/27 | 7.06 | 7.03 | [2026-11-22 cap 2048](../model-offloading/campaign-20261122T010725Z-569a049b-offload-model-offloading-1/README.md) |
 | 5 | [gemma4-26b-moe](model/gemma4-26b-moe.md) | [ollama](harness/ollama.md) | 24/27 | 12.6 | 15.9 | [2026-11-23 cap 2048](../model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/README.md) |
 
-**[llm-routing](experiment/llm-routing.md) on [raider-wsl](hardware/raider-wsl.md)**
+Top 5 harness and model combinations of US models:
+
+| Rank | Harness | Model | Developer | Checks passed | Median wall s | Output tok/s | Run |
+|---:|---|---|---|---:|---:|---:|---|
+| 1 | [ollama](harness/ollama.md) | [nemotron-nano-30b](model/nemotron-nano-30b.md) | NVIDIA | 24/27 | 2.71 | 27 | [2026-11-17 cap 2048](../model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/README.md) |
+| 2 | [lmstudio](harness/lmstudio.md) | [nemotron-nano-30b](model/nemotron-nano-30b.md) | NVIDIA | 24/27 | 5.09 | 14.5 | [2026-11-22 cap 2048](../model-offloading/campaign-20261122T003348Z-8d8d894b-offload-model-offloading-1/README.md) |
+| 3 | [ollama](harness/ollama.md) | [gemma4-26b-moe](model/gemma4-26b-moe.md) | Google | 24/27 | 12.6 | 15.9 | [2026-11-23 cap 2048](../model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/README.md) |
+| 4 | [ollama](harness/ollama.md) | [gemma4-31b](model/gemma4-31b.md) | Google | 24/27 | 44.8 | 3.36 | [2026-11-17 cap 2048](../model-offloading/campaign-20261117T052908Z-16a250ab-offload-model-offloading-1/README.md) |
+| 5 | [lmstudio](harness/lmstudio.md) | [gemma4-31b](model/gemma4-31b.md) | Google | 24/27 | 52.5 | 2.81 | [2026-11-22 cap 2048](../model-offloading/campaign-20261122T030132Z-4cfa054c-offload-model-offloading-1/README.md) |
+
+Top 5 US models, each on its best-ranked harness:
+
+| Rank | Model | Harness | Developer | Checks passed | Median wall s | Output tok/s | Run |
+|---:|---|---|---|---:|---:|---:|---|
+| 1 | [nemotron-nano-30b](model/nemotron-nano-30b.md) | [ollama](harness/ollama.md) | NVIDIA | 24/27 | 2.71 | 27 | [2026-11-17 cap 2048](../model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/README.md) |
+| 2 | [gemma4-26b-moe](model/gemma4-26b-moe.md) | [ollama](harness/ollama.md) | Google | 24/27 | 12.6 | 15.9 | [2026-11-23 cap 2048](../model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/README.md) |
+| 3 | [gemma4-31b](model/gemma4-31b.md) | [ollama](harness/ollama.md) | Google | 24/27 | 44.8 | 3.36 | [2026-11-17 cap 2048](../model-offloading/campaign-20261117T052908Z-16a250ab-offload-model-offloading-1/README.md) |
+| 4 | [laguna-xs21](model/laguna-xs21.md) | [ollama](harness/ollama.md) | Poolside | 21/27 | 18 | 29.8 | [2026-11-17 cap 2048](../model-offloading/campaign-20261117T061720Z-22ef705a-offload-model-offloading-1/README.md) |
+| 5 | [gemma3-27b](model/gemma3-27b.md) | [ollama](harness/ollama.md) | Google | 18/27 | 1.4 | 2.85 | [2026-11-17 cap 2048](../model-offloading/campaign-20261117T073753Z-bee9d8ce-offload-model-offloading-1/README.md) |
+
+**[decision-models](experiment/decision-models.md) on [raider-wsl](hardware/raider-wsl.md)**
 
 | Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
 |---:|---|---|---:|---:|---:|---|
 | 1 | [ollama](harness/ollama.md) | [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) | 6/6 | 0.0253 | – | [2026-11-18](../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
 | 2 | [ollama](harness/ollama.md) | [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) | 6/6 | 0.0531 | – | [2026-11-18](../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
+
+Top 5 harness and model combinations of US models:
+
+No measured run of a US model with scored checks has been published for this pair.
 
 **[model-offloading](experiment/model-offloading.md) on [raider-windows](hardware/raider-windows.md)**
 
@@ -71,14 +100,38 @@ Top 5 models, each on its best-ranked harness:
 | 4 | [gemma4-31b](model/gemma4-31b.md) | [ollama](harness/ollama.md) | 24/27 | 46.9 | 3.39 | [2026-11-15 cap 2048](../model-offloading/campaign-20261115T143606Z-03f6333f-offload-model-offloading-1/README.md) |
 | 5 | [gemma4-26b-moe](model/gemma4-26b-moe.md) | [koboldcpp](harness/koboldcpp.md) | 21/27 | 0.582 | 3.53 | [2026-11-15 cap 2048](../model-offloading/campaign-20261115T161112Z-fff50610-offload-model-offloading-1/README.md) |
 
-**[llm-routing](experiment/llm-routing.md) on [raider-windows](hardware/raider-windows.md)**
+Top 5 harness and model combinations of US models:
+
+| Rank | Harness | Model | Developer | Checks passed | Median wall s | Output tok/s | Run |
+|---:|---|---|---|---:|---:|---:|---|
+| 1 | [ollama](harness/ollama.md) | [nemotron-nano-30b](model/nemotron-nano-30b.md) | NVIDIA | 24/27 | 2.47 | 29.5 | [2026-11-15 cap 2048](../model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) |
+| 2 | [lmstudio](harness/lmstudio.md) | [nemotron-nano-30b](model/nemotron-nano-30b.md) | NVIDIA | 24/27 | 4.62 | 14.4 | [2026-11-15 cap 2048](../model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) |
+| 3 | [ollama](harness/ollama.md) | [gemma4-31b](model/gemma4-31b.md) | Google | 24/27 | 46.9 | 3.39 | [2026-11-15 cap 2048](../model-offloading/campaign-20261115T143606Z-03f6333f-offload-model-offloading-1/README.md) |
+| 4 | [lmstudio](harness/lmstudio.md) | [gemma4-31b](model/gemma4-31b.md) | Google | 24/27 | 58.5 | 2.53 | [2026-11-15 cap 2048](../model-offloading/campaign-20261115T143606Z-03f6333f-offload-model-offloading-1/README.md) |
+| 5 | [koboldcpp](harness/koboldcpp.md) | [gemma4-26b-moe](model/gemma4-26b-moe.md) | Google | 21/27 | 0.582 | 3.53 | [2026-11-15 cap 2048](../model-offloading/campaign-20261115T161112Z-fff50610-offload-model-offloading-1/README.md) |
+
+Top 5 US models, each on its best-ranked harness:
+
+| Rank | Model | Harness | Developer | Checks passed | Median wall s | Output tok/s | Run |
+|---:|---|---|---|---:|---:|---:|---|
+| 1 | [nemotron-nano-30b](model/nemotron-nano-30b.md) | [ollama](harness/ollama.md) | NVIDIA | 24/27 | 2.47 | 29.5 | [2026-11-15 cap 2048](../model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) |
+| 2 | [gemma4-31b](model/gemma4-31b.md) | [ollama](harness/ollama.md) | Google | 24/27 | 46.9 | 3.39 | [2026-11-15 cap 2048](../model-offloading/campaign-20261115T143606Z-03f6333f-offload-model-offloading-1/README.md) |
+| 3 | [gemma4-26b-moe](model/gemma4-26b-moe.md) | [koboldcpp](harness/koboldcpp.md) | Google | 21/27 | 0.582 | 3.53 | [2026-11-15 cap 2048](../model-offloading/campaign-20261115T161112Z-fff50610-offload-model-offloading-1/README.md) |
+| 4 | [gemma3-27b](model/gemma3-27b.md) | [koboldcpp](harness/koboldcpp.md) | Google | 18/27 | 1.29 | 3.1 | [2026-11-15 cap 2048](../model-offloading/campaign-20261115T193835Z-720b0164-offload-model-offloading-1/README.md) |
+| 5 | [phi4-reasoning-plus](model/phi4-reasoning-plus.md) | [koboldcpp](harness/koboldcpp.md) | Microsoft | 15/27 | 0.595 | 3.45 | [2026-11-16 cap 2048](../model-offloading/campaign-20261116T133213Z-8dbe93fd-offload-model-offloading-1/README.md) |
+
+**[decision-models](experiment/decision-models.md) on [raider-windows](hardware/raider-windows.md)**
 
 | Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
 |---:|---|---|---:|---:|---:|---|
 | 1 | [ollama](harness/ollama.md) | [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) | 6/6 | 0.0367 | – | [2026-11-15](../llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md) |
 | 2 | [ollama](harness/ollama.md) | [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) | 6/6 | 0.0602 | – | [2026-11-15](../llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md) |
 
-**[llm-routing](experiment/llm-routing.md) on [raider-ubuntu](hardware/raider-ubuntu.md)**
+Top 5 harness and model combinations of US models:
+
+No measured run of a US model with scored checks has been published for this pair.
+
+**[decision-models](experiment/decision-models.md) on [raider-ubuntu](hardware/raider-ubuntu.md)**
 
 No measured run with scored checks has been published yet.
 
@@ -87,7 +140,7 @@ No measured run with scored checks has been published yet.
 | Category | Indexes (results) |
 |---|---|
 | Hardware configuration | [raider-ubuntu](hardware/raider-ubuntu.md) (1) · [raider-windows](hardware/raider-windows.md) (114) · [raider-wsl](hardware/raider-wsl.md) (65) |
-| Experiment | [hardware-fit](experiment/hardware-fit.md) (5) · [legal-benchmark](experiment/legal-benchmark.md) (8) · [llm-routing](experiment/llm-routing.md) (7) · [model-offloading](experiment/model-offloading.md) (160) |
+| Experiment | [decision-models](experiment/decision-models.md) (7) · [hardware-fit](experiment/hardware-fit.md) (5) · [legal-benchmark](experiment/legal-benchmark.md) (8) · [model-offloading](experiment/model-offloading.md) (160) |
 | Harness | [category](harness/category.md) (1) · [fixture](harness/fixture.md) (2) · [koboldcpp](harness/koboldcpp.md) (52) · [lmstudio](harness/lmstudio.md) (52) · [ollama](harness/ollama.md) (71) · [projection](harness/projection.md) (2) |
 | Model | [category](model/category.md) (1) · [deepseek-r1-32b](model/deepseek-r1-32b.md) (12) · [deepseek-r1-70b](model/deepseek-r1-70b.md) (9) · [fixture](model/fixture.md) (2) · [gemma3-27b](model/gemma3-27b.md) (9) · [gemma4-26b-moe](model/gemma4-26b-moe.md) (11) · [gemma4-31b](model/gemma4-31b.md) (10) · [kimi-dev-72b](model/kimi-dev-72b.md) (10) · [kimi-linear-48b](model/kimi-linear-48b.md) (9) · [laguna-xs21](model/laguna-xs21.md) (9) · [llama3-70b](model/llama3-70b.md) (9) · [llama31-70b](model/llama31-70b.md) (9) · [llama33-70b](model/llama33-70b.md) (9) · [llm-eval-kimi-linear-48b:locked](model/llm-eval-kimi-linear-48b-locked.md) (6) · [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) (3) · [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) (3) · [measured-models-gguf](model/measured-models-gguf.md) (1) · [measured-models-gguf-as-found](model/measured-models-gguf-as-found.md) (1) · [mistral-small31](model/mistral-small31.md) (9) · [nemotron-nano-30b](model/nemotron-nano-30b.md) (9) · [nemotron-super-49b](model/nemotron-super-49b.md) (9) · [phi4-reasoning-plus](model/phi4-reasoning-plus.md) (9) · [qwen35-35b-moe](model/qwen35-35b-moe.md) (9) · [qwen38-27b](model/qwen38-27b.md) (9) · [qwen38-27b-ud-q4_k_xl](model/qwen38-27b-ud-q4_k_xl.md) (3) |
 | Date (UTC) | [2026-11-23](date/2026-11-23.md) (6) · [2026-11-22](date/2026-11-22.md) (17) · [2026-11-18](date/2026-11-18.md) (12) · [2026-11-17](date/2026-11-17.md) (30) · [2026-11-16](date/2026-11-16.md) (12) · [2026-11-15](date/2026-11-15.md) (45) · [2026-11-11](date/2026-11-11.md) (3) · [2026-11-10](date/2026-11-10.md) (30) · [2026-11-09](date/2026-11-09.md) (19) · [2026-11-08](date/2026-11-08.md) (6) |
@@ -135,7 +188,7 @@ Each cell links to the report of every published run of that model on that harne
 | [llm-eval-kimi-linear-48b:locked](model/llm-eval-kimi-linear-48b-locked.md) | – | [2026-11-18 raider-wsl score-only](../legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/README.md)<br>[2026-11-18 raider-wsl measured](../legal-benchmark/campaign-20261118T064854Z-6746b621-generation-legal-benchmark-1/README.md)<br>[2026-11-18 raider-wsl measured](../legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows score-only](../legal-benchmark/campaign-20261115T140033Z-ed2177f1-score-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](../legal-benchmark/campaign-20261115T133729Z-ff84f63f-generation-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](../legal-benchmark/campaign-20261115T133729Z-ff84f63f-workflow-legal-benchmark-1/README.md) |
 | [fixture](model/fixture.md) | [2026-11-18 raider-wsl fixture](../legal-benchmark/campaign-20261118T064854Z-6746b621-retrieval-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows fixture](../legal-benchmark/campaign-20261115T133729Z-ff84f63f-retrieval-legal-benchmark-1/README.md) | – |
 
-### llm-routing: models by harness
+### decision-models: models by harness
 
 Each cell links to the report of every published run of that model on that harness, newest first. Models are ordered by their newest run.
 
@@ -205,8 +258,8 @@ These results are not ranked with other experiments. Two runs are comparable onl
 | [2026-11-18](date/2026-11-18.md) | [legal-benchmark](experiment/legal-benchmark.md) | [raider-wsl](hardware/raider-wsl.md) | [fixture](harness/fixture.md) | [fixture](model/fixture.md) | legal-retrieval | – | succeeded (fixture) | 64 | 0 | 3.55e-05–0.000138 | – | 39/56 | – | [report](../legal-benchmark/campaign-20261118T064854Z-6746b621-retrieval-legal-benchmark-1/README.md) |
 | [2026-11-18](date/2026-11-18.md) | [legal-benchmark](experiment/legal-benchmark.md) | [raider-wsl](hardware/raider-wsl.md) | [ollama](harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](model/llm-eval-kimi-linear-48b-locked.md) | legal-generation | – | succeeded (measured) | 32 | 3 | 12.2–12.9 | 24.5–25.8 | 0/32 | – | [report](../legal-benchmark/campaign-20261118T064854Z-6746b621-generation-legal-benchmark-1/README.md) |
 | [2026-11-18](date/2026-11-18.md) | [legal-benchmark](experiment/legal-benchmark.md) | [raider-wsl](hardware/raider-wsl.md) | [ollama](harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](model/llm-eval-kimi-linear-48b-locked.md) | legal-workflow | – | succeeded (measured) | 32 | 9 | 36.6–40.4 | 21.6–21.9 | 0/32 | – | [report](../legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/README.md) |
-| [2026-11-18](date/2026-11-18.md) | [llm-routing](experiment/llm-routing.md) | [raider-wsl](hardware/raider-wsl.md) | [ollama](harness/ollama.md) | [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) | ollama-nimble | – | succeeded | 6 | 0 | 0.0507–0.0554 | – | – | 6/6 | [report](../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
-| [2026-11-18](date/2026-11-18.md) | [llm-routing](experiment/llm-routing.md) | [raider-wsl](hardware/raider-wsl.md) | [ollama](harness/ollama.md) | [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) | ollama-tev1 | – | succeeded | 6 | 0 | 0.0245–0.0261 | – | – | 6/6 | [report](../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
+| [2026-11-18](date/2026-11-18.md) | [decision-models](experiment/decision-models.md) | [raider-wsl](hardware/raider-wsl.md) | [ollama](harness/ollama.md) | [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) | ollama-nimble | – | succeeded | 6 | 0 | 0.0507–0.0554 | – | – | 6/6 | [report](../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
+| [2026-11-18](date/2026-11-18.md) | [decision-models](experiment/decision-models.md) | [raider-wsl](hardware/raider-wsl.md) | [ollama](harness/ollama.md) | [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) | ollama-tev1 | – | succeeded | 6 | 0 | 0.0245–0.0261 | – | – | 6/6 | [report](../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
 | [2026-11-18](date/2026-11-18.md) | [model-offloading](experiment/model-offloading.md) | [raider-wsl](hardware/raider-wsl.md) | [koboldcpp](harness/koboldcpp.md) | [gemma4-26b-moe](model/gemma4-26b-moe.md) | gemma4-26b-moe-koboldcpp | 2048 | succeeded | 27 | 0 | 0.523–0.524 | 3.82–5.74 | 21/27 | – | [report](../model-offloading/campaign-20261118T050451Z-60d1fe39-offload-model-offloading-1/README.md) |
 | [2026-11-18](date/2026-11-18.md) | [model-offloading](experiment/model-offloading.md) | [raider-wsl](hardware/raider-wsl.md) | [ollama](harness/ollama.md) | [gemma4-26b-moe](model/gemma4-26b-moe.md) | gemma4-26b-moe-ollama | 2048 | failed | 0 | 0 | – | – | – | – | [report](../model-offloading/campaign-20261118T050451Z-60d1fe39-offload-model-offloading-1/README.md) |
 | [2026-11-18](date/2026-11-18.md) | [model-offloading](experiment/model-offloading.md) | [raider-wsl](hardware/raider-wsl.md) | [koboldcpp](harness/koboldcpp.md) | [kimi-dev-72b](model/kimi-dev-72b.md) | kimi-dev-72b-koboldcpp | 2048 | succeeded | 27 | 0 | 101–157 | 2.23–2.27 | 0/27 | – | [report](../model-offloading/campaign-20261118T014808Z-cc8eec8c-offload-model-offloading-1/README.md) |
@@ -296,8 +349,8 @@ These results are not ranked with other experiments. Two runs are comparable onl
 | [2026-11-15](date/2026-11-15.md) | [legal-benchmark](experiment/legal-benchmark.md) | [raider-windows](hardware/raider-windows.md) | [fixture](harness/fixture.md) | [fixture](model/fixture.md) | legal-retrieval | – | succeeded (fixture) | 64 | 0 | 4.26e-05–0.000157 | – | 39/56 | – | [report](../legal-benchmark/campaign-20261115T133729Z-ff84f63f-retrieval-legal-benchmark-1/README.md) |
 | [2026-11-15](date/2026-11-15.md) | [legal-benchmark](experiment/legal-benchmark.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](model/llm-eval-kimi-linear-48b-locked.md) | legal-generation | – | succeeded (measured) | 32 | 6 | 10.7–11.7 | 31.2–31.4 | 0/32 | – | [report](../legal-benchmark/campaign-20261115T133729Z-ff84f63f-generation-legal-benchmark-1/README.md) |
 | [2026-11-15](date/2026-11-15.md) | [legal-benchmark](experiment/legal-benchmark.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](model/llm-eval-kimi-linear-48b-locked.md) | legal-workflow | – | succeeded (measured) | 32 | 9 | 28.8–30.4 | 29–29.1 | 0/32 | – | [report](../legal-benchmark/campaign-20261115T133729Z-ff84f63f-workflow-legal-benchmark-1/README.md) |
-| [2026-11-15](date/2026-11-15.md) | [llm-routing](experiment/llm-routing.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) | ollama-nimble | – | succeeded | 6 | 0 | 0.0594–0.061 | – | – | 6/6 | [report](../llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md) |
-| [2026-11-15](date/2026-11-15.md) | [llm-routing](experiment/llm-routing.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) | ollama-tev1 | – | succeeded | 6 | 0 | 0.0287–0.0446 | – | – | 6/6 | [report](../llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md) |
+| [2026-11-15](date/2026-11-15.md) | [decision-models](experiment/decision-models.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) | ollama-nimble | – | succeeded | 6 | 0 | 0.0594–0.061 | – | – | 6/6 | [report](../llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md) |
+| [2026-11-15](date/2026-11-15.md) | [decision-models](experiment/decision-models.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) | ollama-tev1 | – | succeeded | 6 | 0 | 0.0287–0.0446 | – | – | 6/6 | [report](../llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md) |
 | [2026-11-11](date/2026-11-11.md) | [model-offloading](experiment/model-offloading.md) | [raider-windows](hardware/raider-windows.md) | [koboldcpp](harness/koboldcpp.md) | [gemma4-26b-moe](model/gemma4-26b-moe.md) | gemma4-26b-moe-koboldcpp | 2048 | succeeded | 27 | 0 | 0.575–0.591 | 3.38–5.22 | 21/27 | – | [report](../model-offloading/campaign-20261111T110234Z-68c0f219-offload-model-offloading-1/README.md) |
 | [2026-11-11](date/2026-11-11.md) | [model-offloading](experiment/model-offloading.md) | [raider-windows](hardware/raider-windows.md) | [lmstudio](harness/lmstudio.md) | [gemma4-26b-moe](model/gemma4-26b-moe.md) | gemma4-26b-moe-lmstudio | 2048 | succeeded | 27 | 0 | 13.5–14.7 | 13.6 | 21/27 | – | [report](../model-offloading/campaign-20261111T110234Z-68c0f219-offload-model-offloading-1/README.md) |
 | [2026-11-11](date/2026-11-11.md) | [model-offloading](experiment/model-offloading.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [gemma4-26b-moe](model/gemma4-26b-moe.md) | gemma4-26b-moe-ollama | 2048 | failed | 0 | 0 | – | – | – | – | [report](../model-offloading/campaign-20261111T110234Z-68c0f219-offload-model-offloading-1/README.md) |
@@ -351,8 +404,8 @@ These results are not ranked with other experiments. Two runs are comparable onl
 | [2026-11-09](date/2026-11-09.md) | [model-offloading](experiment/model-offloading.md) | [raider-windows](hardware/raider-windows.md) | [lmstudio](harness/lmstudio.md) | [deepseek-r1-32b](model/deepseek-r1-32b.md) | deepseek-r1-32b-lmstudio | 2048 | succeeded | 27 | 0 | 99.5–145 | 2.6 | 3/27 | – | [report](../model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md) |
 | [2026-11-09](date/2026-11-09.md) | [model-offloading](experiment/model-offloading.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [deepseek-r1-32b](model/deepseek-r1-32b.md) | deepseek-r1-32b-ollama | 2048 | succeeded | 27 | 0 | 70.4–120 | 3.44–3.45 | 3/27 | – | [report](../model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md) |
 | [2026-11-08](date/2026-11-08.md) | [model-offloading](experiment/model-offloading.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [deepseek-r1-32b](model/deepseek-r1-32b.md) | deepseek-r1-32b-q8 | 2048 | succeeded | 27 | 0 | 70.3–120 | 3.44–3.46 | 3/27 | – | [report](../model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/README.md) |
-| [2026-11-08](date/2026-11-08.md) | [llm-routing](experiment/llm-routing.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) | ollama-nimble | – | succeeded | 6 | 0 | 0.0495–0.0497 | – | – | 6/6 | [report](../llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
-| [2026-11-08](date/2026-11-08.md) | [llm-routing](experiment/llm-routing.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) | ollama-tev1 | – | succeeded | 6 | 0 | 0.0274–0.0291 | – | – | 6/6 | [report](../llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
+| [2026-11-08](date/2026-11-08.md) | [decision-models](experiment/decision-models.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-nimble:locked](model/llm-eval-nimble-locked.md) | ollama-nimble | – | succeeded | 6 | 0 | 0.0495–0.0497 | – | – | 6/6 | [report](../llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
+| [2026-11-08](date/2026-11-08.md) | [decision-models](experiment/decision-models.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [llm-eval-tev1:locked](model/llm-eval-tev1-locked.md) | ollama-tev1 | – | succeeded | 6 | 0 | 0.0274–0.0291 | – | – | 6/6 | [report](../llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
 | [2026-11-08](date/2026-11-08.md) | [model-offloading](experiment/model-offloading.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [deepseek-r1-32b](model/deepseek-r1-32b.md) | deepseek-r1-32b-q8 | 256 | succeeded | 27 | 0 | 70.1–75.4 | 3.39–3.47 | 0/27 | – | [report](../model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/README.md) |
 | [2026-11-08](date/2026-11-08.md) | [model-offloading](experiment/model-offloading.md) | [raider-windows](hardware/raider-windows.md) | [ollama](harness/ollama.md) | [deepseek-r1-32b](model/deepseek-r1-32b.md) | deepseek-r1-32b-q8 | 256 | failed | 27 | 27 | – | – | 0/27 | – | [report](../model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/README.md) |
-| [2026-11-08](date/2026-11-08.md) | [llm-routing](experiment/llm-routing.md) | [raider-ubuntu](hardware/raider-ubuntu.md) | [category](harness/category.md) | [category](model/category.md) | category-smoke | – | succeeded (synthetic) | 2 | 0 | 1.81e-05–4.97e-05 | – | – | 2/2 | [report](../llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md) |
+| [2026-11-08](date/2026-11-08.md) | [decision-models](experiment/decision-models.md) | [raider-ubuntu](hardware/raider-ubuntu.md) | [category](harness/category.md) | [category](model/category.md) | category-smoke | – | succeeded (synthetic) | 2 | 0 | 1.81e-05–4.97e-05 | – | – | 2/2 | [report](../llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md) |

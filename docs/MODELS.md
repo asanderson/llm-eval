@@ -85,6 +85,14 @@ The target precision is part of the recommendation. Q4 versions of many 27–35B
 
 **Strata:** the extra Qwen3.8-Flash-Next entry preserves its specialized test track without replacing the three general Qwen candidates. Its reviewed engine supports this family, not every arbitrary GGUF. It has a model-specific expert/PLE layout and quantization/conversion path; document changes before attempting cross-engine quality equivalence.
 
+## Model origins
+
+[`catalog/model-origins.json`](../catalog/model-origins.json) records, for the catalogued models and for each model id the published results use, the organization that released the model and the organizations whose base models it was fine-tuned, distilled or pruned from; and for each organization, the country of its headquarters with a source. A **US model** is one whose developer and base-model developers are all headquartered in the United States. A quantization by a third party (an Unsloth or bartowski GGUF, for example) does not change a model's origin, and an alias maps a result id such as `qwen38-27b-ud-q4_k_xl` or `llm-eval-nimble:locked` to its model.
+
+The [results](results/README.md) rank the US models in tables of their own for each experiment and hardware configuration, and the [executive summary](../README.md#executive-summary) names the best US model on each platform. A model without an entry is not ranked among the US models, and the results flag it as origin not recorded: by name when it is among the five best combinations of its experiment and hardware configuration, by count below them. A model whose developer or base-model developer has no recorded country is not ranked among them either. Two classifications to know: DeepSeek R1 Distill Llama 70B is not a US model although its base is Meta's (DeepSeek released it), and every decision model measured so far is fine-tuned from a Qwen base, so none is a US model although its developer is a US company. Poolside's headquarters are recorded as San Francisco, as Wikipedia lists them; Sifted reported a move to Paris in 2023.
+
+Record the origin of every model added to the catalog or measured under a new id, with the source of each fact. The [candidate review](MODEL_CANDIDATES.md) lists the origin of the candidates found on Ollama, Hugging Face and LM Studio.
+
 ## Licenses and revisions
 
 | Catalog ID | Model license / terms | Original model snapshot |
@@ -165,7 +173,7 @@ A moved artifact pin changes what the next run loads. A changed artifact revisio
 
 The check does not cover:
 
-- The router models of the routing experiment. They are pulled from the Ollama registry and are identified by a digest that the operator records.
+- The decision models of the decision-models experiment. They are pulled from the Ollama registry and are identified by a digest that the operator records.
 - The legal serving profile. A legal role is bound to a locked serving profile, which records the digest of an artifact lock and its source revision. A moved pin does not change that profile; a role that should use the new revision needs re-qualification.
 - Catalog models without a pin. The check follows the artifact and the publisher repository of pinned models only.
 

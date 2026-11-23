@@ -64,12 +64,12 @@ def _beat(out, child, started, owner):
 def _transferable(path):
     """A job.json that cannot be read as a JSON object naming its experiment refuses the transfer; one of an experiment whose
     plugin exports `data_policy` decides by that policy; any other job.json allows it, as before. The error names the path."""
-    from llm_eval.experiments import REGISTRY, data_policy, plugin_hook
+    from llm_eval.experiments import data_policy, plugin_hook, registered
     try:job=read_json(path)
     except (OSError,ValueError,RecursionError):job=None
     name=job.get('experiment_id') if isinstance(job,dict) else None
     if not isinstance(name,str) or not name:raise ValueError('Collection refused by data policy: '+str(path))
-    if name in REGISTRY and plugin_hook(name,'data_policy') and not data_policy(name,job)['transfer']:
+    if registered(name) and plugin_hook(name,'data_policy') and not data_policy(name,job)['transfer']:
         raise ValueError('Collection refused by data policy: '+str(path))
 
 

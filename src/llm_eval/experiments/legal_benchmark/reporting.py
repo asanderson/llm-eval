@@ -1029,7 +1029,7 @@ def _markers():
 def _load_markers():
     """{'files', 'tasks', 'task', 'suites', 'ids', 'benchmarks'} of every approved suite: lock and pinned file digests, the digest of the
     `tasks` list of each routing and workload export, the digest of each single task's messages (any order, any subset), the
-    digest of each routing export as the routing experiment loads it (a replay manifest's `suite_sha256`), and its matter ids
+    digest of each routing export as the decision-models experiment loads it (a replay manifest's `suite_sha256`), and its matter ids
     normalised."""
     approved = contracts.approved_suites()
     key = tuple(sorted(approved))
@@ -1104,7 +1104,7 @@ def _legal_file(path, markers):
     return isinstance(rows, list) and any(isinstance(r, dict) and _norm(r.get('task_id')) in markers['ids'] for r in rows)
 
 
-# Row keys the routing experiment writes itself (its rows carry `router_s`); they claim nothing.
+# Row keys the decision-models experiment writes itself (its rows carry `router_s`); they claim nothing.
 ROUTING_ROW_KEYS = frozenset({'router_s'})
 MANIFEST_KEYS = ('projection', 'canonical_bytes', 'execution_kinds', 'data_class', 'suite_lock_sha256', 'cohorts')
 ROW_KEYS = frozenset({'suite_lock_sha256', 'family_id', 'review_status', *routing.ROUTE_KEYS}) - ROUTING_ROW_KEYS
