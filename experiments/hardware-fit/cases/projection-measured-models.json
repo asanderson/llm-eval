@@ -9,7 +9,7 @@
     "context_tokens": 8192,
     "artifact_root": "../../../models",
     "policy": {
-      "gpu_baseline_gib": 1.5
+      "gpu_baseline_gib": 2.06
     }
   }
 }

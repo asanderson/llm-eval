@@ -6,8 +6,8 @@ Ollama reports about the model it holds. Every function takes plain values, so t
 import re
 
 MIN_GPU_WEIGHT_FRACTION = 0.8      # VRAM use must rise by this share of the weights; below 1 because the counter is device-wide and sampled
-LOG_KEYS = ('layers_offloaded', 'layers_total', 'model_layers', 'gpu_model_buffer_mib', 'host_model_buffer_mib',
-            'gpu_kv_buffer_mib', 'cpu_kv_buffer_mib', 'gpu_compute_buffer_mib', 'device_free_mib_at_load')
+LOG_KEYS = ('layers_offloaded', 'layers_total', 'model_layers', 'model_loads', 'partial_loads', 'gpu_model_buffer_mib',
+            'host_model_buffer_mib', 'gpu_kv_buffer_mib', 'cpu_kv_buffer_mib', 'gpu_compute_buffer_mib', 'device_free_mib_at_load')
 
 # Matched anywhere in a line: the function-name prefix differs between llama.cpp versions and the engines that embed it.
 OFFLOADED = re.compile(r'offloaded (\d+)/(\d+) layers to GPU')
@@ -23,13 +23,20 @@ def parse_backend_log(text):
     The values describe the last model load: the last layer line and the buffer lines after it (the whole log when no layer
     line was printed). Cache buffers are summed, because a model can have several caches. Model and compute buffers take the
     last line of each device, then the devices of a kind are summed. `layers_total` is the count the layer line prints,
-    which includes the output layer; `model_layers` is the model's own `n_layer`."""
+    which is larger than the model's own `n_layer` in `model_layers`: the engine also counts the output layer, and for
+    some architectures one layer more. `model_loads` counts the layer lines. `partial_loads` counts the loads among them
+    that placed fewer layers than the line's total or a cache buffer on the CPU: a backend that reloaded the model served
+    its earlier requests from the earlier load."""
     lines = text.splitlines()
     loads = [i for i, line in enumerate(lines) if OFFLOADED.search(line)]
     facts = dict.fromkeys(LOG_KEYS)
     if loads:
-        offloaded, total = OFFLOADED.search(lines[loads[-1]]).groups()
-        facts.update(layers_offloaded=int(offloaded), layers_total=int(total))
+        partial = 0
+        for start, end in zip(loads, [*loads[1:], len(lines)]):
+            offloaded, total = (int(value) for value in OFFLOADED.search(lines[start]).groups())
+            buffers = (BUFFER.search(line) for line in lines[start:end])
+            partial += offloaded < total or any(m and m.group(2) == 'KV' and not GPU.fullmatch(m.group(1)) for m in buffers)
+        facts.update(layers_offloaded=offloaded, layers_total=total, model_loads=len(loads), partial_loads=partial)
     caches, buffers = {}, {}
     for line in lines[loads[-1] if loads else 0:]:
         match = BUFFER.search(line)
@@ -63,9 +70,11 @@ def served_model_memory(payload, served_model):
     return {key: entry[key] if type(entry.get(key)) is int else None for key in ('size', 'size_vram')}
 
 
-def device(rows, gpu_name):
-    """The GPU a profile names: the first nvidia-smi row whose name contains the profile's GPU name, or None."""
-    return next((row for row in rows if gpu_name in (row.get('name') or '')), None)
+def device(rows, gpu_name, index=0):
+    """The GPU a run is judged on: the nvidia-smi row with the index the launch selects (`launch.gpu`, default 0), when it
+    carries the profile's GPU name; None otherwise. The launch hands that index to the engine as its only visible device.
+    The index is read as nvidia-smi's, which is bus order; CUDA can number unequal cards differently."""
+    return next((row for row in rows if str(row.get('index')) == str(index) and gpu_name in (row.get('name') or '')), None)
 
 
 def peak_used_mib(samples, index):
@@ -80,13 +89,14 @@ def exceeds_free_vram(weight_bytes, total_mib, reserve_mib, baseline_used_mib):
 
 
 def placement(log, ps):
-    """Where the backend says the model is: its layer and cache lines decide, else what Ollama reports, else unobserved."""
+    """Where the backend says the model is: its layer and cache lines decide, else what Ollama reports, else unobserved.
+    Any load of the run that left layers or cache on the CPU decides, not only the last one."""
     offloaded, total, cpu_cache = log['layers_offloaded'], log['layers_total'], log['cpu_kv_buffer_mib']
     line = offloaded is not None and total is not None
-    if line and offloaded == total and not cpu_cache:
-        return 'all_layers_on_gpu'
-    if (line and offloaded < total) or cpu_cache:
+    if log['partial_loads'] or (line and offloaded < total) or cpu_cache:
         return 'layers_on_cpu'
+    if line and offloaded == total:
+        return 'all_layers_on_gpu'
     if not line and ps['size'] is not None and ps['size_vram'] is not None:
         return 'reported_in_vram' if ps['size_vram'] >= ps['size'] else 'reported_partly_in_ram'
     return 'unobserved'

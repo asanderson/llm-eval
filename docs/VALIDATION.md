@@ -187,5 +187,7 @@ Recorded 2026-11-22 on the MSI Raider under native Windows 11, for the `hardware
 
 - A measured run on KoboldCpp, LM Studio, llama.cpp or ik_llama.cpp, and any run under WSL2 or native Ubuntu.
 - A real run that leaves VRAM. The refusal before a launch, the failed verdicts and their reasons are covered by tests with patched readings only.
+- A host with more than one GPU. That the card of `launch.gpu` is the one read is covered by tests with scripted readings only.
+- A backend that loads the model more than once in one job. The rule that judges every load is covered by a fixture log only; the measured run above loaded the model once.
 - The projection against a measured result for more than the one artifact above. The compute-buffer allowance and the cache estimate for sliding-window models are declared assumptions.
 - The repository's CI matrix (Ubuntu and Windows, Python 3.11, 3.12 and 3.13) before the pull request ran it.

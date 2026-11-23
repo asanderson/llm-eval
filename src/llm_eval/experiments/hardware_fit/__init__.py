@@ -72,8 +72,11 @@ def _measured(case, root):
         raise ValueError('hardware-fit does not measure platform ' + platform + ' in this version; supported: ' + ', '.join(sorted(FULL_GPU)))
     if harness != platform:
         raise ValueError('identity.harness must equal config.platform')
-    if not label.startswith(config['model_id'] + '-'):      # quantizations of one model must rank separately
-        raise ValueError('identity.model must be config.model_id followed by the quantization, for example qwen38-27b-q4_k_m')
+    prefix = config['model_id'] + '-'
+    if not label.startswith(prefix) or label == prefix:      # quantizations of one model must rank separately
+        raise ValueError('identity.model must be config.model_id followed by the quantization, for example qwen38-27b-ud-q4_k_xl')
+    if not isinstance(config.get('served_model'), str) or not config['served_model']:      # every launch and request names it
+        raise ValueError('served_model must name the model the backend serves')
     launch = config.get('launch', {})
     field, value = FULL_GPU[platform]
     if not isinstance(launch, dict) or type(launch.get(field)) is not type(value) or launch[field] != value:
@@ -98,9 +101,12 @@ def _measured(case, root):
         return 'unsupported_os_or_excluded_model'
     lock = config.get('artifact_lock')
     if not synthetic and isinstance(lock, str) and Path(lock).is_file():
-        # Weights alone above the VRAM budget cannot fit, whatever the cache and the buffers need.
         locked = read_json(lock)
         weight_bytes = integer(locked.get('weight_bytes') if isinstance(locked, dict) else None, 'artifact_lock weight_bytes', 1, 2 ** 63 - 1)
+        expected = prefix + str(locked.get('precision', '')).lower()      # a run must not be listed under another quantization
+        if label != expected:
+            raise ValueError('identity.model must be config.model_id followed by the precision of the artifact lock in lower case: ' + expected)
+        # Weights alone above the VRAM budget cannot fit, whatever the cache and the buffers need.
         if weight_bytes > hardware.limits(config, root)['gpu_budget_gib'] * GIB:
             return 'artifact_exceeds_gpu_vram_budget'
     return None
@@ -109,10 +115,15 @@ def _measured(case, root):
 def validate(case, root, mode='projection'):
     """Offline check of one case. Raises for an invalid configuration; returns a reason only for a combination that cannot
     run (unsupported OS, excluded or blocked model) or cannot fit (locked weights above the VRAM budget)."""
-    if mode == 'projection':
-        return _projection(case)
-    if mode == 'measured':
-        return _measured(case, Path(root))
+    try:
+        if mode == 'projection':
+            return _projection(case)
+        if mode == 'measured':
+            return _measured(case, Path(root))
+    except (TypeError, AttributeError, KeyError, OverflowError) as exc:
+        # A value of the wrong JSON type, a missing run-config key or a number beyond float range reaches a shared check
+        # that assumes the shape. The campaign commands report a ValueError as one line; these would end in a traceback.
+        raise ValueError('Invalid hardware-fit case: ' + type(exc).__name__ + ': ' + str(exc)) from None
     raise ValueError('Unsupported hardware-fit mode')
 
 

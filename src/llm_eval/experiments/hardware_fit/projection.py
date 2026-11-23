@@ -18,15 +18,16 @@ VERDICTS = ('fits', 'exceeds-vram', 'exceeds-ram', 'exceeds-disk', 'exceeds-cpu'
 CAVEAT = ('Projected from artifact byte sizes and a declared policy, not measured. The shortlist order (larger model first, '
           'then higher precision) is a planning heuristic, not a quality measurement.')
 
+LARGEST_GIB = 2 ** 20      # one pebibyte: above any machine, and small enough that the byte count stays a finite number
 # key: (default, lowest, highest, whole number). One planning assumption each; a case overrides any of them under `policy`.
 POLICY = {
     'kv_bytes_per_element': (2, 0.5, 4, False),                 # f16 key and value cache, the engines' default; 4 is f32
-    'compute_buffer_gib': (1.0, 0, float('inf'), False),        # allowance for the engine's compute and scratch buffers on the GPU
-    'gpu_baseline_gib': (0.0, 0, float('inf'), False),          # VRAM other programs hold, on top of the profile reserve
-    'host_ram_overhead_gib': (8.0, 0, float('inf'), False),     # RAM for the OS, the harness and the engine process
+    'compute_buffer_gib': (1.0, 0, LARGEST_GIB, False),         # allowance for the engine's compute and scratch buffers on the GPU
+    'gpu_baseline_gib': (0.0, 0, LARGEST_GIB, False),           # VRAM other programs hold, and the profile's nominal VRAM above what the card reports
+    'host_ram_overhead_gib': (8.0, 0, LARGEST_GIB, False),      # RAM for the OS, the harness and the engine process
     'host_ram_weight_fraction': (0.0, 0, 1, False),             # share of the weights a loader stages in RAM; 1.0 reads them all into RAM first
     'disk_copies': (2, 1, 16, True),                            # the artifact plus one harness import copy (Ollama imports a copy)
-    'disk_headroom_gib': (10.0, 0, float('inf'), False),        # free space that must remain after the copies
+    'disk_headroom_gib': (10.0, 0, LARGEST_GIB, False),         # free space that must remain after the copies
     'threads': (None, 1, 4096, True),                           # launch threads; unset is the launch default, min(16, profile threads)
     'min_bits_per_weight': (4.0, 0, 64, False),                 # lower quantizations are listed but never shortlisted; 0 disables the floor
     'shortlist': (10, 1, 1000, True),                           # number of ranked entries
@@ -55,10 +56,10 @@ def _repository(value, name):
 
 
 def _file(entry, owner):
-    """One artifact file: a path that stays inside the repository it is listed from, a byte size and its SHA-256."""
+    """One artifact file: a path that names a file inside the repository it is listed from, a byte size and its SHA-256."""
     fields(entry, FILE_KEYS, FILE_KEYS)
     path = entry['path']
-    if (not isinstance(path, str) or not path or '\\' in path or ':' in path or PurePosixPath(path).is_absolute()
+    if (not isinstance(path, str) or not PurePosixPath(path).name.strip() or '\\' in path or ':' in path or PurePosixPath(path).is_absolute()
             or '..' in PurePosixPath(path).parts or PurePosixPath(path).as_posix() != path):
         raise ValueError(owner + ' file path must be a relative POSIX path without ..')
     _count(entry['bytes'], owner + ' file bytes')
@@ -69,7 +70,7 @@ def _file(entry, owner):
 def load_candidates(path):
     """Read and check a candidate set: the frozen artifact sizes and architecture facts a projection is computed from."""
     data = fields(read_json(path), {*SET_KEYS, 'excluded', 'synthetic'}, SET_KEYS)
-    if data['schema_version'] != 1:
+    if type(data['schema_version']) is not int or data['schema_version'] != 1:      # true and 1.0 equal 1 in Python
         raise ValueError('Candidate set schema_version must be 1')
     identifier(data['id'])
     try:
@@ -107,7 +108,7 @@ def load_candidates(path):
         if name in candidates:
             raise ValueError('Duplicate candidate id: ' + name)
         candidates.add(name)
-        if candidate['model_id'] not in models:
+        if not isinstance(candidate['model_id'], str) or candidate['model_id'] not in models:
             raise ValueError('Candidate ' + name + ' names an undeclared model_id')
         _text(candidate['quantization'], 'Candidate ' + name + ' quantization')
         _count(candidate['weight_bytes'], 'Candidate ' + name + ' weight_bytes')
