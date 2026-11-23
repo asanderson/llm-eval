@@ -1,0 +1,48 @@
+{
+  "schema_version": 2,
+  "experiment_id": "hardware-fit",
+  "experiment_run_id": "fit-hardware-fit-1",
+  "publication_id": "campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1",
+  "campaign_id": "fit-wsl-measured2-qwen38-27b-ud-q4_k_xl",
+  "created_utc": "2026-11-23T12:06:32.733902+00:00",
+  "code_revision": "2695cba457664b269921edfcf5afa430e2222330",
+  "status": "complete",
+  "synthetic": false,
+  "coverage": [
+    {
+      "job_id": "fit-hardware-fit-1-aca7cd52ca80",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "fit-hardware-fit-1-4b1c74ff0cbf",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 2
+    }
+  ],
+  "raw_records": 842,
+  "removed_fields": [
+    "absolute_path_values",
+    "artifact_lock",
+    "artifact_root",
+    "backend_pid",
+    "endpoint",
+    "host",
+    "lock_root",
+    "offload_dir",
+    "python"
+  ],
+  "files": {
+    "diagrams/results/hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/latency.png": "0c3fed6751d2dff196401da3326266a10032f30a0c2797e59ae3b432e2aea0e7",
+    "docs/results/hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md": "0a6341f6f51d5cb0e47f11b9b7e3ad8f54b41c07957bc7fc47bd7155174dc3ab",
+    "docs/results/hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/benchmark-summary.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/results/hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/benchmark-summary.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "docs/results/hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/raw/measurements.jsonl.gz": "3688b35431bae258c497c140605c04458f18c335db90cee2b005c1ce623fac23",
+    "docs/results/hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/resolved-config.json": "58d976996af5620473232a3361b2b09e7b3d3fb008efd7962a3a16fa92a9fa98",
+    "docs/results/hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/summary.csv": "9a7984e3c7e042ce7cd6f7ac22248c88354ec3f72be0d3a3388802cd37f4c0e4",
+    "docs/results/hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/summary.json": "f9aa909ff81b83f45e4e81d3f9cb93c7b4278c10ac33cffd98a16e89f95d9025"
+  },
+  "report_fingerprint": "cdcd4af687d304356cf3fd331fc415106f5d290115cd04878e504204b6ccc368"
+}
