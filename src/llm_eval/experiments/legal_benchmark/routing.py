@@ -453,7 +453,7 @@ def export_suite(lock_path, path) -> str:
 
 
 def build_replay(task_suite, candidates, scored) -> dict:
-    """The replay manifest of the routing experiment: `suite_sha256`, `candidate_fingerprints` and one row per task and
+    """The replay manifest of the decision-models experiment: `suite_sha256`, `candidate_fingerprints` and one row per task and
     candidate that was scored, sorted by (task_id, candidate). A scored row without a valid output has quality 0.0."""
     if 'reference' in candidates:
         raise ValueError('The reference arm is not a routing candidate')
@@ -515,7 +515,7 @@ def _in_range(row):
 
 
 def verify_replay(manifest, provenance, task_suite, candidates, suite, attempts=None) -> None:
-    """Everything the routing experiment does not check: orphan rows, values out of range, stale scores, outcomes that do
+    """Everything the decision-models experiment does not check: orphan rows, values out of range, stale scores, outcomes that do
     not match the rows, candidates that are not the fixed generator and the originating attempts. With `attempts`, the
     manifest and the sidecar must equal a fresh build from those attempts' pinned outputs."""
     _check_provenance(provenance)
@@ -528,7 +528,7 @@ def verify_replay(manifest, provenance, task_suite, candidates, suite, attempts=
     for row in manifest['rows']:
         if row.get('task_id') not in tasks or row.get('candidate') not in candidates:
             raise ValueError('Orphan replay row')
-    corpus_index(manifest, task_suite)      # the routing experiment's own duplicate rule
+    corpus_index(manifest, task_suite)      # the decision-models experiment's own duplicate rule
     keys = [(o['task_id'], o['candidate']) for o in provenance['outcomes']]
     if len(set(keys)) != len(keys):
         raise ValueError('Duplicate replay outcome')

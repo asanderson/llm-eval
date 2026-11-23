@@ -4,7 +4,8 @@
   "rule": "A US model is one whose weights come only from organizations headquartered in the United States: the developer that released it and the developer of every base model it was fine-tuned, distilled or pruned from. A quantization or format conversion by a third party does not change a model's origin. A model without an entry, or an organization without a country, is not a US model.",
   "organizations": {
     "Alibaba (Qwen)": {"country": "CN", "headquarters": "Hangzhou, Zhejiang", "source": "https://en.wikipedia.org/wiki/Alibaba_Group"},
-    "Bespoke Labs": {"country": null, "note": "Not checked: its catalogued model is fine-tuned from a Qwen base, so it is not a US model whatever the developer's country."},
+    "AutoTrust": {"country": null, "note": "Not checked: its decision models are fine-tuned from Qwen bases, so they are not US models whatever the developer's country."},
+    "Bespoke Labs": {"country": "US", "headquarters": "Mountain View, California", "source": "https://bespokelabs.ai/", "note": "BespokeLabs.AI, Inc., as the organization data of its site states"},
     "Cloudflare": {"country": "US", "headquarters": "San Francisco, California", "source": "https://en.wikipedia.org/wiki/Cloudflare"},
     "DeepSeek": {"country": "CN", "headquarters": "Hangzhou, Zhejiang", "source": "https://en.wikipedia.org/wiki/DeepSeek"},
     "Google": {"country": "US", "headquarters": "Mountain View, California", "source": "https://en.wikipedia.org/wiki/Google"},
@@ -18,7 +19,7 @@
     "Perplexity": {"country": "US", "headquarters": "San Francisco, California", "source": "https://en.wikipedia.org/wiki/Perplexity_AI"},
     "Poolside": {"country": "US", "headquarters": "San Francisco, California", "source": "https://en.wikipedia.org/wiki/Poolside_AI", "note": "Founded in the United States in 2023; Sifted reported a move to Paris that year. Wikipedia names San Francisco on 2026-11-23."},
     "Thinking Machines Lab": {"country": "US", "headquarters": "San Francisco, California", "source": "https://en.wikipedia.org/wiki/Thinking_Machines_Lab"},
-    "Together AI": {"country": null, "note": "Not checked: its catalogued models are fine-tuned from a Qwen base, so they are not US models whatever the developer's country."},
+    "Together AI": {"country": "US", "headquarters": "United States", "source": "https://www.together.ai/terms-of-service", "note": "Together Computer, Inc., a Delaware corporation, as its terms of service state"},
     "xAI": {"country": "US", "headquarters": "Palo Alto, California", "source": "https://en.wikipedia.org/wiki/XAI_(company)"},
     "Z.ai": {"country": "CN", "headquarters": "Beijing", "source": "https://en.wikipedia.org/wiki/Zhipu_AI"}
   },
@@ -26,6 +27,8 @@
     "nemotron-nano-30b": {"developer": "NVIDIA", "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16"},
     "nemotron-super-49b": {"developer": "NVIDIA", "bases": ["Meta"], "source": "https://huggingface.co/nvidia/Llama-3_3-Nemotron-Super-49B-v1_5", "note": "Derived from Llama 3.3 70B Instruct"},
     "nemotron-super-120b": {"developer": "NVIDIA", "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4"},
+    "nemotron-super-vl-120b": {"developer": "NVIDIA", "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-BF16", "note": "Its vision encoder is NVIDIA's C-RADIO"},
+    "nemotron-super-vl-120b-nvfp4": {"developer": "NVIDIA", "bases": ["NVIDIA"], "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4", "note": "NVIDIA's NVFP4 quantization of nemotron-super-vl-120b"},
     "gpt-oss-120b": {"developer": "OpenAI", "source": "https://huggingface.co/openai/gpt-oss-120b"},
     "gpt-oss-safeguard-120b": {"developer": "OpenAI", "bases": ["OpenAI"], "source": "https://huggingface.co/openai/gpt-oss-safeguard-120b", "note": "Fine-tuned from gpt-oss-120b"},
     "gpt-oss-20b": {"developer": "OpenAI", "source": "https://huggingface.co/openai/gpt-oss-20b"},
@@ -60,7 +63,8 @@
     "clef": {"developer": "Cloudflare", "bases": ["Alibaba (Qwen)"], "source": "https://ollama.com/library/clef", "note": "Decision model fine-tuned from Qwen3.8-27B"},
     "clef-flash": {"developer": "Cloudflare", "bases": ["Alibaba (Qwen)"], "source": "https://ollama.com/library/clef-flash", "note": "Decision model fine-tuned from Qwen3.5-9B"},
     "d1": {"developer": "Liquid AI", "bases": ["Liquid AI"], "source": "https://ollama.com/library/d1", "note": "Decision model built on LFM2.5-VL-3B"},
-    "d1-omni": {"developer": "Liquid AI", "bases": ["Liquid AI"], "source": "https://ollama.com/library/d1-omni", "note": "Decision model built on LFM2.5-Encoder-350M"}
+    "d1-omni": {"developer": "Liquid AI", "bases": ["Liquid AI"], "source": "https://ollama.com/library/d1-omni", "note": "Decision model built on LFM2.5-Encoder-350M"},
+    "autotrust-jev": {"developer": "AutoTrust", "bases": ["Alibaba (Qwen)"], "source": "https://huggingface.co/autotrust/AutoTrust-Decider-Mini-9B", "note": "Decision models fine-tuned from Qwen3.5-9B, Qwen3.8-27B and Qwen3.5-35B-A3B"}
   },
   "aliases": {
     "qwen38-27b-ud-q4_k_xl": "qwen38-27b",
@@ -75,6 +79,7 @@
     "llm-eval-clef:locked": "clef",
     "llm-eval-clef-flash:locked": "clef-flash",
     "llm-eval-d1:locked": "d1",
-    "llm-eval-d1-omni:locked": "d1-omni"
+    "llm-eval-d1-omni:locked": "d1-omni",
+    "llm-eval-autotrust-jev:locked": "autotrust-jev"
   }
 }

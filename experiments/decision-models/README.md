@@ -1,6 +1,6 @@
 # Decision models experiment
 
-This experiment measures decision models: models that answer typed questions about a text (a choice from a list, a yes/no probability or a score on a rubric) with a probability for every allowed answer, instead of generating text. It measures their decision accuracy and latency, and, when a decision routes a request, the quality, latency and API cost of the selected generator. Version 1 supports `decision`, `replay` and `live` modes. It uses one active request per job and can participate in campaigns spanning multiple hardware configurations.
+This experiment measures decision models: models that answer typed questions about a text (a choice from a list, a yes/no probability or a score on a rubric) with a probability for every allowed answer, instead of generating text. The harness asks one choice question per task, over named criteria, and scores the choice; yes/no and score questions are not asked yet. It measures decision accuracy and latency, and, when a decision routes a request, the quality, latency and API cost of the selected generator. Version 1 supports `decision`, `replay` and `live` modes. It uses one active request per job and can participate in campaigns spanning multiple hardware configurations.
 
 Its id is `decision-models`; until 2026-11-23 it was `llm-routing`. Campaigns planned and results published under the former id keep it: their reports and published results resolve to this experiment, and the [results index](../../docs/results/README.md) lists them under the new id. A new campaign must name `decision-models`; the planner refuses the former id.
 
@@ -26,8 +26,8 @@ Each case below is a template for one decision model of the Ollama library. Prep
 | [ollama-clef-flash](cases/ollama-clef-flash.json) | `clef-flash` (9B) | Cloudflare | Qwen3.5-9B | no | none |
 | [ollama-d1](cases/ollama-d1.json) | `d1` (3B) | Liquid AI | LFM2.5-VL-3B | yes | none |
 | [ollama-d1-omni](cases/ollama-d1-omni.json) | `d1-omni` (600M) | Liquid AI | LFM2.5-Encoder-350M | yes | none |
-| [ollama-autotrust-jev](cases/ollama-autotrust-jev.json) | `autotrust-jev` | AutoTrust | not stated | not recorded | none |
-| [ollama-laya](cases/ollama-laya.json) | `laya` (421M) | Convai Innovations | ModernBERT-large | not recorded | none |
+| [ollama-autotrust-jev](cases/ollama-autotrust-jev.json) | `autotrust-jev` (9B) | AutoTrust | Qwen3.5-9B | no | none |
+| [ollama-laya](cases/ollama-laya.json) | `laya` (421M) | Convai Innovations | ModernBERT-large | not recorded | none; Ollama 0.40.0 or later |
 
 `strands-decider` (Strands Agents) has no template: it runs only with MLX on Apple silicon. LM Studio's catalog lists no decision model, and the other platforms here have no SystemOne endpoint, so every decision model runs on Ollama.
 

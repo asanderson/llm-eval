@@ -1617,7 +1617,7 @@ Declared for hardware configuration `raider-ubuntu`, [run of 2026-11-08 01:38](l
 | legal-benchmark | 2026-11-18T06:48:54.008458+00:00 | complete | model-run | [Report](legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/README.md) |
 | legal-benchmark | 2026-11-18T06:48:54.008458+00:00 | complete | model-run | [Report](legal-benchmark/campaign-20261118T064854Z-6746b621-generation-legal-benchmark-1/README.md) |
 | legal-benchmark | 2026-11-18T06:48:54.008458+00:00 | complete | fixture | [Report](legal-benchmark/campaign-20261118T064854Z-6746b621-retrieval-legal-benchmark-1/README.md) |
-| llm-routing | 2026-11-18T05:10:19.056084+00:00 | complete | False | [Report](llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
+| decision-models | 2026-11-18T05:10:19.056084+00:00 | complete | False | [Report](llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
 | model-offloading | 2026-11-18T05:04:51.044818+00:00 | incomplete | False | [Report](model-offloading/campaign-20261118T050451Z-60d1fe39-offload-model-offloading-1/README.md) |
 | model-offloading | 2026-11-18T01:48:08.266672+00:00 | incomplete | False | [Report](model-offloading/campaign-20261118T014808Z-cc8eec8c-offload-model-offloading-1/README.md) |
 | model-offloading | 2026-11-17T22:09:44.960621+00:00 | complete | False | [Report](model-offloading/campaign-20261117T220944Z-fb65881a-offload-model-offloading-1/README.md) |
@@ -1656,7 +1656,7 @@ Declared for hardware configuration `raider-ubuntu`, [run of 2026-11-08 01:38](l
 | legal-benchmark | 2026-11-15T13:37:29.207211+00:00 | complete | model-run | [Report](legal-benchmark/campaign-20261115T133729Z-ff84f63f-workflow-legal-benchmark-1/README.md) |
 | legal-benchmark | 2026-11-15T13:37:29.207211+00:00 | complete | model-run | [Report](legal-benchmark/campaign-20261115T133729Z-ff84f63f-generation-legal-benchmark-1/README.md) |
 | legal-benchmark | 2026-11-15T13:37:29.207211+00:00 | complete | fixture | [Report](legal-benchmark/campaign-20261115T133729Z-ff84f63f-retrieval-legal-benchmark-1/README.md) |
-| llm-routing | 2026-11-15T13:04:20.975155+00:00 | complete | False | [Report](llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md) |
+| decision-models | 2026-11-15T13:04:20.975155+00:00 | complete | False | [Report](llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md) |
 | model-offloading | 2026-11-11T11:02:34.257275+00:00 | incomplete | False | [Report](model-offloading/campaign-20261111T110234Z-68c0f219-offload-model-offloading-1/README.md) |
 | model-offloading | 2026-11-10T19:41:47.897604+00:00 | incomplete | False | [Report](model-offloading/campaign-20261110T194147Z-d3ca2090-offload-model-offloading-1/README.md) |
 | model-offloading | 2026-11-10T14:26:45.241321+00:00 | complete | False | [Report](model-offloading/campaign-20261110T142645Z-46f987f0-offload-model-offloading-1/README.md) |
@@ -1677,8 +1677,8 @@ Declared for hardware configuration `raider-ubuntu`, [run of 2026-11-08 01:38](l
 | model-offloading | 2026-11-09T11:12:25.555879+00:00 | complete | False | [Report](model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md) |
 | model-offloading | 2026-11-08T14:06:51.610167+00:00 | complete | False | [Report](model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/README.md) |
 | model-offloading | 2026-11-08T03:57:38.117849+00:00 | complete | False | [Report](model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/README.md) |
-| llm-routing | 2026-11-08T03:57:38.117849+00:00 | complete | False | [Report](llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
+| decision-models | 2026-11-08T03:57:38.117849+00:00 | complete | False | [Report](llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
 | model-offloading | 2026-11-08T03:53:31.395544+00:00 | incomplete | False | [Report](model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/README.md) |
-| llm-routing | 2026-11-08T01:38:14.202071+00:00 | complete | True | [Report](llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md) |
+| decision-models | 2026-11-08T01:38:14.202071+00:00 | complete | True | [Report](llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md) |
 
 <!-- results-list:end -->

@@ -593,7 +593,10 @@ class RenamedExperimentAndUsModelTests(unittest.TestCase):
         self.assertTrue((index / 'experiment/decision-models.md').is_file())
         self.assertFalse((index / 'experiment/llm-routing.md').exists())
         self.assertTrue((index / 'recommended/raider-windows/decision-models.md').is_file())
-        self.assertIn('**[decision-models](index/experiment/decision-models.md) on', (self.root / 'docs/results/README.md').read_text(encoding='utf-8'))
+        text = (self.root / 'docs/results/README.md').read_text(encoding='utf-8')
+        self.assertIn('**[decision-models](index/experiment/decision-models.md) on', text)
+        listed = next(line for line in text.splitlines() if '[Report](llm-routing/campaign-l-routing/README.md)' in line)
+        self.assertTrue(listed.startswith('| decision-models | 2026-11-19T00:00:00+00:00 |'), listed)      # the link keeps its path
 
     def test_us_models_are_ranked_alone_with_their_lineage(self):
         records = collect(self.root)
@@ -665,6 +668,8 @@ class ModelOriginsCatalogTests(unittest.TestCase):
         for alias, model in data['aliases'].items():
             self.assertIn(model, data['models'])
             self.assertNotIn(alias, data['models'])
+        catalogued = {m['id'] for m in json.loads((root / 'catalog/models.json').read_text(encoding='utf-8'))['models']}
+        self.assertEqual(sorted(catalogued - set(data['models'])), [])      # every catalogued model has an origin
         known = origins(root)
         self.assertEqual([m for m in ('nemotron-nano-30b', 'gemma4-26b-moe', 'phi4-reasoning-plus', 'nemotron-super-49b') if not known[m]['us']], [])
         self.assertEqual([m for m in ('deepseek-r1-70b', 'qwen38-27b-ud-q4_k_xl', 'llm-eval-nimble:locked', 'mistral-small31') if known[m]['us']], [])

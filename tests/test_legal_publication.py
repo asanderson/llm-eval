@@ -1550,7 +1550,7 @@ class ContentTests(Base):
         write_json(replay, {'suite_sha256': '0' * 64, 'candidate_fingerprints': {},
                             'rows': [{'task_id': 'f1-ledger-a', 'candidate': 'no-context', 'quality': 1.0, 'latency_s': 1.0, 'cost_usd': 0}]})
         self.assertTrue(lr._legal_file(replay, lr._markers()))
-        # The routing experiment's own bundle publishes as before.
+        # The decision-models experiment's own bundle publishes as before.
         report = self.routing_bundle(str(ROOT / 'experiments/decision-models/workloads/decisions.json'), name='own')
         self.assertTrue(publish_report(report, ROOT, dry_run=True)['dry_run'])
 

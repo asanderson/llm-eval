@@ -18,7 +18,7 @@ from .telemetry import Sampler, host_snapshot
 
 def validate_config(c, root, synthetic=False):
     if c.get("network", {}).get("kind", "local") != "local":
-        raise ValueError("Hosted endpoints belong in the routing experiment")
+        raise ValueError("Hosted endpoints belong in the decision-models experiment")
     if any(k.lower() in {"api_key", "token", "password", "secret"} for k in c):
         raise ValueError("Do not put credentials in run files; use api_key_env")
     engines = {p["id"]: p for p in read_json(root / "catalog/platforms.json")["platforms"]}

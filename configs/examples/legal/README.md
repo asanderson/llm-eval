@@ -40,7 +40,7 @@ Every campaign file has `"publish": {"mode": "none"}`.
    python -m llm_eval.experiments.legal_benchmark.routing verify --suite SUITE_LOCK --replay PRIVATE_DIR/replay.json --routing-suite PRIVATE_DIR/routing-suite.json --candidates PRIVATE_DIR/candidates.json --attempt ATTEMPT_DIR
    ```
 
-   `verify` takes the same `--attempt` directories and rebuilds the manifest from their pinned outputs. Run `routing verify` before any replay campaign: the routing experiment itself checks only the suite hash, the candidate fingerprints and duplicates, and would accept a manifest built before a rubric or scorer change. Then fill `routing-replay-case.json` and plan `routing-replay-campaign.json`.
+   `verify` takes the same `--attempt` directories and rebuilds the manifest from their pinned outputs. Run `routing verify` before any replay campaign: the `decision-models` experiment itself checks only the suite hash, the candidate fingerprints and duplicates, and would accept a manifest built before a rubric or scorer change. Then fill `routing-replay-case.json` and plan `routing-replay-campaign.json`.
 
 A selector threshold also needs a calibration: run a routed attempt (no threshold) and an attempt of its fallback arm on `original-packets`, `routing calibrate` them, and name the record, the suite and both output manifests in the case's `selector.calibration` block (`calibration_file`, `suite`, `routed.output_manifest`, `fallback.output_manifest`); planning re-derives the record from those attempts.
 
