@@ -4,11 +4,11 @@ Review of 2026-11-23. Until this review, candidates reached the experiments two 
 
 Nothing here is measured. Weight sizes are the catalog's planning arithmetic on the parameter count that Hugging Face publishes (GiB = 2^30 bytes, weights only, about 4.9 bits per weight for Q4_K_M and 8.5 for Q8_0), compared with the MSI Raider's 24 GiB of VRAM and 63.4 GiB of RAM (51 GiB in the WSL2 guest); KV cache, activations and loader peaks come on top. A US model is one whose developer and base models are all from organizations headquartered in the United States ([model origins](MODELS.md#model-origins)). A candidate still needs the catalog's review before it runs: license file, a pinned artifact, engine support and measured fit ([what the status means](MODELS.md#what-the-status-means)).
 
-**Since the review (2026-11-24).** Inkling 2 Mini and Muse Glimmer 30B are in the [catalog](MODELS.md) as `inkling2-mini-26b` and `muse-glimmer-30b`, so that they can be measured, and their publishers' organizations (`thinkingmachines`, `meta-models`) are on the discovery allowlist. The text below is the review as written on 2026-11-23.
+**Since the review (2026-11-24).** Inkling 2 Mini and Muse Glimmer 30B are in the [catalog](MODELS.md) as `inkling2-mini-26b` and `muse-glimmer-30b`, so that they can be measured, and their publishers' organizations (`thinkingmachines`, `meta-models`) are on the discovery allowlist. The catalog counts the language model of Muse Glimmer alone (27.9B parameters, 27.61 GiB at Q8_0): its GGUF files leave out the 1.9B perception encoder, which the 29.8B of the tables below includes. Two decision models turned out not to run on the Raider: Ollama publishes `pplx-decider-flash` and `autotrust-jev` for its MLX runner only, like `strands-decider`, and `ollama pull` refuses both on Linux ([decision models](#decision-models)). Their case templates were removed. Apart from those two rows and the two sentences that counted the templates, the text below is the review as written on 2026-11-23.
 
 ## Why these models were missing
 
-**Only two decision models.** The decision-models experiment (then `llm-routing`) was written on 2026-10-08 from Ollama's [launch post](https://ollama.com/blog/ollama-now-supports-jev-style-decision-models), which named three models: `nimble` (9B, Bespoke Labs), `tev1` (4B, Together AI) and `tev1:0.8b`. Case templates were written for `nimble` and `tev1` only, and no source the repository reads lists decision models since: LiveBench does not score them, so the nightly discovery never raises one. On 2026-11-23 Ollama's library lists twelve official decision models ([table below](#decision-models)); every one is now a case template except `strands-decider`, which runs only with MLX on Apple silicon.
+**Only two decision models.** The decision-models experiment (then `llm-routing`) was written on 2026-10-08 from Ollama's [launch post](https://ollama.com/blog/ollama-now-supports-jev-style-decision-models), which named three models: `nimble` (9B, Bespoke Labs), `tev1` (4B, Together AI) and `tev1:0.8b`. Case templates were written for `nimble` and `tev1` only, and no source the repository reads lists decision models since: LiveBench does not score them, so the nightly discovery never raises one. On 2026-11-23 Ollama's library lists twelve official decision models ([table below](#decision-models)); nine have case templates (`tev1` one for each of its two sizes). The other three (`strands-decider`, `pplx-decider-flash` and `autotrust-jev`) run only with MLX on Apple silicon.
 
 **Mistral.** The catalog has one Mistral AI model, Mistral Small 3.1 24B, added from the LiveBench review as a bf16 capacity test. It was measured on every harness on Windows and in WSL2 and passes 6 of 27 checks at 2.2 to 2.9 output tokens per second, so it never reaches a top-five table. Newer Mistral releases did not enter the catalog: the nightly discovery raises only models that LiveBench scores and matches them by name, which date-coded Mistral ids escape (they are listed for a manual look instead), and Mistral Large 4 (1T parameters, 52B active) was rejected as too large on 2026-11-10. Mistral AI is headquartered in Paris, so no Mistral model is a US model.
 
@@ -62,12 +62,12 @@ Official decision models of the Ollama library on 2026-11-23. The harness serves
 | `tev1` | Together AI | Qwen3.5 | 4B, 0.8B | not stated on its page | no | 4B measured on Windows and WSL2 (6 of 6); 0.8B not yet |
 | `nimble-v3` | Bespoke Labs | Qwen3.5-9B | 9B | CC BY-NC 4.0, noncommercial use only | no | Ollama 0.40.4 or later |
 | `pplx-decider` | Perplexity | Qwen3.8-27B | 27B | Apache 2.0 | no | Text, JSON and images |
-| `pplx-decider-flash` | Perplexity | Qwen3.5-4B | 4B | Apache 2.0 | no | Distilled from `pplx-decider` |
+| `pplx-decider-flash` | Perplexity | Qwen3.5-4B | 4B | Apache 2.0 | no | Distilled from `pplx-decider`. MLX on Apple silicon only (all five tags on 2026-11-24): not runnable on the Raider, so no template |
 | `clef` | Cloudflare | Qwen3.8-27B | 27B | Apache 2.0 | no | Also served from Ollama's cloud (`clef:cloud`) |
 | `clef-flash` | Cloudflare | Qwen3.5-9B | 9B | Apache 2.0 | no | |
 | `d1` | Liquid AI | LFM2.5-VL-3B (3B tag) | 3B, 2B | LFM Open License v1.0 | yes | With `d1-omni`, the only US decision models in the library; the page does not name the base of the 2B tag |
 | `d1-omni` | Liquid AI | LFM2.5-Encoder-350M (600M tag) | 600M, 2B | LFM Open License v1.0 | yes | Images and short English speech too; the page does not name the base of the 2B tag |
-| `autotrust-jev` | AutoTrust | Qwen3.5-9B, Qwen3.8-27B, Qwen3.5-35B-A3B | 9B, 27B-VL, 35B | Apache 2.0 | no | Bases from the Hugging Face cards of AutoTrust's decider models |
+| `autotrust-jev` | AutoTrust | Qwen3.5-9B, Qwen3.8-27B, Qwen3.5-35B-A3B | 9B, 27B-VL, 35B | Apache 2.0 | no | Bases from the Hugging Face cards of AutoTrust's decider models. MLX on Apple silicon only (all eleven tags on 2026-11-24): not runnable on the Raider, so no template |
 | `laya` | Convai Innovations | ModernBERT-large (421M), mmBERT-base (322M multilingual) | 421M; 322M multilingual | Apache 2.0 | not recorded | Ollama 0.40.0 or later; an encoder with no text generation |
 | `strands-decider` | Strands Agents | Qwen3.5-2B-Base | 2B | Apache 2.0 | no | MLX on Apple silicon only: not runnable on the Raider, so no template |
 
@@ -90,7 +90,7 @@ The legal models experiment serves its roles with models from the same catalog; 
 
 ## Repeating the review
 
-1. Ollama: the [decision search](https://ollama.com/search?q=decision) and the [newest library models](https://ollama.com/library?sort=newest); each model page names its developer, base model, sizes and minimum Ollama version.
+1. Ollama: the [decision search](https://ollama.com/search?q=decision) and the [newest library models](https://ollama.com/library?sort=newest); each model page names its developer, base model, sizes and minimum Ollama version, and its tags page marks the tags that need MLX (a model with no other tag does not run on the Raider).
 2. Hugging Face: `https://huggingface.co/api/models?author=ORG&sort=createdAt&direction=-1` for each publisher, and `https://huggingface.co/api/models/REPO` for the parameter count (`safetensors.total`), license and base model (`cardData.base_model`) of a candidate.
 3. LM Studio: the [model catalog](https://lmstudio.ai/models), local and cloud entries.
 4. Record each decision as the [catalog](MODELS.md) does, and each new model's origin in [`catalog/model-origins.json`](../catalog/model-origins.json).
