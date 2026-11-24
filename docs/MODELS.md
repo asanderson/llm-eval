@@ -44,6 +44,7 @@ The target precision is part of the recommendation. Q4 versions of many 27–35B
 | 1 | [meta-llama/Llama-3.3-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct) | GGUF Q4_K_M | 39.12 | candidate | Primary broadly supported dense offload anchor; compare same GGUF bytes across the four GGUF-oriented runtimes. |
 | 2 | [meta-llama/Llama-3.1-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct) | GGUF Q4_K_M | 39.12 | candidate | Earlier checkpoint for quality/performance regression. Dense CPU work will be bandwidth-sensitive. |
 | 3 | [meta-llama/Meta-Llama-3-70B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-70B-Instruct) | GGUF Q4_K_M | 39.12 | candidate | Older control with 8K native context: cap total prompt plus output at 8192, and do not run 16K/32K sweeps. |
+| 4 | [meta-models/Muse-Glimmer-30B](https://huggingface.co/meta-models/Muse-Glimmer-30B) | GGUF Q8_0 | 29.49 | candidate | Dense 30B agent model with a perception encoder; text-only here. Q8_0 exceeds VRAM by a small margin. The publisher's own 4-bit KQuant GGUF files fit in VRAM and are hardware-fit candidates. Found by the candidate review of 2026-11-23, not by LiveBench discovery: it is published under meta-models, not meta-llama. |
 
 ## Laguna (Poolside)
 
@@ -69,6 +70,12 @@ The target precision is part of the recommendation. Q4 versions of many 27–35B
 | 2 | [Qwen/Qwen3.5-35B-A3B](https://huggingface.co/Qwen/Qwen3.5-35B-A3B) | GGUF Q8_0 | 34.63 | candidate | Strong architectural fit hypothesis for sparse CPU/GPU split; low-bit variants are useful in-VRAM controls, not qualifying offload runs. |
 | 3 | [Qwen/Qwen3.5-122B-A10B](https://huggingface.co/Qwen/Qwen3.5-122B-A10B) | GGUF Q4_K_M | 68.17 | conditional | High-memory tier. Require host memory <=52GiB in native profiles and avoid duplicate weights or dequantization. Start at 4K context. |
 | Strata reference | [Qwen/Qwen3.8-Flash-Next](https://huggingface.co/Qwen/Qwen3.8-Flash-Next) | Strata IQ2_XS; exact GSQ/RCO conversion recorded separately | conversion-specific | conditional | Additional Strata reference, not an invented fourth top-three slot. Reviewed Strata documents ~35.5GB expert RAM for IQ2_XS, GPU dense/cache allocations and SSD lookup table. Full original checkpoint is much larger; count all files and conversion steps. PLE SSD lookup is intrinsic and must be recorded. |
+
+## Thinking Machines Lab
+
+| Priority | Model / primary evidence | Initial precision | Planning weights GiB | Status | Why evaluate / limitation |
+|---|---|---|---:|---|---|
+| 1 | [thinkingmachines/Inkling-2-Mini](https://huggingface.co/thinkingmachines/Inkling-2-Mini) | GGUF Q8_0 | 26.12 | candidate | Looped mixture-of-experts transformer: 12 of its 24 layers run three passes per token (3.4B parameters active per pass, 5.4B effective per token by the model card). Q8_0 exceeds VRAM by a small margin; 4-bit GGUF files fit in VRAM and are hardware-fit candidates. Engine support is new: KoboldCpp 1.125.1 and Ollama 0.40.17 are the first pinned versions that load it, and the KoboldCpp release notes say to use the ggml-org GGUF files. The official checkpoint is distributed in mixed NVFP4 and MXFP8 precisions (about 20 GB). Found by the candidate review of 2026-11-23. |
 
 ## What the status means
 
@@ -113,6 +120,7 @@ Record the origin of every model added to the catalog or measured under a new id
 | `llama33-70b` | Llama 3.3 Community License | `6f6073b423013f6a7d4d9f39144961bfbfbc386b` |
 | `llama31-70b` | Llama 3.1 Community License | `1605565b47bb9346c5515c34102e054115b4f98b` |
 | `llama3-70b` | Llama 3 Community License | `50fd307e57011801c7833c87efa1984ddf2db42f` |
+| `muse-glimmer-30b` | Apache-2.0 (LICENSE and USAGE_POLICY.md in the repository) | `1297fd7dfeac4598948a5d15886968435c81c2b7` |
 | `laguna-xs21` | OpenMDW-1.1 | `c5f36269bbdbd3f27fddc9a9f9dbae0cf2cf57db` |
 | `laguna-xs2` | Apache-2.0 | `a397bde04501591d0ac3d74a5d9d0a4ec298ffb8` |
 | `laguna-s21` | OpenMDW-1.1 | `0f573140834b11cfac0c2af97a101a7a69a13e22` |
@@ -123,6 +131,7 @@ Record the origin of every model added to the catalog or measured under a new id
 | `qwen35-35b-moe` | Apache-2.0 | `59d61f3ce65a6d9863b86d2e96597125219dc754` |
 | `qwen35-122b-moe` | Apache-2.0 | `dc4d348443bc740c68e2d77492492c11606384d5` |
 | `qwen38-flash-next-strata` | Apache-2.0 (verify quantization artifact terms) | `de4b8e4d43b917e7706784d8bb445c9af86a3540` |
+| `inkling2-mini-26b` | Apache-2.0 (no LICENSE file at the revision; the card links the publisher's Model Acceptable Use Policy) | `7a67ae2314b44ef05c87fd1d4d311c58aaeb18f6` |
 
 Repository IDs and metadata revisions were resolved through the official publishers' public Hugging Face API. They identify source-model snapshots, **not a chosen community GGUF**. Quantized artifact paths/revisions remain unfilled in `catalog/models.json`; the artifact selected for each measured model is pinned separately, in `catalog/model-artifacts.json` ([Artifact pins](#artifact-pins)). Do not manufacture filenames or assume a precision exists on every backend.
 
@@ -191,6 +200,6 @@ A model that returns tokens is not automatically a successful candidate: report 
 
 ## LiveBench-informed additions
 
-Five additional entries from DeepSeek, Z.AI, Mistral AI and Microsoft bring the catalog to 29; the two Nemotron 3.5 Super VL entries accepted from the 2026-10-25 LiveBench 2.0 discovery issue bring it to 31. See the [recommendation table and release-specific evidence](LIVEBENCH.md#additional-providers-and-models) for DeepSeek R1 Distill 32B Q8 / 70B Q4, Mistral Small 3.1 BF16, Phi-4 Reasoning Plus BF16 and conditional GLM-4.5-Air Q4. The BF16 selections are precision/capacity tests; their smaller quantizations are controls. The historical published scores guide candidate selection and are not local measurements or comparable across releases. All five remain blocked on the currently audited Strata reference lane.
+Five additional entries from DeepSeek, Z.AI, Mistral AI and Microsoft bring the catalog to 29; the two Nemotron 3.5 Super VL entries accepted from the 2026-10-25 LiveBench 2.0 discovery issue bring it to 31; Muse Glimmer 30B and Inkling 2 Mini, added on 2026-11-24 from the [candidate review](MODEL_CANDIDATES.md) to be measured in hardware fit, bring it to 33. See the [recommendation table and release-specific evidence](LIVEBENCH.md#additional-providers-and-models) for DeepSeek R1 Distill 32B Q8 / 70B Q4, Mistral Small 3.1 BF16, Phi-4 Reasoning Plus BF16 and conditional GLM-4.5-Air Q4. The BF16 selections are precision/capacity tests; their smaller quantizations are controls. The historical published scores guide candidate selection and are not local measurements or comparable across releases. All five remain blocked on the currently audited Strata reference lane.
 
 New candidates are raised by the [model discovery](MODEL_DISCOVERY.md) issue; adding one still needs review of its license file, a real artifact, engine architecture support and measured fit. The `LiveBench/new-livebench` GitHub links in the evidence files are no longer reachable; the recorded tables are verified byte for byte (sha256) on `livebench.ai/v1/` instead.
