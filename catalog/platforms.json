@@ -177,6 +177,7 @@
         "llama33-70b",
         "llama31-70b",
         "llama3-70b",
+        "muse-glimmer-30b",
         "laguna-xs21",
         "laguna-xs2",
         "laguna-s21",
@@ -190,7 +191,8 @@
         "deepseek-r1-70b",
         "glm45-air",
         "mistral-small31",
-        "phi4-reasoning-plus"
+        "phi4-reasoning-plus",
+        "inkling2-mini-26b"
       ]
     },
     {

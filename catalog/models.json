@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_on": "2026-11-08",
+  "checked_on": "2026-11-24",
   "scope": "Prioritized hypotheses, not measured performance or guaranteed compatibility",
   "size_note": "Planning bits include rough quant overhead; raw bounds exclude KV, activations, staging, duplicated tensors and loader peaks. Exact locked artifact size decides >VRAM eligibility.",
   "provider_gaps": {
@@ -620,6 +620,44 @@
         }
       },
       "planning_weight_gib": 39.12
+    },
+    {
+      "id": "muse-glimmer-30b",
+      "provider": "Meta",
+      "rank": 4,
+      "upstream_repo": "meta-models/Muse-Glimmer-30B",
+      "parameters_b": 29.8,
+      "active_parameters_b": 29.8,
+      "target_precision": "GGUF Q8_0",
+      "planning_bits": 8.5,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "Apache-2.0 (LICENSE and USAGE_POLICY.md in the repository)",
+      "license_class": "permissive",
+      "rationale": "Dense 30B agent model with a perception encoder; text-only here. Q8_0 exceeds VRAM by a small margin. The publisher's own 4-bit KQuant GGUF files fit in VRAM and are hardware-fit candidates. Found by the candidate review of 2026-11-23, not by LiveBench discovery: it is published under meta-models, not meta-llama.",
+      "sources": [
+        "https://huggingface.co/meta-models/Muse-Glimmer-30B"
+      ],
+      "source_revision": "1297fd7dfeac4598948a5d15886968435c81c2b7",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-11-24",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "meta-models/Muse-Glimmer-30B",
+        "sha": "1297fd7dfeac4598948a5d15886968435c81c2b7",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "BF16": 29776626688
+          },
+          "total": 29776626688
+        }
+      },
+      "planning_weight_gib": 29.49
     },
     {
       "id": "laguna-xs21",
@@ -1295,6 +1333,47 @@
         "source_sha256": "251eb7461da69232733b80d1e63f00a9db5b921d90c966d139ce0e2851c762d9",
         "meaning": "Published source-model reference; not a local, quantized, or cross-release-comparable score."
       }
+    },
+    {
+      "id": "inkling2-mini-26b",
+      "provider": "Thinking Machines Lab",
+      "rank": 1,
+      "upstream_repo": "thinkingmachines/Inkling-2-Mini",
+      "parameters_b": 26.4,
+      "active_parameters_b": 5.4,
+      "target_precision": "GGUF Q8_0",
+      "planning_bits": 8.5,
+      "status": "candidate",
+      "lane": "offload",
+      "task_family": "general",
+      "license": "Apache-2.0 (no LICENSE file at the revision; the card links the publisher's Model Acceptable Use Policy)",
+      "license_class": "permissive",
+      "rationale": "Looped mixture-of-experts transformer: 12 of its 24 layers run three passes per token (3.4B parameters active per pass, 5.4B effective per token by the model card). Q8_0 exceeds VRAM by a small margin; 4-bit GGUF files fit in VRAM and are hardware-fit candidates. Engine support is new: KoboldCpp 1.125.1 and Ollama 0.40.17 are the first pinned versions that load it, and the KoboldCpp release notes say to use the ggml-org GGUF files. The official checkpoint is distributed in mixed NVFP4 and MXFP8 precisions (about 20 GB). Found by the candidate review of 2026-11-23.",
+      "sources": [
+        "https://huggingface.co/thinkingmachines/Inkling-2-Mini"
+      ],
+      "source_revision": "7a67ae2314b44ef05c87fd1d4d311c58aaeb18f6",
+      "artifact_revision": null,
+      "artifact_status": "selection_and_hashing_required",
+      "hardware_validation": "not_measured",
+      "checked_on": "2026-11-24",
+      "max_context_for_initial_plan": 32768,
+      "default_context_tokens": 8192,
+      "upstream_metadata": {
+        "id": "thinkingmachines/Inkling-2-Mini",
+        "sha": "7a67ae2314b44ef05c87fd1d4d311c58aaeb18f6",
+        "gated": false,
+        "safetensors": {
+          "parameters": {
+            "F32": 247848,
+            "BF16": 1927217664,
+            "F8_E4M3": 4076863488,
+            "U8": 20384317440
+          },
+          "total": 26388646440
+        }
+      },
+      "planning_weight_gib": 26.12
     }
   ]
 }

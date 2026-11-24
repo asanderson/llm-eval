@@ -8,7 +8,7 @@
     {"prefixes": ["mistral-", "magistral-", "devstral-", "ministral-", "codestral-", "mixtral-"], "hf_orgs": ["mistralai"]},
     {"prefixes": ["phi-"], "hf_orgs": ["microsoft"]},
     {"prefixes": ["gemma-"], "hf_orgs": ["google"]},
-    {"prefixes": ["llama-", "meta-llama-"], "hf_orgs": ["meta-llama"]},
+    {"prefixes": ["llama-", "meta-llama-", "muse-"], "hf_orgs": ["meta-llama", "meta-models"]},
     {"prefixes": ["nemotron-", "nvidia-", "llama-3.1-nemotron-", "llama-3.3-nemotron-"], "hf_orgs": ["nvidia"]},
     {"prefixes": ["gpt-oss-"], "hf_orgs": ["openai"]},
     {"prefixes": ["kimi-"], "hf_orgs": ["moonshotai"]},
@@ -23,7 +23,8 @@
     {"prefixes": ["step-"], "hf_orgs": ["stepfun-ai"]},
     {"prefixes": ["ling-", "ring-"], "hf_orgs": ["inclusionAI"]},
     {"prefixes": ["longcat-"], "hf_orgs": ["meituan-longcat"]},
-    {"prefixes": ["command-", "aya-"], "hf_orgs": ["CohereLabs"]}
+    {"prefixes": ["command-", "aya-"], "hf_orgs": ["CohereLabs"]},
+    {"prefixes": ["inkling-"], "hf_orgs": ["thinkingmachines"]}
   ],
   "decisions": [
     {"key": "lb:claude*", "decision": "not_open_weight", "reason": "Anthropic Claude: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"},

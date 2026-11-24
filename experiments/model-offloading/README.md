@@ -12,7 +12,7 @@ Ten platforms: **[llama.cpp][llama-cpp], [ik_llama.cpp][ik-llama], [KTransformer
 
 Three environments: **[native Ubuntu 26.04][ubuntu-download]**, **[native Windows 11 Pro][windows-download]**, and **[Windows 11 Pro][windows-download] + [WSL2][wsl-install] + [Ubuntu 26.04][ubuntu-download]**. Native Windows means no WSL, Linux container, or compatibility layer. WSL measurements remain a separate environment even though their user space is Ubuntu.
 
-The [model catalog](../../catalog/models.json) has **29 entries**: the original 24 selections/reference exclusions plus five [LiveBench-informed additions](../../docs/LIVEBENCH.md#additional-providers-and-models) from DeepSeek, Z.AI, Mistral AI, and Microsoft. It deliberately does not invent three qualifying releases for every provider. Downloadable weights do not automatically have an OSI-style software license; model-specific terms are recorded in the [model recommendations](../../docs/MODELS.md). Browse the [complete model link directory](#model-links) below.
+The [model catalog](../../catalog/models.json) has **33 entries**: the original 24 selections/reference exclusions, five [LiveBench-informed additions](../../docs/LIVEBENCH.md#additional-providers-and-models) from DeepSeek, Z.AI, Mistral AI, and Microsoft, two Nemotron 3.5 Super VL entries from the LiveBench discovery, and Muse Glimmer 30B and Inkling 2 Mini from the [candidate review](../../docs/MODEL_CANDIDATES.md). It deliberately does not invent three qualifying releases for every provider. Downloadable weights do not automatically have an OSI-style software license; model-specific terms are recorded in the [model recommendations](../../docs/MODELS.md). Browse the [complete model link directory](#model-links) below.
 
 ## Downloads and setup references
 
@@ -228,13 +228,14 @@ Official publisher repositories for all catalog entries are listed below. These 
 | OpenAI | [gpt-oss-120b][model-gpt-oss-120b] (conditional); [gpt-oss-safeguard-120b][model-gpt-oss-safeguard-120b] (conditional); [gpt-oss-20b][model-gpt-oss-20b] (in-VRAM control) |
 | xAI | [grok-1][model-grok-1] (excluded); [grok-2][model-grok-2] (excluded) |
 | Google | [gemma-4-31B-it][model-gemma4-31b]; [gemma-4-26B-A4B-it][model-gemma4-26b-moe]; [gemma-3-27b-it][model-gemma3-27b] |
-| Meta | [Llama-3.3-70B-Instruct][model-llama33-70b]; [Llama-3.1-70B-Instruct][model-llama31-70b]; [Meta-Llama-3-70B-Instruct][model-llama3-70b] |
+| Meta | [Llama-3.3-70B-Instruct][model-llama33-70b]; [Llama-3.1-70B-Instruct][model-llama31-70b]; [Meta-Llama-3-70B-Instruct][model-llama3-70b]; [Muse-Glimmer-30B][model-muse-glimmer-30b] |
 | Laguna (Poolside) | [Laguna-XS-2.1][model-laguna-xs21]; [Laguna-XS.2][model-laguna-xs2]; [Laguna-S-2.1][model-laguna-s21] (conditional) |
 | Kimi (Moonshot) | [Kimi-Linear-48B-A3B-Instruct][model-kimi-linear-48b]; [Kimi-Dev-72B][model-kimi-dev-72b]; [Kimi-VL-A3B-Thinking-2506][model-kimi-vl-16b] (conditional) |
 | DeepSeek | [R1-Distill-Qwen-32B][model-deepseek-r1-32b]; [R1-Distill-Llama-70B][model-deepseek-r1-70b] |
 | Z.AI | [GLM-4.5-Air][model-glm45-air] (conditional) |
 | Mistral AI | [Mistral-Small-3.1-24B-Instruct-2503][model-mistral-small31] (BF16 capacity test) |
 | Microsoft | [Phi-4-reasoning-plus][model-phi4-reasoning-plus] (BF16 capacity test) |
+| Thinking Machines Lab | [Inkling-2-Mini][model-inkling2-mini-26b] |
 | Qwen | [Qwen3.8-27B][model-qwen38-27b]; [Qwen3.5-35B-A3B][model-qwen35-35b-moe]; [Qwen3.5-122B-A10B][model-qwen35-122b-moe] (conditional) |
 
 Additional Strata reference: [Qwen3.8-Flash-Next][model-qwen38-flash-next-strata] with the [reviewed Strata model/conversion guide][strata-models]. Its IQ2_XS conversion is a separate artifact from the publisher's original checkpoint.
@@ -301,6 +302,7 @@ The project's existing [MIT license](../../LICENSE) is preserved. Backend and mo
 [model-llama33-70b]: https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct
 [model-llama31-70b]: https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct
 [model-llama3-70b]: https://huggingface.co/meta-llama/Meta-Llama-3-70B-Instruct
+[model-muse-glimmer-30b]: https://huggingface.co/meta-models/Muse-Glimmer-30B
 [model-laguna-xs21]: https://huggingface.co/poolside/Laguna-XS-2.1
 [model-laguna-xs2]: https://huggingface.co/poolside/Laguna-XS.2
 [model-laguna-s21]: https://huggingface.co/poolside/Laguna-S-2.1
@@ -322,3 +324,4 @@ The project's existing [MIT license](../../LICENSE) is preserved. Backend and mo
 [model-glm45-air]: https://huggingface.co/zai-org/GLM-4.5-Air
 [model-mistral-small31]: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503
 [model-phi4-reasoning-plus]: https://huggingface.co/microsoft/Phi-4-reasoning-plus
+[model-inkling2-mini-26b]: https://huggingface.co/thinkingmachines/Inkling-2-Mini
