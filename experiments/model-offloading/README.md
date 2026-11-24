@@ -162,7 +162,7 @@ The 120B class is conditional. No catalog entry promises that the sum of RAM and
 
 ## Evaluation report card
 
-**No laptop evaluation results have been recorded yet.** The matrix below tracks execution status, not performance. Each measured result must identify one exact model artifact, precision, platform version, OS build, and context size; one successful model does not qualify every model on that platform. See the [870-combination eligibility matrix](../../docs/evaluation-matrix.csv) for individual model gates.
+**No laptop evaluation results have been recorded yet.** The matrix below tracks execution status, not performance. Each measured result must identify one exact model artifact, precision, platform version, OS build, and context size; one successful model does not qualify every model on that platform. See the [990-combination eligibility matrix](../../docs/evaluation-matrix.csv) for individual model gates.
 
 | Platform | Ubuntu 26.04 native | Windows 11 Pro native | Windows 11 Pro + WSL2 |
 |---|---|---|---|
