@@ -26,7 +26,7 @@ A plugin module may also export any of these. Experiments that do not export the
 | `PROTECTED_PATHS` | `publish-results` | Repository paths a publication branch must not change relative to the fetched base branch (`Publication branch changes a protected file`). |
 | `GENERIC_RANKING` | results index | `False` keeps the experiment's results out of the generic top-combinations ranking. |
 
-`legal-benchmark` uses every hook in this table; see [its README](../experiments/legal-benchmark/README.md) and the [legal benchmark walkthrough](LEGAL_BENCHMARK_WALKTHROUGH.md).
+`legal-models` uses every hook in this table; see [its README](../experiments/legal-models/README.md) and the [legal models walkthrough](LEGAL_MODELS_WALKTHROUGH.md).
 
 ## Frozen inputs: path keys
 

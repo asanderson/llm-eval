@@ -1,4 +1,4 @@
-"""Authority eligibility, retrieval arms, role profiles and the `retrieval` mode of the legal benchmark.
+"""Authority eligibility, retrieval arms, role profiles and the `retrieval` mode of the legal models experiment.
 
 Every record, matter and suite built here is original and fictional. No model, network or GPU is used: the only
 servers are loopback fakes started by the test on an ephemeral port.
@@ -19,15 +19,15 @@ from unittest.mock import patch
 from llm_eval.common import digest, read_json, sha256_file, write_json
 from llm_eval.core.contracts import atomic_json
 from llm_eval.experiments import get_experiment
-from llm_eval.experiments import legal_benchmark as legal
-from llm_eval.experiments.legal_benchmark import authority, contracts, fixture, profiles, retrieval
+from llm_eval.experiments import legal_models as legal
+from llm_eval.experiments.legal_models import authority, contracts, fixture, profiles, retrieval
 from llm_eval.orchestration.planner import compile_campaign
 from llm_eval.orchestration.scheduler import initialize, run_campaign
 
 ROOT = Path(__file__).resolve().parents[1]
-SUITE = ROOT / 'experiments/legal-benchmark/workloads/original-smoke'
+SUITE = ROOT / 'experiments/legal-models/workloads/original-smoke'
 LOCK = SUITE / 'suite.lock.json'
-PACKETS = ROOT / 'experiments/legal-benchmark/workloads/original-packets/suite.lock.json'
+PACKETS = ROOT / 'experiments/legal-models/workloads/original-packets/suite.lock.json'
 EVIDENCE_SENTENCE = 'The purser admits he knew the count was lower.'
 P = authority.DEFAULT_POLICY
 EMBEDDER = {'role': 'embedder', 'serving': 'in-process', 'platform': 'fixture-hash', 'model': 'fixture-hash', 'model_revision': '1',
@@ -725,7 +725,7 @@ class RetrievalTests(unittest.TestCase):
     def test_the_memory_backend_works_without_sqlite(self):
         path = Path(retrieval.__file__)
         with patch.dict('sys.modules', {'sqlite3': None}):      # a Python built without sqlite3: importing it fails
-            spec = importlib.util.spec_from_file_location('llm_eval.experiments.legal_benchmark._retrieval_without_sqlite', path)
+            spec = importlib.util.spec_from_file_location('llm_eval.experiments.legal_models._retrieval_without_sqlite', path)
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             self.assertFalse(module.fts5_available())
@@ -1250,7 +1250,7 @@ class RetrievalCampaignTests(unittest.TestCase):
         self.case = {'id': 'copied-retrieval', 'parameters': {'suite': 'suite/suite.lock.json', 'synthetic': True,
                                                               'arms': ['no-context', 'filters-only', 'lexical', 'lexical-eligible', 'reference']}}
         self.campaign = {'schema_version': 2, 'id': 'legal-retrieval-test', 'inventory': 'inventory.json', 'phases': [
-            {'id': 'legal', 'experiments': [{'id': 'legal-benchmark', 'version': 1, 'mode': 'retrieval', 'cases': ['case.json'],
+            {'id': 'legal', 'experiments': [{'id': 'legal-models', 'version': 1, 'mode': 'retrieval', 'cases': ['case.json'],
                                              'hardware_configs': ['native']}]}]}
 
     def plan(self):
@@ -1283,7 +1283,7 @@ class RetrievalCampaignTests(unittest.TestCase):
         self.assertEqual(legal.MODE_MODULES, {'smoke': 'fixture', 'retrieval': 'retrieval', 'generation': 'workflow', 'workflow': 'workflow',
                                               'score': 'grading'})
         self.assertIs(legal._module('retrieval'), retrieval)
-        shipped = read_json(ROOT / 'experiments/legal-benchmark/cases/retrieval.json')
+        shipped = read_json(ROOT / 'experiments/legal-models/cases/retrieval.json')
         self.assertEqual(shipped, {'id': 'retrieval', 'parameters': {'suite': '../workloads/original-smoke/suite.lock.json', 'synthetic': True,
                                                                      'arms': ['no-context', 'filters-only', 'lexical', 'lexical-eligible', 'reference'],
                                                                      'top_k': 5, 'token_budget': 1200}})
@@ -1333,7 +1333,7 @@ class RetrievalCampaignTests(unittest.TestCase):
         self.assertEqual(metadata['retrieval']['backend'], 'memory')
         (receipt,) = state['reports'].values()
         self.assertEqual(receipt['status'], 'generated')      # package F: a projected local report of cohort aggregates
-        bundle = next((directory / receipt['report'] / 'bundle/docs/results/legal-benchmark').iterdir())
+        bundle = next((directory / receipt['report'] / 'bundle/docs/results/legal-models').iterdir())
         published = (bundle / 'raw/measurements.jsonl.gz').read_bytes()
         import gzip
         self.assertNotIn(b'"record_type": "request"', gzip.decompress(published))      # no per-matter row of a model-run mode
@@ -1470,7 +1470,7 @@ class RetrievalCampaignTests(unittest.TestCase):
             with self.subTest(arms=arms), self.assertRaisesRegex(ValueError, 'arms'):
                 legal.validate({'suite': str(LOCK), 'synthetic': True, 'arms': arms}, ROOT, 'retrieval')
         for mode in (['retrieval'], {'mode': 'smoke'}, None):
-            with self.subTest(mode=mode), self.assertRaisesRegex(ValueError, 'Unsupported legal-benchmark mode'):
+            with self.subTest(mode=mode), self.assertRaisesRegex(ValueError, 'Unsupported legal-models mode'):
                 legal.validate({'suite': str(LOCK), 'synthetic': True}, ROOT, mode)
 
     def test_a_benchmark_corpus_without_authorities_records_no_policy(self):

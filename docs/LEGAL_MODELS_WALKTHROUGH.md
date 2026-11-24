@@ -1,6 +1,6 @@
-# Legal benchmark walkthrough
+# Legal models walkthrough
 
-**Output provenance.** This walkthrough was written from the code of the `legal-benchmark` experiment and its tests. While writing it, these commands were run on a Windows development host, CPU only: the repository's unit tests (scripted loopback test servers stand in for every model), `llm-eval experiments list`, the read-only `llm-eval plan` of the example campaigns, `llm-eval matrix` with its output outside the checkout, and `scripts/render_legal_diagram.py`. No model was served, no GPU was used, and no campaign was set up or run on a target host. Every output block below is illustrative expected output, not a measurement: values in angle brackets are placeholders. Host measurements are pending. That describes this walkthrough as written on 2026-11-13: four Windows-host runs of the approved fixture suite were published on 2026-11-17 and four WSL2 runs followed, and all are listed under [Legal benchmark reports](RESULTS.md#legal-benchmark-reports).
+**Output provenance.** This walkthrough was written from the code of the `legal-models` experiment and its tests. While writing it, these commands were run on a Windows development host, CPU only: the repository's unit tests (scripted loopback test servers stand in for every model), `llm-eval experiments list`, the read-only `llm-eval plan` of the example campaigns, `llm-eval matrix` with its output outside the checkout, and `scripts/render_legal_diagram.py`. No model was served, no GPU was used, and no campaign was set up or run on a target host. Every output block below is illustrative expected output, not a measurement: values in angle brackets are placeholders. Host measurements are pending. That describes this walkthrough as written on 2026-11-13: four Windows-host runs of the approved fixture suite were published on 2026-11-17 and four WSL2 runs followed, and all are listed under [Legal models reports](RESULTS.md#legal-models-reports).
 
 The experiment drafts internal screening memos **for human review** over a **fictional jurisdiction with original authorities** (the "Commonwealth of Veld" fixtures). It never files, charges, contacts anyone or discloses evidence. The plan this walkthrough implements states the scope:
 
@@ -9,20 +9,20 @@ The experiment drafts internal screening memos **for human review** over a **fic
 - No public results promotion from private inputs, even aggregate metrics.
 - Run one campaign at a time on the Raider.
 
-The rules this page refers to are stated once, in the [experiment README](../experiments/legal-benchmark/README.md); this page quotes them or links to them.
+The rules this page refers to are stated once, in the [experiment README](../experiments/legal-models/README.md); this page quotes them or links to them.
 
-![Legal benchmark stages from offload calibration to the local report.](../diagrams/legal-benchmark-workflow.png)
+![Legal models stages from offload calibration to the local report.](../diagrams/legal-models-workflow.png)
 
 ## What this walkthrough runs
 
-Three experiments take part: `model-offloading` (stage 1), `legal-benchmark` (stages 3 to 5) and, optionally, `decision-models` (a replay in stage 3). Each stage pins its inputs by digest and writes an explicit output that a later stage names by file.
+Three experiments take part: `model-offloading` (stage 1), `legal-models` (stages 3 to 5) and, optionally, `decision-models` (a replay in stage 3). Each stage pins its inputs by digest and writes an explicit output that a later stage names by file.
 
 | Stage | Experiment and mode | Pinned input | Explicit stage output |
 |---|---|---|---|
-| 1. Offload calibration | `model-offloading`, `category-smoke` on the legal-shaped workload | `experiments/legal-benchmark/workloads/qualification/legal-shaped.json`, artifact lock | one succeeded attempt directory |
+| 1. Offload calibration | `model-offloading`, `category-smoke` on the legal-shaped workload | `experiments/legal-models/workloads/qualification/legal-shaped.json`, artifact lock | one succeeded attempt directory |
 | 2. Locked serving profile | operator command `profiles freeze` with the observed placement attested | campaign directory, job id, attempt id (all explicit) | `serving-profile.json` and its SHA-256 |
-| 3. Routing calibration and replay (optional) | on the calibration suite: `legal-benchmark` `generation` per recipe and one routed run, then `routing calibrate`; on the evaluation suite: `routing export`, `routing replay`, `routing verify`, then `decision-models` `replay` or `routing evaluate` | both suite locks, locked profile | calibration file, routing suite, replay manifest, sidecar provenance |
-| 4. Frozen legal evaluation | `legal-benchmark` `retrieval`, `generation`, `workflow` (with the pinned calibration file when a threshold is used), then `score` in a later campaign | suite lock, locked profile, calibration file (only with a threshold), output manifest | attempts with rows, private `local/` detail, output manifest |
+| 3. Routing calibration and replay (optional) | on the calibration suite: `legal-models` `generation` per recipe and one routed run, then `routing calibrate`; on the evaluation suite: `routing export`, `routing replay`, `routing verify`, then `decision-models` `replay` or `routing evaluate` | both suite locks, locked profile | calibration file, routing suite, replay manifest, sidecar provenance |
+| 4. Frozen legal evaluation | `legal-models` `retrieval`, `generation`, `workflow` (with the pinned calibration file when a threshold is used), then `score` in a later campaign | suite lock, locked profile, calibration file (only with a threshold), output manifest | attempts with rows, private `local/` detail, output manifest |
 | 5. Local report | `llm-eval report` | campaign directory | projected local bundle (exact fixture export for an approved fixture suite, reduced projection for any other suite); no publication |
 
 A phase dependency (`depends_on`) only orders jobs inside one campaign; it passes nothing. The locked serving profile, the calibration file, the output manifest and the replay manifest are passed by naming the file in the next case, where a path key (`serving_profile`, `calibration_file`, `output_manifest`, `replay`, `suite`) makes the planner pin the file it names by digest. Nothing reads "the newest" result. The frozen evaluation takes from stage 3 at most the calibration file; the routing suite, replay manifest and sidecar serve the routing comparison only.
@@ -35,7 +35,7 @@ The example files are in [`configs/examples/legal/`](../configs/examples/legal/)
 
 What keeps a copied example from measuring anything by accident, as the code has it: every role's `model_revision` and `backend_version` is a `REPLACE_WITH_` value, so the `generation` and `workflow` jobs stop at `profiles.check_revisions` before their first request (`Record the exact loaded model revision before evaluating`), and every campaign has `"publish": {"mode": "none"}`. The `retrieval` phase is a fixture run and does run. Stage 1 is a real `model-offloading` campaign: `setup` of `qualification-campaign.json` installs the serving runtime its run file names, and `run` reserves the `raider` host lock before the run file's placeholders are refused. It belongs to the operator who owns the host, one campaign at a time.
 
-Install the harness (`python -m pip install -e ".[telemetry,reporting]"`; the legal benchmark needs no further dependency) and run [readiness](READINESS.md#legal-benchmark-campaigns) on the target host. Then copy the whole directory `configs/examples/legal/` to `configs/local/legal/` (ignored by Git; the relative case and suite paths keep working at that depth) and edit only the copies. Below, `raider-HOST` stands for `raider-windows`, `raider-wsl` or `raider-ubuntu`. The qualification files at the top of the directory describe Windows 11 native; on another OS point `inventory.json` and the `os_id` of `legal-offload-run.json` at that host's hardware configuration.
+Install the harness (`python -m pip install -e ".[telemetry,reporting]"`; the legal models experiment needs no further dependency) and run [readiness](READINESS.md#legal-models-campaigns) on the target host. Then copy the whole directory `configs/examples/legal/` to `configs/local/legal/` (ignored by Git; the relative case and suite paths keep working at that depth) and edit only the copies. Below, `raider-HOST` stands for `raider-windows`, `raider-wsl` or `raider-ubuntu`. The qualification files at the top of the directory describe Windows 11 native; on another OS point `inventory.json` and the `os_id` of `legal-offload-run.json` at that host's hardware configuration.
 
 Host locks: for a local target the coordinator and the worker both reserve the host under the target's `lock_root`, or under the default lock directory of the account that runs them when the inventory names none (`orchestration/resources.py`). For a remote target the worker reserves under the target's `lock_root` on the remote host and the coordinator under its own default directory. Native Windows and WSL exclude each other only when both inventories name the same physical directory: follow [Share the Windows physical-host reservation](WSL_RAIDER_WALKTHROUGH.md#share-the-windows-physical-host-reservation) for the WSL inventory's `lock_root`.
 
@@ -56,7 +56,7 @@ The output of this stage is one succeeded attempt directory, `CAMPAIGN_DIR/exper
 Freeze the profile from that one named attempt. The offload result has no observed placement, so the operator attests the placement that was observed (`--observed-placement`, written as `key=value` pairs such as the run file's `gpu_layers` and `threads`); without it the profile's probe is `inconclusive` (`placement_unobserved`) and cannot qualify a role. The output must lie outside any repository, attempt directory and any directory named `reports` or `model_judgment`.
 
 ```bash
-python -m llm_eval.experiments.legal_benchmark.profiles freeze --campaign-dir CAMPAIGN_DIR --job-id JOB_ID --attempt-id ATTEMPT_ID --observed-placement OBSERVED_PLACEMENT --output PRIVATE_DIR/serving-profile.json
+python -m llm_eval.experiments.legal_models.profiles freeze --campaign-dir CAMPAIGN_DIR --job-id JOB_ID --attempt-id ATTEMPT_ID --observed-placement OBSERVED_PLACEMENT --output PRIVATE_DIR/serving-profile.json
 ```
 
 The command prints the SHA-256 of the profile it wrote. Illustrative output:
@@ -67,16 +67,16 @@ The command prints the SHA-256 of the profile it wrote. Illustrative output:
 
 The probe outcome is `passed`, `failed` (`job_not_succeeded`, `request_errors`, `paging_observed`, `placement_mismatch`, `memory_reserve_exceeded`) or `inconclusive` (`paging_unknown`, `placement_unobserved`, `all_responses_truncated`, `no_measured_requests`). **On Windows 11 native and in WSL the paging counters cannot show host paging, so a profile passes there only with the explicit operator attestation `hardware_attestation.paging`; the attested value is an attestation, not a measurement, and a profile that claims observed paging on either is refused.** The public metadata of every role bound to such a profile says `qualified_by_attestation: true`.
 
-Bind a role to the profile by copying the file next to your case and naming it: `"qualification": {"serving_profile": "serving-profile.json"}`. The role's identity, placement and budgets must equal the profile's, and the profile's probe must be `passed`: see [Locked serving profile](../experiments/legal-benchmark/README.md#serving-profiles-routing-and-exports) for the complete binding rule.
+Bind a role to the profile by copying the file next to your case and naming it: `"qualification": {"serving_profile": "serving-profile.json"}`. The role's identity, placement and budgets must equal the profile's, and the profile's probe must be `passed`: see [Locked serving profile](../experiments/legal-models/README.md#serving-profiles-routing-and-exports) for the complete binding rule.
 
 ## 3. Routing calibration and replay
 
-This stage is optional. It needs the generator of stage 2 and, for a served selector, a `selector` role (`capability: decision`, `protocol: json`, local). The attempts it reads are `legal-benchmark` `generation` runs.
+This stage is optional. It needs the generator of stage 2 and, for a served selector, a `selector` role (`capability: decision`, `protocol: json`, local). The attempts it reads are `legal-models` `generation` runs.
 
 On the **calibration suite** (`original-packets`), run a `generation` case with a `selector` block and no threshold (`require_confidence: false`), and a `generation` case of its fallback arm. Then calibrate a threshold:
 
 ```bash
-python -m llm_eval.experiments.legal_benchmark.routing calibrate --suite experiments/legal-benchmark/workloads/original-packets/suite.lock.json --routed-attempt ROUTED_ATTEMPT_DIR --fallback-attempt FALLBACK_ATTEMPT_DIR --fallback-arm FALLBACK_ARM --thresholds THRESHOLDS --output PRIVATE_DIR/calibration.json
+python -m llm_eval.experiments.legal_models.routing calibrate --suite experiments/legal-models/workloads/original-packets/suite.lock.json --routed-attempt ROUTED_ATTEMPT_DIR --fallback-attempt FALLBACK_ATTEMPT_DIR --fallback-arm FALLBACK_ARM --thresholds THRESHOLDS --output PRIVATE_DIR/calibration.json
 ```
 
 A case that uses a threshold names the record, the calibration suite and both output manifests in `selector.calibration` (`calibration_file`, `suite`, `routed.output_manifest`, `fallback.output_manifest`); planning re-runs the calibration from those pinned attempts and refuses a record that differs.
@@ -84,10 +84,10 @@ A case that uses a threshold names the record, the calibration suite and both ou
 On the **evaluation suite** (`original-smoke`), run one `generation` attempt over the candidate arms (recipes) with the same generator, then export, replay and verify:
 
 ```bash
-python -m llm_eval.experiments.legal_benchmark.routing export --suite experiments/legal-benchmark/workloads/original-smoke/suite.lock.json --output PRIVATE_DIR/routing-suite.json
-python -m llm_eval.experiments.legal_benchmark.routing replay --suite experiments/legal-benchmark/workloads/original-smoke/suite.lock.json --routing-suite PRIVATE_DIR/routing-suite.json --attempt ATTEMPT_DIR --candidates PRIVATE_DIR/candidates.json --output PRIVATE_DIR/replay.json
-python -m llm_eval.experiments.legal_benchmark.routing verify --suite experiments/legal-benchmark/workloads/original-smoke/suite.lock.json --replay PRIVATE_DIR/replay.json --routing-suite PRIVATE_DIR/routing-suite.json --candidates PRIVATE_DIR/candidates.json --attempt ATTEMPT_DIR
-python -m llm_eval.experiments.legal_benchmark.routing evaluate --suite experiments/legal-benchmark/workloads/original-smoke/suite.lock.json --strategies PRIVATE_DIR/strategies.json --replay PRIVATE_DIR/replay.json --routing-suite PRIVATE_DIR/routing-suite.json --attempt ATTEMPT_DIR --candidates PRIVATE_DIR/candidates.json
+python -m llm_eval.experiments.legal_models.routing export --suite experiments/legal-models/workloads/original-smoke/suite.lock.json --output PRIVATE_DIR/routing-suite.json
+python -m llm_eval.experiments.legal_models.routing replay --suite experiments/legal-models/workloads/original-smoke/suite.lock.json --routing-suite PRIVATE_DIR/routing-suite.json --attempt ATTEMPT_DIR --candidates PRIVATE_DIR/candidates.json --output PRIVATE_DIR/replay.json
+python -m llm_eval.experiments.legal_models.routing verify --suite experiments/legal-models/workloads/original-smoke/suite.lock.json --replay PRIVATE_DIR/replay.json --routing-suite PRIVATE_DIR/routing-suite.json --candidates PRIVATE_DIR/candidates.json --attempt ATTEMPT_DIR
+python -m llm_eval.experiments.legal_models.routing evaluate --suite experiments/legal-models/workloads/original-smoke/suite.lock.json --strategies PRIVATE_DIR/strategies.json --replay PRIVATE_DIR/replay.json --routing-suite PRIVATE_DIR/routing-suite.json --attempt ATTEMPT_DIR --candidates PRIVATE_DIR/candidates.json
 ```
 
 `replay` also writes the sidecar `PRIVATE_DIR/replay.provenance.json`. The `--candidates` file maps each arm to exactly the fixed generator's identity. An illustrative `candidates.json` (every value a placeholder):
@@ -99,10 +99,10 @@ python -m llm_eval.experiments.legal_benchmark.routing evaluate --suite experime
 }
 ```
 
-- Exports, replays and calibrations exist only for a suite listed in [`approved-suites.json`](../experiments/legal-benchmark/approved-suites.json) (the two shipped fixture suites); any other suite gets `Export is limited to approved fixture suites`.
+- Exports, replays and calibrations exist only for a suite listed in [`approved-suites.json`](../experiments/legal-models/approved-suites.json) (the two shipped fixture suites); any other suite gets `Export is limited to approved fixture suites`.
 - `routing verify` must pass before a replay campaign: the `decision-models` experiment itself checks only the suite hash, the candidate fingerprints and duplicates. Then fill [`routing-replay-case.json`](../configs/examples/legal/routing-replay-case.json) and plan [`routing-replay-campaign.json`](../configs/examples/legal/routing-replay-campaign.json).
 - Replay manifests, sidecars and calibration records hold per-matter values derived from the gold. They are local operator files and never public.
-- A routing or offload report built from a legal export is refused by `publish-results` when it carries a legal benchmark name (`Publication identity mismatch: the bundle carries a legal benchmark name`) or legal content the plugin recognises (`Publication identity mismatch: the bundle carries content of legal-benchmark (<class>)`). The legal benchmark names are the plugin's own (`legal-smoke`, `legal-routing`, `legal-shaped` and the benchmark ids of approved suites); a public legal benchmark such as `LegalBench` under a generic experiment is publishable. The content check has a stated limit: a replay export with renamed ids and a foreign `suite_sha256` is not recognised (see [Known limits](VALIDATION.md#known-limits)).
+- A routing or offload report built from a legal export is refused by `publish-results` when it carries a legal benchmark name (`Publication identity mismatch: the bundle carries a legal benchmark name`) or legal content the plugin recognises (`Publication identity mismatch: the bundle carries content of legal-models (<class>)`). The legal benchmark names are the plugin's own (`legal-smoke`, `legal-routing`, `legal-shaped` and the benchmark ids of approved suites); a public legal benchmark such as `LegalBench` under a generic experiment is publishable. The content check has a stated limit: a replay export with renamed ids and a foreign `suite_sha256` is not recognised (see [Known limits](VALIDATION.md#known-limits)).
 - With the shipped data a threshold is calibrated on `original-packets` (2 families) and used on `original-smoke`; nothing calibrated on them supports adopting a selector.
 
 ## 4. Frozen legal evaluation
@@ -115,12 +115,12 @@ llm-eval setup --campaign configs/local/legal/raider-HOST/legal-evaluation-campa
 llm-eval run --campaign configs/local/legal/raider-HOST/legal-evaluation-campaign.json
 ```
 
-`setup` installs nothing for a legal campaign (only `serving: managed` would need a runtime, and it is gated). Each generation or workflow attempt writes `requests.jsonl` and `metadata.json` (public rows), the private files under `local/` and, last, `local/output-manifest.json` (see [What stays local](../experiments/legal-benchmark/README.md#what-stays-local)). When the attempt finishes, the coordinator records a receipt in `campaign.json`: `file_sha256` and `output_manifest_sha256` (see [Lineage](../experiments/legal-benchmark/README.md#classification-gates-and-the-report-projection)).
+`setup` installs nothing for a legal campaign (only `serving: managed` would need a runtime, and it is gated). Each generation or workflow attempt writes `requests.jsonl` and `metadata.json` (public rows), the private files under `local/` and, last, `local/output-manifest.json` (see [What stays local](../experiments/legal-models/README.md#what-stays-local)). When the attempt finishes, the coordinator records a receipt in `campaign.json`: `file_sha256` and `output_manifest_sha256` (see [Lineage](../experiments/legal-models/README.md#classification-gates-and-the-report-projection)).
 
 To grade the stored outputs again, write a review packet, have it reviewed (see the [checklist](#human-rubric-review-checklist)), and run `score` in a later campaign whose case names the output manifest (and optionally `review_file` with `review_key`):
 
 ```bash
-python -m llm_eval.experiments.legal_benchmark.grading packet --output-manifest ATTEMPT_DIR/local/output-manifest.json --output PRIVATE_DIR/review
+python -m llm_eval.experiments.legal_models.grading packet --output-manifest ATTEMPT_DIR/local/output-manifest.json --output PRIVATE_DIR/review
 llm-eval plan --campaign configs/local/legal/score-campaign.json
 llm-eval run --campaign configs/local/legal/score-campaign.json
 ```
@@ -137,11 +137,11 @@ With `"on_experiment_end": true` the coordinator writes the report when an exper
 llm-eval report --input CAMPAIGN_DIR/experiments/RUN_ID
 ```
 
-The report directory `CAMPAIGN_DIR/experiments/RUN_ID/report/` holds `publication.json` and `bundle/`; the seven bundle files (`README.md`, `manifest.json`, `summary.json`, `summary.csv`, `resolved-config.json`, `legal-summary.json` and `raw/measurements.jsonl.gz`) are under `bundle/docs/results/legal-benchmark/PUBLICATION_ID/`. What the projection exports is stated in the README:
+The report directory `CAMPAIGN_DIR/experiments/RUN_ID/report/` holds `publication.json` and `bundle/`; the seven bundle files (`README.md`, `manifest.json`, `summary.json`, `summary.csv`, `resolved-config.json`, `legal-summary.json` and `raw/measurements.jsonl.gz`) are under `bundle/docs/results/legal-models/PUBLICATION_ID/`. What the projection exports is stated in the README:
 
 > A legal report is the projection, never the generic scan: a strict recursive allowlist of enumerated categories, opaque ids, hashes, versioned numbers, approved settings, coverage and coarse status.
 
-The report step publishes nothing: publication is the separately authorized step, see [Results](RESULTS.md#legal-benchmark-reports).
+The report step publishes nothing: publication is the separately authorized step, see [Results](RESULTS.md#legal-models-reports).
 
 ## Status, resume and cancel
 
@@ -199,27 +199,27 @@ Candidate-side code receives only `contracts.candidate_view(suite)`: the lock (l
 - **Documents and model output are data.** Matter text, corpus text, emails and every model reply are untrusted content: passage text is fenced between `<<<BEGIN id>>>` and `<<<END id>>>` lines, no tool is offered and a reply that calls one is refused (`tool_call_refused`), and memos are rendered from validated JSON with every string escaped once.
 - **Plan reads and hashes only.** `llm-eval plan` and validation read and hash local files; ingestion and dataset import are separate operator commands that `plan` never calls.
 - **Endpoints.** A job's allowlist is computed from its planned roles; every legal role is local.
-- **What stays local.** See [What stays local](../experiments/legal-benchmark/README.md#what-stays-local). The review packet and key, replay manifests, sidecars and calibration records are written outside the repository.
-- **Classification.** One classification (`reporting.classify`) gives `approved`, `declared` or `refused`, with the reasons `approved`, `not_approved`, `private_matter`, `dataset_gate_blocked`, `unknown_mode`, `lock_missing`, `planned_digest_mismatch` and `lock_invalid`; the rule is in [One classification](../experiments/legal-benchmark/README.md#classification-gates-and-the-report-projection). The README states what each level allows:
+- **What stays local.** See [What stays local](../experiments/legal-models/README.md#what-stays-local). The review packet and key, replay manifests, sidecars and calibration records are written outside the repository.
+- **Classification.** One classification (`reporting.classify`) gives `approved`, `declared` or `refused`, with the reasons `approved`, `not_approved`, `private_matter`, `dataset_gate_blocked`, `unknown_mode`, `lock_missing`, `planned_digest_mismatch` and `lock_invalid`; the rule is in [One classification](../experiments/legal-models/README.md#classification-gates-and-the-report-projection). The README states what each level allows:
 
   > `approved` allows local and SSH runs, collection and a local report, and, with an authorization, manual publication; `declared` allows a local run and a local, reduced report, and nothing leaves the host; `refused` allows nothing.
 
-- **The six gates and the messages an operator meets.** The rule is in [The gates](../experiments/legal-benchmark/README.md#classification-gates-and-the-report-projection); the messages are the code's:
+- **The six gates and the messages an operator meets.** The rule is in [The gates](../experiments/legal-models/README.md#classification-gates-and-the-report-projection); the messages are the code's:
 
   | Gate | What the operator sees |
   |---|---|
-  | Plan time | `Job is not admitted by the data policy of <job>: <reason>`; `Remote execution is not available for <job>: <reason>` for an SSH target that is not approved; `Publication is not available for legal-benchmark: automatic_publication_unavailable` for `publish.mode: pull-request` |
+  | Plan time | `Job is not admitted by the data policy of <job>: <reason>`; `Remote execution is not available for <job>: <reason>` for an SSH target that is not approved; `Publication is not available for legal-models: automatic_publication_unavailable` for `publish.mode: pull-request` |
   | Scheduler | the job `failed` with reason `data_policy` |
   | Worker | `Data policy refused the job` |
   | Remote collection | `collect: refused` in the attempt record; `Collection refused by data policy: <path of the deciding job.json>` |
   | Finalization | report `disabled` with the reason, or `failed` with `ProjectionRejected` |
-  | Publication | `Publication is not available for legal-benchmark: <code>` with the codes of `reporting.verify_publication`, in order: `provenance_missing`, `legacy_report`, `plan_changed`, `unverified`, `not_approved`, `not_approved_upstream`, `receipt_mismatch`, `bundle_mismatch`, `not_authorized` |
+  | Publication | `Publication is not available for legal-models: <code>` with the codes of `reporting.verify_publication`, in order: `provenance_missing`, `legacy_report`, `plan_changed`, `unverified`, `not_approved`, `not_approved_upstream`, `receipt_mismatch`, `bundle_mismatch`, `not_authorized` |
 
-- **Small cohorts.** The rule (`MIN_COHORT`: fewer than 5 distinct matters publish no number outside an exact fixture export) is in [Small cohorts](../experiments/legal-benchmark/README.md#classification-gates-and-the-report-projection). Its limit, as the README states it:
+- **Small cohorts.** The rule (`MIN_COHORT`: fewer than 5 distinct matters publish no number outside an exact fixture export) is in [Small cohorts](../experiments/legal-models/README.md#classification-gates-and-the-report-projection). Its limit, as the README states it:
 
   > Differencing is not prevented: two reduced runs over overlapping subsets (five matters and the same five plus a sixth) can be subtracted to give the sixth matter's result.
 
-- **Publication.** Manual publication needs `publication-authorization.json`, which `python -m llm_eval.experiments.legal_benchmark.reporting authorize` writes only after the run id is typed back on an interactive terminal; a Python caller of `reporting.authorize` can instead pass a `confirm` hook, and the authorization is then written once the hook returns true. Eight bundles of the approved public-synthetic fixture suite have been published, four from the Windows host and four from WSL2, each after its own authorization given through that hook (see [Legal benchmark reports](RESULTS.md#legal-benchmark-reports)). No campaign or code of this repository runs `authorize`. See [Publication](../experiments/legal-benchmark/README.md#classification-gates-and-the-report-projection).
+- **Publication.** Manual publication needs `publication-authorization.json`, which `python -m llm_eval.experiments.legal_models.reporting authorize` writes only after the run id is typed back on an interactive terminal; a Python caller of `reporting.authorize` can instead pass a `confirm` hook, and the authorization is then written once the hook returns true. Eight bundles of the approved public-synthetic fixture suite have been published, four from the Windows host and four from WSL2, each after its own authorization given through that hook (see [Legal models reports](RESULTS.md#legal-models-reports)). No campaign or code of this repository runs `authorize`. See [Publication](../experiments/legal-models/README.md#classification-gates-and-the-report-projection).
 
   > A report manifest's own labels authorize nothing.
 
@@ -227,7 +227,7 @@ Candidate-side code receives only `contracts.candidate_view(suite)`: the lock (l
 
   > Private matter is never transferred or published in any form; the class exists so that every gate can refuse it.
 
-The threat model, as the [README](../experiments/legal-benchmark/README.md#classification-gates-and-the-report-projection) states it:
+The threat model, as the [README](../experiments/legal-models/README.md#classification-gates-and-the-report-projection) states it:
 
 > The gates stop mistakes, lazy relabels and partial edits by an operator, and let no unapproved or private suite's numbers out through this code without a deliberate forgery of several files. They do not stop a person who rewrites every file by hand.
 
@@ -280,16 +280,16 @@ python -m llm_eval matrix --output OUTSIDE_DIR/matrix.csv
 python -m unittest discover -s tests -v
 ```
 
-`experiments list` shows the five legal modes; both plans print and create no file; the full suite ends with `OK`. The result of this sequence on the development host is recorded in [VALIDATION.md](VALIDATION.md#legal-benchmark-issue-45).
+`experiments list` shows the five legal modes; both plans print and create no file; the full suite ends with `OK`. The result of this sequence on the development host is recorded in [VALIDATION.md](VALIDATION.md#legal-models-issue-45).
 
-Target-host sequence, per host cell, one campaign at a time on the Raider. **Not run in the effort that wrote this walkthrough (2026-11-13); the Windows and WSL2 cells have been run since, see [Legal benchmark reports](RESULTS.md#legal-benchmark-reports).** `setup` and `run` reserve the `raider` host lock.
+Target-host sequence, per host cell, one campaign at a time on the Raider. **Not run in the effort that wrote this walkthrough (2026-11-13); the Windows and WSL2 cells have been run since, see [Legal models reports](RESULTS.md#legal-models-reports).** `setup` and `run` reserve the `raider` host lock.
 
 ```bash
 bash scripts/readiness.sh --campaign configs/local/legal/raider-HOST/legal-evaluation-campaign.json --json-output OUTSIDE_DIR/readiness-legal.json
 llm-eval plan --campaign configs/local/legal/qualification-campaign.json
 llm-eval setup --campaign configs/local/legal/qualification-campaign.json
 llm-eval run --campaign configs/local/legal/qualification-campaign.json
-python -m llm_eval.experiments.legal_benchmark.profiles freeze --campaign-dir CAMPAIGN_DIR --job-id JOB_ID --attempt-id ATTEMPT_ID --observed-placement OBSERVED_PLACEMENT --output PRIVATE_DIR/serving-profile.json
+python -m llm_eval.experiments.legal_models.profiles freeze --campaign-dir CAMPAIGN_DIR --job-id JOB_ID --attempt-id ATTEMPT_ID --observed-placement OBSERVED_PLACEMENT --output PRIVATE_DIR/serving-profile.json
 llm-eval plan --campaign configs/local/legal/raider-HOST/legal-evaluation-campaign.json
 llm-eval setup --campaign configs/local/legal/raider-HOST/legal-evaluation-campaign.json
 llm-eval run --campaign configs/local/legal/raider-HOST/legal-evaluation-campaign.json

@@ -1,8 +1,8 @@
-# Legal benchmark: qualification, evaluation, scoring and routing replay
+# Legal models: qualification, evaluation, scoring and routing replay
 
-Example campaign files for the three-experiment flow of the `legal-benchmark` experiment. Nothing in this directory is a measurement: every number, revision and endpoint is a placeholder or a fixture default, an example value is not a measurement, and no result produced from these files has been recorded here.
+Example campaign files for the three-experiment flow of the `legal-models` experiment. Nothing in this directory is a measurement: every number, revision and endpoint is a placeholder or a fixture default, an example value is not a measurement, and no result produced from these files has been recorded here.
 
-Every inventory here names the target `raider` with `physical_host_id: raider`, like the generic Raider examples, so a legal campaign and every other Raider campaign exclude each other: `setup` and `run` of any campaign here reserve the `raider` host lock. What keeps a copied example from measuring by accident: every role's `model_revision` and `backend_version` is a `REPLACE_WITH_` value, so the `generation` and `workflow` jobs stop at `profiles.check_revisions` before any request, and `publish.mode` is `none`; the `retrieval` phase is a fixture run and does run. `qualification-campaign.json` is a real `model-offloading` campaign: `setup` installs the serving runtime its run file names. `llm-eval plan --campaign FILE` is read-only and may be run anywhere; `setup`, `run` and `resume` are for the operator on the target host, one campaign at a time. The [legal benchmark walkthrough](../../../docs/LEGAL_BENCHMARK_WALKTHROUGH.md) runs every stage.
+Every inventory here names the target `raider` with `physical_host_id: raider`, like the generic Raider examples, so a legal campaign and every other Raider campaign exclude each other: `setup` and `run` of any campaign here reserve the `raider` host lock. What keeps a copied example from measuring by accident: every role's `model_revision` and `backend_version` is a `REPLACE_WITH_` value, so the `generation` and `workflow` jobs stop at `profiles.check_revisions` before any request, and `publish.mode` is `none`; the `retrieval` phase is a fixture run and does run. `qualification-campaign.json` is a real `model-offloading` campaign: `setup` installs the serving runtime its run file names. `llm-eval plan --campaign FILE` is read-only and may be run anywhere; `setup`, `run` and `resume` are for the operator on the target host, one campaign at a time. The [legal models walkthrough](../../../docs/LEGAL_MODELS_WALKTHROUGH.md) runs every stage.
 
 ## Files
 
@@ -10,7 +10,7 @@ Every inventory here names the target `raider` with `physical_host_id: raider`, 
 |---|---|
 | `inventory.json` | The Raider as one local target (Windows 11 native), the same shape as `configs/examples/raider-windows/inventory.json` |
 | `inventory-separate-service.json` | The same, with a role served on another physical host; see "A role on another host" below. No campaign here uses it |
-| `qualification-campaign.json`, `legal-offload-case.json`, `legal-offload-run.json` | `model-offloading` over the legal-shaped workload `experiments/legal-benchmark/workloads/qualification/legal-shaped.json`, external serving. Plans as shipped |
+| `qualification-campaign.json`, `legal-offload-case.json`, `legal-offload-run.json` | `model-offloading` over the legal-shaped workload `experiments/legal-models/workloads/qualification/legal-shaped.json`, external serving. Plans as shipped |
 | `evaluation-campaign.json`, `retrieval-case.json`, `generation-case.json`, `workflow-case.json` | The frozen legal evaluation: `retrieval` (a fixture run), then `generation`, then `workflow`. External, GPU-served roles on a loopback endpoint with placeholder revisions and `"qualification": null`. Plans as shipped; a run stops at the placeholder revisions |
 | `score-campaign.json`, `score-case.json` | Template: `score` over the output manifest of an earlier generation or workflow attempt. Does not plan until `REPLACE_WITH_...` is filled |
 | `routing-replay-campaign.json`, `routing-replay-case.json` | Template: a `decision-models` `replay` over an exported routing suite and a verified replay manifest. Does not plan until `REPLACE_WITH_...` is filled |
@@ -23,7 +23,7 @@ Every campaign file has `"publish": {"mode": "none"}`.
 1. **Qualify serving.** Plan, set up and run `qualification-campaign.json` with the exact model, backend build, template and placement filled in `legal-offload-run.json`. Then freeze a locked serving profile from that one attempt, naming every id and attesting the placement you observed:
 
    ```bash
-   python -m llm_eval.experiments.legal_benchmark.profiles freeze --campaign-dir CAMPAIGN_DIR --job-id JOB_ID --attempt-id ATTEMPT_ID --observed-placement OBSERVED_PLACEMENT --output PRIVATE_DIR/serving-profile.json
+   python -m llm_eval.experiments.legal_models.profiles freeze --campaign-dir CAMPAIGN_DIR --job-id JOB_ID --attempt-id ATTEMPT_ID --observed-placement OBSERVED_PLACEMENT --output PRIVATE_DIR/serving-profile.json
    ```
 
    `PRIVATE_DIR` is a directory outside any repository: the command refuses an output inside one.
@@ -35,16 +35,16 @@ Every campaign file has `"publish": {"mode": "none"}`.
 5. **Routing replay (optional).** Export the routing suite of an approved fixture suite, build the replay manifest from scored attempts, and verify it:
 
    ```bash
-   python -m llm_eval.experiments.legal_benchmark.routing export --suite SUITE_LOCK --output PRIVATE_DIR/routing-suite.json
-   python -m llm_eval.experiments.legal_benchmark.routing replay --suite SUITE_LOCK --routing-suite PRIVATE_DIR/routing-suite.json --attempt ATTEMPT_DIR --candidates PRIVATE_DIR/candidates.json --output PRIVATE_DIR/replay.json
-   python -m llm_eval.experiments.legal_benchmark.routing verify --suite SUITE_LOCK --replay PRIVATE_DIR/replay.json --routing-suite PRIVATE_DIR/routing-suite.json --candidates PRIVATE_DIR/candidates.json --attempt ATTEMPT_DIR
+   python -m llm_eval.experiments.legal_models.routing export --suite SUITE_LOCK --output PRIVATE_DIR/routing-suite.json
+   python -m llm_eval.experiments.legal_models.routing replay --suite SUITE_LOCK --routing-suite PRIVATE_DIR/routing-suite.json --attempt ATTEMPT_DIR --candidates PRIVATE_DIR/candidates.json --output PRIVATE_DIR/replay.json
+   python -m llm_eval.experiments.legal_models.routing verify --suite SUITE_LOCK --replay PRIVATE_DIR/replay.json --routing-suite PRIVATE_DIR/routing-suite.json --candidates PRIVATE_DIR/candidates.json --attempt ATTEMPT_DIR
    ```
 
    `verify` takes the same `--attempt` directories and rebuilds the manifest from their pinned outputs. Run `routing verify` before any replay campaign: the `decision-models` experiment itself checks only the suite hash, the candidate fingerprints and duplicates, and would accept a manifest built before a rubric or scorer change. Then fill `routing-replay-case.json` and plan `routing-replay-campaign.json`.
 
 A selector threshold also needs a calibration: run a routed attempt (no threshold) and an attempt of its fallback arm on `original-packets`, `routing calibrate` them, and name the record, the suite and both output manifests in the case's `selector.calibration` block (`calibration_file`, `suite`, `routed.output_manifest`, `fallback.output_manifest`); planning re-derives the record from those attempts.
 
-Exports are allowed only for the suites listed in `experiments/legal-benchmark/approved-suites.json` (the two shipped fixture suites). A relocked copy of a shipped suite is refused, whatever its `data_class` says.
+Exports are allowed only for the suites listed in `experiments/legal-models/approved-suites.json` (the two shipped fixture suites). A relocked copy of a shipped suite is refused, whatever its `data_class` says.
 
 ## A role on another host
 

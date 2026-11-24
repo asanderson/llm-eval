@@ -706,7 +706,7 @@ def _manifest(path, suite):
     attempt = path.parent.parent
     if manifest['attempt_id'] != attempt.name:
         wrong('attempt_id')
-    if manifest['experiment'] != 'legal-benchmark' or manifest['execution_kind'] != 'model-run':
+    if manifest['experiment'] not in contracts.EXPERIMENT_IDS or manifest['execution_kind'] != 'model-run':
         wrong('experiment')
     files = manifest['files']
     listed = [f.get('path') if isinstance(f, dict) else None for f in files] if isinstance(files, list) else None
@@ -732,7 +732,7 @@ def _manifest(path, suite):
     if not isinstance(expected, dict) or set(expected) != set(RESULT_KEYS) or set(result) - set(RESULT_KEYS) - set(RESULT_EXTRA) \
             or any(result.get(k) != expected[k] for k in RESULT_KEYS) or expected['benchmark'] != suite['lock']['benchmark_id']:
         wrong('result')
-    if job.get('experiment_id') != 'legal-benchmark':
+    if job.get('experiment_id') not in contracts.EXPERIMENT_IDS:
         wrong('experiment_id')
     if job.get('job_id') != manifest['job_id']:
         wrong('job_id')
@@ -747,7 +747,7 @@ def _manifest(path, suite):
     if manifest['role_digests'] != {name: profiles.profile_digest(p, inputs) for name, p in roles.items()}:
         wrong('role_digests')
     rows, _, _, _, metadata = _source(attempt)
-    if metadata.get('mode') != manifest['mode'] or metadata.get('experiment') != 'legal-benchmark':
+    if metadata.get('mode') != manifest['mode'] or metadata.get('experiment') not in contracts.EXPERIMENT_IDS:
         wrong('mode')
     if metadata.get('suite_lock_sha256') != manifest['suite_lock_sha256']:
         wrong('suite')
@@ -917,14 +917,14 @@ def run(job, suite, output, root):
     return {'status': job_status(new_rows), 'result_path': '.', 'benchmark': lock['benchmark_id']}
 
 
-SCANNED = contracts.SCANNED_NAMES      # directory names the generic report builder scans (legal_benchmark.SCANNED_DIRECTORIES)
+SCANNED = contracts.SCANNED_NAMES      # directory names the generic report builder scans (legal_models.SCANNED_DIRECTORIES)
 _inside_attempt = contracts.inside_attempt
 
 
 def main(argv=None):
     """`packet --output-manifest FILE --output DIR`: the blind review packet and its private key table, written outside
     any attempt directory, outside the repository and outside any directory the report builder scans."""
-    parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_benchmark.grading')
+    parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_models.grading')
     commands = parser.add_subparsers(dest='command', required=True)
     packet = commands.add_parser('packet', help='write review-packet.json and review-key.json for one output manifest')
     packet.add_argument('--output-manifest', required=True)

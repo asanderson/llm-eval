@@ -1,4 +1,4 @@
-"""Generation, workflow and score modes of the legal benchmark: the chat adapter of a role profile, the deterministic
+"""Generation, workflow and score modes of the legal models experiment: the chat adapter of a role profile, the deterministic
 verifier and grader, the blind review contract, the memo renderer and the CPU-only worker requirement.
 
 Every record, matter and suite used here is original and fictional. No model, network or GPU is used: the only
@@ -23,30 +23,30 @@ from llm_eval import adapters
 from llm_eval.common import digest, read_json, sha256_file, write_json
 from llm_eval.core.contracts import atomic_json
 from llm_eval.experiments import get_experiment
-from llm_eval.experiments import legal_benchmark as legal
-from llm_eval.experiments.legal_benchmark import authority, contracts, fixture, ingest, profiles, retrieval
+from llm_eval.experiments import legal_models as legal
+from llm_eval.experiments.legal_models import authority, contracts, fixture, ingest, profiles, retrieval
 from llm_eval.orchestration.planner import compile_campaign
 from llm_eval.orchestration.scheduler import initialize, run_campaign
 
 ROOT = Path(__file__).resolve().parents[1]
-SUITE = ROOT / 'experiments/legal-benchmark/workloads/original-smoke'
+SUITE = ROOT / 'experiments/legal-models/workloads/original-smoke'
 LOCK = SUITE / 'suite.lock.json'
-CASES = ROOT / 'experiments/legal-benchmark/cases'
+CASES = ROOT / 'experiments/legal-models/cases'
 NO_GPU = patch('llm_eval.telemetry.gpu_snapshot', return_value=[])
 
 
 def workflow():
-    from llm_eval.experiments.legal_benchmark import workflow as module
+    from llm_eval.experiments.legal_models import workflow as module
     return module
 
 
 def grading():
-    from llm_eval.experiments.legal_benchmark import grading as module
+    from llm_eval.experiments.legal_models import grading as module
     return module
 
 
 def render():
-    from llm_eval.experiments.legal_benchmark import render as module
+    from llm_eval.experiments.legal_models import render as module
     return module
 
 
@@ -227,7 +227,7 @@ def subset_suite(directory, matter_ids, edit=None):
 def job_for(lock, parameters, mode='generation', job_id='legal-job-1'):
     lock = str(lock)
     # A planned job reserves the physical host of its target; served roles run on that host (package E's `check_job`).
-    return {'job_id': job_id, 'experiment_id': 'legal-benchmark', 'mode': mode, 'parameters': {'suite': lock, **parameters},
+    return {'job_id': job_id, 'experiment_id': 'legal-models', 'mode': mode, 'parameters': {'suite': lock, **parameters},
             'target': {'transport': 'local', 'physical_host_id': 'legal-test-host'}, 'resources': ['legal-test-host'],
             'hardware': {'hardware_profile': 'msi-raider-18-hx-ai', 'os_id': 'ubuntu-26.04-native'},
             'input_files': [{'path': lock, 'sha256': sha256_file(lock)}]}
@@ -761,13 +761,13 @@ class PreflightTests(unittest.TestCase):
         self.input = self.path / 'input.json'
         write_json(self.input, {'value': 1})
 
-    def job(self, experiment='legal-benchmark', mode='score', parameters=None, os_id='ubuntu-26.04-native', lock_root=None):
+    def job(self, experiment='legal-models', mode='score', parameters=None, os_id='ubuntu-26.04-native', lock_root=None):
         target = {'transport': 'local', 'physical_host_id': 'legal-test-host'}
         if lock_root:
             target['lock_root'] = lock_root
         parameters = parameters if parameters is not None else {'suite': str(LOCK), 'output_manifest': str(self.input)}
         # A planned job pins its suite lock (package F: the worker re-derives the data classification from that digest).
-        suite = [{'path': parameters['suite'], 'sha256': sha256_file(parameters['suite'])}] if experiment == 'legal-benchmark' and 'suite' in parameters else []
+        suite = [{'path': parameters['suite'], 'sha256': sha256_file(parameters['suite'])}] if experiment == 'legal-models' and 'suite' in parameters else []
         return {'job_id': 'job-1', 'experiment_id': experiment, 'mode': mode, 'target': target,
                 'hardware': {'hardware_profile': 'msi-raider-18-hx-ai', 'os_id': os_id}, 'parameters': parameters,
                 'input_files': [{'path': str(self.input), 'sha256': sha256_file(self.input)}, *suite]}
@@ -1727,7 +1727,7 @@ class CampaignBase(unittest.TestCase):
     def plan(self, name, mode, parameters):
         write_json(self.path / f'{name}.json', {'id': name, 'parameters': parameters})
         write_json(self.path / f'{name}-campaign.json', {'schema_version': 2, 'id': name, 'inventory': 'inventory.json', 'phases': [
-            {'id': 'legal', 'experiments': [{'id': 'legal-benchmark', 'version': 1, 'mode': mode, 'cases': [f'{name}.json'],
+            {'id': 'legal', 'experiments': [{'id': 'legal-models', 'version': 1, 'mode': mode, 'cases': [f'{name}.json'],
                                              'hardware_configs': ['native']}]}]})
         return compile_campaign(self.path / f'{name}-campaign.json', ROOT)
 
@@ -1975,7 +1975,7 @@ class ScoreTests(CampaignBase):
             refile(directory)
 
         def roles_rewritten(directory):
-            from llm_eval.experiments.legal_benchmark import profiles as p
+            from llm_eval.experiments.legal_models import profiles as p
             job = read_json(directory / 'job.json')
             job['parameters']['roles']['generator']['model'] = 'some-other-model'
             write_json(directory / 'job.json', job)
@@ -2094,7 +2094,7 @@ class WorkflowCampaignTests(CampaignBase):
         (receipt,) = state['reports'].values()
         self.assertEqual(receipt['status'], 'generated')      # package F: a projected local report of cohort aggregates
         import gzip
-        bundle = next((attempt.parents[4] / receipt['report'] / 'bundle/docs/results/legal-benchmark').iterdir())
+        bundle = next((attempt.parents[4] / receipt['report'] / 'bundle/docs/results/legal-models').iterdir())
         self.assertNotIn(b'"record_type": "request"', gzip.decompress((bundle / 'raw/measurements.jsonl.gz').read_bytes()))
         rows = lines(attempt / 'requests.jsonl')
         metadata = read_json(attempt / 'metadata.json')
@@ -2144,7 +2144,7 @@ class WorkflowCampaignTests(CampaignBase):
             for leaked in ('controlling_authority', 'reference_passages', 'ineligible_versions', 'injection_span_ids'):
                 self.assertNotIn(leaked, text)
         # On the packet suite, review-set sources and the prior brief withheld from its own family never reach a prompt.
-        packets = contracts.load_suite(ROOT / 'experiments/legal-benchmark/workloads/original-packets/suite.lock.json')
+        packets = contracts.load_suite(ROOT / 'experiments/legal-models/workloads/original-packets/suite.lock.json')
         view = contracts.candidate_view(poisoned(packets))
         withheld = [span['text'] for s in packets['review']['sources'] for span in s['spans']]
         for m in packets['matters']['matters']:
@@ -2227,7 +2227,7 @@ class WorkflowCampaignTests(CampaignBase):
                 legal.validate({'suite': str(self.lock), **parameters}, ROOT, mode)
 
     def test_shipped_cases_plan_and_placeholders_stop_the_run(self):
-        bundled = read_json(ROOT / 'experiments/legal-benchmark/experiment.json')
+        bundled = read_json(ROOT / 'experiments/legal-models/experiment.json')
         self.assertEqual(bundled['modes'], ['smoke', 'retrieval', 'generation', 'workflow', 'score'])
         self.assertEqual({k: bundled['cases'][k] for k in ('generation', 'workflow', 'score')},
                          {'generation': 'cases/generation.json', 'workflow': 'cases/workflow.json', 'score': 'cases/score.json'})

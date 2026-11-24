@@ -383,7 +383,7 @@ def _pinned(attempt_dir, suite=None):
     the outputs are graded as the `score` mode grades them. The attempt's own `score-detail.jsonl` is never read."""
     attempt = Path(attempt_dir)
     metadata, _ = contracts.read_json_strict(attempt / 'metadata.json')
-    if metadata.get('experiment') != 'legal-benchmark' or metadata.get('mode') not in ('generation', 'workflow', 'score'):
+    if metadata.get('experiment') not in contracts.EXPERIMENT_IDS or metadata.get('mode') not in ('generation', 'workflow', 'score'):
         raise ValueError('Not a scored legal generation, workflow or score attempt')
     job, _ = contracts.read_json_strict(attempt / 'job.json')
     if metadata['mode'] == 'score':
@@ -959,7 +959,7 @@ def _evaluate_attempts(suite, attempts, pool):
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_benchmark.routing')
+    parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_models.routing')
     commands = parser.add_subparsers(dest='command', required=True)
     export = commands.add_parser('export', help='write the routing suite of an approved fixture suite')
     export.add_argument('--suite', required=True)

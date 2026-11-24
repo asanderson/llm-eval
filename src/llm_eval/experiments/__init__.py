@@ -4,7 +4,7 @@ from importlib import import_module
 REGISTRY = {
     'model-offloading': 'llm_eval.experiments.model_offloading',
     'decision-models': 'llm_eval.experiments.decision_models',
-    'legal-benchmark': 'llm_eval.experiments.legal_benchmark',
+    'legal-models': 'llm_eval.experiments.legal_models',
     'hardware-fit': 'llm_eval.experiments.hardware_fit',
 }
 # The former id of a renamed experiment, mapped to its current id. Campaigns planned and bundles published before the
@@ -12,6 +12,7 @@ REGISTRY = {
 # names the current id: the planner refuses a former one.
 RENAMED = {
     'llm-routing': 'decision-models',
+    'legal-benchmark': 'legal-models',
 }
 
 

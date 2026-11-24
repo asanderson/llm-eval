@@ -36,9 +36,9 @@ bash scripts/readiness.sh --campaign configs/local/raider-wsl/campaign.json --js
 
 To inspect WSL tools before configuring that directory, use `--platform ollama --os windows-11-wsl2-ubuntu-26.04`. It reports the missing shared lock without preventing independent tool installations. For standalone checks, `--lock-root /mnt/c/Users/YOU/.cache/llm-eval/locks` specifies an existing shared directory. With a campaign, the inventory itself must contain the correct path; readiness does not edit it. The checker can establish that the directory exists and is writable; you must confirm that the Windows inventory refers to the same physical directory and host ID.
 
-## Legal benchmark campaigns
+## Legal models campaigns
 
-A `legal-benchmark` campaign declares no serving platform, so readiness infers no runtime for its jobs: legal roles are served by a local server the operator runs (`serving: external`), and managed serving is gated. Whether a job needs the GPU comes from the plugin's explicit `host_requirements`, which looks at every role of the job, a served selector included: a job needs the hardware-profile GPU only when one of its roles declares `accelerator: gpu`. A job whose roles are all CPU-served, a `score` job and the synthetic `smoke` fixture need no GPU. Nothing verifies an `accelerator: cpu` claim; it is part of the role digest and the metadata.
+A `legal-models` campaign declares no serving platform, so readiness infers no runtime for its jobs: legal roles are served by a local server the operator runs (`serving: external`), and managed serving is gated. Whether a job needs the GPU comes from the plugin's explicit `host_requirements`, which looks at every role of the job, a served selector included: a job needs the hardware-profile GPU only when one of its roles declares `accelerator: gpu`. A job whose roles are all CPU-served, a `score` job and the synthetic `smoke` fixture need no GPU. Nothing verifies an `accelerator: cpu` claim; it is part of the role digest and the metadata.
 
 Check a host for the legal evaluation example of its OS (read-only; the per-host inventories name the same target and host id `raider` as the other Raider examples):
 
@@ -46,7 +46,7 @@ Check a host for the legal evaluation example of its OS (read-only; the per-host
 bash scripts/readiness.sh --campaign configs/examples/legal/raider-ubuntu/legal-evaluation-campaign.json --check-only
 ```
 
-The same works with `raider-wsl` inside WSL, after its `lock_root` placeholder is replaced as described above for the generic WSL campaign, and with `raider-windows` after the Windows `.ps1` entry point. Readiness does not check the model, its revision or the locked serving profile; see the [legal benchmark walkthrough](LEGAL_BENCHMARK_WALKTHROUGH.md).
+The same works with `raider-wsl` inside WSL, after its `lock_root` placeholder is replaced as described above for the generic WSL campaign, and with `raider-windows` after the Windows `.ps1` entry point. Readiness does not check the model, its revision or the locked serving profile; see the [legal models walkthrough](LEGAL_MODELS_WALKTHROUGH.md).
 
 ## Controls and exit status
 

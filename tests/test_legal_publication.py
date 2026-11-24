@@ -20,9 +20,9 @@ from unittest.mock import patch
 from llm_eval.common import digest, read_json, sha256_file, write_json
 from llm_eval.core.contracts import atomic_json, config_hash
 from llm_eval.experiments import get_experiment
-from llm_eval.experiments import legal_benchmark as legal
-from llm_eval.experiments.legal_benchmark import contracts, fixture, grading, retrieval
-from llm_eval.experiments.legal_benchmark import reporting as lr
+from llm_eval.experiments import legal_models as legal
+from llm_eval.experiments.legal_models import contracts, fixture, grading, retrieval
+from llm_eval.experiments.legal_models import reporting as lr
 from llm_eval.orchestration import scheduler, worker
 from llm_eval.orchestration.planner import compile_campaign, revision
 from llm_eval.orchestration.scheduler import initialize, run_campaign
@@ -33,9 +33,9 @@ from tests.test_legal_workflow import ANALYSIS, FakeGenerator, generator, subset
 from tests.test_reporting import FakeGitHub
 
 ROOT = Path(__file__).resolve().parents[1]
-SUITE = ROOT / 'experiments/legal-benchmark/workloads/original-smoke'
+SUITE = ROOT / 'experiments/legal-models/workloads/original-smoke'
 LOCK = SUITE / 'suite.lock.json'
-PACKETS = ROOT / 'experiments/legal-benchmark/workloads/original-packets/suite.lock.json'
+PACKETS = ROOT / 'experiments/legal-models/workloads/original-packets/suite.lock.json'
 CANARY = 'CANARY7f3a91'
 SSH = {'transport': 'ssh', 'physical_host_id': 'remote-test-host', 'host': 'remote-test-alias', 'python': 'python3',
        'repo_root': '/srv/llm-eval', 'work_root': '/srv/work'}
@@ -120,7 +120,7 @@ class Base(unittest.TestCase):
         parameters = {'suite': str(LOCK), 'synthetic': True} if parameters is None else parameters
         write_json(self.path / f'{name}.json', {'id': case_id or name, 'parameters': parameters})
         campaign = {'schema_version': 2, 'id': name, 'inventory': 'inventory.json', 'phases': [
-            {'id': phase, 'experiments': [{'id': 'legal-benchmark', 'version': 1, 'mode': mode, 'cases': [f'{name}.json'],
+            {'id': phase, 'experiments': [{'id': 'legal-models', 'version': 1, 'mode': mode, 'cases': [f'{name}.json'],
                                            'hardware_configs': [hardware]}]}]}
         if reporting is not None:
             campaign['reporting'] = reporting
@@ -803,7 +803,7 @@ class PublicationTests(Base):
         report = self.report(directory)
 
         def refused(code, target=None):
-            with self.assertRaisesRegex(ValueError, f'Publication is not available for legal-benchmark: {code}$'):
+            with self.assertRaisesRegex(ValueError, f'Publication is not available for legal-models: {code}$'):
                 publish_report(target or report, ROOT, dry_run=True)
             with self.assertRaisesRegex(ValueError, f'^{code}$'):
                 lr.verify_publication(target or report, ROOT)
@@ -943,7 +943,7 @@ class PublicationTests(Base):
         manifest = read_json(dest / 'manifest.json')
         self.assertEqual(sorted(result['files']), sorted(spec['report_path'] + '/' + n for n in BUNDLE_FILES if n != 'manifest.json'))
         self.assertEqual(result['files'], list(manifest['files']))
-        self.assertEqual(read_json(dest / 'resolved-config.json')['experiment']['experiment_id'], 'legal-benchmark')
+        self.assertEqual(read_json(dest / 'resolved-config.json')['experiment']['experiment_id'], 'legal-models')
         self.assertEqual((manifest['projection'], manifest['canonical_bytes'], manifest['execution_kinds'], manifest['data_class']),
                          (lr.PROJECTION, 1, ['fixture'], 'public-synthetic'))
         code, output = cli('publish-results', '--input', str(report), '--project-root', str(ROOT), '--dry-run')
@@ -995,7 +995,7 @@ class PublicationTests(Base):
             publish_report(renamed / report.relative_to(directory), ROOT, dry_run=True)
 
     def test_automatic_publication_stays_refused_at_plan_and_finalize(self):
-        with self.assertRaisesRegex(ValueError, 'Publication is not available for legal-benchmark: automatic_publication_unavailable'):
+        with self.assertRaisesRegex(ValueError, 'Publication is not available for legal-models: automatic_publication_unavailable'):
             self.plan('automatic', reporting={'publish': {'mode': 'pull-request', 'repository': 'asanderson/llm-eval'}})
         directory = self.smoke(LOCK, 'automatic')
         self.authorize(directory)
@@ -1180,7 +1180,7 @@ class CohortTests(CohortCase):
         job = read_json(directory / 'plan.json')['jobs'][0]
         metadata = read_json(self.attempt(directory) / 'metadata.json')
         _, base = lr.cohort(job, metadata, 'lexical-eligible')
-        from llm_eval.experiments.legal_benchmark import profiles
+        from llm_eval.experiments.legal_models import profiles
 
         def role_change(**changes):
             def apply(j, m):
@@ -1236,7 +1236,7 @@ class CohortTests(CohortCase):
             plain_job, plain_meta = self.metadata('unrouted', 'generation', {'arms': ['no-context', 'lexical-eligible'], 'roles': generation['roles']})
             self.assertNotIn(routed, {lr.cohort(plain_job, plain_meta, arm)[1] for arm in ('no-context', 'lexical-eligible')})
         with self.subTest('serving-profile qualification'):
-            from llm_eval.experiments.legal_benchmark import profiles
+            from llm_eval.experiments.legal_models import profiles
             qualified = copy.deepcopy(base_meta)
             profile = {**base_job['parameters']['roles']['generator'], 'qualification': {'serving_profile': str(self.path / 'profile.json')}}
             write_json(self.path / 'profile.json', {'fixture': True})
@@ -1421,7 +1421,7 @@ class CanaryTests(Base):
                 for file_name, data in pristine.items():      # the bytes the receipt names
                     (attempt / file_name).write_bytes(data)
         with self.subTest('exception message'):
-            with patch('llm_eval.experiments.legal_benchmark.grading.aggregate', side_effect=RuntimeError(CANARY)):
+            with patch('llm_eval.experiments.legal_models.grading.aggregate', side_effect=RuntimeError(CANARY)):
                 receipt = self.refinalize(directory)
                 code, output = cli('report', '--input', str(self.experiment_dir(directory)))
             self.assertEqual((receipt['status'], receipt['error_type'], code), ('failed', 'ProjectionRejected', 2))
@@ -1517,12 +1517,12 @@ class ContentTests(Base):
         return directory / self.receipt(directory)['report']
 
     def test_bundles_of_other_experiments_built_from_legal_exports_are_refused(self):
-        from llm_eval.experiments.legal_benchmark import profiles, routing
+        from llm_eval.experiments.legal_models import profiles, routing
         exported = routing.route_tasks(contracts.load_suite(LOCK))
         # Neither the benchmark name nor the category `legal` decides the renamed cases: the content does (task id, then pinned input).
         anonymous = [{**t, 'id': 'q' + str(i), 'category': 'general'} for i, t in enumerate(exported['tasks'])]
-        for name, benchmark, tasks, message in (('renamed', 'routing-fixture', None, r'carries content of legal-benchmark \(task id\)$'),
-                                                ('anonymous', 'routing-fixture', anonymous, r'carries content of legal-benchmark \(pinned input\)$'),
+        for name, benchmark, tasks, message in (('renamed', 'routing-fixture', None, r'carries content of legal-models \(task id\)$'),
+                                                ('anonymous', 'routing-fixture', anonymous, r'carries content of legal-models \(pinned input\)$'),
                                                 ('underscored', 'legal_routing', None, 'carries a legal benchmark name'),
                                                 ('joined', 'legalrouting', None, 'carries a legal benchmark name')):
             with self.subTest(name=name, benchmark=benchmark):
@@ -1653,7 +1653,7 @@ def relabel(report, target, experiment='decision-models', mode='decision', bench
     rel = Path('docs/results') / experiment / Path(spec['report_path']).name
     (target / 'bundle' / rel).parent.mkdir(parents=True, exist_ok=True)
     shutil.move(str(dest), str(target / 'bundle' / rel))
-    shutil.rmtree(target / 'bundle/docs/results/legal-benchmark')
+    shutil.rmtree(target / 'bundle/docs/results/legal-models')
     dest = target / 'bundle' / rel
     (dest / 'raw/measurements.jsonl.gz').write_bytes(gzip.compress(('\n'.join(json.dumps(r) for r in records) + '\n').encode(), mtime=0))
     resolved = read_json(dest / 'resolved-config.json')
@@ -1716,16 +1716,16 @@ class RelabelTests(CohortCase):
         self.refused(relabel(report, out / 'fullwidth' / 'report', benchmark='ｌegal-smoke', rename_ids=True))
         # Each structural claim alone: the other legal traces removed from the bundle first.
         bare = relabel(report, out / 'ids' / 'report', category='general')
-        self.refused(strip_structure(bare, row_keys=('family_id', 'review_status', 'expected_choice')), 'carries content of legal-benchmark')
+        self.refused(strip_structure(bare, row_keys=('family_id', 'review_status', 'expected_choice')), 'carries content of legal-models')
         renamed = relabel(report, out / 'family' / 'report', category='general', rename_ids=True)
-        self.refused(strip_structure(renamed, row_keys=('review_status', 'expected_choice')), 'carries content of legal-benchmark')
+        self.refused(strip_structure(renamed, row_keys=('review_status', 'expected_choice')), 'carries content of legal-models')
 
     def test_relabelled_declared_bundles_are_refused(self):
         report = self.report(self.smoke(self.copy('cp'), 'declared'))
         self.refused(relabel(report, self.path / 'x' / 'smoke' / 'report'))
         generation = self.run_mode('generation', 'generation', {'arms': ['no-context', 'lexical-eligible'], 'roles': {'generator': generator('FAKE_ENDPOINT')}})
         relabelled = relabel(self.report(generation), self.path / 'x' / 'generation' / 'report')
-        self.refused(relabelled, 'carries content of legal-benchmark')      # legal-summary.json alone is a claim
+        self.refused(relabelled, 'carries content of legal-models')      # legal-summary.json alone is a claim
         self.assertTrue(lr.claims_bundle(relabelled, bundle_dir(relabelled)[0], {}, {}, []))
 
     def test_relabel_inside_the_campaign_layout_is_refused_by_the_campaign_record(self):
@@ -1735,7 +1735,7 @@ class RelabelTests(CohortCase):
         strip_structure(relabelled, row_keys=('family_id', 'review_status', 'expected_choice'))
         shutil.rmtree(report)
         shutil.copytree(relabelled, report)
-        with self.assertRaisesRegex(ValueError, 'Publication is not available for legal-benchmark|Publication identity mismatch'):
+        with self.assertRaisesRegex(ValueError, 'Publication is not available for legal-models|Publication identity mismatch'):
             publish_report(report, ROOT, dry_run=True)
 
     def test_structural_claims_have_no_false_positive_on_other_experiments(self):
@@ -1914,7 +1914,7 @@ class ExportContentTests(Base):
     routing_bundle = ContentTests.routing_bundle
 
     def test_transformed_routing_exports_are_refused(self):
-        from llm_eval.experiments.legal_benchmark import routing
+        from llm_eval.experiments.legal_models import routing
         exported = routing.route_tasks(contracts.load_suite(LOCK))
         tasks = exported['tasks']
         variants = {
@@ -1929,11 +1929,11 @@ class ExportContentTests(Base):
             with self.subTest(name):
                 path = self.path / f'v{i}-suite.json'
                 write_json(path, {**exported, 'benchmark': 'routing-fixture', 'tasks': value})
-                with self.assertRaisesRegex(ValueError, 'carries content of legal-benchmark'):
+                with self.assertRaisesRegex(ValueError, 'carries content of legal-models'):
                     publish_report(self.routing_bundle(str(path), name=f'v{i}'), ROOT, dry_run=True)
 
     def test_transformed_workload_exports_and_replays_are_legal_files(self):
-        from llm_eval.experiments.legal_benchmark import profiles, routing
+        from llm_eval.experiments.legal_models import profiles, routing
         workload = profiles.workload(LOCK)
         markers = lr._markers()
         for name, tasks in (('reordered', list(reversed(workload['tasks']))), ('one task', workload['tasks'][:1]),
@@ -1953,7 +1953,7 @@ class ExportContentTests(Base):
         self.assertTrue(lr._legal_file(replay, markers))
 
     def test_a_model_offloading_bundle_from_a_renamed_workload_is_refused(self):
-        from llm_eval.experiments.legal_benchmark import profiles
+        from llm_eval.experiments.legal_models import profiles
         workload = profiles.workload(LOCK)
         write_json(self.path / 'workload.json', {**workload, 'benchmark': 'category-smoke', 'tasks': list(reversed(workload['tasks']))})
         config = read_json(ROOT / 'configs/runs/ollama.example.json')
@@ -1973,7 +1973,7 @@ class ExportContentTests(Base):
             write_json(out / 'metadata.json', {'config': {'model': 'fixture'}})
             return {'status': 'succeeded'}
         directory, _ = self.run_plan(plan, 'offload', rpc=rpc)
-        with self.assertRaisesRegex(ValueError, 'carries content of legal-benchmark'):
+        with self.assertRaisesRegex(ValueError, 'carries content of legal-models'):
             publish_report(directory / self.receipt(directory)['report'], ROOT, dry_run=True)
 
 
@@ -2085,7 +2085,7 @@ class SchemaTests(Base):
         write_json(self.path / 'a.json', {'id': 'approved', 'parameters': {'suite': str(LOCK), 'synthetic': True}})
         write_json(self.path / 'b.json', {'id': 'declared', 'parameters': {'suite': str(copy_lock), 'synthetic': True}})
         write_json(self.path / 'two.json', {'schema_version': 2, 'id': 'two', 'inventory': 'inventory.json', 'phases': [
-            {'id': 'legal', 'experiments': [{'id': 'legal-benchmark', 'version': 1, 'mode': 'smoke', 'cases': ['a.json', 'b.json'],
+            {'id': 'legal', 'experiments': [{'id': 'legal-models', 'version': 1, 'mode': 'smoke', 'cases': ['a.json', 'b.json'],
                                              'hardware_configs': ['native']}]}]})
         directory, code = self.run_plan(compile_campaign(self.path / 'two.json', ROOT), 'two')
         self.assertEqual(code, 0)
@@ -2159,7 +2159,7 @@ class GateDetailTests(Base):
         plain = self.path / 'routing-attempt'
         plain.mkdir()
         (plain / 'x.bin').write_bytes(b'x')
-        for text in ('[1, 2]', '{"job_id": "x"}', '{"experiment_id": "legal-benchmark", '):      # not a job object with an experiment
+        for text in ('[1, 2]', '{"job_id": "x"}', '{"experiment_id": "legal-models", '):      # not a job object with an experiment
             with self.subTest(job=text):
                 (plain / 'job.json').write_text(text, encoding='utf-8')
                 with self.assertRaisesRegex(ValueError, 'Collection refused by data policy: .*job.json'):
@@ -2206,7 +2206,7 @@ def scrub(report):
     names replaced in every text file and in the raw archive, the legal summary and the structural keys removed, task ids
     renamed. The result is what a person who rewrites the whole bundle produces."""
     dest, spec = bundle_dir(report)
-    names = ((b'legal-original-smoke', b'smoke'), (b'legal-benchmark', b'decision-models'), (b'legal-smoke', b'smoke'))
+    names = ((b'legal-original-smoke', b'smoke'), (b'legal-models', b'decision-models'), (b'legal-smoke', b'smoke'))
 
     def clean(data):
         for old, new in names:
@@ -2322,9 +2322,9 @@ class PublicLegalBenchmarkTests(unittest.TestCase):
         name = '^Publication identity mismatch: the bundle carries a legal benchmark name$'
         cases = [({'benchmark': 'LEGAL_smoke'}, None, name), ({'benchmark': 'legal-original-smoke'}, None, name),
                  ({'benchmark': 'legal_routing', 'category': 'legal'}, None, name), ({'benchmark': 'ｌｅｇａｌ-shaped'}, None, name),
-                 ({'task_id': 'F1 Ledger A', 'benchmark': 'LegalBench'}, None, r'carries content of legal-benchmark \(task id\)$'),
-                 ({'family_id': 'fam', 'category': 'legal'}, None, r'carries content of legal-benchmark \(row key\)$'),
-                 ({}, {'config': {'model': 'fixture'}, 'suite_lock_sha256': 'x'}, r'carries content of legal-benchmark \(row key\)$')]
+                 ({'task_id': 'F1 Ledger A', 'benchmark': 'LegalBench'}, None, r'carries content of legal-models \(task id\)$'),
+                 ({'family_id': 'fam', 'category': 'legal'}, None, r'carries content of legal-models \(row key\)$'),
+                 ({}, {'config': {'model': 'fixture'}, 'suite_lock_sha256': 'x'}, r'carries content of legal-models \(row key\)$')]
         for experiment, mode in self.GENERIC:
             for i, (row, metadata, message) in enumerate(cases):
                 with self.subTest(experiment=experiment, row=row, metadata=metadata):
@@ -2332,7 +2332,7 @@ class PublicLegalBenchmarkTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError, message):
                         publish_report(report, ROOT, dry_run=True)
         report = edit_generic(self.report('manifest', 'model-offloading', 'category-smoke'), manifest=lambda m: m.update(cohorts=1))
-        with self.assertRaisesRegex(ValueError, r'carries content of legal-benchmark \(manifest key\)$'):
+        with self.assertRaisesRegex(ValueError, r'carries content of legal-models \(manifest key\)$'):
             publish_report(report, ROOT, dry_run=True)
 
     def test_only_the_names_this_plugin_writes_are_claimed(self):
@@ -2346,7 +2346,7 @@ class PublicLegalBenchmarkTests(unittest.TestCase):
                                                   [{'record_type': 'request', 'data': {'benchmark': name}}]), 'benchmark name')
                 self.assertEqual(lr.claims_bundle(self.path / 'x' / 'report', self.path, {}, {},
                                                   [{'record_type': 'metadata', 'data': {'benchmark_id': name}}]), 'benchmark name')
-        for name in ('LegalBench', 'legalbench', 'legal-bench', 'legalese-quiz', 'legal', 'legal-benchmark-x', 'routing-fixture', None):
+        for name in ('LegalBench', 'legalbench', 'legal-bench', 'legalese-quiz', 'legal', 'legal-models-x', 'routing-fixture', None):
             with self.subTest(not_claimed=name):
                 self.assertFalse(legal.claims_benchmark(name))
                 self.assertIsNone(lr.claims_bundle(self.path / 'x' / 'report', self.path, {}, {},
@@ -2375,11 +2375,11 @@ class SecondRelabelTests(CohortCase):
         relabelled = strip_structure(relabel(report, self.path / 'x' / 'smoke' / 'report', benchmark='smoke', rename_ids=True),
                                      files=('legal-summary.json',), manifest_keys=('execution_kinds', 'data_class', 'suite_lock_sha256', 'cohorts'),
                                      row_keys=('family_id', 'review_status', 'suite_lock_sha256'))
-        self.refused(relabelled, r'carries content of legal-benchmark \(text file\)')      # README.md and summary.csv
+        self.refused(relabelled, r'carries content of legal-models \(text file\)')      # README.md and summary.csv
         generation = self.run_mode('gen', 'generation', {'arms': ['no-context', 'lexical-eligible'], 'roles': {'generator': generator('FAKE_ENDPOINT')}})
         relabelled = strip_structure(relabel(self.report(generation), self.path / 'x' / 'generation' / 'report'), files=('legal-summary.json',),
                                      manifest_keys=('execution_kinds', 'data_class', 'suite_lock_sha256', 'cohorts'), row_keys=('suite_lock_sha256',))
-        self.refused(relabelled, r'carries content of legal-benchmark \(text file\)')
+        self.refused(relabelled, r'carries content of legal-models \(text file\)')
 
     def test_a_scrubbed_bundle_is_refused_anywhere_inside_its_campaign(self):
         directory = self.smoke(LOCK, 'scrub')
@@ -2388,23 +2388,23 @@ class SecondRelabelTests(CohortCase):
         self.assertTrue(publish_report(scrubbed, ROOT, dry_run=True)['dry_run'])      # outside any campaign: the documented residual
         off = directory / 'experiments' / report.parent.name / 'copy' / 'report'
         shutil.copytree(scrubbed, off)
-        self.refused(off, 'the campaign record names legal-benchmark')
+        self.refused(off, 'the campaign record names legal-models')
         renamed = self.path / 'renamed-campaign'
         shutil.copytree(directory, renamed)
         shutil.rmtree(renamed / 'experiments' / report.parent.name / 'report')
         shutil.copytree(scrubbed, renamed / 'experiments' / report.parent.name / 'report')
         (renamed / 'experiments').rename(renamed / 'Experiments2')
-        self.refused(renamed / 'Experiments2' / report.parent.name / 'report', 'the campaign record names legal-benchmark')
+        self.refused(renamed / 'Experiments2' / report.parent.name / 'report', 'the campaign record names legal-models')
         # The plan and the experiment record relabelled too: the attempts' own job.json still name the experiment.
         inplace = directory / 'experiments' / report.parent.name / 'report'
         shutil.rmtree(inplace)
         shutil.copytree(scrubbed, inplace)
         plan = read_json(directory / 'plan.json')
-        text = json.dumps(plan).replace('"experiment_id": "legal-benchmark"', '"experiment_id": "decision-models"')
+        text = json.dumps(plan).replace('"experiment_id": "legal-models"', '"experiment_id": "decision-models"')
         write_plan(directory, json.loads(text))
         record = read_json(inplace.parent / 'experiment.json')
         write_json(inplace.parent / 'experiment.json', {**record, 'experiment_id': 'decision-models'})
-        self.refused(inplace, 'the campaign record names legal-benchmark')
+        self.refused(inplace, 'the campaign record names legal-models')
         for name in ('job.json', 'metadata.json'):      # each attempt file alone is enough
             with self.subTest(attempt_file=name):
                 attempt = self.attempt(directory)
@@ -2413,7 +2413,7 @@ class SecondRelabelTests(CohortCase):
                 stash = (attempt / other).read_bytes()
                 (attempt / other).unlink()
                 try:
-                    self.refused(inplace, 'the campaign record names legal-benchmark')
+                    self.refused(inplace, 'the campaign record names legal-models')
                 finally:
                     (attempt / other).write_bytes(stash)
                 self.assertEqual((attempt / name).read_bytes(), kept)
@@ -2427,7 +2427,7 @@ class SecondRelabelTests(CohortCase):
         for name, rows, manifest, marker in cases:
             with self.subTest(name):
                 report = edit_generic(generic_bundle(self), rows, manifest)
-                with self.assertRaisesRegex(ValueError, rf'carries content of legal-benchmark \({marker}\)$'):
+                with self.assertRaisesRegex(ValueError, rf'carries content of legal-models \({marker}\)$'):
                     publish_report(report, ROOT, dry_run=True)
         report = edit_generic(generic_bundle(self), lambda r: r.update(benchmark='LEGAL_original smoke'))
         with self.assertRaisesRegex(ValueError, '^Publication identity mismatch: the bundle carries a legal benchmark name$'):

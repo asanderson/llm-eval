@@ -1,4 +1,4 @@
-"""Shared contracts of the legal benchmark: suite lock v1, matter and authority manifests, candidate output v1.
+"""Shared contracts of the legal models experiment: suite lock v1, matter and authority manifests, candidate output v1.
 
 Everything here reads, validates and hashes local files only; the one writer, `write_text_atomic`, is used by the
 operator commands and never by the planner. Nothing is fetched or executed, so the planner can call it freely. Documents are untrusted content: they are data to quote and anchor, never instructions.
@@ -16,6 +16,13 @@ import tempfile
 from llm_eval.common import sha256_file
 from llm_eval.core.contracts import fields, identifier
 
+# The experiment id this plugin writes, and every id it reads as its own: `legal-benchmark` until 2026-11-23. Attempts,
+# manifests and published bundles of that time carry the former id and stay valid; a name check compares against both.
+EXPERIMENT_ID = 'legal-models'
+FORMER_IDS = ('legal-benchmark',)
+EXPERIMENT_IDS = (EXPERIMENT_ID, *FORMER_IDS)
+# Cohort digests keep the id they were introduced with, so a run after the rename is comparable with one before it.
+COHORT_EXPERIMENT = 'legal-benchmark'
 LOCK_VERSION = 1
 OUTPUT_VERSION = 1
 DATA_CLASSES = ('public-synthetic', 'public-benchmark', 'private-matter')
@@ -233,7 +240,7 @@ def _read_lock(lock_path):
     return _verify_lock(lock_path)[:3]
 
 
-APPROVED_SUITES = 'experiments/legal-benchmark/approved-suites.json'
+APPROVED_SUITES = 'experiments/legal-models/approved-suites.json'
 APPROVED_KEYS = ('benchmark_id', 'fixture_export')
 HEX64 = re.compile(r'[0-9a-f]{64}')
 

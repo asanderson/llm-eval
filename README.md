@@ -7,7 +7,7 @@ A reproducible lab for running **versioned LLM experiments** across hardware con
 | Topic | Documents |
 |---|---|
 | Summary | [Executive summary](#executive-summary): recommended models per platform, experiment and hardware configuration |
-| Experiments | [Hardware fit](experiments/hardware-fit/README.md) · [Model offloading](experiments/model-offloading/README.md) · [Decision models](experiments/decision-models/README.md) · [Legal benchmark](experiments/legal-benchmark/README.md) ([walkthrough](docs/LEGAL_BENCHMARK_WALKTHROUGH.md)) · [Add a new experiment](docs/NEW_EXPERIMENT.md) |
+| Experiments | [Hardware fit](experiments/hardware-fit/README.md) · [Model offloading](experiments/model-offloading/README.md) · [Decision models](experiments/decision-models/README.md) · [Legal models](experiments/legal-models/README.md) ([walkthrough](docs/LEGAL_MODELS_WALKTHROUGH.md)) · [Add a new experiment](docs/NEW_EXPERIMENT.md) |
 | Models | [Model catalog](docs/MODELS.md) · [Model origins and US models](docs/MODELS.md#model-origins) · [Candidate models from Ollama, Hugging Face and LM Studio](docs/MODEL_CANDIDATES.md) · [LiveBench integration](docs/LIVEBENCH.md) · [Nightly model discovery](docs/MODEL_DISCOVERY.md) · catalogs: [models](catalog/models.json), [artifact pins](catalog/model-artifacts.json), [origins](catalog/model-origins.json) |
 | Model platforms | [Setup and compatibility of every platform](docs/PLATFORMS.md): [Ollama](docs/PLATFORMS.md#ollama) · [LM Studio](docs/PLATFORMS.md#lm-studio) · [KoboldCpp](docs/PLATFORMS.md#koboldcpp) · [llama.cpp and ik_llama.cpp](docs/PLATFORMS.md#llamacpp-and-ik_llamacpp) · [KTransformers](docs/PLATFORMS.md#ktransformers) · [vLLM](docs/PLATFORMS.md#vllm) · [Hugging Face Accelerate](docs/PLATFORMS.md#hugging-face-accelerate) · [AirLLM](docs/PLATFORMS.md#airllm) · [Strata](docs/PLATFORMS.md#strata) |
 | Hardware configurations | [Hardware configurations](docs/HARDWARE.md): [raider-windows](docs/HARDWARE.md#raider-windows) · [raider-wsl](docs/HARDWARE.md#raider-wsl) · [raider-ubuntu](docs/HARDWARE.md#raider-ubuntu) |
@@ -22,13 +22,13 @@ A reproducible lab for running **versioned LLM experiments** across hardware con
 | Hardware fit | The best model artifact for a hardware configuration that stays inside GPU VRAM: projected fit of candidate artifacts from GPU, VRAM, CPU, RAM and disk limits, and measured runs with every layer on the GPU | [Hardware fit guide](experiments/hardware-fit/README.md) |
 | Model offloading | Quality, latency, throughput, and CPU/GPU/disk placement for models exceeding GPU VRAM | [Original experiment and model catalog](experiments/model-offloading/README.md) |
 | Decision models | Accuracy and latency of decision models (one choice question per task over named criteria, through Ollama's SystemOne API), replay selection quality, and the live quality, latency and API cost of the generators they route to. Formerly `llm-routing` | [Decision models guide](experiments/decision-models/README.md) |
-| Legal benchmark | Retrieval of applicable law and source-grounded draft screening memos for human review, over a fictional jurisdiction; fictional fixture suite only; four runs on the Windows host and four in WSL2 published (generation and workflow on a served model, score, fixture retrieval), human review pending | [Legal benchmark guide](experiments/legal-benchmark/README.md) |
+| Legal models | Retrieval of applicable law and source-grounded draft screening memos for human review, over a fictional jurisdiction; fictional fixture suite only; four runs on the Windows host and four in WSL2 published (generation and workflow on a served model, score, fixture retrieval), human review pending. Formerly `legal-benchmark` | [Legal models guide](experiments/legal-models/README.md) |
 
 The original target is the MSI Raider 18 HX AI with RTX 5090 Laptop 24 GiB, 64 GiB RAM, and native Ubuntu, native Windows, or WSL. Additional machines use their own profiles and execution targets. **Fixture tests are not real hardware benchmarks.** See the [validation record](docs/VALIDATION.md) for hardware acceptance gates.
 
 ## Executive summary
 
-The recommended model on each model platform, per experiment and hardware configuration, from the published results. Decision models run only on Ollama, the one platform here with the SystemOne API. The legal benchmark publishes its results by class and cohort and does not rank models. On the MSI Raider, every US model measured so far is a model-offloading run: no US model has been measured in hardware fit, and every decision model measured so far is fine-tuned from a Qwen base, so none is a US model. The [candidate review](docs/MODEL_CANDIDATES.md) lists the US models to measure next.
+The recommended model on each model platform, per experiment and hardware configuration, from the published results. Decision models run only on Ollama, the one platform here with the SystemOne API. The legal models experiment publishes its results by class and cohort and does not rank models. On the MSI Raider, every US model measured so far is a model-offloading run: no US model has been measured in hardware fit, and every decision model measured so far is fine-tuned from a Qwen base, so none is a US model. The [candidate review](docs/MODEL_CANDIDATES.md) lists the US models to measure next.
 
 <!-- summary-recommended:start -->
 
@@ -41,9 +41,9 @@ Generated by `llm-eval index-results` from the published bundles; do not edit be
 | [Hardware fit](experiments/hardware-fit/README.md) | [qwen38-27b-ud-q4_k_xl](docs/results/index/model/qwen38-27b-ud-q4_k_xl.md) [24/27, 1.97 s](docs/results/hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md)<br>US: none measured | [qwen38-27b-ud-q4_k_xl](docs/results/index/model/qwen38-27b-ud-q4_k_xl.md) [24/27, 0.886 s](docs/results/hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md)<br>US: none measured | [qwen38-27b-ud-q4_k_xl](docs/results/index/model/qwen38-27b-ud-q4_k_xl.md) [24/27, 2.78 s](docs/results/hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md)<br>US: none measured |
 | [Model offloading](experiments/model-offloading/README.md) | [kimi-linear-48b](docs/results/index/model/kimi-linear-48b.md) [24/27, 0.149 s](docs/results/model-offloading/campaign-20261117T043857Z-d2cbbd81-offload-model-offloading-1/README.md)<br>US: [nemotron-nano-30b](docs/results/index/model/nemotron-nano-30b.md) [24/27, 2.71 s](docs/results/model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/README.md) | [qwen35-35b-moe](docs/results/index/model/qwen35-35b-moe.md) [27/27, 8.32 s](docs/results/model-offloading/campaign-20261122T083921Z-1f20982a-offload-model-offloading-1/README.md)<br>US: [nemotron-nano-30b](docs/results/index/model/nemotron-nano-30b.md) [24/27, 5.09 s](docs/results/model-offloading/campaign-20261122T003348Z-8d8d894b-offload-model-offloading-1/README.md) | [kimi-linear-48b](docs/results/index/model/kimi-linear-48b.md) [24/27, 0.524 s](docs/results/model-offloading/campaign-20261117T043857Z-d2cbbd81-offload-model-offloading-1/README.md)<br>US: [gemma4-26b-moe](docs/results/index/model/gemma4-26b-moe.md) [21/27, 0.524 s](docs/results/model-offloading/campaign-20261118T050451Z-60d1fe39-offload-model-offloading-1/README.md) |
 | [Decision models](experiments/decision-models/README.md) | [llm-eval-tev1:locked](docs/results/index/model/llm-eval-tev1-locked.md) [6/6, 0.0253 s](docs/results/llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md)<br>US: none measured | – | – |
-| [Legal benchmark](experiments/legal-benchmark/README.md) | – | – | – |
+| [Legal models](experiments/legal-models/README.md) | – | – | – |
 
-Published here but not ranked (fixture runs only, or results published by class and cohort): [Legal benchmark](experiments/legal-benchmark/README.md).
+Published here but not ranked (fixture runs only, or results published by class and cohort): [Legal models](experiments/legal-models/README.md).
 
 **[raider-windows](docs/results/index/hardware/raider-windows.md)**
 
@@ -52,9 +52,9 @@ Published here but not ranked (fixture runs only, or results published by class 
 | [Hardware fit](experiments/hardware-fit/README.md) | – | – | – |
 | [Model offloading](experiments/model-offloading/README.md) | [kimi-linear-48b](docs/results/index/model/kimi-linear-48b.md) [24/27, 0.141 s](docs/results/model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md)<br>US: [nemotron-nano-30b](docs/results/index/model/nemotron-nano-30b.md) [24/27, 2.47 s](docs/results/model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) | [kimi-linear-48b](docs/results/index/model/kimi-linear-48b.md) [24/27, 0.147 s](docs/results/model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md)<br>US: [nemotron-nano-30b](docs/results/index/model/nemotron-nano-30b.md) [24/27, 4.62 s](docs/results/model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) | [kimi-linear-48b](docs/results/index/model/kimi-linear-48b.md) [24/27, 0.58 s](docs/results/model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md)<br>US: [gemma4-26b-moe](docs/results/index/model/gemma4-26b-moe.md) [21/27, 0.582 s](docs/results/model-offloading/campaign-20261115T161112Z-fff50610-offload-model-offloading-1/README.md) |
 | [Decision models](experiments/decision-models/README.md) | [llm-eval-tev1:locked](docs/results/index/model/llm-eval-tev1-locked.md) [6/6, 0.0367 s](docs/results/llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md)<br>US: none measured | – | – |
-| [Legal benchmark](experiments/legal-benchmark/README.md) | – | – | – |
+| [Legal models](experiments/legal-models/README.md) | – | – | – |
 
-Published here but not ranked (fixture runs only, or results published by class and cohort): [Legal benchmark](experiments/legal-benchmark/README.md).
+Published here but not ranked (fixture runs only, or results published by class and cohort): [Legal models](experiments/legal-models/README.md).
 
 **[raider-ubuntu](docs/results/index/hardware/raider-ubuntu.md)**
 
@@ -116,6 +116,6 @@ llm-eval publish-results --input results/campaign-EXAMPLE/experiments/EXPERIMENT
 
 ## Documentation
 
-Every document is listed under [Contents](#contents). The [legal benchmark walkthrough](docs/LEGAL_BENCHMARK_WALKTHROUGH.md) covers offload calibration, the locked serving profile, routing calibration and replay, the frozen legal evaluation and the local report.
+Every document is listed under [Contents](#contents). The [legal models walkthrough](docs/LEGAL_MODELS_WALKTHROUGH.md) covers offload calibration, the locked serving profile, routing calibration and replay, the frozen legal evaluation and the local report.
 
 Existing `llm-eval run --config FILE`, `scripts/run.py --config FILE`, and platform/OS wrappers remain supported. Their original installation and local-inference defaults remain in place. Source, workloads and experiment settings must be pinned for meaningful comparisons.

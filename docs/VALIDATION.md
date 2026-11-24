@@ -39,9 +39,9 @@ For each claimed successful cell, retain: exact artifacts/revisions, engine/depe
 
 A benchmark request reaching an endpoint is not proof of the requested backend, model, quantization, or offload placement. Verify those facts independently from local startup/configuration evidence. The harness labels them as operator attestations.
 
-## Legal benchmark (issue 45)
+## Legal models (issue 45)
 
-Recorded 2026-11-13, on the development host, for the `legal-benchmark` experiment and its [walkthrough](LEGAL_BENCHMARK_WALKTHROUGH.md). The statements and counts of the sections above are historical and unchanged. No model was served, no GPU was used, no campaign was set up or run on a target host, and no number produced by these checks is a measurement: every value in the legal tests comes from original fictional fixtures and a deterministic stand-in generator behind a scripted loopback test server. Host measurements are pending.
+Recorded 2026-11-13, on the development host, for the `legal-benchmark` experiment (renamed `legal-models` on 2026-11-23) and its [walkthrough](LEGAL_MODELS_WALKTHROUGH.md). The statements and counts of the sections above are historical and unchanged. No model was served, no GPU was used, no campaign was set up or run on a target host, and no number produced by these checks is a measurement: every value in the legal tests comes from original fictional fixtures and a deterministic stand-in generator behind a scripted loopback test server. Host measurements are pending.
 
 "No authorization to access private matter inputs or publish a results bundle is implied by this plan." "Do not run models on actual prosecution decisions or automate filing, charging, contact or evidence disclosure." "No public results promotion from private inputs, even aggregate metrics." "Run one campaign at a time on the Raider."
 
@@ -65,11 +65,11 @@ Recorded 2026-11-13, on the development host, for the `legal-benchmark` experime
   - the diagram has the edges of the walkthrough, and re-rendering it gives the committed Mermaid source byte for byte and a PNG of the same size that differs by less than 2 % per pixel on average (skipped without matplotlib).
 - Not run here: the repository's CI matrix (Ubuntu and Windows, Python 3.11, 3.12 and 3.13; the pull request runs it), Linux, Python 3.11 and 3.13, `python -m pip install -e ".[telemetry,reporting]"` in a fresh environment.
 
-No test downloads anything or calls a paid API, and operators who skip the legal benchmark need nothing new: `pyproject.toml` still has `dependencies = []` and exactly the `telemetry` and `reporting` extras.
+No test downloads anything or calls a paid API, and operators who skip the legal models experiment need nothing new: `pyproject.toml` still has `dependencies = []` and exactly the `telemetry` and `reporting` extras.
 
-### Behaviour outside the legal benchmark
+### Behaviour outside the legal models experiment
 
-Several changes reach the other experiments; all are refusals. `publish-results` refuses a bundle of any experiment that lacks its raw archive or a summary file, names an unregistered experiment, holds a job whose mode its experiment does not register, or sits below a campaign whose record names another experiment. `run` and `resume` refuse a campaign whose stored `plan.json` no longer matches its recorded digest. A generic bundle of any experiment is refused by `publish-results` when it carries one of the legal plugin's own benchmark names after normalisation (`legal-smoke`, `legal-routing`, `legal-shaped` or the benchmark id of an approved suite; `Publication identity mismatch: the bundle carries a legal benchmark name`), a legal task id, or legal row or manifest keys (`Publication identity mismatch: the bundle carries content of legal-benchmark (<class>)`). A public legal benchmark under a generic experiment is publishable: a `model-offloading` or `decision-models` bundle that measures `LegalBench`, or has rows in category `legal`, is not refused for that. A worker refuses remote collection of a path when a `job.json` at or above it does not name its experiment (`Collection refused by data policy: <path>`). The published bundles of the other experiments are not changed, re-hashed or blob-checked. A report the generic layer may not build is recorded as `disabled` with its reason (`Report generation is disabled` when built by hand).
+Several changes reach the other experiments; all are refusals. `publish-results` refuses a bundle of any experiment that lacks its raw archive or a summary file, names an unregistered experiment, holds a job whose mode its experiment does not register, or sits below a campaign whose record names another experiment. `run` and `resume` refuse a campaign whose stored `plan.json` no longer matches its recorded digest. A generic bundle of any experiment is refused by `publish-results` when it carries one of the legal plugin's own benchmark names after normalisation (`legal-smoke`, `legal-routing`, `legal-shaped` or the benchmark id of an approved suite; `Publication identity mismatch: the bundle carries a legal benchmark name`), a legal task id, or legal row or manifest keys (`Publication identity mismatch: the bundle carries content of legal-models (<class>)`). A public legal benchmark under a generic experiment is publishable: a `model-offloading` or `decision-models` bundle that measures `LegalBench`, or has rows in category `legal`, is not refused for that. A worker refuses remote collection of a path when a `job.json` at or above it does not name its experiment (`Collection refused by data policy: <path>`). The published bundles of the other experiments are not changed, re-hashed or blob-checked. A report the generic layer may not build is recorded as `disabled` with its reason (`Report generation is disabled` when built by hand).
 
 ### What was not measured
 
@@ -118,7 +118,7 @@ Two further questions were settled by the integration owner and are built: a bun
 
 ### Known limits
 
-The limits of the gates are stated in the [experiment README](../experiments/legal-benchmark/README.md#classification-gates-and-the-report-projection). Quoted from it:
+The limits of the gates are stated in the [experiment README](../experiments/legal-models/README.md#classification-gates-and-the-report-projection). Quoted from it:
 
 > A consistent forgery of `campaign.json` together with the attempt files and the output manifest also passes the receipt checks.
 
@@ -149,7 +149,7 @@ Open. Nothing in this repository records this review.
 - [ ] The pilot gold rubric, including the 12 calibration and 24 evaluation matter families that are not authored yet.
 - [ ] Authority snapshots and the policy profile of any corpus that is not the fictional fixture.
 - [ ] Material-error adjudication (one adjudication per critical code of each reviewed item).
-- [ ] Memo evaluation (the [human rubric review checklist](LEGAL_BENCHMARK_WALKTHROUGH.md#human-rubric-review-checklist), per memo).
+- [ ] Memo evaluation (the [human rubric review checklist](LEGAL_MODELS_WALKTHROUGH.md#human-rubric-review-checklist), per memo).
 
 ### Target-host acceptance
 

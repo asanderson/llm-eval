@@ -7,7 +7,7 @@
       "id": "legal",
       "experiments": [
         {
-          "id": "legal-benchmark",
+          "id": "legal-models",
           "version": 1,
           "mode": "smoke",
           "cases": [

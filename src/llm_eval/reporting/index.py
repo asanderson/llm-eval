@@ -37,7 +37,7 @@ ORIGINS = 'catalog/model-origins.json'
 EXPERIMENTS = (('hardware-fit', 'Hardware fit', 'experiments/hardware-fit/README.md'),
                ('model-offloading', 'Model offloading', 'experiments/model-offloading/README.md'),
                ('decision-models', 'Decision models', 'experiments/decision-models/README.md'),
-               ('legal-benchmark', 'Legal benchmark', 'experiments/legal-benchmark/README.md'))
+               ('legal-models', 'Legal models', 'experiments/legal-models/README.md'))
 PLATFORMS = {'ollama': 'Ollama', 'lmstudio': 'LM Studio', 'koboldcpp': 'KoboldCpp', 'llama.cpp': 'llama.cpp',
              'ik_llama.cpp': 'ik_llama.cpp', 'ktransformers': 'KTransformers', 'vllm': 'vLLM', 'accelerate': 'Accelerate',
              'airllm': 'AirLLM', 'strata': 'Strata'}      # display names, in the order the summary columns take

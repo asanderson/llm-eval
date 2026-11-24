@@ -11,8 +11,8 @@ from unittest.mock import patch
 from llm_eval.common import digest, read_json, sha256_file, write_json
 from llm_eval.core.contracts import atomic_json
 from llm_eval.experiments import REGISTRY, get_experiment, list_experiments, reporting_policy
-from llm_eval.experiments import legal_benchmark as legal
-from llm_eval.experiments.legal_benchmark import contracts, fixture
+from llm_eval.experiments import legal_models as legal
+from llm_eval.experiments.legal_models import contracts, fixture
 from llm_eval.orchestration import worker
 from llm_eval.orchestration.planner import compile_campaign
 from llm_eval.orchestration.scheduler import initialize, run_campaign
@@ -22,7 +22,7 @@ from llm_eval.reporting.experiment import build_report, finalize_campaign
 from llm_eval.reporting.publish import publish_report, validate_bundle
 
 ROOT = Path(__file__).resolve().parents[1]
-SUITE = ROOT / 'experiments/legal-benchmark/workloads/original-smoke'
+SUITE = ROOT / 'experiments/legal-models/workloads/original-smoke'
 LOCK = SUITE / 'suite.lock.json'
 EVIDENCE_SENTENCE = 'The purser admits he knew the count was lower.'
 
@@ -57,10 +57,10 @@ class LegalFixtureTests(unittest.TestCase):
         return fixture.score(output, self.matters[matter_id], self.gold[matter_id], self.suite['corpus'])
 
     def test_registered_with_the_five_modes(self):
-        self.assertEqual(REGISTRY['legal-benchmark'], 'llm_eval.experiments.legal_benchmark')
+        self.assertEqual(REGISTRY['legal-models'], 'llm_eval.experiments.legal_models')
         self.assertIn(legal.MANIFEST, list_experiments())
-        bundled = read_json(ROOT / 'experiments/legal-benchmark/experiment.json')
-        self.assertEqual((bundled['id'], bundled['version'], bundled['modes']), ('legal-benchmark', 1, ['smoke', 'retrieval', 'generation', 'workflow', 'score']))
+        bundled = read_json(ROOT / 'experiments/legal-models/experiment.json')
+        self.assertEqual((bundled['id'], bundled['version'], bundled['modes']), ('legal-models', 1, ['smoke', 'retrieval', 'generation', 'workflow', 'score']))
         self.assertEqual(legal.MANIFEST['modes'], ['smoke', 'retrieval', 'generation', 'workflow', 'score'])
         # The digest that approves a suite for reporting and publication is the shipped lock, which pins every suite file.
         self.assertIn(sha256_file(LOCK), contracts.approved_suites())
@@ -667,7 +667,7 @@ class LegalCampaignTests(unittest.TestCase):
             'hardware_configs': {'native': {'target': 'local', 'hardware_profile': 'msi-raider-18-hx-ai', 'os_id': 'ubuntu-26.04-native'}}})
         self.case = {'id': 'copied-smoke', 'parameters': {'suite': 'suite/suite.lock.json', 'synthetic': True}}
         self.campaign = {'schema_version': 2, 'id': 'legal-test', 'inventory': 'inventory.json', 'phases': [
-            {'id': 'legal', 'experiments': [{'id': 'legal-benchmark', 'version': 1, 'mode': 'smoke', 'cases': ['case.json'],
+            {'id': 'legal', 'experiments': [{'id': 'legal-models', 'version': 1, 'mode': 'smoke', 'cases': ['case.json'],
                                              'hardware_configs': ['native']}]}]}
 
     def plan(self):
@@ -690,12 +690,12 @@ class LegalCampaignTests(unittest.TestCase):
             return directory, run_campaign(directory)
 
     def test_shipped_campaign_plans_one_fixture_job_without_side_effects(self):
-        before = sorted(p.as_posix() for p in (ROOT / 'experiments/legal-benchmark').rglob('*'))
+        before = sorted(p.as_posix() for p in (ROOT / 'experiments/legal-models').rglob('*'))
         plan = compile_campaign(ROOT / 'campaigns/legal-smoke.json', ROOT)
-        self.assertEqual(before, sorted(p.as_posix() for p in (ROOT / 'experiments/legal-benchmark').rglob('*')))
+        self.assertEqual(before, sorted(p.as_posix() for p in (ROOT / 'experiments/legal-models').rglob('*')))
         (job,) = plan['jobs']
         self.assertEqual((job['status'], job['experiment_id'], job['mode'], job['case_id'], job['parameters']['synthetic']),
-                         ('planned', 'legal-benchmark', 'smoke', 'smoke', True))
+                         ('planned', 'legal-models', 'smoke', 'smoke', True))
         self.assertEqual(sorted(Path(f['path']).name for f in job['input_files']),
                          ['corpus.json', 'matters.json', 'rubric.json', 'suite.lock.json'])
         self.assertTrue(all(plan['inputs'][f['path']] == f['sha256'] for f in job['input_files']))
@@ -709,7 +709,7 @@ class LegalCampaignTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Unsupported experiment version or mode'):
             self.plan()
         self.campaign['phases'][0]['experiments'][0]['mode'] = 'smoke'
-        with self.assertRaisesRegex(ValueError, 'Unsupported legal-benchmark mode'):
+        with self.assertRaisesRegex(ValueError, 'Unsupported legal-models mode'):
             legal.validate(self.case['parameters'], ROOT, 'draft')
         for parameters, message in (({'suite': 'suite/suite.lock.json', 'synthetic': False}, 'synthetic: true'),
                                     ({'suite': 'suite/suite.lock.json'}, 'Missing fields'),
@@ -758,7 +758,7 @@ class LegalCampaignTests(unittest.TestCase):
         self.assertEqual(receipt['status'], 'generated')      # one local report, nothing published
         self.assertNotIn('pull_request', receipt)
         report = directory / receipt['report']
-        bundle = next((report / 'bundle/docs/results/legal-benchmark').iterdir())
+        bundle = next((report / 'bundle/docs/results/legal-models').iterdir())
         manifest = read_json(bundle / 'manifest.json')
         self.assertEqual((manifest['status'], manifest['synthetic']), ('complete', True))
         # The projected bundle: exactly the seven canonical files, no chart.
@@ -831,7 +831,7 @@ class LegalCampaignTests(unittest.TestCase):
         self.assertFalse((self.path / 'attempt').exists())
 
     def test_report_policy_reads_the_lock_on_disk(self):
-        from llm_eval.experiments.legal_benchmark import reporting
+        from llm_eval.experiments.legal_models import reporting
         relock(self.suite, revision='operator-copy')
         lock = str(self.suite / 'suite.lock.json')
         claimed = {'mode': 'smoke', 'parameters': {'suite': lock, 'synthetic': True},
@@ -866,15 +866,15 @@ class LegalCampaignTests(unittest.TestCase):
 
     def test_only_the_shipped_suite_is_reported_and_nothing_is_published(self):
         shipped = compile_campaign(ROOT / 'campaigns/legal-smoke.json', ROOT)
-        self.assertEqual({k: v for k, v in reporting_policy('legal-benchmark', shipped['jobs']).items() if k != 'reason'},
+        self.assertEqual({k: v for k, v in reporting_policy('legal-models', shipped['jobs']).items() if k != 'reason'},
                          {'report': True, 'publish': False, 'include_outputs': False})
         self.assertEqual(reporting_policy('decision-models', [])['publish'], True)
-        self.assertEqual(reporting_policy('legal-benchmark', [])['report'], False)
+        self.assertEqual(reporting_policy('legal-models', [])['report'], False)
         # A copied suite with one changed revision is a different, declared suite: it runs and gets a local, reduced report.
         relock(self.suite, revision='operator-copy')
         self.campaign['reporting'] = {'on_experiment_end': True, 'include_outputs': True}
         plan = self.plan()
-        self.assertEqual({k: v for k, v in reporting_policy('legal-benchmark', plan['jobs']).items() if k != 'reason'},
+        self.assertEqual({k: v for k, v in reporting_policy('legal-models', plan['jobs']).items() if k != 'reason'},
                          {'report': True, 'publish': False, 'include_outputs': False})
         directory, code = self.run_local(plan)
         self.assertEqual(code, 0)
@@ -882,11 +882,11 @@ class LegalCampaignTests(unittest.TestCase):
         (receipt,) = state['reports'].values()
         self.assertEqual(receipt['status'], 'generated')
         experiment = directory / 'experiments' / plan['experiments'][0]['experiment_run_id']
-        bundle = next((experiment / 'report/bundle/docs/results/legal-benchmark').iterdir())
+        bundle = next((experiment / 'report/bundle/docs/results/legal-models').iterdir())
         raw = gzip.decompress((bundle / 'raw/measurements.jsonl.gz').read_bytes()).decode()
         for leaked in ('f1-ledger-a', 'expected_choice', 'operator-copy', EVIDENCE_SENTENCE):
             self.assertNotIn(leaked, raw)
-        with self.assertRaisesRegex(ValueError, 'Publication is not available for legal-benchmark: not_approved'):
+        with self.assertRaisesRegex(ValueError, 'Publication is not available for legal-models: not_approved'):
             publish_report(experiment / 'report', ROOT, dry_run=True)
         # Only a refused job gets no report: here the plan, edited after the run, names a private relabelled copy.
         private = self.path / 'private'
@@ -910,7 +910,7 @@ class LegalCampaignTests(unittest.TestCase):
 
     def test_publication_is_rejected_at_plan_at_finalize_and_by_the_manual_command(self):
         self.campaign['reporting'] = {'publish': {'mode': 'pull-request', 'repository': 'asanderson/llm-eval'}}
-        with self.assertRaisesRegex(ValueError, 'Publication is not available for legal-benchmark'):
+        with self.assertRaisesRegex(ValueError, 'Publication is not available for legal-models'):
             self.plan()
         self.campaign['reporting'] = {'on_experiment_end': True}
         self.case['parameters']['suite'] = str(LOCK)
@@ -919,7 +919,7 @@ class LegalCampaignTests(unittest.TestCase):
         self.assertEqual(code, 0)
         report = directory / next(iter(read_json(directory / 'campaign.json')['reports'].values()))['report']
         for dry_run in (True, False):      # approved and verified, but no authorization: refused before anything leaves
-            with self.subTest(dry_run=dry_run), self.assertRaisesRegex(ValueError, 'Publication is not available for legal-benchmark: not_authorized'):
+            with self.subTest(dry_run=dry_run), self.assertRaisesRegex(ValueError, 'Publication is not available for legal-models: not_authorized'):
                 publish_report(report, ROOT, dry_run=dry_run, api=object())
         # A plan edited after the fact to ask for a pull request still publishes nothing.
         stored = read_json(directory / 'plan.json')
@@ -936,7 +936,7 @@ class LegalCampaignTests(unittest.TestCase):
         spec = read_json(report / 'publication.json')
         spec['experiment_id'] = 'decision-models'
         write_json(report / 'publication.json', spec)
-        with self.assertRaisesRegex(ValueError, 'Publication is not available for legal-benchmark: bundle_mismatch'):
+        with self.assertRaisesRegex(ValueError, 'Publication is not available for legal-models: bundle_mismatch'):
             publish_report(report, ROOT, dry_run=True)
 
 
@@ -1084,7 +1084,7 @@ class LegalGuardTests(unittest.TestCase):
                  # Every label, the job mode and the benchmark name rewritten: the bundle still pins the approved legal suite.
                  ('consistent relabel, routing mode, benchmark renamed', dict(raw_benchmark='routing-smoke', summary_benchmark='routing-smoke',
                                                                              mode='decision'),
-                  'Publication identity mismatch: the (bundle carries content of|campaign record names) legal-benchmark')]
+                  'Publication identity mismatch: the (bundle carries content of|campaign record names) legal-models')]
         for name, change, message in moved:
             with self.subTest(name):
                 shutil.rmtree(report)
@@ -1114,7 +1114,7 @@ class LegalGuardTests(unittest.TestCase):
 
         def list_id(r):
             spec = read_json(r / 'publication.json')
-            spec['experiment_id'] = ['legal-benchmark']
+            spec['experiment_id'] = ['legal-models']
             write_json(r / 'publication.json', spec)
 
         def archive(r, data):
