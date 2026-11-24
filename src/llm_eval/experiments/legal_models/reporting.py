@@ -666,8 +666,10 @@ def _project(campaign_dir, plan, state, exp, create_salt):
             metadata = _json(data, 'metadata') if data is not None else None
             if metadata is not None:
                 validate_projection(metadata, METADATA, 'metadata')
+                # The attempt wrote the id its run was planned with: plan entry, job and attempt carry one id.
                 if metadata['mode'] != mode or metadata['suite_lock_sha256'] != c['suite_lock_sha256'] or \
-                        metadata['data_class'] != c['data_class'] or metadata['execution_kind'] != c['execution_kind']:
+                        metadata['data_class'] != c['data_class'] or metadata['execution_kind'] != c['execution_kind'] or \
+                        metadata.get('experiment') != entry['experiment_id']:
                     raise ProjectionRejected('metadata')
                 if exact:
                     _exact_metadata(metadata, c, suite)
@@ -930,7 +932,8 @@ def _verify(report, root, base):
             metadata, _ = contracts.read_json_strict(attempt / 'metadata.json')
         except (OSError, ValueError):
             raise ValueError('receipt_mismatch') from None
-        if not isinstance(metadata, dict) or metadata.get('suite_lock_sha256') != c['suite_lock_sha256'] or metadata.get('experiment') not in contracts.EXPERIMENT_IDS:
+        if not isinstance(metadata, dict) or metadata.get('suite_lock_sha256') != c['suite_lock_sha256'] or \
+                metadata.get('experiment') not in contracts.EXPERIMENT_IDS or metadata.get('experiment') != entry.get('experiment_id'):
             raise ValueError('receipt_mismatch')
         # The coordinator's receipt binds the suite, every file the projection reads and the output manifest; publication
         # needs all of it (a campaign written before the receipt existed is reported locally, never published).

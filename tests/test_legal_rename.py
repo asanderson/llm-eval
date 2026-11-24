@@ -18,7 +18,7 @@ from llm_eval.experiments import RENAMED, canonical, get_experiment, list_experi
 from llm_eval.experiments import legal_models as legal
 from llm_eval.experiments.legal_models import contracts, fixture, reporting
 from llm_eval.orchestration import worker
-from llm_eval.reporting.experiment import build_report
+from llm_eval.reporting.experiment import build_report, projected_bundle
 from llm_eval.reporting.publish import publish_report
 from tests.test_legal_publication import Base, write_plan
 from tests.test_legal_routing import PACKETS, SMOKE, TempCase, build_calibration_attempts, grading, routing, selector_role, served
@@ -137,8 +137,37 @@ class FormerIdCampaignTests(Base):
         with self.assertRaisesRegex(reporting.ProjectionRejected, '^not_reportable$'):
             reporting.project(directory, read_json(directory / 'plan.json'), read_json(directory / 'campaign.json'),
                               read_json(experiment / 'experiment.json'))
-        with self.assertRaises(ValueError):
+        # The call the publication gate makes to rebuild a bundle: no generic check stands in front of the projection there.
+        with self.assertRaisesRegex(reporting.ProjectionRejected, '^not_reportable$'):
+            projected_bundle(experiment, lambda *arguments: reporting.project(*arguments, create_salt=False))
+        with self.assertRaisesRegex(ValueError, '^Experiment identity does not match its planned jobs$'):      # the generic check
             build_report(experiment)
+
+    def test_an_attempt_that_wrote_the_other_id_is_refused(self):
+        def projected(directory):
+            return reporting.project(directory, read_json(directory / 'plan.json'), read_json(directory / 'campaign.json'),
+                                     read_json(self.experiment_dir(directory) / 'experiment.json'))
+
+        def rewrite(directory, experiment):
+            metadata = self.attempt(directory) / 'metadata.json'
+            write_json(metadata, {**read_json(metadata), 'experiment': experiment})
+            self.rereceipt(directory)
+        # Planned under the current id, the attempt names the former one.
+        current = self.smoke(name='current-plan', reporting={'on_experiment_end': False})
+        self.assertTrue(projected(current)['readme'].startswith('# legal-models results'))
+        rewrite(current, FORMER)
+        with self.assertRaisesRegex(reporting.ProjectionRejected, '^metadata$'):
+            projected(current)
+        # Stored as before the rename, reported and authorized; then the attempt names the current id.
+        former, experiment = self.former_campaign('former-plan')
+        report = build_report(experiment)
+        self.authorize(former)
+        reporting.verify_publication(report, ROOT)
+        rewrite(former, CURRENT)
+        with self.assertRaisesRegex(reporting.ProjectionRejected, '^metadata$'):
+            projected(former)
+        with self.assertRaisesRegex(ValueError, '^receipt_mismatch$'):
+            reporting.verify_publication(report, ROOT)
 
     def test_the_worker_gate_applies_the_data_policy_to_a_job_of_the_former_id(self):
         for name, lock, allowed in (('declared', self.copy('declared'), False), ('approved', None, True)):
@@ -221,7 +250,6 @@ class VanishedSuitePathTests(TempCase):
             r.calibration_rows(routed, fallback, 'lexical-eligible', contracts.load_suite(SMOKE))
         rows = r.calibration_rows(routed, fallback, 'lexical-eligible', packets)
         self.assertEqual([x['task_id'] for x in rows], ['p1-quay-a', 'p1-quay-b', 'p2-kiln-a', 'p2-kiln-b'])
-        self.assertEqual(r.lineage_suite(routed, packets), packets['lock_sha256'])
         record = r.calibrate(rows, [0.5, 0.9], packets, r.calibration_lineage(routed, fallback, 'lexical-eligible', packets))
         with patch('sys.stdout', io.StringIO()):      # the operator command, with the suite at its current path
             self.assertEqual(r.main(['calibrate', '--suite', str(PACKETS), '--routed-attempt', str(routed), '--fallback-attempt', str(fallback),

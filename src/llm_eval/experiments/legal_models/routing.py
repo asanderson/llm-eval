@@ -236,12 +236,11 @@ def validate_selector(selector, arms, roles, suite) -> None:
         # The record must be exactly what the two pinned calibration attempts give: a hand-written record is refused.
         routed, fallback = (Path(calibration[side]['output_manifest']).parent.parent for side in ('routed', 'fallback'))
         try:
-            # Read through the calibration suite this case names (bound to the attempts by its lock digest), not through the
-            # path the attempts were planned with: that path may be gone, as after the rename of the experiment directory.
+            # Read through the calibration suite this case names, not through the path the attempts were planned with: that
+            # path may be gone, as after the rename of the experiment directory. Attempts that ran on another suite are
+            # refused here (`Output manifest belongs to another suite`): their manifests name another lock digest.
             rows = calibration_rows(routed, fallback, policy['fallback'], calibration_suite)
             lineage = calibration_lineage(routed, fallback, policy['fallback'], calibration_suite)
-            if lineage_suite(routed, calibration_suite) != calibration_suite['lock_sha256']:
-                raise ValueError('the calibration attempts ran on another suite')
             recomputed = calibrate(rows, [e['threshold'] for e in record['risk_coverage']], calibration_suite, lineage)
         except (ValueError, OSError, KeyError) as exc:
             raise ValueError('Calibration record does not follow from its calibration attempts: ' + (str(exc) if isinstance(exc, ValueError)
@@ -706,11 +705,6 @@ def calibration_lineage(routed_attempt, fallback_attempt, fallback_arm, suite=No
             'routed_output_manifest_sha256': routed['lineage']['output_manifest_sha256'],
             'fallback_output_manifest_sha256': fallback['lineage']['output_manifest_sha256'],
             'generator_sha256': profiles.profile_digest(parameters['roles']['generator'], routed['job'].get('input_files', ()))}
-
-
-def lineage_suite(attempt, suite=None) -> str:
-    """The suite lock digest the pinned outputs of a calibration attempt were scored on. `suite`: as for `calibration_rows`."""
-    return _pinned(attempt, suite)['lineage']['suite_lock_sha256']
 
 
 def calibration_rows(routed_attempt, fallback_attempt, fallback_arm, suite=None) -> list[dict]:
