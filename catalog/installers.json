@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_on": "2026-11-23",
+  "checked_on": "2026-11-24",
   "qualification": "Recipe pins, not verified laptop installations. Transitive Python dependencies are captured with pip freeze after installation; not a fully hashed dependency lock.",
   "harness_packages": [
     "psutil==7.2.2"
@@ -22,7 +22,7 @@
     "ik_llama.cpp": {
       "kind": "cmake",
       "repository": "https://github.com/ikawrakow/ik_llama.cpp.git",
-      "revision": "1180df7edc2349470b651b64cade01341b52e0af"
+      "revision": "ac2169477c6f2ea2af1cf993f527af249bd94df2"
     },
     "ktransformers": {
       "kind": "pip",
@@ -84,7 +84,7 @@
       "torch": "2.11.0",
       "torch_index": "https://download.pytorch.org/whl/cu128",
       "packages": [
-        "airllm==4.0.0",
+        "airllm==4.0.1",
         "transformers==5.24.0",
         "accelerate==1.16.0",
         "sentencepiece==0.2.3"
