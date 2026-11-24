@@ -526,7 +526,7 @@ Checks are those passed out of the 27 measured requests of the three categories;
 
 ### Legal benchmark in WSL2 of 2026-11-18
 
-The experiment was renamed `legal-models` on 2026-11-23. These runs were published under its former id `legal-benchmark`, which their report paths keep.
+The experiment was renamed `legal-models` on 2026-11-24. These runs were published under its former id `legal-benchmark`, which their report paths keep.
 
 The four legal benchmark runs that ran on the Windows host on 2026-11-15 ran again in WSL2 with Ubuntu 26.04 on the same machine, on 2026-11-18. The served model is the same, `kimi-linear-48b` (Kimi-Linear-48B-A3B-Instruct Q6_K, same revision). Ollama was 0.40.15 on Windows and is 0.40.16 in WSL, and the operating system differs, so the cohort digests differ and the runs are set side by side, not compared as one cohort. The suite is the approved public-synthetic fixture suite `legal-original-smoke`: 16 matters of a fictional jurisdiction. No bundle holds private matter. Each bundle needed its own authorization of the run, recorded from the operator's written instruction. Every output requires human review, and none of this says anything about legal quality.
 

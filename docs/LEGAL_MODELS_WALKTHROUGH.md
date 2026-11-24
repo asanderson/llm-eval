@@ -125,6 +125,8 @@ llm-eval plan --campaign configs/local/legal/score-campaign.json
 llm-eval run --campaign configs/local/legal/score-campaign.json
 ```
 
+For an attempt planned before the experiment directory was renamed (`experiments/legal-benchmark`), give `packet` the suite lock at its current path with `--suite`; the output manifest must name that lock's digest.
+
 A source attempt whose output manifest differs from the coordinator's receipt is refused (`Output manifest differs from the campaign record`), and one from a campaign written before the receipts existed too (`Campaign record has no output-manifest digest (campaign written before this check)`). The README states the consequence:
 
 > An attempt in a campaign written before this package therefore cannot be scored, replayed or used for calibration in place (copy it out, or re-run it); a smoke campaign of that age still resumes and gets its local report, and cannot be published.

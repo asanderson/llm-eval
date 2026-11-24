@@ -638,7 +638,8 @@ def _project(campaign_dir, plan, state, exp, create_salt):
     classes = {}
     for job in jobs:
         policy = data_policy(job)
-        if not policy['report'] or job.get('experiment_id') not in contracts.EXPERIMENT_IDS:
+        # A job carries one of the experiment's ids, and the one its experiment entry carries: a run never mixes the two.
+        if not policy['report'] or job.get('experiment_id') not in contracts.EXPERIMENT_IDS or job.get('experiment_id') != entry['experiment_id']:
             raise ProjectionRejected('not_reportable')
         classes[job['job_id']] = classify(job)
     reduced = not all(c['fixture_export'] for c in classes.values())      # one unexported suite reduces the whole run

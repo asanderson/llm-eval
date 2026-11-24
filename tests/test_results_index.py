@@ -235,7 +235,7 @@ def legal_job(job_id, kind, harness='fixture', model='fixture', mode='smoke', co
 
 def legal_bundle(root, publication, created, jobs, summary, projection=True, experiment='legal-models'):
     """A legal bundle as the projection writes it: the marker, the execution kinds and public job descriptions; `experiment`
-    is the id it was published under (`legal-benchmark` before the rename of 2026-11-23)."""
+    is the id it was published under (`legal-benchmark` before the rename of 2026-11-24)."""
     dest = root / 'docs/results' / experiment / publication
     dest.mkdir(parents=True)
     (dest / 'README.md').write_text('# report\n', encoding='utf-8')

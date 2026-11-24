@@ -1060,34 +1060,39 @@ class RoutingTests(RoutedCase):
             'generator_sha256': profiles.profile_digest(job['parameters']['roles']['generator'], job['input_files'])})
 
 
+def build_calibration_attempts(directory, lock=PACKETS):
+    """(routed, fallback) below `directory`: a routed attempt (served fixture selector, threshold 0) and an unrouted attempt
+    of its fallback arm on the packet calibration suite, planned with the suite at `lock`. Fixture replies only."""
+    packets = contracts.load_suite(lock)
+
+    def respond(body):
+        content = body['messages'][1]['content']
+        matter = next(m for m in packets['matters']['matters'] if 'MATTER ' + m['matter_id'] + '\n' in content)
+        output = fixture.draft(matter, packets['corpus'])
+        listed = set(re.findall(r'^\[([a-z0-9-]+@[0-9]+)\] ', content, re.M))
+        output['claims'] = [c for c in output['claims'] if c['authority_id'] + '@' + c['version'] in listed]
+        return json.dumps(output)
+    attempts = []
+    with FakeSelector(lambda body: by_question(body, {'kiln': 'none'}, 0.8)) as selector, FakeGenerator(respond=respond) as fake, NO_GPU:
+        for name, parameters in (('cal-routed', {'arms': ['no-context', 'lexical-eligible'], 'selector': served(),
+                                                 'roles': {'generator': generator(fake.endpoint), 'selector': selector_role(selector.endpoint)}}),
+                                 ('cal-fallback', {'arms': ['lexical-eligible'], 'roles': {'generator': generator(fake.endpoint)}})):
+            job = job_for(lock, parameters, job_id='legal-' + name)
+            out = Path(directory) / name
+            out.mkdir(parents=True)
+            atomic_json(out / 'job.json', job)
+            result = legal.execute(job, out, ROOT)
+            atomic_json(out / 'result.json', {**result, 'attempt_id': out.name})
+            attempts.append(out)
+    return tuple(attempts)
+
+
 def calibration_attempts():
-    """A routed attempt (served fixture selector, threshold 0) and an unrouted attempt of its fallback arm on the packet
-    calibration suite, built once. Fixture replies only."""
+    """The calibration attempts on the shipped packet suite, built once."""
     if 'calibration' not in _SHARED:
         directory = Path(tempfile.mkdtemp())
         unittest.addModuleCleanup(shutil.rmtree, directory, True)
-        packets = contracts.load_suite(PACKETS)
-
-        def respond(body):
-            content = body['messages'][1]['content']
-            matter = next(m for m in packets['matters']['matters'] if 'MATTER ' + m['matter_id'] + '\n' in content)
-            output = fixture.draft(matter, packets['corpus'])
-            listed = set(re.findall(r'^\[([a-z0-9-]+@[0-9]+)\] ', content, re.M))
-            output['claims'] = [c for c in output['claims'] if c['authority_id'] + '@' + c['version'] in listed]
-            return json.dumps(output)
-        attempts = []
-        with FakeSelector(lambda body: by_question(body, {'kiln': 'none'}, 0.8)) as selector, FakeGenerator(respond=respond) as fake, NO_GPU:
-            for name, parameters in (('cal-routed', {'arms': ['no-context', 'lexical-eligible'], 'selector': served(),
-                                                     'roles': {'generator': generator(fake.endpoint), 'selector': selector_role(selector.endpoint)}}),
-                                     ('cal-fallback', {'arms': ['lexical-eligible'], 'roles': {'generator': generator(fake.endpoint)}})):
-                job = job_for(PACKETS, parameters, job_id='legal-' + name)
-                out = directory / name
-                out.mkdir()
-                atomic_json(out / 'job.json', job)
-                result = legal.execute(job, out, ROOT)
-                atomic_json(out / 'result.json', {**result, 'attempt_id': out.name})
-                attempts.append(out)
-        _SHARED['calibration'] = tuple(attempts)
+        _SHARED['calibration'] = build_calibration_attempts(directory)
     return _SHARED['calibration']
 
 

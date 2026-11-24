@@ -922,20 +922,26 @@ _inside_attempt = contracts.inside_attempt
 
 
 def main(argv=None):
-    """`packet --output-manifest FILE --output DIR`: the blind review packet and its private key table, written outside
-    any attempt directory, outside the repository and outside any directory the report builder scans."""
+    """`packet --output-manifest FILE --output DIR [--suite LOCK]`: the blind review packet and its private key table,
+    written outside any attempt directory, outside the repository and outside any directory the report builder scans.
+    `--suite` names the suite lock when it is no longer at the path the attempt was planned with (an attempt of before
+    the rename of the experiment directory, say); the manifest must name that lock's digest either way."""
     parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_models.grading')
     commands = parser.add_subparsers(dest='command', required=True)
     packet = commands.add_parser('packet', help='write review-packet.json and review-key.json for one output manifest')
     packet.add_argument('--output-manifest', required=True)
     packet.add_argument('--output', required=True)
+    packet.add_argument('--suite', help='the suite lock of the outputs; default: the path the attempt was planned with')
     args = parser.parse_args(argv)
     path = Path(args.output_manifest).resolve()
     try:
         source_job, _ = contracts.read_json_strict(path.parent.parent / 'job.json')
     except OSError:
         raise ValueError('Output manifest not found') from None
-    suite = contracts.load_suite(source_job['parameters']['suite'])
+    try:
+        suite = contracts.load_suite(args.suite or source_job['parameters']['suite'])
+    except OSError:
+        raise ValueError('Suite lock not found: name the suite the attempt ran on with --suite') from None
     _, attempt, _, sha = _manifest(str(path), suite)
     out = Path(args.output).resolve()
     if out.is_relative_to(attempt.resolve()):

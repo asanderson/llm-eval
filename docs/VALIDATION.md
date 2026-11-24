@@ -41,7 +41,7 @@ A benchmark request reaching an endpoint is not proof of the requested backend, 
 
 ## Legal models (issue 45)
 
-Recorded 2026-11-13, on the development host, for the `legal-benchmark` experiment (renamed `legal-models` on 2026-11-23) and its [walkthrough](LEGAL_MODELS_WALKTHROUGH.md). The statements and counts of the sections above are historical and unchanged. No model was served, no GPU was used, no campaign was set up or run on a target host, and no number produced by these checks is a measurement: every value in the legal tests comes from original fictional fixtures and a deterministic stand-in generator behind a scripted loopback test server. Host measurements are pending.
+Recorded 2026-11-13, on the development host, for the `legal-benchmark` experiment (renamed `legal-models` on 2026-11-24) and its [walkthrough](LEGAL_MODELS_WALKTHROUGH.md). The statements and counts of the sections above are historical and unchanged. No model was served, no GPU was used, no campaign was set up or run on a target host, and no number produced by these checks is a measurement: every value in the legal tests comes from original fictional fixtures and a deterministic stand-in generator behind a scripted loopback test server. Host measurements are pending.
 
 "No authorization to access private matter inputs or publish a results bundle is implied by this plan." "Do not run models on actual prosecution decisions or automate filing, charging, contact or evidence disclosure." "No public results promotion from private inputs, even aggregate metrics." "Run one campaign at a time on the Raider."
 

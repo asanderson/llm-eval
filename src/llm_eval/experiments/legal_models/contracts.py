@@ -16,7 +16,7 @@ import tempfile
 from llm_eval.common import sha256_file
 from llm_eval.core.contracts import fields, identifier
 
-# The experiment id this plugin writes, and every id it reads as its own: `legal-benchmark` until 2026-11-23. Attempts,
+# The experiment id this plugin writes, and every id it reads as its own: `legal-benchmark` until 2026-11-24. Attempts,
 # manifests and published bundles of that time carry the former id and stay valid; a name check compares against both.
 EXPERIMENT_ID = 'legal-models'
 FORMER_IDS = ('legal-benchmark',)
