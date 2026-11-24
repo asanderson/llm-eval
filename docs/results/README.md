@@ -17,21 +17,61 @@ Each pair then ranks US models alone. US models only, by the same ranking: model
 
 | Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
 |---:|---|---|---:|---:|---:|---|
-| 1 | [lmstudio](index/harness/lmstudio.md) | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 0.886 | 68.6 | [2026-11-23 cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
-| 2 | [ollama](index/harness/ollama.md) | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 1.97 | 33.6 | [2026-11-23 cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
-| 3 | [koboldcpp](index/harness/koboldcpp.md) | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 2.78 | 27.2 | [2026-11-23 cap 2048](hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) |
+| 1 | [lmstudio](index/harness/lmstudio.md) | [inkling2-mini-26b-iq4_nl](index/model/inkling2-mini-26b-iq4_nl.md) | 27/27 | 1.75 | 54.3 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
+| 2 | [koboldcpp](index/harness/koboldcpp.md) | [inkling2-mini-26b-iq4_nl](index/model/inkling2-mini-26b-iq4_nl.md) | 27/27 | 6.66 | 12.8 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
+| 3 | [lmstudio](index/harness/lmstudio.md) | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 0.886 | 68.6 | [2026-11-23 cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
+| 4 | [ollama](index/harness/ollama.md) | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 1.97 | 33.7 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
+| 5 | [koboldcpp](index/harness/koboldcpp.md) | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 3.04 | 27 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
 
 Top 5 models, each on its best-ranked harness:
 
 | Rank | Model | Harness | Checks passed | Median wall s | Output tok/s | Run |
 |---:|---|---|---:|---:|---:|---|
-| 1 | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | [lmstudio](index/harness/lmstudio.md) | 24/27 | 0.886 | 68.6 | [2026-11-23 cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
+| 1 | [inkling2-mini-26b-iq4_nl](index/model/inkling2-mini-26b-iq4_nl.md) | [lmstudio](index/harness/lmstudio.md) | 27/27 | 1.75 | 54.3 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
+| 2 | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | [lmstudio](index/harness/lmstudio.md) | 24/27 | 0.886 | 68.6 | [2026-11-23 cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
+| 3 | [muse-glimmer-30b-kquant-17gb-q4_k_m](index/model/muse-glimmer-30b-kquant-17gb-q4_k_m.md) | [ollama](index/harness/ollama.md) | 24/27 | 4.07 | 37.1 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
 
 Top 5 harness and model combinations of US models:
 
-No measured run of a US model with scored checks has been published for this pair.
+| Rank | Harness | Model | Developer | Checks passed | Median wall s | Output tok/s | Run |
+|---:|---|---|---|---:|---:|---:|---|
+| 1 | [lmstudio](index/harness/lmstudio.md) | [inkling2-mini-26b-iq4_nl](index/model/inkling2-mini-26b-iq4_nl.md) | Thinking Machines Lab | 27/27 | 1.75 | 54.3 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
+| 2 | [koboldcpp](index/harness/koboldcpp.md) | [inkling2-mini-26b-iq4_nl](index/model/inkling2-mini-26b-iq4_nl.md) | Thinking Machines Lab | 27/27 | 6.66 | 12.8 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
+| 3 | [ollama](index/harness/ollama.md) | [muse-glimmer-30b-kquant-17gb-q4_k_m](index/model/muse-glimmer-30b-kquant-17gb-q4_k_m.md) | Meta | 24/27 | 4.07 | 37.1 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
+| 4 | [lmstudio](index/harness/lmstudio.md) | [muse-glimmer-30b-kquant-17gb-q4_k_m](index/model/muse-glimmer-30b-kquant-17gb-q4_k_m.md) | Meta | 24/27 | 4.16 | 35.6 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
+| 5 | [koboldcpp](index/harness/koboldcpp.md) | [muse-glimmer-30b-kquant-17gb-q4_k_m](index/model/muse-glimmer-30b-kquant-17gb-q4_k_m.md) | Meta | 18/27 | 0.524 | 3.82 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
+
+Top 5 US models, each on its best-ranked harness:
+
+| Rank | Model | Harness | Developer | Checks passed | Median wall s | Output tok/s | Run |
+|---:|---|---|---|---:|---:|---:|---|
+| 1 | [inkling2-mini-26b-iq4_nl](index/model/inkling2-mini-26b-iq4_nl.md) | [lmstudio](index/harness/lmstudio.md) | Thinking Machines Lab | 27/27 | 1.75 | 54.3 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
+| 2 | [muse-glimmer-30b-kquant-17gb-q4_k_m](index/model/muse-glimmer-30b-kquant-17gb-q4_k_m.md) | [ollama](index/harness/ollama.md) | Meta | 24/27 | 4.07 | 37.1 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
 
 ![hardware-fit on raider-wsl: harness and model combinations compared](../../diagrams/results/summary/hardware-fit-raider-wsl.png)
+
+Chart: every ranked combination, best-ranked model first, one color per harness. Each panel has its own axis; wall time is on a log scale. Exact values are in the tables of this page and in the linked reports.
+
+**[decision-models](index/experiment/decision-models.md) on [raider-wsl](index/hardware/raider-wsl.md)**
+
+| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
+|---:|---|---|---:|---:|---:|---|
+| 1 | [ollama](index/harness/ollama.md) | [llm-eval-d1:locked](index/model/llm-eval-d1-locked.md) | 6/6 | 0.0119 | – | [2026-11-24](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
+| 2 | [ollama](index/harness/ollama.md) | [llm-eval-laya:locked](index/model/llm-eval-laya-locked.md) | 6/6 | 0.0136 | – | [2026-11-24](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
+| 3 | [ollama](index/harness/ollama.md) | [llm-eval-d1-omni:locked](index/model/llm-eval-d1-omni-locked.md) | 6/6 | 0.0146 | – | [2026-11-24](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
+| 4 | [ollama](index/harness/ollama.md) | [llm-eval-tev1-0.8b:locked](index/model/llm-eval-tev1-0.8b-locked.md) | 6/6 | 0.017 | – | [2026-11-24](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
+| 5 | [ollama](index/harness/ollama.md) | [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) | 6/6 | 0.0311 | – | [2026-11-24](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
+
+Top 5 harness and model combinations of US models:
+
+| Rank | Harness | Model | Developer | Checks passed | Median wall s | Output tok/s | Run |
+|---:|---|---|---|---:|---:|---:|---|
+| 1 | [ollama](index/harness/ollama.md) | [llm-eval-d1:locked](index/model/llm-eval-d1-locked.md) | Liquid AI | 6/6 | 0.0119 | – | [2026-11-24](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
+| 2 | [ollama](index/harness/ollama.md) | [llm-eval-d1-omni:locked](index/model/llm-eval-d1-omni-locked.md) | Liquid AI | 6/6 | 0.0146 | – | [2026-11-24](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
+
+Origin not recorded, so not ranked among US models: `llm-eval-laya:locked`.
+
+![decision-models on raider-wsl: harness and model combinations compared](../../diagrams/results/summary/decision-models-raider-wsl.png)
 
 Chart: every ranked combination, best-ranked model first, one color per harness. Each panel has its own axis; wall time is on a log scale. Exact values are in the tables of this page and in the linked reports.
 
@@ -76,21 +116,6 @@ Top 5 US models, each on its best-ranked harness:
 | 5 | [gemma3-27b](index/model/gemma3-27b.md) | [ollama](index/harness/ollama.md) | Google | 18/27 | 1.4 | 2.85 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T073753Z-bee9d8ce-offload-model-offloading-1/README.md) |
 
 ![model-offloading on raider-wsl: harness and model combinations compared](../../diagrams/results/summary/model-offloading-raider-wsl.png)
-
-Chart: every ranked combination, best-ranked model first, one color per harness. Each panel has its own axis; wall time is on a log scale. Exact values are in the tables of this page and in the linked reports.
-
-**[decision-models](index/experiment/decision-models.md) on [raider-wsl](index/hardware/raider-wsl.md)**
-
-| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---:|---:|---:|---|
-| 1 | [ollama](index/harness/ollama.md) | [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) | 6/6 | 0.0253 | – | [2026-11-18](llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
-| 2 | [ollama](index/harness/ollama.md) | [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) | 6/6 | 0.0531 | – | [2026-11-18](llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
-
-Top 5 harness and model combinations of US models:
-
-No measured run of a US model with scored checks has been published for this pair.
-
-![decision-models on raider-wsl: harness and model combinations compared](../../diagrams/results/summary/decision-models-raider-wsl.png)
 
 Chart: every ranked combination, best-ranked model first, one color per harness. Each panel has its own axis; wall time is on a log scale. Exact values are in the tables of this page and in the linked reports.
 
@@ -188,8 +213,14 @@ MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 285HX, NVIDIA RTX 5090 Laptop (24
 
 #### `raider-wsl`
 
-The laptop of `raider-windows` (MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 285HX, NVIDIA RTX 5090 Laptop, 63.4 GiB RAM, Windows 11 Pro 10.0.26300, AC power, MSI Center "Best Performance", MUX in MSHybrid mode), measured inside WSL2 with Ubuntu 26.04 (WSL 2.7.12.0, kernel 6.18.33.2-microsoft-standard-WSL2, NVIDIA driver 610.74 as read in the guest). Model files and the Ollama and KoboldCpp runtimes live on the ext4 virtual disk of the guest, on the same NVMe volume; LM Studio runs from the vendor AppImage installed in the guest. The guest memory limit differs between two groups of Ollama and KoboldCpp jobs and is stated in the [WSL2 table](#wsl2-measurement-of-2026-11-17-and-2026-11-18); every LM Studio job ran with the 52 GB limit ([LM Studio section](#wsl2-lm-studio-measurement-of-2026-11-22)). Two exceptions: in the hardware-fit jobs of 2026-11-23 on KoboldCpp and LM Studio, the model file stayed on the Windows volume and was read through `/mnt/c` ([KoboldCpp](#hardware-fit-in-wsl2-of-2026-11-23), [LM Studio](#hardware-fit-on-ollama-and-lm-studio-in-wsl2-of-2026-11-23)).
+The laptop of `raider-windows` (MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 285HX, NVIDIA RTX 5090 Laptop, 63.4 GiB RAM, Windows 11 Pro 10.0.26300, AC power, MSI Center "Best Performance", MUX in MSHybrid mode), measured inside WSL2 with Ubuntu 26.04 (WSL 2.7.12.0, kernel 6.18.33.2-microsoft-standard-WSL2, NVIDIA driver 610.74 as read in the guest). Model files and the Ollama and KoboldCpp runtimes live on the ext4 virtual disk of the guest, on the same NVMe volume; LM Studio runs from the vendor AppImage installed in the guest. The guest memory limit differs between two groups of Ollama and KoboldCpp jobs and is stated in the [WSL2 table](#wsl2-measurement-of-2026-11-17-and-2026-11-18); every LM Studio job ran with the 52 GB limit ([LM Studio section](#wsl2-lm-studio-measurement-of-2026-11-22)). Exceptions: in the hardware-fit jobs of `qwen38-27b`, the model file stayed on the Windows volume and was read through `/mnt/c`: on KoboldCpp and LM Studio on 2026-11-23 ([KoboldCpp](#hardware-fit-in-wsl2-of-2026-11-23), [LM Studio](#hardware-fit-on-ollama-and-lm-studio-in-wsl2-of-2026-11-23)) and on KoboldCpp on 2026-11-24 ([section](#hardware-fit-of-muse-glimmer-30b-and-inkling-2-mini-in-wsl2-of-2026-11-24)). The campaigns of 2026-11-24 ran with a soft memory limit of 32 GiB inside the guest, except the first of the two decision-models campaigns.
 
+<!-- hardware-fit-wsl-2026-11-24-bullet:start -->
+- **Hardware fit of Muse Glimmer 30B and Inkling 2 Mini in WSL2 of 2026-11-24** ([tables and notes](#hardware-fit-of-muse-glimmer-30b-and-inkling-2-mini-in-wsl2-of-2026-11-24)). The two US models of the candidate review stay inside VRAM at 4 bits on every harness that loads them: sampled peaks of 19,894 to 20,020 MiB for Inkling 2 Mini at IQ4_NL and of 17,532 to 17,745 MiB for Muse Glimmer 30B at KQuant Q4_K_M, of 24,463 MiB. Inkling 2 Mini passes 27 of 27 checks on LM Studio 0.4.28+2 (53 to 55 output tokens per second) and on KoboldCpp 1.125.1 (13), the first hardware-fit jobs to pass every check; Ollama 0.40.17 cannot load it. Muse Glimmer 30B passes 24 of 27 on Ollama and LM Studio (35 to 37 output tokens per second) and 18 of 27 on KoboldCpp. The results index now recommends Inkling 2 Mini on LM Studio for this experiment on `raider-wsl`.
+<!-- hardware-fit-wsl-2026-11-24-bullet:end -->
+<!-- decision-models-wsl-2026-11-24-bullet:start -->
+- **Decision models in WSL2 of 2026-11-24** ([table and notes](#decision-models-in-wsl2-of-2026-11-24)). All ten decision models of the Ollama library that can run on this laptop choose the right category for six of six prompts, on Ollama 0.40.16. The fastest, `d1`, decides in 12 ms; the slowest, `clef`, takes 0.3 to 0.5 s, because Ollama placed it only partly on the GPU. The two US models, `d1` and `d1-omni` of Liquid AI, are among the three fastest. A first campaign pushed the Windows host into paging; the ranked one ran with the guest's memory bounded.
+<!-- decision-models-wsl-2026-11-24-bullet:end -->
 <!-- hardware-fit-wsl-ollama-lmstudio-2026-11-23-bullet:start -->
 - **Hardware fit on Ollama and LM Studio in WSL2 of 2026-11-23** ([tables and notes](#hardware-fit-on-ollama-and-lm-studio-in-wsl2-of-2026-11-23)). The `qwen38-27b` UD-Q4_K_XL artifact of the KoboldCpp job below also stayed inside VRAM on Ollama 0.40.16 and LM Studio 0.4.28+2, and all three harnesses pass the same 24 of 27 checks. LM Studio is the fastest of the three: category medians of 0.75 to 0.97 s per request and 62 to 69 output tokens per second, against 1.4 to 2.0 s and about 33 on Ollama and 2.6 to 3.1 s and about 27 on KoboldCpp. The results index now recommends LM Studio for this experiment on `raider-wsl`.
 <!-- hardware-fit-wsl-ollama-lmstudio-2026-11-23-bullet:end -->
@@ -209,6 +240,121 @@ The laptop of `raider-windows` (MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 2
 #### `raider-ubuntu`
 
 Synthetic fixture run only. No conclusions.
+
+<!-- hardware-fit-wsl-2026-11-24:start -->
+
+### Hardware fit of Muse Glimmer 30B and Inkling 2 Mini in WSL2 of 2026-11-24
+
+The [candidate review](../MODEL_CANDIDATES.md) named two US models whose 4-bit files fit in VRAM. Both were measured on 2026-11-24 (UTC) in WSL2 (Ubuntu 26.04) on the host of `raider-windows`, on code revision `ce08c16`:
+
+- `muse-glimmer-30b` (Meta) at the publisher's KQuant Q4_K_M: one SHA256-locked GGUF of 16,756,683,904 bytes (15.61 GiB) from `meta-models/Muse-Glimmer-30B-GGUF`.
+- `inkling2-mini-26b` (Thinking Machines Lab) at IQ4_NL: one SHA256-locked GGUF of 17,627,940,768 bytes (16.42 GiB) from `ggml-org/Inkling-2-Mini-GGUF`, the repository the KoboldCpp release notes name for this model.
+
+Each ran on KoboldCpp 1.125.1, Ollama 0.40.17 and LM Studio 0.4.28+2, in one campaign per harness ([KoboldCpp](hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md), [Ollama](hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md), [LM Studio](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md)). KoboldCpp and Ollama are newer than in the runs of 2026-11-23 (1.124.2 and 0.40.16). To tell a change of harness version from a difference between models, the `qwen38-27b` UD-Q4_K_XL artifact of those runs was measured again on both. The settings are those of 2026-11-23: every layer requested on the GPU, context 8192, the three smoke categories with one warm-up and three measured repetitions per task, temperature 0 and a 2,048-token output cap.
+
+Seven of the eight jobs succeeded with the verdict `in_vram`. The eighth failed: Ollama 0.40.17 cannot load Inkling 2 Mini, so the Ollama campaign is recorded as incomplete.
+
+| Model | Harness | Layers on the GPU | GPU buffers in MiB: model, cache, compute | Model buffer on the host, MiB | VRAM before the launch, MiB | Sampled peak, of 24,463 MiB | Rise as recorded |
+|---|---|---|---|---:|---:|---:|---|
+| Muse Glimmer 30B | LM Studio 0.4.28+2 | not reported | not reported | – | 1,609 | 17,532 | 15,923 MiB, 100 % of the 15,980 MiB of weights |
+| Muse Glimmer 30B | Ollama 0.40.17 | 53 of 53 | 15,246; 221; 360 | 721 | 1,620 | 17,745 | 16,125 MiB, 101 % of the 15,980 MiB of weights |
+| Muse Glimmer 30B | KoboldCpp 1.125.1 | 53 of 53 | 15,246; 210; 458 | 721 | 1,413 | 17,620 | 16,207 MiB, 101 % of the 15,980 MiB of weights |
+| Inkling 2 Mini | LM Studio 0.4.28+2 | not reported | not reported | – | 1,609 | 20,020 | 18,411 MiB, 110 % of the 16,811 MiB of weights |
+| Inkling 2 Mini | Ollama 0.40.17 | model not loaded | – | – | 1,620 | 2,126 | 506 MiB |
+| Inkling 2 Mini | KoboldCpp 1.125.1 | 49 of 49 | 16,331; 524; 1,005 | 469 | 1,413 | 19,894 | 18,481 MiB, 110 % of the 16,811 MiB of weights |
+| Qwen 3.8 27B | Ollama 0.40.17 | 66 of 66 | 15,718; 512; 150 | 682 | 1,620 | 18,446 | 16,826 MiB, 100 % of the 16,746 MiB of weights |
+| Qwen 3.8 27B | KoboldCpp 1.125.1 | 66 of 66 | 15,718; 528; 533 | 682 | 1,425 | 18,849 | 17,424 MiB, 104 % of the 16,746 MiB of weights |
+
+The capacity rule allows a sampled peak of 22,415 MiB, which keeps the 2,048 MiB reserve free. In the next table, checks are those passed out of the nine measured requests of each category; the other figures are medians over those requests.
+
+| Model | Harness | Category | Checks | Median wall s | Median output tok/s | Median first output s | Median completion tokens |
+|---|---|---|---:|---:|---:|---:|---:|
+| Muse Glimmer 30B | LM Studio | coding | 9/9 | 4.16 | 35.6 | 0.17 | 148 |
+| Muse Glimmer 30B | LM Studio | math | 9/9 | 2.96 | 35.4 | 0.16 | 105 |
+| Muse Glimmer 30B | LM Studio | reasoning | 6/9 | 6.84 | 35.7 | 0.17 | 245 |
+| Muse Glimmer 30B | Ollama | coding | 9/9 | 4.07 | 37.1 | 0.17 | 151 |
+| Muse Glimmer 30B | Ollama | math | 9/9 | 2.78 | 36.6 | 0.18 | 102 |
+| Muse Glimmer 30B | Ollama | reasoning | 6/9 | 5.19 | 37.1 | 0.17 | 193 |
+| Muse Glimmer 30B | KoboldCpp | coding | 9/9 | 0.52 | 3.8 | 0.52 | 2 |
+| Muse Glimmer 30B | KoboldCpp | math | 6/9 | 0.52 | 3.8 | 0.52 | 2 |
+| Muse Glimmer 30B | KoboldCpp | reasoning | 3/9 | 0.52 | 3.8 | 0.52 | 2 |
+| Inkling 2 Mini | LM Studio | coding | 9/9 | 1.75 | 54.3 | 0.17 | 95 |
+| Inkling 2 Mini | LM Studio | math | 9/9 | 1.46 | 53.5 | 0.17 | 78 |
+| Inkling 2 Mini | LM Studio | reasoning | 9/9 | 2.04 | 55.3 | 0.17 | 113 |
+| Inkling 2 Mini | Ollama | coding | 0/9 | – | – | – | – |
+| Inkling 2 Mini | Ollama | math | 0/9 | – | – | – | – |
+| Inkling 2 Mini | Ollama | reasoning | 0/9 | – | – | – | – |
+| Inkling 2 Mini | KoboldCpp | coding | 9/9 | 6.66 | 12.8 | 0.52 | 86 |
+| Inkling 2 Mini | KoboldCpp | math | 9/9 | 5.22 | 13.0 | 0.52 | 68 |
+| Inkling 2 Mini | KoboldCpp | reasoning | 9/9 | 11.75 | 12.8 | 0.52 | 151 |
+| Qwen 3.8 27B | Ollama | coding | 9/9 | 1.98 | 33.7 | 0.11 | 67 |
+| Qwen 3.8 27B | Ollama | math | 9/9 | 1.97 | 33.7 | 0.11 | 66 |
+| Qwen 3.8 27B | Ollama | reasoning | 6/9 | 1.41 | 33.1 | 0.10 | 47 |
+| Qwen 3.8 27B | KoboldCpp | coding | 9/9 | 3.72 | 27.7 | 0.52 | 103 |
+| Qwen 3.8 27B | KoboldCpp | math | 9/9 | 2.76 | 27.0 | 0.52 | 75 |
+| Qwen 3.8 27B | KoboldCpp | reasoning | 6/9 | 3.04 | 27.0 | 0.52 | 83 |
+
+What to keep in mind:
+
+- **Inkling 2 Mini passes every check on both harnesses that load it.** 27 of 27 on LM Studio and on KoboldCpp. No hardware-fit job had passed the three repetitions of `reasoning-logic` before: Qwen 3.8 27B and Muse Glimmer 30B fail them on every harness. Inkling 2 Mini reasons before it answers, with category medians of 68 to 151 completion tokens for answers of one or two characters. The suite has nine tasks, so this says the model and its template work on these harnesses; it is not a quality ranking.
+- **LM Studio decodes Inkling 2 Mini about four times as fast as KoboldCpp.** 53.5 to 55.3 against 12.8 to 13.0 output tokens per second, from the same file with every layer on the GPU. The bundles do not show why. LM Studio was also the faster of the two for Qwen 3.8 27B on 2026-11-23, by a factor of about 2.4 (62 to 69 against 27).
+- **Ollama 0.40.17 cannot load Inkling 2 Mini.** The import into Ollama's store succeeded and the server started, but each of the 9 warm-up and 27 measured requests ended in a `RuntimeError`. The backend log in the guest, which the bundle does not carry, gives the cause: `llama_model_load: error loading model: unknown model architecture: 'inkling2_loop'`. Ollama's release notes say the same in other words: 0.40.17 supports this model on Apple silicon only, with PC support to follow. Ollama 0.40.18, released on 2026-11-24, is not the version the installer catalog pins and was not tried.
+- **How that failed job reads in the bundle.** Its evidence record has the verdict `not_in_vram` with the reason `gpu_use_below_weights`. That is the rise check: VRAM use rose by 506 MiB, to a peak of 2,126 MiB, against 16,811 MiB of weights. It means that no model was on the GPU, not that a loaded model spilled over to the CPU. The results index does not rank the job.
+- **Muse Glimmer 30B passes 24 of 27 on Ollama and LM Studio and 18 of 27 on KoboldCpp.** On Ollama and LM Studio it reasons first (category medians of 102 to 245 completion tokens), decodes at 35 to 37 output tokens per second and fails only `reasoning-logic`. KoboldCpp builds its own chat prompt: there the model answers at once, with a median of 2 completion tokens and no reasoning text, and also fails `math-algebra` and `reasoning-navigation` on all three repetitions. Its 0.52 s per request and 3.8 output tokens per second on KoboldCpp are the floor of that harness for very short answers ([known tooling issues](#known-tooling-issues-observed)), not a decode speed.
+- **Both models leave room in VRAM, Inkling 2 Mini less.** The peaks of Muse Glimmer 30B stay 4,670 to 4,883 MiB below the limit of the capacity rule, those of Inkling 2 Mini 2,395 to 2,521 MiB. Inkling 2 Mini needs more beyond its weights: on KoboldCpp its buffers on the GPU add up to 17,860 MiB (model 16,331, cache 524, compute 1,005), against 15,914 MiB for Muse Glimmer 30B (15,246, 210 and 458) at the same context of 8192. The recorded rise is 110 % of the weights for Inkling 2 Mini and 100 to 101 % for Muse Glimmer 30B.
+- **Layer counts.** The engine reports 52 layers for Muse Glimmer 30B and 48 for Inkling 2 Mini, and its placement line counts one more in each case. The model card of Inkling 2 Mini counts 24 layers of weights, of which the middle 12 run three times: 48 layer applications, which is what the GGUF file describes.
+- **The new harness versions change little for Qwen 3.8 27B.** Both reruns place the model as on 2026-11-23, with the same model buffer of 15,718 MiB on the GPU, and pass the same 24 of 27 checks.
+  - *Ollama 0.40.17 against 0.40.16:* the category medians agree within 1.2 %: 1.98, 1.97 and 1.41 s per request against 1.99, 1.97 and 1.43 s, at 33 to 34 output tokens per second in both, with the same median token counts (67, 66 and 47).
+  - *KoboldCpp 1.125.1 against 1.124.2:* the token rate is the same (27.0 to 27.7 against 26.9 to 27.4), but the answers are longer. A measured request has 57 to 112 completion tokens where it had 6 to 126, and the coding median rose from 70 to 103 tokens and from 2.58 to 3.72 s. The math and reasoning medians are unchanged (2.76 and 3.04 s against 2.78 and 3.07 s).
+  - LM Studio is the version of 2026-11-23, so its Qwen job was not repeated.
+- **LM Studio's verdicts rest on the VRAM counter.** Its managed launch keeps no placement lines, so the capacity and rise checks decided, as on 2026-11-23. Rises of 100 % and 110 % of the weights fit the weights, the cache and the compute buffers all on the GPU, but they are not a per-layer measurement. The bundle does not record LM Studio's engine either; the app listed its llama.cpp CUDA runtime 2.80.1 as selected before the campaign.
+- **The VRAM counter was steady.** It read 1,413 to 1,620 MiB before the launches and returned to that range after every job, so the recorded rises are not distorted the way the rise of the KoboldCpp job of 2026-11-23 was.
+- **Where each harness read the models.** The files of Muse Glimmer 30B and Inkling 2 Mini are on the guest's virtual disk, as the WSL profile expects. The Qwen file stayed on the Windows NTFS volume, as on 2026-11-23: KoboldCpp loaded it through `/mnt/c`, and Ollama imported its copy from there. Ollama imported a copy of each of the three files, 48.4 GiB together, into the private store of its new installation; the copies were removed after the campaign. LM Studio imported symbolic links, which were removed after its campaign.
+- **Two installations per harness.** KoboldCpp 1.125.1 and Ollama 0.40.17 were installed by the harness setup into new prefixes of the guest, from the URLs the installer catalog pins and with its SHA-256 check. The installations of 2026-11-16 (1.124.2 and 0.40.16) stay beside them; each case names its installation.
+- **The guest's memory was bounded.** Each campaign ran in a transient systemd scope with a soft memory limit (`memory.high`) of 32 GiB, after the guest's page cache was dropped. Without it, the page cache that file reads leave behind grows to the guest's 52 GB limit and the Windows host starts paging ([decision models of the same day](#decision-models-in-wsl2-of-2026-11-24)). All three campaigns reached the limit, so the kernel reclaimed page cache while files were read: the artifact is verified before the launch and before each category run, and loaded once. Requests read no file. The Qwen job on Ollama, whose figures agree with those of 2026-11-23 within 1.2 %, is the evidence that the limit did not change request times; the earlier runs had no such limit.
+- **Programs and host memory.** The attestations list the consumer Ollama tray app, a Windows Ollama server, Microsoft Teams, the VMware tray and authorization service, the ProtonVPN client and the ChatGPT and Claude desktop apps, and no running virtual machine. The LM Studio desktop app was open in the guest during all three campaigns, with no model loaded during the first two. A sampler on the Windows host (`typeperf`, every 2 s) saw pages written out in 6 of the 458 samples of the KoboldCpp campaign (about 0.17 GiB, nearly all in the first three minutes), in 18 of the 419 samples of the Ollama campaign (about 0.03 GiB) and in none of the 173 samples of the LM Studio campaign. Available host memory stayed above 11,000 MiB throughout. The sampler's files are not part of the bundles.
+- **Two starts of the KoboldCpp campaign are not published.** The first was stopped by the operator after about a minute, before any request: its attestation named no Windows program, because the operator's helper had failed to read the process list. The second ended at once, with every job blocked by the reservation the first had left behind ([known tooling issues](#known-tooling-issues-observed)). Neither holds a measurement.
+- **No projection.** The candidate set of the projection covers the 17 models with model-offloading results, so neither new model has a projected fit to compare with. The facts a candidate entry needs are now in the backend logs: 52 layers, a trained context of 131,072 and 27.85B parameters for Muse Glimmer 30B; 48 layers, 1,048,576 and 26.07B for Inkling 2 Mini.
+
+<!-- hardware-fit-wsl-2026-11-24:end -->
+
+<!-- decision-models-wsl-2026-11-24:start -->
+
+### Decision models in WSL2 of 2026-11-24
+
+Until now the [decision models experiment](../../experiments/decision-models/README.md) had published results for two models, `nimble` and `tev1`. On 2026-11-24 (UTC) every decision model of the Ollama library that can run on this laptop was measured in WSL2 (Ubuntu 26.04) on the host of `raider-windows`: those two again, and `tev1:0.8b`, `nimble-v3`, `pplx-decider`, `clef`, `clef-flash`, `d1`, `d1-omni` and `laya` for the first time. The runs use Ollama 0.40.16, the version of the WSL2 run of 2026-11-18, and code revision `ce08c16`. Three more decision models of the library were not run: Ollama publishes them for its MLX runner only, which needs Apple silicon ([case templates](../../experiments/decision-models/README.md#decision-models-and-case-templates)).
+
+Each router chooses one of three categories (coding, math or general) for six labelled prompts: the workload `original-routing-smoke`, with one coding and one math task, three measured repetitions of each after one warm-up. Each model is a locked alias in the harness's private Ollama store and is identified by the digest the store reports.
+
+The campaign ran twice. The [first campaign](decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) pushed the Windows host into paging. The [second campaign](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) ran five minutes later with the guest's memory bounded, and the results index ranks it, as the newer of the two. The table is in the order of that ranking: by the median of the two category medians, which are over three decisions each.
+
+| Model | Developer | US model | File in the store | Correct | Coding ms | Math ms | Ranked on, ms | All six, ms: median / p95 | Brier (median) | First campaign, ms: coding, math |
+|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `d1` | Liquid AI | yes | 3.47 GiB, Q8_0 | 6/6 | 12.1 | 11.7 | 11.9 | 11.9 / 15.5 | 0.0030 | 19.1, 14.0 |
+| `laya` | not recorded | not recorded | 0.79 GiB, BF16 | 6/6 | 18.8 | 8.4 | 13.6 | 17.9 / 51.3 | 0.0851 | 14.5, 13.8 |
+| `d1-omni` | Liquid AI | yes | 0.79 GiB, Q8_0 | 6/6 | 17.1 | 12.1 | 14.6 | 13.0 / 19.5 | 0.0912 | 39.8, 34.5 |
+| `tev1:0.8b` | Together AI on Alibaba (Qwen) base | no | 0.78 GiB, Q8_0 | 6/6 | 17.3 | 16.7 | 17.0 | 17.0 / 20.3 | 0.0216 | 23.4, 12.9 |
+| `tev1` | Together AI on Alibaba (Qwen) base | no | 4.29 GiB, Q8_0 | 6/6 | 30.8 | 31.5 | 31.1 | 31.1 / 37.6 | 0.0009 | 28.1, 26.5 |
+| `clef-flash` | Cloudflare on Alibaba (Qwen) base | no | 9.85 GiB, Q8_0 | 6/6 | 42.0 | 45.4 | 43.7 | 45.3 / 48.8 | 0.0004 | 55.7, 54.1 |
+| `nimble-v3` | Bespoke Labs on Alibaba (Qwen) base | no | 8.87 GiB, Q8_0 | 6/6 | 43.2 | 44.6 | 43.9 | 44.1 / 45.3 | <0.0001 | 54.9, 55.1 |
+| `nimble` | Bespoke Labs on Alibaba (Qwen) base | no | 8.87 GiB, Q8_0 | 6/6 | 52.3 | 50.4 | 51.4 | 51.4 / 54.0 | <0.0001 | 52.7, 44.4 |
+| `pplx-decider` | Perplexity on Alibaba (Qwen) base | no | 16.27 GiB, Q4_K_M | 6/6 | 94.0 | 104.4 | 99.2 | 104.2 / 108.4 | <0.0001 | 89.6, 106.6 |
+| `clef` | Cloudflare on Alibaba (Qwen) base | no | 18.78 GiB, Q4_K_M | 6/6 | 483.1 | 314.4 | 398.8 | 441.3 / 500.4 | <0.0001 | 503.6, 565.9 |
+
+What to keep in mind:
+
+- **Every router gets all six decisions right, in both campaigns.** Accuracy and macro F1 are 1.0 for all ten, so the smoke set does not separate them. Six labelled decisions show that a model answers through the SystemOne API with the right label on easy prompts. They do not establish routing quality on real traffic.
+- **Latency follows model size, and the order among the fastest is within noise.** Four models decide in under 20 ms: `d1`, `laya`, `d1-omni` and `tev1:0.8b`. Their category medians rest on three decisions each, and single decisions of `laya` range from 8 to 61 ms in the second campaign. Between the two campaigns the order of these four changes.
+- **The two measured US models are among the three fastest.** `d1` and `d1-omni` are from Liquid AI, on its own base models, and are the only US models among the ten by the [model origins](../MODELS.md#model-origins). The origin of `laya` (Convai Innovations) is not recorded there, so it is not counted as a US model.
+- **`clef` is slow because it did not fit in VRAM.** Ollama's service log of the second campaign, which the bundle does not carry, shows 58 of 65 layers on the GPU for `clef` and every layer on the GPU for the other nine. `pplx-decider` has the same Qwen3.8-27B base and a smaller file (16.27 against 18.78 GiB), loaded completely at the same context of 16,384 tokens, and decides in about 100 ms where `clef` takes 290 to 510 ms. The contexts come from each model's own parameters in the library, from 512 tokens (`laya`) to 32,768 (`nimble-v3`); the harness sets none for SystemOne requests.
+- **Calibration differs by orders of magnitude.** All choices are right, but the median Brier score runs from below 0.0001 (`nimble`, `nimble-v3`, `pplx-decider`, `clef`) to 0.09 (`laya`, `d1-omni`): the smallest models put less probability on the label they choose. The probabilities, and so the scores, are the same in both campaigns.
+- **The peak GPU memory of the summary chart is not a per-model figure.** The sampler reads the device-wide VRAM use during each job, and Ollama keeps the model of the previous job loaded until the next one loads. Six of the ten jobs peak at their first sample, with the previous model still in VRAM: `d1`, a 3.47 GiB file, shows 14.4 GiB, the reading that `clef-flash` left behind, and ends at 5,485 MiB. The peak of `clef` itself, 23,755 of 24,463 MiB, fits its partial placement.
+- **The first campaign made the Windows host page.** In two minutes it loaded ten models with 72.8 GiB of files. The guest's page cache grew toward its 52 GB limit, more than the 63.4 GiB host can spare beside its own programs. A sampler on the Windows host (`typeperf`, every 2 s) saw available memory fall from 44,672 MiB to 26 MiB and pages written out in 25 of the 60 samples of the campaign, about 13.3 GiB in total. Model loads slowed down: the first warm-up of `clef-flash` took 26.3 s, against 7.1 s in the second campaign, and that of `d1-omni` 12.9 s against 3.3 s. The decisions of `d1-omni` took 22 to 54 ms, against 6 to 20 ms in the second campaign.
+- **The second campaign ran with the guest's memory bounded.** After the page cache was dropped, the campaign and its Ollama service ran in a transient systemd scope with a soft memory limit (`memory.high`) of 32 GiB. The scope reached that limit, so the kernel reclaimed page cache as models were loaded. The sampler saw pages written out in 2 of 37 samples, about 0.03 GiB, and at least 16,507 MiB of host memory available. The ten jobs took 68 s, against 117 s in the first campaign. The sampler's files and the service log are not part of the bundles.
+- **Against the earlier runs.** For `nimble` and `tev1`, with the same digests and the same Ollama version as in the WSL2 run of 2026-11-18: `nimble` 52.3 ms for coding and 50.4 ms for math (55.4 and 50.6 then), `tev1` 30.8 and 31.5 ms (26.1 and 24.4 then). Each figure is the median of three decisions.
+- **Conditions.** Decision cases carry no hardware attestation. The LM Studio desktop app was not running in the guest during these two campaigns; it was started afterwards for the [hardware-fit campaigns](#hardware-fit-of-muse-glimmer-30b-and-inkling-2-mini-in-wsl2-of-2026-11-24), whose attestations list the Windows programs that were running a few minutes later.
+
+<!-- decision-models-wsl-2026-11-24:end -->
 
 <!-- hardware-fit-wsl-ollama-lmstudio-2026-11-23:start -->
 
@@ -571,11 +717,11 @@ The four legal benchmark runs that ran on the Windows host on 2026-11-15 ran aga
 
 | Category | Indexes (results) |
 |---|---|
-| Hardware configuration | [raider-ubuntu](index/hardware/raider-ubuntu.md) (1) · [raider-windows](index/hardware/raider-windows.md) (114) · [raider-wsl](index/hardware/raider-wsl.md) (65) |
-| Experiment | [decision-models](index/experiment/decision-models.md) (7) · [hardware-fit](index/experiment/hardware-fit.md) (5) · [legal-models](index/experiment/legal-models.md) (8) · [model-offloading](index/experiment/model-offloading.md) (160) |
-| Harness | [category](index/harness/category.md) (1) · [fixture](index/harness/fixture.md) (2) · [koboldcpp](index/harness/koboldcpp.md) (52) · [lmstudio](index/harness/lmstudio.md) (52) · [ollama](index/harness/ollama.md) (71) · [projection](index/harness/projection.md) (2) |
-| Model | [category](index/model/category.md) (1) · [deepseek-r1-32b](index/model/deepseek-r1-32b.md) (12) · [deepseek-r1-70b](index/model/deepseek-r1-70b.md) (9) · [fixture](index/model/fixture.md) (2) · [gemma3-27b](index/model/gemma3-27b.md) (9) · [gemma4-26b-moe](index/model/gemma4-26b-moe.md) (11) · [gemma4-31b](index/model/gemma4-31b.md) (10) · [kimi-dev-72b](index/model/kimi-dev-72b.md) (10) · [kimi-linear-48b](index/model/kimi-linear-48b.md) (9) · [laguna-xs21](index/model/laguna-xs21.md) (9) · [llama3-70b](index/model/llama3-70b.md) (9) · [llama31-70b](index/model/llama31-70b.md) (9) · [llama33-70b](index/model/llama33-70b.md) (9) · [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) (6) · [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) (3) · [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) (3) · [measured-models-gguf](index/model/measured-models-gguf.md) (1) · [measured-models-gguf-as-found](index/model/measured-models-gguf-as-found.md) (1) · [mistral-small31](index/model/mistral-small31.md) (9) · [nemotron-nano-30b](index/model/nemotron-nano-30b.md) (9) · [nemotron-super-49b](index/model/nemotron-super-49b.md) (9) · [phi4-reasoning-plus](index/model/phi4-reasoning-plus.md) (9) · [qwen35-35b-moe](index/model/qwen35-35b-moe.md) (9) · [qwen38-27b](index/model/qwen38-27b.md) (9) · [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) (3) |
-| Date (UTC) | [2026-11-23](index/date/2026-11-23.md) (6) · [2026-11-22](index/date/2026-11-22.md) (17) · [2026-11-18](index/date/2026-11-18.md) (12) · [2026-11-17](index/date/2026-11-17.md) (30) · [2026-11-16](index/date/2026-11-16.md) (12) · [2026-11-15](index/date/2026-11-15.md) (45) · [2026-11-11](index/date/2026-11-11.md) (3) · [2026-11-10](index/date/2026-11-10.md) (30) · [2026-11-09](index/date/2026-11-09.md) (19) · [2026-11-08](index/date/2026-11-08.md) (6) |
+| Hardware configuration | [raider-ubuntu](index/hardware/raider-ubuntu.md) (1) · [raider-windows](index/hardware/raider-windows.md) (114) · [raider-wsl](index/hardware/raider-wsl.md) (93) |
+| Experiment | [decision-models](index/experiment/decision-models.md) (27) · [hardware-fit](index/experiment/hardware-fit.md) (13) · [legal-models](index/experiment/legal-models.md) (8) · [model-offloading](index/experiment/model-offloading.md) (160) |
+| Harness | [category](index/harness/category.md) (1) · [fixture](index/harness/fixture.md) (2) · [koboldcpp](index/harness/koboldcpp.md) (55) · [lmstudio](index/harness/lmstudio.md) (54) · [ollama](index/harness/ollama.md) (94) · [projection](index/harness/projection.md) (2) |
+| Model | [category](index/model/category.md) (1) · [deepseek-r1-32b](index/model/deepseek-r1-32b.md) (12) · [deepseek-r1-70b](index/model/deepseek-r1-70b.md) (9) · [fixture](index/model/fixture.md) (2) · [gemma3-27b](index/model/gemma3-27b.md) (9) · [gemma4-26b-moe](index/model/gemma4-26b-moe.md) (11) · [gemma4-31b](index/model/gemma4-31b.md) (10) · [inkling2-mini-26b-iq4_nl](index/model/inkling2-mini-26b-iq4_nl.md) (3) · [kimi-dev-72b](index/model/kimi-dev-72b.md) (10) · [kimi-linear-48b](index/model/kimi-linear-48b.md) (9) · [laguna-xs21](index/model/laguna-xs21.md) (9) · [llama3-70b](index/model/llama3-70b.md) (9) · [llama31-70b](index/model/llama31-70b.md) (9) · [llama33-70b](index/model/llama33-70b.md) (9) · [llm-eval-clef-flash:locked](index/model/llm-eval-clef-flash-locked.md) (2) · [llm-eval-clef:locked](index/model/llm-eval-clef-locked.md) (2) · [llm-eval-d1-omni:locked](index/model/llm-eval-d1-omni-locked.md) (2) · [llm-eval-d1:locked](index/model/llm-eval-d1-locked.md) (2) · [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) (6) · [llm-eval-laya:locked](index/model/llm-eval-laya-locked.md) (2) · [llm-eval-nimble-v3:locked](index/model/llm-eval-nimble-v3-locked.md) (2) · [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) (5) · [llm-eval-pplx-decider:locked](index/model/llm-eval-pplx-decider-locked.md) (2) · [llm-eval-tev1-0.8b:locked](index/model/llm-eval-tev1-0.8b-locked.md) (2) · [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) (5) · [measured-models-gguf](index/model/measured-models-gguf.md) (1) · [measured-models-gguf-as-found](index/model/measured-models-gguf-as-found.md) (1) · [mistral-small31](index/model/mistral-small31.md) (9) · [muse-glimmer-30b-kquant-17gb-q4_k_m](index/model/muse-glimmer-30b-kquant-17gb-q4_k_m.md) (3) · [nemotron-nano-30b](index/model/nemotron-nano-30b.md) (9) · [nemotron-super-49b](index/model/nemotron-super-49b.md) (9) · [phi4-reasoning-plus](index/model/phi4-reasoning-plus.md) (9) · [qwen35-35b-moe](index/model/qwen35-35b-moe.md) (9) · [qwen38-27b](index/model/qwen38-27b.md) (9) · [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) (5) |
+| Date (UTC) | [2026-11-24](index/date/2026-11-24.md) (28) · [2026-11-23](index/date/2026-11-23.md) (6) · [2026-11-22](index/date/2026-11-22.md) (17) · [2026-11-18](index/date/2026-11-18.md) (12) · [2026-11-17](index/date/2026-11-17.md) (30) · [2026-11-16](index/date/2026-11-16.md) (12) · [2026-11-15](index/date/2026-11-15.md) (45) · [2026-11-11](index/date/2026-11-11.md) (3) · [2026-11-10](index/date/2026-11-10.md) (30) · [2026-11-09](index/date/2026-11-09.md) (19) · [2026-11-08](index/date/2026-11-08.md) (6) |
 
 ### hardware-fit: models by harness
 
@@ -583,9 +729,29 @@ Each cell links to the report of every published run of that model on that harne
 
 | Model | [koboldcpp](index/harness/koboldcpp.md) | [lmstudio](index/harness/lmstudio.md) | [ollama](index/harness/ollama.md) | [projection](index/harness/projection.md) |
 |---|---|---|---|---|
-| [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | [2026-11-23 raider-wsl cap 2048](hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) | [2026-11-23 raider-wsl cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) | [2026-11-23 raider-wsl cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) | – |
+| [inkling2-mini-26b-iq4_nl](index/model/inkling2-mini-26b-iq4_nl.md) | [2026-11-24 raider-wsl cap 2048](hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) | [2026-11-24 raider-wsl cap 2048](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) | [2026-11-24 raider-wsl cap 2048 failed](hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) | – |
+| [muse-glimmer-30b-kquant-17gb-q4_k_m](index/model/muse-glimmer-30b-kquant-17gb-q4_k_m.md) | [2026-11-24 raider-wsl cap 2048](hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) | [2026-11-24 raider-wsl cap 2048](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) | [2026-11-24 raider-wsl cap 2048](hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) | – |
+| [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | [2026-11-24 raider-wsl cap 2048](hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md)<br>[2026-11-23 raider-wsl cap 2048](hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) | [2026-11-23 raider-wsl cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) | [2026-11-24 raider-wsl cap 2048](hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md)<br>[2026-11-23 raider-wsl cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) | – |
 | [measured-models-gguf](index/model/measured-models-gguf.md) | – | – | – | [2026-11-23 raider-wsl](hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
 | [measured-models-gguf-as-found](index/model/measured-models-gguf-as-found.md) | – | – | – | [2026-11-23 raider-wsl](hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
+
+### decision-models: models by harness
+
+Each cell links to the report of every published run of that model on that harness, newest first. Models are ordered by their newest run.
+
+| Model | [category](index/harness/category.md) | [ollama](index/harness/ollama.md) |
+|---|---|---|
+| [llm-eval-clef-flash:locked](index/model/llm-eval-clef-flash-locked.md) | – | [2026-11-24 raider-wsl](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md)<br>[2026-11-24 raider-wsl](decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
+| [llm-eval-clef:locked](index/model/llm-eval-clef-locked.md) | – | [2026-11-24 raider-wsl](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md)<br>[2026-11-24 raider-wsl](decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
+| [llm-eval-d1-omni:locked](index/model/llm-eval-d1-omni-locked.md) | – | [2026-11-24 raider-wsl](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md)<br>[2026-11-24 raider-wsl](decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
+| [llm-eval-d1:locked](index/model/llm-eval-d1-locked.md) | – | [2026-11-24 raider-wsl](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md)<br>[2026-11-24 raider-wsl](decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
+| [llm-eval-laya:locked](index/model/llm-eval-laya-locked.md) | – | [2026-11-24 raider-wsl](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md)<br>[2026-11-24 raider-wsl](decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
+| [llm-eval-nimble-v3:locked](index/model/llm-eval-nimble-v3-locked.md) | – | [2026-11-24 raider-wsl](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md)<br>[2026-11-24 raider-wsl](decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
+| [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) | – | [2026-11-24 raider-wsl](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md)<br>[2026-11-24 raider-wsl](decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md)<br>[2026-11-18 raider-wsl](llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md)<br>[2026-11-15 raider-windows](llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md)<br>[2026-11-08 raider-windows](llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
+| [llm-eval-pplx-decider:locked](index/model/llm-eval-pplx-decider-locked.md) | – | [2026-11-24 raider-wsl](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md)<br>[2026-11-24 raider-wsl](decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
+| [llm-eval-tev1-0.8b:locked](index/model/llm-eval-tev1-0.8b-locked.md) | – | [2026-11-24 raider-wsl](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md)<br>[2026-11-24 raider-wsl](decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
+| [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) | – | [2026-11-24 raider-wsl](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md)<br>[2026-11-24 raider-wsl](decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md)<br>[2026-11-18 raider-wsl](llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md)<br>[2026-11-15 raider-windows](llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md)<br>[2026-11-08 raider-windows](llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
+| [category](index/model/category.md) | [2026-11-08 raider-ubuntu synthetic](llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md) | – |
 
 ### model-offloading: models by harness
 
@@ -619,16 +785,6 @@ Each cell links to the report of every published run of that model on that harne
 |---|---|---|
 | [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) | – | [2026-11-18 raider-wsl score-only](legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/README.md)<br>[2026-11-18 raider-wsl measured](legal-benchmark/campaign-20261118T064854Z-6746b621-generation-legal-benchmark-1/README.md)<br>[2026-11-18 raider-wsl measured](legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows score-only](legal-benchmark/campaign-20261115T140033Z-ed2177f1-score-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](legal-benchmark/campaign-20261115T133729Z-ff84f63f-generation-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows measured](legal-benchmark/campaign-20261115T133729Z-ff84f63f-workflow-legal-benchmark-1/README.md) |
 | [fixture](index/model/fixture.md) | [2026-11-18 raider-wsl fixture](legal-benchmark/campaign-20261118T064854Z-6746b621-retrieval-legal-benchmark-1/README.md)<br>[2026-11-15 raider-windows fixture](legal-benchmark/campaign-20261115T133729Z-ff84f63f-retrieval-legal-benchmark-1/README.md) | – |
-
-### decision-models: models by harness
-
-Each cell links to the report of every published run of that model on that harness, newest first. Models are ordered by their newest run.
-
-| Model | [category](index/harness/category.md) | [ollama](index/harness/ollama.md) |
-|---|---|---|
-| [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) | – | [2026-11-18 raider-wsl](llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md)<br>[2026-11-15 raider-windows](llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md)<br>[2026-11-08 raider-windows](llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
-| [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) | – | [2026-11-18 raider-wsl](llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md)<br>[2026-11-15 raider-windows](llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md)<br>[2026-11-08 raider-windows](llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md) |
-| [category](index/model/category.md) | [2026-11-08 raider-ubuntu synthetic](llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md) | – |
 
 ### Results by class and cohort
 
@@ -1553,6 +1709,27 @@ Hardware configuration `raider-windows`, GPU offload ratio 0.308. The layer coun
 
 A router model picks the category of each prompt; decisions are scored against labels. Workload `original-routing-smoke`, 3 requests in each of the coding and math categories.
 
+#### Harness: Ollama 0.40.16 (SystemOne API)
+
+##### Models: the ten decision models of the Ollama library that run on this laptop
+
+Hardware configuration `raider-wsl`, [run of 2026-11-24 22:46](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md), the second of two campaigns of that day ([notes](#decision-models-in-wsl2-of-2026-11-24)). Latency is over the six decisions of each model.
+
+| Model | Decisions | Accuracy | Macro F1 | Brier (median) | Router latency s (median / p95) |
+|---|---:|---:|---:|---:|---:|
+| `llm-eval-d1:locked` | 6 | 1.00 | 1.00 | 0.0030 | 0.012 / 0.015 |
+| `llm-eval-laya:locked` | 6 | 1.00 | 1.00 | 0.0851 | 0.018 / 0.051 |
+| `llm-eval-d1-omni:locked` | 6 | 1.00 | 1.00 | 0.0912 | 0.013 / 0.020 |
+| `llm-eval-tev1-0.8b:locked` | 6 | 1.00 | 1.00 | 0.0216 | 0.017 / 0.020 |
+| `llm-eval-tev1:locked` | 6 | 1.00 | 1.00 | 0.0009 | 0.031 / 0.038 |
+| `llm-eval-clef-flash:locked` | 6 | 1.00 | 1.00 | 0.0004 | 0.045 / 0.049 |
+| `llm-eval-nimble-v3:locked` | 6 | 1.00 | 1.00 | <0.0001 | 0.044 / 0.045 |
+| `llm-eval-nimble:locked` | 6 | 1.00 | 1.00 | <0.0001 | 0.051 / 0.054 |
+| `llm-eval-pplx-decider:locked` | 6 | 1.00 | 1.00 | <0.0001 | 0.104 / 0.108 |
+| `llm-eval-clef:locked` | 6 | 1.00 | 1.00 | <0.0001 | 0.441 / 0.500 |
+
+All ten routers classify the smoke prompts perfectly with no abstentions or policy violations. The four smallest models decide in under 20 ms; `clef`, the largest, takes about 0.44 s because Ollama placed only 58 of its 65 layers on the GPU. The smallest models are also the least sure of their right choices. Six labelled decisions per router is a smoke-level sample and does not establish routing quality on real traffic.
+
 #### Harness: Ollama 0.40.15 (SystemOne API)
 
 ##### Models: `llm-eval-nimble:locked` and `llm-eval-tev1:locked`
@@ -1585,6 +1762,9 @@ Declared for hardware configuration `raider-ubuntu`, [run of 2026-11-08 01:38](l
 - The matrix runs do not save model outputs (`save_outputs` is off), so a failed exact check cannot be told apart from a right answer wrapped in prose. Llama 3.1 70B scored 0 of 27 on Ollama and LM Studio with sentence-length answers on every task, and Nemotron Super 49B, Laguna XS 2.1 and the Llama 70B models fail several tasks with 50 to 930 characters of text, and a few with under 10 characters. Saving outputs, or a check tolerant of trailing prose, is needed before those scores say anything about the models.
 - Models that return their thinking inline (Phi-4-reasoning-plus) report no reasoning field, so the harness counts the whole stream as the answer: on Ollama every request ran to the 2,048-token cap and scored nothing. The reasoning detection only sees a separate field.
 - On Windows, KoboldCpp never delivers a first token in under about 0.6 s (0.57 to 0.62 s on every short-answer model; in WSL whole requests take from 0.52 s), so for fast models with 2- to 7-token answers its wall time and token rate are set by that floor rather than by decode speed: Kimi Linear 48B answers in 0.6 s on KoboldCpp and in 0.1 to 0.3 s on Ollama and LM Studio.
+- Stopping a campaign leaves its reservations behind. The coordinator and the worker each reserve the host with a directory under the lock root, and nothing treats a reservation as expired. After the processes of a campaign were stopped on 2026-11-24, every job of the next campaign ended within a second as `blocked` with the reason `reservation_recovered` (`BlockingIOError`). By the code, `llm-eval resume` also keeps the reservation of an attempt whose worker left no result. The two reservation directories of the stopped attempt were removed by hand, after a check that no campaign process was running.
+- A WSL2 campaign that reads many large files can make the Windows host page. File reads leave page cache in the guest, which grows to the guest's memory limit (52 GB here, on a 63.4 GiB host). A decision-models campaign that loaded ten models with 72.8 GiB of files had about 13 GiB written to the Windows page file in two minutes. Running a campaign in a systemd scope with a soft memory limit (`memory.high` of 32 GiB) kept the page cache bounded and the host out of paging; see the [decision models of 2026-11-24](#decision-models-in-wsl2-of-2026-11-24).
+- A hardware-fit job whose engine cannot load the model ends with the verdict `not_in_vram` and the reason `gpu_use_below_weights`, the wording of a model that loaded elsewhere. Request records keep the type of an error and not its message, so the bundle of such a job shows only `RuntimeError`; the cause is in the backend log, which is not exported (Inkling 2 Mini on Ollama 0.40.17: `unknown model architecture: 'inkling2_loop'`).
 
 ## All published reports
 
@@ -1592,6 +1772,11 @@ Declared for hardware configuration `raider-ubuntu`, [run of 2026-11-08 01:38](l
 
 | Experiment | Run time UTC | Status | Synthetic | Results |
 |---|---|---|---|---|
+| hardware-fit | 2026-11-24T23:22:44.997235+00:00 | complete | False | [Report](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
+| hardware-fit | 2026-11-24T23:08:11.066043+00:00 | incomplete | False | [Report](hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
+| hardware-fit | 2026-11-24T22:52:10.518917+00:00 | complete | False | [Report](hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
+| decision-models | 2026-11-24T22:46:34.923711+00:00 | complete | False | [Report](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
+| decision-models | 2026-11-24T22:41:17.740366+00:00 | complete | False | [Report](decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
 | hardware-fit | 2026-11-23T12:06:32.733902+00:00 | complete | False | [Report](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
 | model-offloading | 2026-11-23T10:47:21.531863+00:00 | complete | False | [Report](model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/README.md) |
 | hardware-fit | 2026-11-23T06:04:54.502356+00:00 | complete | False | [Report](hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) |

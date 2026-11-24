@@ -12,20 +12,20 @@ Its id is `decision-models`; until 2026-11-23 it was `llm-routing`. Campaigns pl
 
 ## Decision models and case templates
 
-Each case below is a template for one decision model of the Ollama library. Prepare the local service and model yourself and replace `model_revision` with the actual loaded artifact digest. Templates do not establish that an external service loaded the claimed model; preserve operator attestations. No weights are downloaded automatically. The [candidate review](../../docs/MODEL_CANDIDATES.md#decision-models) lists the developer, base model, sizes and license of each and how they were found; the US column follows the [model origins](../../docs/MODELS.md#model-origins).
+Each case below is a template for one decision model of the Ollama library. Prepare the local service and model yourself and replace `model_revision` with the actual loaded artifact digest. Templates do not establish that an external service loaded the claimed model; preserve operator attestations. No weights are downloaded automatically. The [candidate review](../../docs/MODEL_CANDIDATES.md#decision-models) lists the developer, base model, sizes and license of each and how they were found; the US column follows the [model origins](../../docs/MODELS.md#model-origins). The last column names the hardware configurations with published runs: the [WSL2 runs of 2026-11-24](../../docs/results/README.md#decision-models-in-wsl2-of-2026-11-24) cover all ten templates.
 
 | Case | Ollama tag | Developer | Base model | US model | Published runs |
 |---|---|---|---|---|---|
 | [ollama-nimble](cases/ollama-nimble.json) | `nimble` | Bespoke Labs | Qwen3.5-9B | no | Windows and WSL2 |
 | [ollama-tev1](cases/ollama-tev1.json) | `tev1` (4B) | Together AI | Qwen3.5 | no | Windows and WSL2 |
-| [ollama-tev1-0.8b](cases/ollama-tev1-0.8b.json) | `tev1:0.8b` | Together AI | Qwen3.5 | no | none |
-| [ollama-nimble-v3](cases/ollama-nimble-v3.json) | `nimble-v3` | Bespoke Labs | Qwen3.5-9B | no | none; noncommercial license (CC BY-NC 4.0) |
-| [ollama-pplx-decider](cases/ollama-pplx-decider.json) | `pplx-decider` (27B) | Perplexity | Qwen3.8-27B | no | none |
-| [ollama-clef](cases/ollama-clef.json) | `clef` (27B) | Cloudflare | Qwen3.8-27B | no | none |
-| [ollama-clef-flash](cases/ollama-clef-flash.json) | `clef-flash` (9B) | Cloudflare | Qwen3.5-9B | no | none |
-| [ollama-d1](cases/ollama-d1.json) | `d1` (3B) | Liquid AI | LFM2.5-VL-3B | yes | none |
-| [ollama-d1-omni](cases/ollama-d1-omni.json) | `d1-omni` (600M) | Liquid AI | LFM2.5-Encoder-350M | yes | none |
-| [ollama-laya](cases/ollama-laya.json) | `laya` (421M) | Convai Innovations | ModernBERT-large | not recorded | none; Ollama 0.40.0 or later |
+| [ollama-tev1-0.8b](cases/ollama-tev1-0.8b.json) | `tev1:0.8b` | Together AI | Qwen3.5 | no | WSL2 |
+| [ollama-nimble-v3](cases/ollama-nimble-v3.json) | `nimble-v3` | Bespoke Labs | Qwen3.5-9B | no | WSL2; noncommercial license (CC BY-NC 4.0) |
+| [ollama-pplx-decider](cases/ollama-pplx-decider.json) | `pplx-decider` (27B) | Perplexity | Qwen3.8-27B | no | WSL2 |
+| [ollama-clef](cases/ollama-clef.json) | `clef` (27B) | Cloudflare | Qwen3.8-27B | no | WSL2; only partly on the GPU there |
+| [ollama-clef-flash](cases/ollama-clef-flash.json) | `clef-flash` (9B) | Cloudflare | Qwen3.5-9B | no | WSL2 |
+| [ollama-d1](cases/ollama-d1.json) | `d1` (3B) | Liquid AI | LFM2.5-VL-3B | yes | WSL2 |
+| [ollama-d1-omni](cases/ollama-d1-omni.json) | `d1-omni` (600M) | Liquid AI | LFM2.5-Encoder-350M | yes | WSL2 |
+| [ollama-laya](cases/ollama-laya.json) | `laya` (421M) | Convai Innovations | ModernBERT-large | not recorded | WSL2; Ollama 0.40.0 or later |
 
 Three decision models of the library have no template, because Ollama publishes them for its MLX runner only, which needs Apple silicon: `strands-decider` (Strands Agents), `pplx-decider-flash` (Perplexity) and `autotrust-jev` (AutoTrust). On Linux, `ollama pull` refuses them with "this model requires MLX support, but the MLX runtime is not available" (Ollama 0.40.16 in WSL2, 2026-11-24). LM Studio's catalog lists no decision model, and the other platforms here have no SystemOne endpoint, so every decision model runs on Ollama.
 
