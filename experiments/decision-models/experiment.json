@@ -13,12 +13,10 @@
     "ollama-tev1-0.8b": "cases/ollama-tev1-0.8b.json",
     "ollama-nimble-v3": "cases/ollama-nimble-v3.json",
     "ollama-pplx-decider": "cases/ollama-pplx-decider.json",
-    "ollama-pplx-decider-flash": "cases/ollama-pplx-decider-flash.json",
     "ollama-clef": "cases/ollama-clef.json",
     "ollama-clef-flash": "cases/ollama-clef-flash.json",
     "ollama-d1": "cases/ollama-d1.json",
     "ollama-d1-omni": "cases/ollama-d1-omni.json",
-    "ollama-autotrust-jev": "cases/ollama-autotrust-jev.json",
     "ollama-laya": "cases/ollama-laya.json"
   }
 }

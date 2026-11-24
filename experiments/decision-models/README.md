@@ -21,15 +21,13 @@ Each case below is a template for one decision model of the Ollama library. Prep
 | [ollama-tev1-0.8b](cases/ollama-tev1-0.8b.json) | `tev1:0.8b` | Together AI | Qwen3.5 | no | none |
 | [ollama-nimble-v3](cases/ollama-nimble-v3.json) | `nimble-v3` | Bespoke Labs | Qwen3.5-9B | no | none; noncommercial license (CC BY-NC 4.0) |
 | [ollama-pplx-decider](cases/ollama-pplx-decider.json) | `pplx-decider` (27B) | Perplexity | Qwen3.8-27B | no | none |
-| [ollama-pplx-decider-flash](cases/ollama-pplx-decider-flash.json) | `pplx-decider-flash` (4B) | Perplexity | Qwen3.5-4B | no | none |
 | [ollama-clef](cases/ollama-clef.json) | `clef` (27B) | Cloudflare | Qwen3.8-27B | no | none |
 | [ollama-clef-flash](cases/ollama-clef-flash.json) | `clef-flash` (9B) | Cloudflare | Qwen3.5-9B | no | none |
 | [ollama-d1](cases/ollama-d1.json) | `d1` (3B) | Liquid AI | LFM2.5-VL-3B | yes | none |
 | [ollama-d1-omni](cases/ollama-d1-omni.json) | `d1-omni` (600M) | Liquid AI | LFM2.5-Encoder-350M | yes | none |
-| [ollama-autotrust-jev](cases/ollama-autotrust-jev.json) | `autotrust-jev` (9B) | AutoTrust | Qwen3.5-9B | no | none |
 | [ollama-laya](cases/ollama-laya.json) | `laya` (421M) | Convai Innovations | ModernBERT-large | not recorded | none; Ollama 0.40.0 or later |
 
-`strands-decider` (Strands Agents) has no template: it runs only with MLX on Apple silicon. LM Studio's catalog lists no decision model, and the other platforms here have no SystemOne endpoint, so every decision model runs on Ollama.
+Three decision models of the library have no template, because Ollama publishes them for its MLX runner only, which needs Apple silicon: `strands-decider` (Strands Agents), `pplx-decider-flash` (Perplexity) and `autotrust-jev` (AutoTrust). On Linux, `ollama pull` refuses them with "this model requires MLX support, but the MLX runtime is not available" (Ollama 0.40.16 in WSL2, 2026-11-24). LM Studio's catalog lists no decision model, and the other platforms here have no SystemOne endpoint, so every decision model runs on Ollama.
 
 The [category smoke case](cases/category-smoke.json) is deliberately synthetic. Its two original checks verify harness behavior; they are not LiveBench scores or model rankings.
 

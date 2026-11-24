@@ -626,8 +626,8 @@
       "provider": "Meta",
       "rank": 4,
       "upstream_repo": "meta-models/Muse-Glimmer-30B",
-      "parameters_b": 29.8,
-      "active_parameters_b": 29.8,
+      "parameters_b": 27.9,
+      "active_parameters_b": 27.9,
       "target_precision": "GGUF Q8_0",
       "planning_bits": 8.5,
       "status": "candidate",
@@ -635,7 +635,7 @@
       "task_family": "general",
       "license": "Apache-2.0 (LICENSE and USAGE_POLICY.md in the repository)",
       "license_class": "permissive",
-      "rationale": "Dense 30B agent model with a perception encoder; text-only here. Q8_0 exceeds VRAM by a small margin. The publisher's own 4-bit KQuant GGUF files fit in VRAM and are hardware-fit candidates. Found by the candidate review of 2026-11-23, not by LiveBench discovery: it is published under meta-models, not meta-llama.",
+      "rationale": "Dense 30B agent model with a perception encoder; text-only here, so the parameter count is the language model's (27.85B in the GGUF files) and leaves out the 1.9B encoder, which the GGUF repositories ship as separate mmproj files. Q8_0 exceeds VRAM by a small margin. The publisher's own 4-bit KQuant GGUF files fit in VRAM and are hardware-fit candidates. Found by the candidate review of 2026-11-23, not by LiveBench discovery: it is published under meta-models, not meta-llama.",
       "sources": [
         "https://huggingface.co/meta-models/Muse-Glimmer-30B"
       ],
@@ -657,7 +657,7 @@
           "total": 29776626688
         }
       },
-      "planning_weight_gib": 29.49
+      "planning_weight_gib": 27.61
     },
     {
       "id": "laguna-xs21",
@@ -1348,7 +1348,7 @@
       "task_family": "general",
       "license": "Apache-2.0 (no LICENSE file at the revision; the card links the publisher's Model Acceptable Use Policy)",
       "license_class": "permissive",
-      "rationale": "Looped mixture-of-experts transformer: 12 of its 24 layers run three passes per token (3.4B parameters active per pass, 5.4B effective per token by the model card). Q8_0 exceeds VRAM by a small margin; 4-bit GGUF files fit in VRAM and are hardware-fit candidates. Engine support is new: KoboldCpp 1.125.1 and Ollama 0.40.17 are the first pinned versions that load it, and the KoboldCpp release notes say to use the ggml-org GGUF files. The official checkpoint is distributed in mixed NVFP4 and MXFP8 precisions (about 20 GB). Found by the candidate review of 2026-11-23.",
+      "rationale": "Looped mixture-of-experts transformer: 12 of its 24 layers run three passes per token (3.4B parameters active, 5.4B effective per token by the model card). Q8_0 exceeds VRAM by a small margin; 4-bit GGUF files fit in VRAM and are hardware-fit candidates. Engine support is new: KoboldCpp 1.125.1 is the first pinned version that loads it, and its release notes say to use the ggml-org GGUF files. The same notes report a known issue on CUDA with partial offload and large prompts, where the output can be corrupted (llama.cpp issues 32710 and 32778), and name --no-op-offload as the mitigation; that is the Q8_0 offload case, not hardware fit, where every layer is on the GPU. Ollama's release notes announce the model in 0.40.17, the pinned version, for Apple silicon only, with PC support to follow in a later release. The official checkpoint is distributed in mixed NVFP4 and MXFP8 precisions (about 20 GB). Found by the candidate review of 2026-11-23.",
       "sources": [
         "https://huggingface.co/thinkingmachines/Inkling-2-Mini"
       ],

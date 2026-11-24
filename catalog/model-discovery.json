@@ -24,7 +24,7 @@
     {"prefixes": ["ling-", "ring-"], "hf_orgs": ["inclusionAI"]},
     {"prefixes": ["longcat-"], "hf_orgs": ["meituan-longcat"]},
     {"prefixes": ["command-", "aya-"], "hf_orgs": ["CohereLabs"]},
-    {"prefixes": ["inkling-"], "hf_orgs": ["thinkingmachines"]}
+    {"prefixes": ["inkling"], "hf_orgs": ["thinkingmachines"]}
   ],
   "decisions": [
     {"key": "lb:claude*", "decision": "not_open_weight", "reason": "Anthropic Claude: closed API family with no published weights (seeded with the discovery tool; pending the owner's confirmation in review)", "decided_on": "2026-11-08"},
