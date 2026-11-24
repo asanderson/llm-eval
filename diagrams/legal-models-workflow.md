@@ -1,6 +1,6 @@
-# Legal benchmark workflow
+# Legal models workflow
 
-The five stages of the [legal benchmark walkthrough](../docs/LEGAL_BENCHMARK_WALKTHROUGH.md) and the explicit output of each. A phase dependency only orders jobs; the next stage names the output file in its case. Stage 3 is optional, and the frozen evaluation takes from it at most the calibration file (dashed edge).
+The five stages of the [legal models walkthrough](../docs/LEGAL_MODELS_WALKTHROUGH.md) and the explicit output of each. A phase dependency only orders jobs; the next stage names the output file in its case. Stage 3 is optional, and the frozen evaluation takes from it at most the calibration file (dashed edge).
 
 ```mermaid
 flowchart TD
@@ -8,7 +8,7 @@ flowchart TD
   attempt["One succeeded offload attempt directory"]
   profile["2. Locked serving profile profiles freeze (placement attested)"]
   locked["serving-profile.json and its SHA-256"]
-  routing["3. Routing calibration and replay (optional): legal-benchmark generation runs per recipe, routed and fallback"]
+  routing["3. Routing calibration and replay (optional): legal-models generation runs per recipe, routed and fallback"]
   calibration["routing calibrate: calibration file (optional)"]
   replay["routing export, replay, verify: routing suite, replay manifest, sidecar (local only)"]
   evaluation["4. Frozen legal evaluation retrieval, generation, workflow"]
@@ -31,4 +31,4 @@ flowchart TD
   report --> bundle
 ```
 
-[View PNG rendering](legal-benchmark-workflow.png).
+[View PNG rendering](legal-models-workflow.png).

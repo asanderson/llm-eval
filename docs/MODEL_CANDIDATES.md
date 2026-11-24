@@ -71,9 +71,9 @@ Official decision models of the Ollama library on 2026-11-23. The harness serves
 
 Community uploads with a decision tag (for example `aminroudaki/decisio-v3` and `nsru/winit`) are not official listings and were not reviewed.
 
-## Legal benchmark
+## Legal models
 
-The legal benchmark serves its roles with models from the same catalog; its published runs use `kimi-linear-48b` (Moonshot AI), which is not a US model. US models that the offload and hardware-fit runs measured or that this review found (Nemotron 3 Nano 30B, the Gemma 4 models, gpt-oss-20b, Inkling 2 Mini, Muse Glimmer 30B) are the candidates for a US-only legal run.
+The legal models experiment serves its roles with models from the same catalog; its published runs use `kimi-linear-48b` (Moonshot AI), which is not a US model. US models that the offload and hardware-fit runs measured or that this review found (Nemotron 3 Nano 30B, the Gemma 4 models, gpt-oss-20b, Inkling 2 Mini, Muse Glimmer 30B) are the candidates for a US-only legal run.
 
 ## Too large for the Raider
 

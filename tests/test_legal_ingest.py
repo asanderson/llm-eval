@@ -23,14 +23,14 @@ from unittest.mock import Mock, patch
 import zipfile
 
 from llm_eval.common import read_json, sha256_file
-from llm_eval.experiments import legal_benchmark as legal
-from llm_eval.experiments.legal_benchmark import benchmarks, contracts, fixture, ingest
+from llm_eval.experiments import legal_models as legal
+from llm_eval.experiments.legal_models import benchmarks, contracts, fixture, ingest
 
 ROOT = Path(__file__).resolve().parents[1]
-X = ROOT / 'experiments/legal-benchmark'
+X = ROOT / 'experiments/legal-models'
 SMOKE = X / 'workloads/original-smoke'
 PACKETS = X / 'workloads/original-packets'
-INGEST = 'llm_eval.experiments.legal_benchmark.ingest'
+INGEST = 'llm_eval.experiments.legal_models.ingest'
 NONCE = 'ab' * 16
 
 
@@ -207,7 +207,7 @@ class TextIngestTests(unittest.TestCase):
         self.assertEqual((entries[0]['status'], entries[0]['reason_codes']), ('ok', ['control_characters_replaced']))
 
     def test_package_sources_spell_invisible_characters_as_escapes(self):
-        for path in [ROOT / 'src/llm_eval/experiments/legal_benchmark' / name for name in ('ingest.py', 'benchmarks.py', 'contracts.py')] + \
+        for path in [ROOT / 'src/llm_eval/experiments/legal_models' / name for name in ('ingest.py', 'benchmarks.py', 'contracts.py')] + \
                 [Path(__file__)]:
             with self.subTest(path=path.name):
                 self.assertEqual([c for c in path.read_text(encoding='utf-8') if ord(c) > 127], [])
@@ -1212,7 +1212,7 @@ class AdapterTests(unittest.TestCase):
                     benchmarks.import_dataset(base / 'request.json', base / 'import', nonce=NONCE)
                 self.assertFalse((base / 'import').exists())
         base = self.upstream(self)
-        target = ROOT / 'experiments' / 'legal-benchmark' / 'workloads' / 'imported-test-output'
+        target = ROOT / 'experiments' / 'legal-models' / 'workloads' / 'imported-test-output'
         with self.assertRaisesRegex(ValueError, 'Dataset imports must stay outside the repository tree'):
             benchmarks.import_dataset(base / 'request.json', target, nonce=NONCE)
         self.assertFalse(target.exists())

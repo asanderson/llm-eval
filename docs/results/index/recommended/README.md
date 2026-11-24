@@ -17,12 +17,12 @@ Generated from the published bundles by `llm-eval index-results`; do not edit by
 | [raider-windows](../hardware/raider-windows.md) | [ollama](../harness/ollama.md) | [kimi-linear-48b](../model/kimi-linear-48b.md) | 24/27 | 0.141 | 16.8 | [recommended setup](raider-windows/model-offloading.md) |
 | [raider-wsl](../hardware/raider-wsl.md) | [lmstudio](../harness/lmstudio.md) | [qwen35-35b-moe](../model/qwen35-35b-moe.md) | 27/27 | 8.32 | 42.4 | [recommended setup](raider-wsl/model-offloading.md) |
 
-## legal-benchmark
+## legal-models
 
 | Hardware configuration | Harness | Model | Checks passed | Median wall s | Output tok/s | Page |
 |---|---|---|---:|---:|---:|---|
-| [raider-windows](../hardware/raider-windows.md) | – | – | – | – | – | [recommended setup](raider-windows/legal-benchmark.md) (no recommendation) |
-| [raider-wsl](../hardware/raider-wsl.md) | – | – | – | – | – | [recommended setup](raider-wsl/legal-benchmark.md) (no recommendation) |
+| [raider-windows](../hardware/raider-windows.md) | – | – | – | – | – | [recommended setup](raider-windows/legal-models.md) (no recommendation) |
+| [raider-wsl](../hardware/raider-wsl.md) | – | – | – | – | – | [recommended setup](raider-wsl/legal-models.md) (no recommendation) |
 
 ## decision-models
 

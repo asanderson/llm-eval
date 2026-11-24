@@ -15,7 +15,7 @@
   "telemetry_interval_s": 1.0,
   "ram_budget_gib": 52,
   "gpu_budget_gib": 22,
-  "suite": "../../../experiments/legal-benchmark/workloads/qualification/legal-shaped.json",
+  "suite": "../../../experiments/legal-models/workloads/qualification/legal-shaped.json",
   "artifact_root": "../../../models/deepseek-r1-32b-q8",
   "artifact_lock": "../../../artifacts/deepseek-r1-32b-q8.lock.json",
   "offload_dir": "../../../offload",

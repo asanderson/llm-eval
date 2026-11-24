@@ -225,26 +225,28 @@ class ResultsIndexTests(unittest.TestCase):
                 self.assertLess(text.index('## All published reports'), text.index('campaign-a-routing/README.md)', text.index(LIST_START)))
 
 
-def legal_job(job_id, kind, harness='fixture', model='fixture', mode='smoke', cohort='a' * 64, os_id='ubuntu-26.04-native', hardware='legal-host'):
-    return {'job_id': job_id, 'experiment_id': 'legal-benchmark', 'experiment_version': 1, 'mode': mode, 'case_id': job_id,
+def legal_job(job_id, kind, harness='fixture', model='fixture', mode='smoke', cohort='a' * 64, os_id='ubuntu-26.04-native', hardware='legal-host',
+              experiment='legal-models'):
+    return {'job_id': job_id, 'experiment_id': experiment, 'experiment_version': 1, 'mode': mode, 'case_id': job_id,
             'hardware_config_id': hardware, 'hardware': {'os_id': os_id, 'hardware_profile': 'msi-raider-18-hx-ai'},
             'parameters': {'synthetic': kind == 'fixture', 'execution_kind': kind, 'data_class': 'public-synthetic',
                            'identity': {'harness': harness, 'model': model}, 'cohorts': [cohort]}, 'input_files': [{'sha256': 'b' * 64}]}
 
 
-def legal_bundle(root, publication, created, jobs, summary, projection=True):
-    """A legal bundle as the projection writes it: the marker, the execution kinds and public job descriptions."""
-    dest = root / 'docs/results/legal-benchmark' / publication
+def legal_bundle(root, publication, created, jobs, summary, projection=True, experiment='legal-models'):
+    """A legal bundle as the projection writes it: the marker, the execution kinds and public job descriptions; `experiment`
+    is the id it was published under (`legal-benchmark` before the rename of 2026-11-24)."""
+    dest = root / 'docs/results' / experiment / publication
     dest.mkdir(parents=True)
     (dest / 'README.md').write_text('# report\n', encoding='utf-8')
-    manifest = {'experiment_id': 'legal-benchmark', 'publication_id': publication, 'campaign_id': 'fixture', 'created_utc': created,
+    manifest = {'experiment_id': experiment, 'publication_id': publication, 'campaign_id': 'fixture', 'created_utc': created,
                 'status': 'complete', 'synthetic': any(j['parameters'].get('synthetic') for j in jobs),
                 'coverage': [{'job_id': j['job_id'], 'status': 'succeeded'} for j in jobs]}
     if projection:
         manifest.update(projection={'id': 'legal-projection', 'version': 1}, canonical_bytes=1,
                         execution_kinds=sorted({j['parameters']['execution_kind'] for j in jobs}))
     (dest / 'manifest.json').write_text(json.dumps(manifest), encoding='utf-8')
-    (dest / 'resolved-config.json').write_text(json.dumps({'experiment': {'experiment_id': 'legal-benchmark'}, 'jobs': jobs}), encoding='utf-8')
+    (dest / 'resolved-config.json').write_text(json.dumps({'experiment': {'experiment_id': experiment}, 'jobs': jobs}), encoding='utf-8')
     (dest / 'summary.json').write_text(json.dumps(summary), encoding='utf-8')
     return dest
 
@@ -255,7 +257,7 @@ def without_legal(text):
     kept, skipping, browse = [], False, False
     for line in text.split('\n'):
         if line.startswith('#'):
-            skipping = 'legal-benchmark' in line or 'Results by class and cohort' in line
+            skipping = 'legal-models' in line or 'Results by class and cohort' in line
             browse = line == '### Browse by category'
         if line.startswith(('<!--', 'Full table and per-category pages')):      # the end of a generated section
             skipping = False
@@ -285,7 +287,7 @@ class LegalIndexTests(unittest.TestCase):
         self.assertEqual(identity({'parameters': {'identity': {}}}), ('unknown', 'unknown'))
         self.add_legal()
         records = collect(self.root)
-        legal = {r['case']: r for r in records if r['experiment'] == 'legal-benchmark'}
+        legal = {r['case']: r for r in records if r['experiment'] == 'legal-models'}
         self.assertEqual({k: (r['execution_kind'], r['data_class'], r['cohorts'], r['class'], r['ranked'], r['synthetic'], r['harness'])
                           for k, r in legal.items()},
                          {'l1': ('fixture', 'public-synthetic', ['c' * 64], 'fixture', False, True, 'fixture'),
@@ -338,16 +340,16 @@ class LegalIndexTests(unittest.TestCase):
                     self.assertNotIn('(synthetic)', line)
         listing = next(line for line in readme.splitlines() if 'campaign-l-legal' in line and '[Report]' in line)
         self.assertIn('| fixture, model-run, score-only |', listing)
-        self.assertTrue((index / 'experiment/legal-benchmark.md').is_file())
+        self.assertTrue((index / 'experiment/legal-models.md').is_file())
 
     def test_legal_records_never_enter_top_combinations(self):
         self.add_legal()
         records = collect(self.root)
-        self.assertTrue(any(r['experiment'] == 'legal-benchmark' and not r['synthetic'] and r['status'] == 'succeeded' and r['score'] for r in records))
-        self.assertFalse(any(r['experiment'] == 'legal-benchmark' for chosen in top_combinations(records, 10).values() for r in chosen))
+        self.assertTrue(any(r['experiment'] == 'legal-models' and not r['synthetic'] and r['status'] == 'succeeded' and r['score'] for r in records))
+        self.assertFalse(any(r['experiment'] == 'legal-models' for chosen in top_combinations(records, 10).values() for r in chosen))
         write_results_index(self.root)
         top = self.summary.read_text(encoding='utf-8').split(TOP_START)[1].split(TOP_END)[0]
-        self.assertNotIn('legal-benchmark', top)
+        self.assertNotIn('legal-models', top)
         self.assertNotIn('campaign-l-legal', top)
         self.assertNotIn('legal-host', top)
         charts = self.root / 'diagrams/results/summary'
@@ -376,7 +378,7 @@ class LegalIndexTests(unittest.TestCase):
                  'parameters': {'router': {'kind': 'systemone', 'platform': 'ollama', 'model': 'llm-eval-nimble:locked'}}}],
                [row('r2', 'coding', 0.05, None, decisions=0.5)])
         self.assertEqual([r['publication'] for r in top_combinations(collect(self.root))[('decision-models', 'raider-ubuntu')]], ['campaign-r-routing'])
-        # Newer and perfect, but the manifest says decision-models while the resolved jobs say legal-benchmark.
+        # Newer and perfect, but the manifest says decision-models while the resolved jobs say legal-models.
         relabelled = legal_bundle(self.root, 'campaign-x-legal', '2026-11-12T03:57:38+00:00',
                                   [{**legal_job('x1', 'model-run', hardware='raider-ubuntu'),
                                     'parameters': {'router': {'kind': 'systemone', 'platform': 'ollama', 'model': 'llm-eval-nimble:locked'}}}],
@@ -403,7 +405,7 @@ class LegalIndexTests(unittest.TestCase):
         before, records_before = outputs(), collect(self.root)
         self.add_legal()
         after, records_after = outputs(), collect(self.root)
-        self.assertEqual([r for r in records_after if r['experiment'] != 'legal-benchmark'], records_before)
+        self.assertEqual([r for r in records_after if r['experiment'] != 'legal-models'], records_before)
         readme = 'docs/results/README.md'
         self.assertEqual(after[readme].decode().split(TOP_START)[1].split(TOP_END)[0], before[readme].decode().split(TOP_START)[1].split(TOP_END)[0])
         charts = {k for k in before if k.endswith('.png')}
@@ -414,10 +416,10 @@ class LegalIndexTests(unittest.TestCase):
                 with self.subTest(page=name):
                     self.assertEqual(without_legal(after[name].decode()), without_legal(data.decode()))
         self.assertEqual(sorted(set(after) - set(before)),
-                         ['docs/results/index/date/2026-11-10.md', 'docs/results/index/experiment/legal-benchmark.md',
+                         ['docs/results/index/date/2026-11-10.md', 'docs/results/index/experiment/legal-models.md',
                           'docs/results/index/hardware/legal-host.md', 'docs/results/index/harness/fixture.md', 'docs/results/index/model/fixture.md',
-                          'docs/results/index/recommended/legal-host/legal-benchmark.md',
-                          'docs/results/index/recommended/raider-windows/legal-benchmark.md'])
+                          'docs/results/index/recommended/legal-host/legal-models.md',
+                          'docs/results/index/recommended/raider-windows/legal-models.md'])
 
     def test_hostile_values_of_a_projected_bundle_are_rendered_inert(self):
         hostile = legal_job('h1', 'model-run', 'h](javascript:alert(1))', 'm\n| x |', mode='generation\n## INJECTED\n<script>x</script>',
@@ -493,7 +495,7 @@ class RecommendationTests(unittest.TestCase):
         write_results_index(self.root)
         for hardware, experiment, reason in (
                 ('raider-ubuntu', 'decision-models', 'Every published run of this pair is a synthetic fixture, which measures no model.'),
-                ('legal-host', 'legal-benchmark', 'The results of this experiment are published by class and cohort and are not ranked.'),
+                ('legal-host', 'legal-models', 'The results of this experiment are published by class and cohort and are not ranked.'),
                 ('other-host', 'model-offloading', 'No run of this pair has succeeded with scored checks.')):
             text = self.page(hardware, experiment)
             self.assertIn('## No recommendation\n\n' + reason, text)
@@ -501,7 +503,7 @@ class RecommendationTests(unittest.TestCase):
             self.assertNotIn('## Setup of the recommended run', text)
             self.assertIn('## Published results of this pair\n\n| Date | Experiment |', text)
         overview = (self.root / 'docs/results/index/recommended/README.md').read_text(encoding='utf-8')
-        self.assertIn('| [legal-host](../hardware/legal-host.md) | – | – | – | – | – | [recommended setup](legal-host/legal-benchmark.md) (no recommendation) |', overview)
+        self.assertIn('| [legal-host](../hardware/legal-host.md) | – | – | – | – | – | [recommended setup](legal-host/legal-models.md) (no recommendation) |', overview)
 
     def test_a_routing_pair_shows_the_router_settings(self):
         bundle(self.root, 'decision-models', 'campaign-m-routing', '2026-11-10T03:00:00+00:00',
@@ -630,7 +632,7 @@ class RenamedExperimentAndUsModelTests(unittest.TestCase):
         self.assertEqual(table[0], '| Experiment | Ollama | LM Studio | KoboldCpp |')
         self.assertEqual([line.split(' | ')[0] for line in table[1:]],
                          ['| [Hardware fit](experiments/hardware-fit/README.md)', '| [Model offloading](experiments/model-offloading/README.md)',
-                          '| [Decision models](experiments/decision-models/README.md)', '| [Legal benchmark](experiments/legal-benchmark/README.md)'])
+                          '| [Decision models](experiments/decision-models/README.md)', '| [Legal models](experiments/legal-models/README.md)'])
         ollama, lmstudio, koboldcpp = table[2].split(' | ')[1:4]
         self.assertEqual(ollama, '[us-on-foreign-base](docs/results/index/model/us-on-foreign-base.md) '
                                  '[9/9, 1 s](docs/results/model-offloading/campaign-o-offload/README.md)<br>US: '
@@ -646,6 +648,25 @@ class RenamedExperimentAndUsModelTests(unittest.TestCase):
         write_results_index(self.root)
         self.assertEqual(readme.read_text(encoding='utf-8'), '# Project without markers\n')
         self.assertFalse(plain.exists())
+
+
+class LegalRenameIndexTests(unittest.TestCase):
+    def test_a_legal_bundle_published_under_the_former_id_is_indexed_under_the_current_id(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            legal_bundle(root, 'campaign-old-smoke-legal-benchmark-1', '2026-11-18T00:00:00+00:00',
+                         [legal_job('old1', 'fixture', experiment='legal-benchmark')], [], experiment='legal-benchmark')
+            legal_bundle(root, 'campaign-new-smoke-legal-models-1', '2026-11-24T00:00:00+00:00', [legal_job('new1', 'fixture')], [])
+            records = collect(root)
+            self.assertEqual({(r['case'], r['experiment'], r['class'], r['ranked']) for r in records},
+                             {('old1', 'legal-models', 'fixture', False), ('new1', 'legal-models', 'fixture', False)})
+            write_results_index(root)
+            index = root / 'docs/results/index'
+            self.assertTrue((index / 'experiment/legal-models.md').is_file())
+            self.assertFalse((index / 'experiment/legal-benchmark.md').exists())
+            page = (index / 'experiment/legal-models.md').read_text(encoding='utf-8')
+            self.assertIn('legal-benchmark/campaign-old-smoke-legal-benchmark-1/README.md', page)      # the old bundle keeps its path
+            self.assertIn('legal-models/campaign-new-smoke-legal-models-1/README.md', page)
 
 
 class ModelOriginsCatalogTests(unittest.TestCase):

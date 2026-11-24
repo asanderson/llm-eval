@@ -1,12 +1,12 @@
 """Bounded offline ingestion of raw matter files into suite manifests, as an explicit operator step.
 
-`python -m llm_eval.experiments.legal_benchmark.ingest --collection DIR/collection.json --visibility DIR/visibility.json
+`python -m llm_eval.experiments.legal_models.ingest --collection DIR/collection.json --visibility DIR/visibility.json
 --output DIR [--lock --benchmark-id ID --revision REV --split-id ID]`
 
 Raw files are untrusted content. Nothing here fetches, executes or expands anything: UTF-8 text and `.eml` are parsed
 with the standard library, an attachment name only selects a parser by its extension and is never used as a path,
 archives are not expanded, HTML is reduced to text without loading what it references, and DOCX or PDF text is
-extracted only by a backend pinned in `experiments/legal-benchmark/capabilities.json`. Content problems become report
+extracted only by a backend pinned in `experiments/legal-models/capabilities.json`. Content problems become report
 statuses, never exceptions; the planner never calls this module, it only reads and hashes what it produced.
 """
 from __future__ import annotations
@@ -36,7 +36,7 @@ from llm_eval.core.contracts import fields, identifier
 from . import contracts
 
 ROOT = Path(__file__).resolve().parents[4]
-CAPABILITIES = 'experiments/legal-benchmark/capabilities.json'
+CAPABILITIES = 'experiments/legal-models/capabilities.json'
 LIMITS = {'max_file_bytes': 8 * 1024 * 1024, 'max_files': 2000, 'max_total_bytes': 256 * 1024 * 1024,
           'max_attachment_depth': 3, 'max_spans_per_source': 2000, 'max_span_chars': 2000,
           # Header parsing is not linear in the header size: an email is refused before it is parsed above these.
@@ -1046,7 +1046,7 @@ def verify_anchors(suite):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_benchmark.ingest',
+    parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_models.ingest',
                                      description='Ingest raw matter files into suite manifests (offline; nothing is fetched or executed).')
     parser.add_argument('--collection', required=True, help='collection.json (operator-authored)')
     parser.add_argument('--visibility', required=True, help='visibility.json beside the collection manifest')

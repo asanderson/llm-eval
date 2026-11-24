@@ -22,8 +22,8 @@ from unittest.mock import patch
 from llm_eval.common import digest, read_json, sha256_file, write_json
 from llm_eval.core.contracts import atomic_json
 from llm_eval.experiments import get_experiment
-from llm_eval.experiments import legal_benchmark as legal
-from llm_eval.experiments.legal_benchmark import contracts, fixture, profiles, retrieval
+from llm_eval.experiments import legal_models as legal
+from llm_eval.experiments.legal_models import contracts, fixture, profiles, retrieval
 from llm_eval.orchestration.planner import compile_campaign
 from llm_eval.orchestration.scheduler import initialize, run_campaign
 
@@ -33,7 +33,7 @@ except ImportError:
     from tests.test_legal_workflow import ANALYSIS, FakeGenerator, generator, job_for, lines, subset_suite
 
 ROOT = Path(__file__).resolve().parents[1]
-X = ROOT / 'experiments/legal-benchmark'
+X = ROOT / 'experiments/legal-models'
 SMOKE = X / 'workloads/original-smoke/suite.lock.json'
 PACKETS = X / 'workloads/original-packets/suite.lock.json'
 EXAMPLES = ROOT / 'configs/examples/legal'
@@ -49,17 +49,17 @@ WORKLOAD_SHA256 = digest(json.loads((X / 'workloads/qualification/legal-shaped.j
 
 
 def routing():
-    from llm_eval.experiments.legal_benchmark import routing as module
+    from llm_eval.experiments.legal_models import routing as module
     return module
 
 
 def grading():
-    from llm_eval.experiments.legal_benchmark import grading as module
+    from llm_eval.experiments.legal_models import grading as module
     return module
 
 
 def workflow():
-    from llm_eval.experiments.legal_benchmark import workflow as module
+    from llm_eval.experiments.legal_models import workflow as module
     return module
 
 
@@ -186,7 +186,7 @@ class TempCase(unittest.TestCase):
         self.inventory(os_id, **inventory)
         write_json(self.path / f'{name}.json', {'id': name, 'parameters': parameters})
         write_json(self.path / f'{name}-campaign.json', {'schema_version': 2, 'id': name, 'inventory': 'inventory.json', 'phases': [
-            {'id': 'legal', 'experiments': [{'id': 'legal-benchmark', 'version': 1, 'mode': mode, 'cases': [f'{name}.json'],
+            {'id': 'legal', 'experiments': [{'id': 'legal-models', 'version': 1, 'mode': mode, 'cases': [f'{name}.json'],
                                              'hardware_configs': ['native']}]}]})
         return compile_campaign(self.path / f'{name}-campaign.json', ROOT)
 
@@ -226,10 +226,10 @@ class ApprovalTests(TempCase):
                        {'schema_version': 1, 'suites': {key: {'benchmark_id': 'legal-original-smoke'}}},
                        {'schema_version': 1, 'suites': {key: {**good['suites'][key], 'off_host': True}}}):
             with self.subTest(broken=broken):
-                write_json(self.path / 'experiments/legal-benchmark/approved-suites.json', broken)
+                write_json(self.path / 'experiments/legal-models/approved-suites.json', broken)
                 with self.assertRaises(ValueError):
                     contracts.approved_suites(self.path)
-        (self.path / 'experiments/legal-benchmark/approved-suites.json').write_text('{"schema_version": 1, "schema_version": 1}', encoding='utf-8')
+        (self.path / 'experiments/legal-models/approved-suites.json').write_text('{"schema_version": 1, "schema_version": 1}', encoding='utf-8')
         with self.assertRaisesRegex(ValueError, 'Duplicate JSON key'):
             contracts.approved_suites(self.path)
         # An entry that is not marked for fixture export, or names another benchmark, does not allow an export.
@@ -316,7 +316,7 @@ class ProfileTests(TempCase):
             profiles.freeze(two, JOB_ID, ATTEMPT_ID, measurement='../escape')
         for name, kwargs, message in (('synthetic', {'synthetic': True}, 'A synthetic run cannot qualify a serving profile'),
                                       ('measured', {'metadata': offload_metadata(synthetic=True)}, 'A synthetic run cannot qualify a serving profile'),
-                                      ('legal', {'experiment': 'legal-benchmark'}, 'not a model-offloading job'),
+                                      ('legal', {'experiment': 'legal-models'}, 'not a model-offloading job'),
                                       ('running', {'status': 'running'}, 'The attempt has no finished result')):
             with self.subTest(name), self.assertRaisesRegex(ValueError, message):
                 campaign, _ = offload_attempt(self.path / name, **kwargs)
@@ -1060,34 +1060,39 @@ class RoutingTests(RoutedCase):
             'generator_sha256': profiles.profile_digest(job['parameters']['roles']['generator'], job['input_files'])})
 
 
+def build_calibration_attempts(directory, lock=PACKETS):
+    """(routed, fallback) below `directory`: a routed attempt (served fixture selector, threshold 0) and an unrouted attempt
+    of its fallback arm on the packet calibration suite, planned with the suite at `lock`. Fixture replies only."""
+    packets = contracts.load_suite(lock)
+
+    def respond(body):
+        content = body['messages'][1]['content']
+        matter = next(m for m in packets['matters']['matters'] if 'MATTER ' + m['matter_id'] + '\n' in content)
+        output = fixture.draft(matter, packets['corpus'])
+        listed = set(re.findall(r'^\[([a-z0-9-]+@[0-9]+)\] ', content, re.M))
+        output['claims'] = [c for c in output['claims'] if c['authority_id'] + '@' + c['version'] in listed]
+        return json.dumps(output)
+    attempts = []
+    with FakeSelector(lambda body: by_question(body, {'kiln': 'none'}, 0.8)) as selector, FakeGenerator(respond=respond) as fake, NO_GPU:
+        for name, parameters in (('cal-routed', {'arms': ['no-context', 'lexical-eligible'], 'selector': served(),
+                                                 'roles': {'generator': generator(fake.endpoint), 'selector': selector_role(selector.endpoint)}}),
+                                 ('cal-fallback', {'arms': ['lexical-eligible'], 'roles': {'generator': generator(fake.endpoint)}})):
+            job = job_for(lock, parameters, job_id='legal-' + name)
+            out = Path(directory) / name
+            out.mkdir(parents=True)
+            atomic_json(out / 'job.json', job)
+            result = legal.execute(job, out, ROOT)
+            atomic_json(out / 'result.json', {**result, 'attempt_id': out.name})
+            attempts.append(out)
+    return tuple(attempts)
+
+
 def calibration_attempts():
-    """A routed attempt (served fixture selector, threshold 0) and an unrouted attempt of its fallback arm on the packet
-    calibration suite, built once. Fixture replies only."""
+    """The calibration attempts on the shipped packet suite, built once."""
     if 'calibration' not in _SHARED:
         directory = Path(tempfile.mkdtemp())
         unittest.addModuleCleanup(shutil.rmtree, directory, True)
-        packets = contracts.load_suite(PACKETS)
-
-        def respond(body):
-            content = body['messages'][1]['content']
-            matter = next(m for m in packets['matters']['matters'] if 'MATTER ' + m['matter_id'] + '\n' in content)
-            output = fixture.draft(matter, packets['corpus'])
-            listed = set(re.findall(r'^\[([a-z0-9-]+@[0-9]+)\] ', content, re.M))
-            output['claims'] = [c for c in output['claims'] if c['authority_id'] + '@' + c['version'] in listed]
-            return json.dumps(output)
-        attempts = []
-        with FakeSelector(lambda body: by_question(body, {'kiln': 'none'}, 0.8)) as selector, FakeGenerator(respond=respond) as fake, NO_GPU:
-            for name, parameters in (('cal-routed', {'arms': ['no-context', 'lexical-eligible'], 'selector': served(),
-                                                     'roles': {'generator': generator(fake.endpoint), 'selector': selector_role(selector.endpoint)}}),
-                                     ('cal-fallback', {'arms': ['lexical-eligible'], 'roles': {'generator': generator(fake.endpoint)}})):
-                job = job_for(PACKETS, parameters, job_id='legal-' + name)
-                out = directory / name
-                out.mkdir()
-                atomic_json(out / 'job.json', job)
-                result = legal.execute(job, out, ROOT)
-                atomic_json(out / 'result.json', {**result, 'attempt_id': out.name})
-                attempts.append(out)
-        _SHARED['calibration'] = tuple(attempts)
+        _SHARED['calibration'] = build_calibration_attempts(directory)
     return _SHARED['calibration']
 
 
@@ -1410,7 +1415,7 @@ class ReplayTests(ReplayCase):
         routed = self.path / 'routed'
         routed.mkdir()
         (routed / 'requests.jsonl').write_text(json.dumps({'task_id': 'f1-ledger-a', 'arm': 'routed', 'repetition': 0}) + '\n', encoding='utf-8')
-        write_json(routed / 'metadata.json', {'experiment': 'legal-benchmark', 'mode': 'generation'})
+        write_json(routed / 'metadata.json', {'experiment': 'legal-models', 'mode': 'generation'})
         (routed / 'local').mkdir()
         (routed / 'local/score-detail.jsonl').write_text('', encoding='utf-8')
         with self.assertRaisesRegex(ValueError, 'A routed attempt is not a candidate'):
@@ -1606,7 +1611,7 @@ class ExampleTests(TempCase):
         self.assertEqual(Path(job['parameters']['config']['suite']), (X / 'workloads/qualification/legal-shaped.json').resolve())
         evaluation = compile_campaign(EXAMPLES / 'evaluation-campaign.json', ROOT)
         self.assertEqual([(j['experiment_id'], j['mode']) for j in evaluation['jobs']],
-                         [('legal-benchmark', 'retrieval'), ('legal-benchmark', 'generation'), ('legal-benchmark', 'workflow')])
+                         [('legal-models', 'retrieval'), ('legal-models', 'generation'), ('legal-models', 'workflow')])
         self.assertEqual([j['parameters'].get('synthetic', False) for j in evaluation['jobs']], [True, False, False])
         self.assertEqual(evaluation['jobs'][1]['depends_on'], [evaluation['jobs'][0]['job_id']])
         self.assertEqual(evaluation['jobs'][2]['depends_on'], [evaluation['jobs'][1]['job_id']])

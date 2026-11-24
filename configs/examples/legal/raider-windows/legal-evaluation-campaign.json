@@ -12,7 +12,7 @@
       "id": "retrieval",
       "experiments": [
         {
-          "id": "legal-benchmark",
+          "id": "legal-models",
           "version": 1,
           "mode": "retrieval",
           "cases": [
@@ -31,7 +31,7 @@
       ],
       "experiments": [
         {
-          "id": "legal-benchmark",
+          "id": "legal-models",
           "version": 1,
           "mode": "generation",
           "cases": [
@@ -50,7 +50,7 @@
       ],
       "experiments": [
         {
-          "id": "legal-benchmark",
+          "id": "legal-models",
           "version": 1,
           "mode": "workflow",
           "cases": [

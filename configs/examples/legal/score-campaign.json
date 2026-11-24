@@ -12,7 +12,7 @@
       "id": "score",
       "experiments": [
         {
-          "id": "legal-benchmark",
+          "id": "legal-models",
           "version": 1,
           "mode": "score",
           "cases": [

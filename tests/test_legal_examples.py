@@ -26,27 +26,27 @@ from llm_eval import readiness
 from llm_eval.common import read_json
 from llm_eval.orchestration import planner
 from llm_eval.orchestration.planner import compile_campaign
-import llm_eval.experiments.legal_benchmark as legal
-from llm_eval.experiments.legal_benchmark import profiles, reporting
+import llm_eval.experiments.legal_models as legal
+from llm_eval.experiments.legal_models import profiles, reporting
 
 ROOT = Path(__file__).resolve().parents[1]
-X = ROOT / 'experiments/legal-benchmark'
+X = ROOT / 'experiments/legal-models'
 EXAMPLES = ROOT / 'configs/examples/legal'
 HOSTS = {'windows': 'windows-11-native', 'wsl': 'windows-11-wsl2-ubuntu-26.04', 'ubuntu': 'ubuntu-26.04-native'}
 # The two template campaigns of package E: their cases name REPLACE_WITH_... input files, so they do not plan.
 TEMPLATES = {'score-campaign.json': (ValueError, 'Output manifest not found'),
              'routing-replay-campaign.json': (FileNotFoundError, 'REPLACE_WITH_EXPORTED_ROUTING_SUITE')}
-WALKTHROUGH = ROOT / 'docs/LEGAL_BENCHMARK_WALKTHROUGH.md'
+WALKTHROUGH = ROOT / 'docs/LEGAL_MODELS_WALKTHROUGH.md'
 VALIDATION = ROOT / 'docs/VALIDATION.md'
 NEW_EXPERIMENT = ROOT / 'docs/NEW_EXPERIMENT.md'
 X_README = X / 'README.md'
-DIAGRAM = ROOT / 'diagrams/legal-benchmark-workflow'
+DIAGRAM = ROOT / 'diagrams/legal-models-workflow'
 # Documents this package adds or changes.
-DOCUMENTS = ('docs/LEGAL_BENCHMARK_WALKTHROUGH.md', 'docs/NEW_EXPERIMENT.md', 'docs/RESULTS.md', 'docs/VALIDATION.md', 'docs/READINESS.md',
-             'README.md', 'experiments/legal-benchmark/README.md', 'configs/examples/legal/README.md', 'diagrams/legal-benchmark-workflow.md')
+DOCUMENTS = ('docs/LEGAL_MODELS_WALKTHROUGH.md', 'docs/NEW_EXPERIMENT.md', 'docs/RESULTS.md', 'docs/VALIDATION.md', 'docs/READINESS.md',
+             'README.md', 'experiments/legal-models/README.md', 'configs/examples/legal/README.md', 'diagrams/legal-models-workflow.md')
 # The legal part of each document (None: the whole document).
-LEGAL_PARTS = {'docs/LEGAL_BENCHMARK_WALKTHROUGH.md': None, 'docs/VALIDATION.md': '## Legal benchmark (issue 45)',
-               'docs/RESULTS.md': '## Legal benchmark reports', 'docs/READINESS.md': '## Legal benchmark campaigns',
+LEGAL_PARTS = {'docs/LEGAL_MODELS_WALKTHROUGH.md': None, 'docs/VALIDATION.md': '## Legal models (issue 45)',
+               'docs/RESULTS.md': '## Legal models reports', 'docs/READINESS.md': '## Legal models campaigns',
                'configs/examples/legal/README.md': None}
 # Every optional plugin attribute the shared code reads from the legal plugin.
 HOOKS = ('input_files', 'setup_platforms', 'reporting_policy', 'host_requirements', 'data_policy', 'attempt_receipt', 'report_projection',
@@ -56,9 +56,9 @@ STAGES = ('Offload calibration', 'Locked serving profile', 'Routing calibration 
 GATED = ('Managed serving', 'hosted decision arm', 'Tev1 and Nimble', 'verifier cascade', 'DOCX, PDF and OCR', 'five gates',
          'eCFR, LegalReasonBench and Harvey', '12 calibration and 24 evaluation', 'policy profile', 'Validated human or judge scoring',
          'Publication of any legal result', 'private pilot')
-GATE_SECTIONS = ((WALKTHROUGH, None, '## Human rubric review checklist'), (VALIDATION, '## Legal benchmark (issue 45)', '### Independent engineer review'),
-                 (VALIDATION, '## Legal benchmark (issue 45)', '### Qualified legal reviewer'),
-                 (VALIDATION, '## Legal benchmark (issue 45)', '### Target-host acceptance'))
+GATE_SECTIONS = ((WALKTHROUGH, None, '## Human rubric review checklist'), (VALIDATION, '## Legal models (issue 45)', '### Independent engineer review'),
+                 (VALIDATION, '## Legal models (issue 45)', '### Qualified legal reviewer'),
+                 (VALIDATION, '## Legal models (issue 45)', '### Target-host acceptance'))
 HOST_CELLS = ('Windows 11 native', 'WSL2 Ubuntu 26.04', 'Native Ubuntu 26.04')
 # Sentences copied verbatim from the plan of issue 45, which is not part of the repository: the documents may quote them.
 PLAN_SENTENCES = ('No authorization to access private matter inputs or publish a results bundle is implied by this plan.',
@@ -80,12 +80,12 @@ PLAN_QUOTES = PLAN_SENTENCES + (
     'Treat semantic entailment, admissibility, defense arguments and sufficiency as separate rubric dimensions requiring validated human/judge scoring.',
     'Phase 3 private matter requires its own operator and counsel approval, local-only staging, and an independently tested publication/transport gate.')
 # Messages the code builds at run time around an experiment id, mapped to the fixed part a document's message must contain.
-BUILT = {'Publication is not available for legal-benchmark: automatic_publication_unavailable': 'Publication is not available for ',
-         'Publication is not available for legal-benchmark: <code>': 'Publication is not available for ',
-         'Publication identity mismatch: the bundle carries content of legal-benchmark (<class>)': 'Publication identity mismatch: the bundle carries content of ',
-         'Publication identity mismatch: the bundle carries content of legal-benchmark (text file)': 'Publication identity mismatch: the bundle carries content of ',
-         'Publication identity mismatch: the campaign record names legal-benchmark': 'Publication identity mismatch: the campaign record names '}
-LEGAL_DOCUMENTS = ('docs/LEGAL_BENCHMARK_WALKTHROUGH.md', 'experiments/legal-benchmark/README.md', 'configs/examples/legal/README.md')
+BUILT = {'Publication is not available for legal-models: automatic_publication_unavailable': 'Publication is not available for ',
+         'Publication is not available for legal-models: <code>': 'Publication is not available for ',
+         'Publication identity mismatch: the bundle carries content of legal-models (<class>)': 'Publication identity mismatch: the bundle carries content of ',
+         'Publication identity mismatch: the bundle carries content of legal-models (text file)': 'Publication identity mismatch: the bundle carries content of ',
+         'Publication identity mismatch: the campaign record names legal-models': 'Publication identity mismatch: the campaign record names '}
+LEGAL_DOCUMENTS = ('docs/LEGAL_MODELS_WALKTHROUGH.md', 'experiments/legal-models/README.md', 'configs/examples/legal/README.md')
 ENTRY = re.compile(r'(llm-eval |python -m llm_eval|python scripts/readiness\.py|bash scripts/readiness\.sh|powershell -NoProfile -File \.\\scripts\\readiness\.ps1)')
 # A number next to a rate or score word reads as a measurement.
 MEASURED = re.compile(r'\d[\d.,]*\s*(?:tok/s|tokens? per second|seconds?\b)|(?:tok/s|tokens per second|accuracy|latency)\D{0,30}\d', re.I)
@@ -229,7 +229,7 @@ def parse(argv):
         def run():
             with patch.object(sys, 'argv', ['llm-eval', *args]):
                 main()
-    elif module.startswith('llm_eval.experiments.legal_benchmark.'):
+    elif module.startswith('llm_eval.experiments.legal_models.'):
         run = lambda: importlib.import_module(module).main(args)
     else:
         raise AssertionError('Not a documented entry point: ' + argv)
@@ -326,7 +326,7 @@ class ExampleTests(unittest.TestCase):
                 "for name in ('psutil', 'matplotlib', 'pypdf', 'docx'):\n"
                 '    sys.modules[name] = None\n'
                 'import importlib, pkgutil\n'
-                'import llm_eval.experiments.legal_benchmark as package\n'
+                'import llm_eval.experiments.legal_models as package\n'
                 'names = sorted(m.name for m in pkgutil.iter_modules(package.__path__))\n'
                 'for name in names:\n'
                 "    importlib.import_module(package.__name__ + '.' + name)\n"
@@ -372,7 +372,7 @@ class DocumentationTests(unittest.TestCase):
             self.assertTrue(hasattr(legal, hook), hook)
             self.assertIn(hook, table)
         # Every optional attribute the shared code reads from a plugin has its row (no hook is silently undocumented).
-        shared = '\n'.join(text(p) for p in sorted((ROOT / 'src/llm_eval').rglob('*.py')) if 'legal_benchmark' not in p.parts)
+        shared = '\n'.join(text(p) for p in sorted((ROOT / 'src/llm_eval').rglob('*.py')) if 'legal_models' not in p.parts)
         read = set(re.findall(r"plugin_hook\([^,()]+(?:\([^()]*\))?[^,()]*,\s*'(\w+)'\)", shared))
         read |= set(re.findall(r"getattr\(get_experiment\([^()]*\),\s*'(\w+)'", shared))
         self.assertTrue(read)
@@ -385,7 +385,7 @@ class DocumentationTests(unittest.TestCase):
         walkthrough = text(WALKTHROUGH)
         for phrase in (*STAGES, 'serving-profile', 'output-manifest', 'routing calibrate', 'routing verify', 'approved-suites.json',
                        'llm-eval status', 'llm-eval resume', 'llm-eval cancel', '--retry-failed', 'fictional', 'raider` host lock',
-                       '![Legal benchmark stages from offload calibration to the local report.](../diagrams/legal-benchmark-workflow.png)'):
+                       '![Legal models stages from offload calibration to the local report.](../diagrams/legal-models-workflow.png)'):
             self.assertIn(phrase, walkthrough)
         for heading in ('## What this walkthrough runs', '## Status, resume and cancel', '## Roles', '## Source permissions', '## Trust boundaries',
                         '## Human rubric review checklist', '## Repeatable acceptance command sequence', '## What is not covered'):
@@ -395,7 +395,7 @@ class DocumentationTests(unittest.TestCase):
 
     def test_every_documented_command_line_parses(self):
         found = {name: commands(text(ROOT / name)) for name in DOCUMENTS}
-        legal_lines = [line for name in ('docs/LEGAL_BENCHMARK_WALKTHROUGH.md', 'configs/examples/legal/README.md') for line, _ in found[name]]
+        legal_lines = [line for name in ('docs/LEGAL_MODELS_WALKTHROUGH.md', 'configs/examples/legal/README.md') for line, _ in found[name]]
         self.assertGreater(len(legal_lines), 25)
         for name, lines in found.items():
             for line, inline in lines:
@@ -452,7 +452,7 @@ class DocumentationTests(unittest.TestCase):
     def test_quotes_are_verbatim(self):
         readme = text(X_README)
         for name in DOCUMENTS:
-            if name == 'experiments/legal-benchmark/README.md':
+            if name == 'experiments/legal-models/README.md':
                 continue
             body = text(ROOT / name)
             for quote in re.findall(r'^\s*> (.+)$', body, re.M):      # block quotes are quotes of the experiment README
@@ -477,7 +477,7 @@ class DocumentationTests(unittest.TestCase):
             for line in prose(part):
                 with self.subTest(document=name, line=line[:60]):
                     self.assertNotRegex(line, MEASURED)
-        legal_section = section(VALIDATION, '## Legal benchmark (issue 45)')
+        legal_section = section(VALIDATION, '## Legal models (issue 45)')
         hosts = subsection(legal_section, '### Host readiness and acceptance')
         rows = [l for l in hosts.splitlines() if l.startswith('|') and not l.startswith(('| Host cell', '|---'))]
         self.assertEqual([r.split('|')[1].strip() for r in rows], list(HOST_CELLS))
@@ -504,13 +504,13 @@ class DocumentationTests(unittest.TestCase):
                     self.assertTrue(item.startswith('- [ ] '), item)
                 for line in prose(body):
                     self.assertNotRegex(line, GATE_CLAIM)
-        legal_section = section(VALIDATION, '## Legal benchmark (issue 45)')
+        legal_section = section(VALIDATION, '## Legal models (issue 45)')
         self.assertIn('single active large model', subsection(legal_section, '### Target-host acceptance'))
         self.assertIn('reviewer_token', section(WALKTHROUGH, '## Human rubric review checklist'))
         self.assertIn(PLAN_SENTENCES[4], legal_section)
 
     def test_gated_plan_requirements_are_listed_by_name(self):
-        legal_section = section(VALIDATION, '## Legal benchmark (issue 45)')
+        legal_section = section(VALIDATION, '## Legal models (issue 45)')
         table = subsection(legal_section, '### Gated plan requirements')
         rows = [l for l in table.splitlines() if l.startswith('| ') and not l.startswith('| Plan requirement') and not l.startswith('|---')]
         self.assertEqual(len(rows), len(GATED))
@@ -553,7 +553,7 @@ class DocumentationTests(unittest.TestCase):
         source_text = text(DIAGRAM.with_suffix('.md'))
         self.assertEqual(source_text.count('```mermaid'), 1)
         self.assertIn('flowchart TD', source_text)
-        self.assertIn('[View PNG rendering](legal-benchmark-workflow.png).', source_text)
+        self.assertIn('[View PNG rendering](legal-models-workflow.png).', source_text)
         for stage in STAGES:
             self.assertIn(stage, source_text)
         edges = set(re.findall(r'^\s+(\w+) -\.?-> (\w+)$', source_text, re.M))
@@ -580,10 +580,10 @@ class DocumentationTests(unittest.TestCase):
             shutil.copy(ROOT / 'scripts/render_legal_diagram.py', copy / 'scripts')
             done = subprocess.run([sys.executable, str(copy / 'scripts/render_legal_diagram.py')], capture_output=True, text=True, timeout=300)
             self.assertEqual(done.returncode, 0, done.stderr)
-            self.assertEqual((copy / 'diagrams/legal-benchmark-workflow.md').read_bytes(), DIAGRAM.with_suffix('.md').read_bytes())
+            self.assertEqual((copy / 'diagrams/legal-models-workflow.md').read_bytes(), DIAGRAM.with_suffix('.md').read_bytes())
             import matplotlib.image
             committed = matplotlib.image.imread(str(DIAGRAM.with_suffix('.png')))
-            rendered = matplotlib.image.imread(str(copy / 'diagrams/legal-benchmark-workflow.png'))
+            rendered = matplotlib.image.imread(str(copy / 'diagrams/legal-models-workflow.png'))
             self.assertEqual(committed.shape, rendered.shape)
             self.assertLess(float(abs(committed - rendered).mean()), 0.02)
 

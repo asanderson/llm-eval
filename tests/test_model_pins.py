@@ -305,7 +305,7 @@ class RulesTest(Base):
         # A legal-shaped bundle (projected manifest, identity instead of config), also when it sits in this directory.
         legal_job = {'case_id': 'generation', 'parameters': {'cohorts': ['7' * 64], 'data_class': 'public-synthetic',
                                                              'identity': {'harness': 'ollama', 'model': 'llm-eval-model-a:locked'}}}
-        for experiment in ('model-offloading', 'legal-benchmark'):
+        for experiment in ('model-offloading', 'legal-models'):
             bundle(root, 'campaign-legal', '2026-12-31T00:00:00+00:00', [legal_job], experiment=experiment,
                    manifest={'canonical_bytes': 1, 'cohorts': 2, 'projection': {}})
         # Bundles the reader cannot date or parse are skipped, never fatal.

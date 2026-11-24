@@ -1,7 +1,7 @@
 {
   "id": "legal-retrieval",
   "parameters": {
-    "suite": "../../../experiments/legal-benchmark/workloads/original-smoke/suite.lock.json",
+    "suite": "../../../experiments/legal-models/workloads/original-smoke/suite.lock.json",
     "synthetic": true,
     "arms": [
       "no-context",

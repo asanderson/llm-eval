@@ -246,7 +246,7 @@ def check_gold(suite):
             raise ValueError('Reference adverse authorities must be every eligible exemption of the controlling authority: ' + g['matter_id'])
 
 
-# Smoke mode hooks (the mode-module interface of `legal_benchmark`) ---------------------------------------------------
+# Smoke mode hooks (the mode-module interface of `legal_models`) ---------------------------------------------------
 
 PARAMETERS = {'smoke': ({'top_k'}, ('synthetic',))}
 

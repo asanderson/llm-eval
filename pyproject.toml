@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "llm-eval-lab"
 version = "0.3.0"
-description = "Reproducible LLM experiments (hardware fit, model offloading, decision models, legal benchmark) across hardware and inference platforms"
+description = "Reproducible LLM experiments (hardware fit, model offloading, decision models, legal models) across hardware and inference platforms"
 requires-python = ">=3.11"
 license = {text = "MIT"}
 dependencies = []

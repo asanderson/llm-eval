@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render the legal benchmark stages and their explicit outputs, and the standalone Mermaid source, from one graph."""
+"""Render the legal models stages and their explicit outputs, and the standalone Mermaid source, from one graph."""
 from pathlib import Path
 import matplotlib
 matplotlib.use('Agg')
@@ -14,7 +14,7 @@ NODES={
  'attempt':('One succeeded offload\nattempt directory',.50,.92,False),
  'profile':('2. Locked serving profile\nprofiles freeze (placement attested)',.18,.76,True),
  'locked':('serving-profile.json\nand its SHA-256',.50,.76,False),
- 'routing':('3. Routing calibration and replay\n(optional): legal-benchmark generation\nruns per recipe, routed and fallback',.82,.60,True),
+ 'routing':('3. Routing calibration and replay\n(optional): legal-models generation\nruns per recipe, routed and fallback',.82,.60,True),
  'calibration':('routing calibrate:\ncalibration file (optional)',.50,.44,False),
  'replay':('routing export, replay, verify:\nrouting suite, replay manifest,\nsidecar (local only)',.82,.44,False),
  'evaluation':('4. Frozen legal evaluation\nretrieval, generation, workflow',.18,.28,True),
@@ -48,10 +48,10 @@ for label,x,y,stage in NODES.values():
  ax.text(x,y,label,ha='center',va='center',fontsize=10,color='#173452' if stage else '#292524',zorder=3)
 ax.text(.5,.995,'Outputs are passed by naming the file in the next case; dashed: only with a selector threshold. '
         'Fictional fixture suites only; Windows and WSL2 host runs published.',ha='center',va='top',fontsize=9.5,color='#475569')
-fig.tight_layout();fig.savefig(ROOT/'diagrams/legal-benchmark-workflow.png',dpi=150,metadata={'Software':'llm-eval'});plt.close(fig)
-source=('# Legal benchmark workflow\n\nThe five stages of the [legal benchmark walkthrough](../docs/LEGAL_BENCHMARK_WALKTHROUGH.md) and the explicit '
+fig.tight_layout();fig.savefig(ROOT/'diagrams/legal-models-workflow.png',dpi=150,metadata={'Software':'llm-eval'});plt.close(fig)
+source=('# Legal models workflow\n\nThe five stages of the [legal models walkthrough](../docs/LEGAL_MODELS_WALKTHROUGH.md) and the explicit '
         'output of each. A phase dependency only orders jobs; the next stage names the output file in its case. Stage 3 is '
         'optional, and the frozen evaluation takes from it at most the calibration file (dashed edge).\n\n```mermaid\nflowchart TD\n')
 for key,(label,_,_,_) in NODES.items():source+='  '+key+'["'+label.replace('\n',' ')+'"]\n'
 for a,b in EDGES:source+=f'  {a} {"-.->" if (a,b) in OPTIONAL else "-->"} {b}\n'
-(ROOT/'diagrams/legal-benchmark-workflow.md').write_text(source+'```\n\n[View PNG rendering](legal-benchmark-workflow.png).\n',encoding='utf-8',newline='\n')
+(ROOT/'diagrams/legal-models-workflow.md').write_text(source+'```\n\n[View PNG rendering](legal-models-workflow.png).\n',encoding='utf-8',newline='\n')

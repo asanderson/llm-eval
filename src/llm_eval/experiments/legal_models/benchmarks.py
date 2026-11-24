@@ -1,6 +1,6 @@
 """Gated import of a released public benchmark into a legal suite, as an explicit operator step on local bytes.
 
-`python -m llm_eval.experiments.legal_benchmark.benchmarks import --request FILE --output DIR`,
+`python -m llm_eval.experiments.legal_models.benchmarks import --request FILE --output DIR`,
 `... parity --dataset-lock FILE --native FILE`, `... gate --dataset-lock FILE --gate NAME --evidence ID --verified-by ID`.
 
 Nothing is downloaded: the operator supplies the upstream bytes. An imported suite is `public-benchmark` and does not load
@@ -635,7 +635,7 @@ def _relock(directory):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_benchmark.benchmarks',
+    parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_models.benchmarks',
                                      description='Gated public-benchmark import on local bytes (nothing is downloaded).')
     commands = parser.add_subparsers(dest='command', required=True)
     run = commands.add_parser('import', help='convert an operator-supplied upstream copy')

@@ -236,10 +236,11 @@ def validate_selector(selector, arms, roles, suite) -> None:
         # The record must be exactly what the two pinned calibration attempts give: a hand-written record is refused.
         routed, fallback = (Path(calibration[side]['output_manifest']).parent.parent for side in ('routed', 'fallback'))
         try:
-            rows = calibration_rows(routed, fallback, policy['fallback'])
-            lineage = calibration_lineage(routed, fallback, policy['fallback'])
-            if lineage_suite(routed) != calibration_suite['lock_sha256']:
-                raise ValueError('the calibration attempts ran on another suite')
+            # Read through the calibration suite this case names, not through the path the attempts were planned with: that
+            # path may be gone, as after the rename of the experiment directory. Attempts that ran on another suite are
+            # refused here (`Output manifest belongs to another suite`): their manifests name another lock digest.
+            rows = calibration_rows(routed, fallback, policy['fallback'], calibration_suite)
+            lineage = calibration_lineage(routed, fallback, policy['fallback'], calibration_suite)
             recomputed = calibrate(rows, [e['threshold'] for e in record['risk_coverage']], calibration_suite, lineage)
         except (ValueError, OSError, KeyError) as exc:
             raise ValueError('Calibration record does not follow from its calibration attempts: ' + (str(exc) if isinstance(exc, ValueError)
@@ -380,10 +381,12 @@ def _latency(row):
 def _pinned(attempt_dir, suite=None):
     """One generation, workflow or score attempt, read only through the output manifest it pins (or, for a score attempt,
     the manifest it scored): the manifest's identity, files and rows are checked as `grading._manifest` checks them, and
-    the outputs are graded as the `score` mode grades them. The attempt's own `score-detail.jsonl` is never read."""
+    the outputs are graded as the `score` mode grades them. The attempt's own `score-detail.jsonl` is never read.
+    `suite` is the loaded suite the caller holds; without it the suite is loaded from the path the attempt was planned
+    with. Either way the manifest must name that suite's lock digest."""
     attempt = Path(attempt_dir)
     metadata, _ = contracts.read_json_strict(attempt / 'metadata.json')
-    if metadata.get('experiment') != 'legal-benchmark' or metadata.get('mode') not in ('generation', 'workflow', 'score'):
+    if metadata.get('experiment') not in contracts.EXPERIMENT_IDS or metadata.get('mode') not in ('generation', 'workflow', 'score'):
         raise ValueError('Not a scored legal generation, workflow or score attempt')
     job, _ = contracts.read_json_strict(attempt / 'job.json')
     if metadata['mode'] == 'score':
@@ -674,8 +677,8 @@ def _per_task(pinned, arm):
     return {task: (rs, _quality(ds), _combined([outcome(d) for d in ds])) for task, (rs, ds) in found.items()}
 
 
-def _calibration_pair(routed_attempt, fallback_attempt, fallback_arm):
-    routed, fallback = _pinned(routed_attempt), _pinned(fallback_attempt)
+def _calibration_pair(routed_attempt, fallback_attempt, fallback_arm, suite=None):
+    routed, fallback = _pinned(routed_attempt, suite), _pinned(fallback_attempt, suite)
     selector = routed['job']['parameters'].get('selector')
     if selector is None or fallback['job']['parameters'].get('selector') is not None:
         raise ValueError('Calibration needs a routed attempt and an unrouted attempt of the fallback arm')
@@ -693,10 +696,10 @@ def _calibration_pair(routed_attempt, fallback_attempt, fallback_arm):
     return routed, fallback
 
 
-def calibration_lineage(routed_attempt, fallback_attempt, fallback_arm) -> dict:
+def calibration_lineage(routed_attempt, fallback_attempt, fallback_arm, suite=None) -> dict:
     """The lineage a calibration record carries: the routed job's selector identity, both output manifest digests and the
-    generator's profile digest."""
-    routed, fallback = _calibration_pair(routed_attempt, fallback_attempt, fallback_arm)
+    generator's profile digest. `suite`: as for `calibration_rows`."""
+    routed, fallback = _calibration_pair(routed_attempt, fallback_attempt, fallback_arm, suite)
     parameters = routed['job']['parameters']
     return {'selector_sha256': selector_identity(parameters['selector'], parameters['roles']),
             'routed_output_manifest_sha256': routed['lineage']['output_manifest_sha256'],
@@ -704,16 +707,13 @@ def calibration_lineage(routed_attempt, fallback_attempt, fallback_arm) -> dict:
             'generator_sha256': profiles.profile_digest(parameters['roles']['generator'], routed['job'].get('input_files', ()))}
 
 
-def lineage_suite(attempt) -> str:
-    """The suite lock digest the pinned outputs of a calibration attempt were scored on."""
-    return _pinned(attempt)['lineage']['suite_lock_sha256']
-
-
-def calibration_rows(routed_attempt, fallback_attempt, fallback_arm) -> list[dict]:
+def calibration_rows(routed_attempt, fallback_attempt, fallback_arm, suite=None) -> list[dict]:
     """One row per task (task-id order) of a routed attempt and an unrouted attempt of the routed policy's fallback arm on
     the same calibration suite, from their pinned outputs. `action` and `route_reason` say whether the routed run deferred
-    the task. With repetitions, `confidence` is the lowest one (None if any is None)."""
-    routed, fallback = _calibration_pair(routed_attempt, fallback_attempt, fallback_arm)
+    the task. With repetitions, `confidence` is the lowest one (None if any is None). `suite` is the loaded calibration
+    suite when the caller holds it: the attempts are then read through it, and refused when they pinned another lock
+    digest, instead of through the path they were planned with."""
+    routed, fallback = _calibration_pair(routed_attempt, fallback_attempt, fallback_arm, suite)
     a, b = _per_task(routed, 'routed'), _per_task(fallback, fallback_arm)
     if set(a) != set(b):
         raise ValueError('Calibration attempts are not comparable')
@@ -959,7 +959,7 @@ def _evaluate_attempts(suite, attempts, pool):
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_benchmark.routing')
+    parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_models.routing')
     commands = parser.add_subparsers(dest='command', required=True)
     export = commands.add_parser('export', help='write the routing suite of an approved fixture suite')
     export.add_argument('--suite', required=True)
@@ -1045,11 +1045,11 @@ def main(argv=None) -> int:
             contracts.check_output(args.output, 'The calibration record')
             thresholds = [float(t) for t in args.thresholds.split(',')]
             suite = contracts.load_suite(args.suite)
-            rows = calibration_rows(args.routed_attempt, args.fallback_attempt, args.fallback_arm)
+            rows = calibration_rows(args.routed_attempt, args.fallback_attempt, args.fallback_arm, suite)
             routed, _ = contracts.read_json_strict(Path(args.routed_attempt) / 'metadata.json')
             if routed.get('suite_lock_sha256') != suite['lock_sha256'] or {r['task_id'] for r in rows} != {m['matter_id'] for m in suite['matters']['matters']}:
                 raise ValueError('Calibration attempts belong to another suite')
-            lineage = calibration_lineage(args.routed_attempt, args.fallback_attempt, args.fallback_arm)
+            lineage = calibration_lineage(args.routed_attempt, args.fallback_attempt, args.fallback_arm, suite)
             print(write_calibration(calibrate(rows, thresholds, suite, lineage), args.output))
     except (ValueError, KeyError, OSError) as exc:
         print('Error: ' + (str(exc) if isinstance(exc, ValueError) else type(exc).__name__), file=sys.stderr)

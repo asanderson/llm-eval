@@ -1,6 +1,6 @@
 # original-packets
 
-A small packet suite built by `llm_eval.experiments.legal_benchmark.ingest` from raw files under `raw/`. Everything is original and fictional: the jurisdiction is the invented "Commonwealth of Veld" of `original-smoke`, but every statute, fact, name and address here is new, and email addresses use the reserved `.example` domain.
+A small packet suite built by `llm_eval.experiments.legal_models.ingest` from raw files under `raw/`. Everything is original and fictional: the jurisdiction is the invented "Commonwealth of Veld" of `original-smoke`, but every statute, fact, name and address here is new, and email addresses use the reserved `.example` domain.
 
 Lock: `benchmark_id: legal-original-packets`, `split_id: calibration`, `data_class: public-synthetic`, `revision: 2026-11-11.1`. The split is disjoint from `original-smoke` (`split_id: smoke`): no family id, authority id, citation or matter question is shared, so a threshold can be calibrated here and checked on the smoke suite. It is a calibration fixture at a reduced count (two families), not the plan's 12 calibration families, and no result on it supports adopting anything.
 
@@ -16,8 +16,8 @@ Raw files: patrol, inspection and statement reports (`.txt`), three `.eml` messa
 The raw files and `collection.json`, `visibility.json` and `rubric.json` are authored; the other manifests are generated:
 
 ```bash
-python -m llm_eval.experiments.legal_benchmark.ingest --collection experiments/legal-benchmark/workloads/original-packets/collection.json \
-  --visibility experiments/legal-benchmark/workloads/original-packets/visibility.json --output experiments/legal-benchmark/workloads/original-packets \
+python -m llm_eval.experiments.legal_models.ingest --collection experiments/legal-models/workloads/original-packets/collection.json \
+  --visibility experiments/legal-models/workloads/original-packets/visibility.json --output experiments/legal-models/workloads/original-packets \
   --lock --benchmark-id legal-original-packets --revision 2026-11-11.1 --split-id calibration
 ```
 

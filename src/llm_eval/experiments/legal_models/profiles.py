@@ -1,4 +1,4 @@
-"""Role profile v1: one shape for every served role of the legal benchmark, and the job's endpoint allowlist.
+"""Role profile v1: one shape for every served role of the legal models experiment, and the job's endpoint allowlist.
 
 A role is reached only through an explicit, pinned profile. `serving` must be declared; `managed` is recognised and
 gated; `in-process` exists only for the deterministic fixture embedder and reranker. Every served role is local:
@@ -667,7 +667,7 @@ def approved_workloads() -> dict:
     approved = contracts.approved_suites()
     key = tuple(sorted(approved))
     if key not in _WORKLOADS:
-        root = Path(__file__).resolve().parents[4] / 'experiments/legal-benchmark/workloads'
+        root = Path(__file__).resolve().parents[4] / 'experiments/legal-models/workloads'
         locks = {sha256_file(p): p for p in sorted(root.glob('*/suite.lock.json'))}
         _WORKLOADS[key] = {digest(workload(locks[k])): approved[k]['benchmark_id'] for k in key if k in locks}
     return dict(_WORKLOADS[key])
@@ -697,7 +697,7 @@ def _placement_flag(text):
 
 def main(argv=None) -> int:
     from .contracts import check_output
-    parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_benchmark.profiles')
+    parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_models.profiles')
     commands = parser.add_subparsers(dest='command', required=True)
     freezing = commands.add_parser('freeze', help='freeze a locked serving profile from one named model-offloading attempt')
     freezing.add_argument('--campaign-dir', required=True)

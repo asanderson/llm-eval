@@ -1,4 +1,4 @@
-"""One data classification, the strict report projection and the publication gates of the legal benchmark.
+"""One data classification, the strict report projection and the publication gates of the legal models experiment.
 
 `classify(job)` is the only source of what a legal job may do. It reads the planned job, the files that job pins and the
 reviewed list of approved suites, and nothing else: no report label, manifest field, campaign setting, case field or
@@ -170,7 +170,7 @@ def plan_unchanged(plan):
     always written it)."""
     from llm_eval.core.contracts import config_hash
     if 'plan_sha256' not in plan:
-        return not any(isinstance(j, dict) and j.get('experiment_id') == 'legal-benchmark' for j in plan.get('jobs') or [])
+        return not any(isinstance(j, dict) and j.get('experiment_id') in contracts.EXPERIMENT_IDS for j in plan.get('jobs') or [])
     return config_hash({k: v for k, v in plan.items() if k != 'plan_sha256'}) == plan['plan_sha256']
 
 
@@ -182,7 +182,8 @@ def cohort(job, metadata, arm) -> tuple[dict, str]:
     generator = roles.get('generator') if isinstance(roles.get('generator'), dict) else {}
     hardware = job.get('hardware') if isinstance(job.get('hardware'), dict) else {}
     selector = metadata.get('selector') if isinstance(metadata.get('selector'), dict) else None
-    value = {'experiment': metadata.get('experiment'), 'mode': job.get('mode'), 'execution_kind': metadata.get('execution_kind'),
+    experiment = metadata.get('experiment')
+    value = {'experiment': contracts.COHORT_EXPERIMENT if experiment in contracts.EXPERIMENT_IDS else experiment, 'mode': job.get('mode'), 'execution_kind': metadata.get('execution_kind'),
              'data_class': metadata.get('data_class'),
              **{k: metadata.get(k) for k in ('benchmark_id', 'suite_revision', 'suite_lock_sha256', 'split_id', 'jurisdiction_profile',
                                              'policy_id', 'policy_version', 'rubric_version', 'scorer_version', 'scorer_fingerprint',
@@ -267,7 +268,7 @@ TELEMETRY = _object({'memory_scope': _enum('host', 'wsl_guest'), **{k: _null(NUM
     'system_used_gib_peak', 'swap_used_gib_peak', 'gpu_used_mib_peak', 'gpu_power_w_peak', 'gpu_temperature_c_peak')},
     'disk_read_bytes': _null(COUNT), 'samples': COUNT})
 METADATA = _object({
-    'schema_version': COUNT, 'experiment': _enum('legal-benchmark'), 'mode': _enum(*MODE_MODULES), 'execution_kind': _enum(*contracts.EXECUTION_KINDS),
+    'schema_version': COUNT, 'experiment': _enum(*contracts.EXPERIMENT_IDS), 'mode': _enum(*MODE_MODULES), 'execution_kind': _enum(*contracts.EXECUTION_KINDS),
     'synthetic': BOOL, 'data_class': _enum(*contracts.DATA_CLASSES), 'benchmark_id': _null(ID), 'suite_revision': VERSION, 'split_id': _null(ID),
     'jurisdiction_profile': _null(ID), 'suite_lock_sha256': SHA, 'rubric_version': VERSION, 'scorer_version': VERSION, 'policy_id': _null(ID),
     'policy_version': VERSION, 'template_sha256': _null(SHA), 'arms': _list(ARM),
@@ -297,7 +298,7 @@ METRIC = _object({'value': _null(NUMBER), 'n': _null(COUNT), 'low': _null(NUMBER
 SMALL_METRIC = {'value': None, 'n': None, 'low': None, 'high': None, 'missing': None}
 SMALL_PAIRED = {'mean': None, 'n': None, 'low': None, 'high': None, 'missing': None}
 COHORT = _object({
-    'experiment': _null(_enum('legal-benchmark')), 'mode': _enum(*MODE_MODULES), 'execution_kind': _null(_enum(*contracts.EXECUTION_KINDS)),
+    'experiment': _null(_enum(*contracts.EXPERIMENT_IDS)), 'mode': _enum(*MODE_MODULES), 'execution_kind': _null(_enum(*contracts.EXECUTION_KINDS)),
     'data_class': _null(_enum(*contracts.DATA_CLASSES)), 'benchmark_id': _null(ID), 'suite_revision': VERSION, 'suite_lock_sha256': _null(SHA),
     'split_id': _null(ID), 'jurisdiction_profile': _null(ID), 'policy_id': _null(ID), 'policy_version': VERSION, 'rubric_version': VERSION,
     'scorer_version': VERSION, 'scorer_fingerprint': _null(SHA), 'reviewer_fingerprint': _null(SHA), 'arm': ARM, 'retrieval_sha256': _null(SHA),
@@ -314,12 +315,12 @@ LEGAL_SUMMARY = _object({
                             ('job_id', 'arm_a', 'arm_b', 'metric', 'mean', 'n', 'low', 'high', 'missing')))})
 COVERAGE = _object({'job_id': ID, 'status': ID, 'reason': _null(ID), 'attempts': COUNT})
 PUBLIC_JOB = _object({
-    'job_id': ID, 'experiment_id': _enum('legal-benchmark'), 'experiment_version': COUNT, 'mode': _enum(*MODE_MODULES), 'case_id': ID,
+    'job_id': ID, 'experiment_id': _enum(*contracts.EXPERIMENT_IDS), 'experiment_version': COUNT, 'mode': _enum(*MODE_MODULES), 'case_id': ID,
     'hardware_config_id': ID, 'hardware': _object({'os_id': ID, 'hardware_profile': ID}),
     'parameters': _object({'synthetic': BOOL, 'execution_kind': _enum(*contracts.EXECUTION_KINDS), 'data_class': _enum(*contracts.DATA_CLASSES),
                            'identity': _object({'harness': _p('version'), 'model': _p('version')}), 'cohorts': _list(SHA)}),
     'input_files': _list(_object({'sha256': SHA}))})
-EXPERIMENT = _object({'experiment_run_id': ID, 'experiment_id': _enum('legal-benchmark'), 'version': COUNT, 'mode': _enum(*MODE_MODULES),
+EXPERIMENT = _object({'experiment_run_id': ID, 'experiment_id': _enum(*contracts.EXPERIMENT_IDS), 'version': COUNT, 'mode': _enum(*MODE_MODULES),
                       'job_ids': _list(ID), 'campaign_id': ID, 'code_revision': _p('revision')})
 RECORD = _object({'job_id': ID, 'attempt_id': ID, 'latest_attempt': BOOL, 'record_type': _enum('request', 'metadata'),
                   'source_file': _enum('requests.jsonl', 'metadata.json'), 'data': ('record',)})
@@ -637,7 +638,8 @@ def _project(campaign_dir, plan, state, exp, create_salt):
     classes = {}
     for job in jobs:
         policy = data_policy(job)
-        if not policy['report'] or job.get('experiment_id') != 'legal-benchmark':
+        # A job carries one of the experiment's ids, and the one its experiment entry carries: a run never mixes the two.
+        if not policy['report'] or job.get('experiment_id') not in contracts.EXPERIMENT_IDS or job.get('experiment_id') != entry['experiment_id']:
             raise ProjectionRejected('not_reportable')
         classes[job['job_id']] = classify(job)
     reduced = not all(c['fixture_export'] for c in classes.values())      # one unexported suite reduces the whole run
@@ -664,8 +666,10 @@ def _project(campaign_dir, plan, state, exp, create_salt):
             metadata = _json(data, 'metadata') if data is not None else None
             if metadata is not None:
                 validate_projection(metadata, METADATA, 'metadata')
+                # The attempt wrote the id its run was planned with: plan entry, job and attempt carry one id.
                 if metadata['mode'] != mode or metadata['suite_lock_sha256'] != c['suite_lock_sha256'] or \
-                        metadata['data_class'] != c['data_class'] or metadata['execution_kind'] != c['execution_kind']:
+                        metadata['data_class'] != c['data_class'] or metadata['execution_kind'] != c['execution_kind'] or \
+                        metadata.get('experiment') != entry['experiment_id']:
                     raise ProjectionRejected('metadata')
                 if exact:
                     _exact_metadata(metadata, c, suite)
@@ -793,7 +797,7 @@ def _project(campaign_dir, plan, state, exp, create_salt):
                                  (generic, GENERIC, 'manifest'), (public_jobs, _list(PUBLIC_JOB), 'jobs'), (summary, _list(SUMMARY), 'summary')):
         validate_projection(value, schema, where)
     input_hashes = sorted({f['sha256'] for j in public_jobs for f in j['input_files']})
-    readme = _readme(generic, manifest, coverage, public_jobs, cohorts, paired, reduced)
+    readme = _readme(generic, manifest, coverage, public_jobs, cohorts, paired, reduced, experiment['experiment_id'])
     return {'records': records, 'coverage': coverage, 'experiment': experiment, 'jobs': public_jobs, 'input_hashes': input_hashes,
             'files': {'legal-summary.json': legal}, 'manifest': manifest, 'readme': readme, 'summary': summary}
 
@@ -802,11 +806,12 @@ def _fmt(value):
     return 'unavailable' if value is None else str(value)
 
 
-def _readme(generic, manifest, coverage, jobs, cohorts, paired, reduced):
-    """Fixed sentences and projected values only."""
+def _readme(generic, manifest, coverage, jobs, cohorts, paired, reduced, experiment_id):
+    """Fixed sentences and projected values only. `experiment_id` is the id the campaign was planned with (validated against
+    `contracts.EXPERIMENT_IDS`), so the report of a campaign planned under the former id is the bytes it always was."""
     status = 'complete' if all(c['status'] in ('succeeded', 'skipped') for c in coverage) else 'incomplete'
     modes = {j['job_id']: j for j in jobs}
-    text = (f"# legal-benchmark results\n\nStatus: **{status}**. Execution classes: **{', '.join(manifest['execution_kinds'])}**. "
+    text = (f"# {experiment_id} results\n\nStatus: **{status}**. Execution classes: **{', '.join(manifest['execution_kinds'])}**. "
             f"Data class: **{manifest['data_class']}**. Cohorts: **{manifest['cohorts']}**.\n\n"
             f"Campaign: `{generic['campaign_id']}`. Experiment run: `{generic['experiment_run_id']}`. Measured code: `{generic['code_revision']}`.\n\n"
             '[Raw measurements](raw/measurements.jsonl.gz) · [JSON summary](summary.json) · [CSV summary](summary.csv) · '
@@ -927,7 +932,8 @@ def _verify(report, root, base):
             metadata, _ = contracts.read_json_strict(attempt / 'metadata.json')
         except (OSError, ValueError):
             raise ValueError('receipt_mismatch') from None
-        if not isinstance(metadata, dict) or metadata.get('suite_lock_sha256') != c['suite_lock_sha256'] or metadata.get('experiment') != 'legal-benchmark':
+        if not isinstance(metadata, dict) or metadata.get('suite_lock_sha256') != c['suite_lock_sha256'] or \
+                metadata.get('experiment') not in contracts.EXPERIMENT_IDS or metadata.get('experiment') != entry.get('experiment_id'):
             raise ValueError('receipt_mismatch')
         # The coordinator's receipt binds the suite, every file the projection reads and the output manifest; publication
         # needs all of it (a campaign written before the receipt existed is reported locally, never published).
@@ -1037,7 +1043,7 @@ def _load_markers():
         from . import profiles
         from llm_eval.runner import load_suite as load_task_suite
         files, tasks, task, suites, ids = set(), set(), set(), set(), set()
-        workloads = Path(__file__).resolve().parents[4] / 'experiments/legal-benchmark/workloads'
+        workloads = Path(__file__).resolve().parents[4] / 'experiments/legal-models/workloads'
         for lock in sorted(workloads.glob('*/suite.lock.json')):
             if sha256_file(lock) not in approved:
                 continue
@@ -1128,10 +1134,10 @@ def _claimed(name, markers):
 
 
 def _text_markers(markers):
-    """Strings only this plugin writes into a report's text files: the experiment id (also part of every legal job and run id),
+    """Strings only this plugin writes into a report's text files: the experiment id and its former id (also part of every legal job and run id),
     the benchmark names of the approved suites and exports, and the names of the legal cohort metrics. Compared after NFKC normalisation and case folding."""
     from . import MANIFEST
-    names = {MANIFEST['id'], *_benchmark_names(markers)}
+    names = {MANIFEST['id'], *contracts.FORMER_IDS, *_benchmark_names(markers)}
     names |= {m for m in ROW_METRICS if m.startswith(('retrieval.', 'usable_memo_s', 'rate.selector_deferral'))}
     names |= {m for m in grading.METRICS if len(m) >= 12}
     return tuple(sorted(n.casefold() for n in names))
@@ -1209,7 +1215,7 @@ def claims_bundle(report, dest, manifest, resolved, records):
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_benchmark.reporting',
+    parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_models.reporting',
                                      description='Authorize the publication of one verified legal report')
     sub = parser.add_subparsers(dest='command', required=True)
     command = sub.add_parser('authorize', help='verify a report, show what would be published and record the authorization')

@@ -1,4 +1,4 @@
-"""Legal benchmark experiment: retrieval, evidence-grounded analysis and draft screening memos for human review.
+"""Legal models experiment (formerly `legal-benchmark`): retrieval, evidence-grounded analysis and draft screening memos for human review.
 
 Registered modes: `smoke` (a deterministic fixture pipeline over fictional matters with no model, network or GPU),
 `retrieval` (the retrieval arms and their metrics), `generation` (one direct draft request per matter and arm),
@@ -14,10 +14,10 @@ from pathlib import Path
 from llm_eval.core.contracts import fields
 
 from . import fixture
-from .contracts import load_suite, pinned_files
+from .contracts import EXPERIMENT_ID, load_suite, pinned_files
 
 MODE_MODULES = {'smoke': 'fixture', 'retrieval': 'retrieval', 'generation': 'workflow', 'workflow': 'workflow', 'score': 'grading'}
-MANIFEST = {'id': 'legal-benchmark', 'version': 1, 'modes': list(MODE_MODULES),
+MANIFEST = {'id': EXPERIMENT_ID, 'version': 1, 'modes': list(MODE_MODULES),
             'description': 'Legal retrieval, evidence-grounded analysis and draft screening memos for human review'}
 BENCHMARK = 'legal-smoke'
 # Legal results stay out of the generic top-combinations ranking of the results index (read through `plugin_hook`).
@@ -45,11 +45,11 @@ def job_status(rows):
 
 def _parameters(case, mode):
     if not isinstance(mode, str) or mode not in MODE_MODULES:
-        raise ValueError('Unsupported legal-benchmark mode: ' + str(mode))
+        raise ValueError('Unsupported legal-models mode: ' + str(mode))
     allowed, required = _module(mode).PARAMETERS[mode]
     fields(case, {'suite', 'synthetic', *allowed}, ['suite', *required])
     if not isinstance(case['suite'], str):
-        raise ValueError('The legal-benchmark suite must be a path string')
+        raise ValueError('The legal-models suite must be a path string')
 
 
 def _admit(case, suite, root, mode):
@@ -151,7 +151,7 @@ def claims_benchmark(name):
 
 
 # Files a publication branch must not change: the reviewed approved list decides what may be published.
-PROTECTED_PATHS = ('experiments/legal-benchmark/approved-suites.json',)
+PROTECTED_PATHS = ('experiments/legal-models/approved-suites.json',)
 
 
 def execute(job, output, root):
