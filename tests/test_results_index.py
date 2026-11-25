@@ -126,7 +126,7 @@ class ResultsIndexTests(unittest.TestCase):
         records = collect(self.root)
         self.assertEqual(matched(records), {})
         write_results_index(self.root)
-        page = (self.root / 'docs/results/index/recommended/raider-windows/model-offloading.md').read_text()
+        page = (self.root / 'docs/results/index/recommended/raider-windows/model-offloading.md').read_text(encoding='utf-8')
         self.assertIn('No two successful model packages have complete matching controls', page)
         self.assertIn('deepseek-r1-32b · koboldcpp | category-smoke · failed', page)
         self.assertIn('not recorded | not recorded | 0/9', page)
@@ -272,7 +272,7 @@ class LegalIndexTests(unittest.TestCase):
         self.add_legal()
         self.assertTrue(all(r['comparison'] is None for r in collect(self.root) if r['class']))
         write_results_index(self.root)
-        page = (self.root / 'docs/results/index/recommended/legal-host/legal-models.md').read_text()
+        page = (self.root / 'docs/results/index/recommended/legal-host/legal-models.md').read_text(encoding='utf-8')
         self.assertNotIn('Matched model comparisons', page)
         self.assertIn('score-only', page)
 
@@ -329,7 +329,7 @@ class EvidencePageTests(unittest.TestCase):
         before = {p: p.read_bytes() for p in directory.rglob('*') if p.is_file()}
         write_results_index(self.root)
         self.assertEqual({p: p.read_bytes() for p in directory.rglob('*') if p.is_file()}, before)
-        self.assertIn('[setup evidence](index/recommended/README.md)', self.summary.read_text())
+        self.assertIn('[setup evidence](index/recommended/README.md)', self.summary.read_text(encoding='utf-8'))
 
     def test_latest_attempt_with_warmups_and_failed_requests(self):
         bundle_path = self.root / 'docs/results/model-offloading/campaign-b-offload'
@@ -461,7 +461,7 @@ class RenamedExperimentAndUsModelTests(unittest.TestCase):
         self.assertEqual([lineage(next(r for r in records if r['model'] == m)['origin']) for m in
                           ('us-model-q4', 'us-on-foreign-base', 'nowhere-model')], ['US Lab', 'US Lab on Elsewhere base', 'not recorded'])
         write_results_index(self.root)
-        page = (self.root / 'docs/results/index/origin/us.md').read_text()
+        page = (self.root / 'docs/results/index/origin/us.md').read_text(encoding='utf-8')
         self.assertIn('[us-model-q4]', page)
         self.assertNotIn('[unknown-model]', page)
         self.assertNotIn('[foreign-model]', page)
@@ -469,15 +469,15 @@ class RenamedExperimentAndUsModelTests(unittest.TestCase):
 
     def test_readme_markers_preserve_outside_text(self):
         path = self.root / 'README.md'
-        path.write_text(f'# Project\n\n{SUMMARY_START}\nold\n{SUMMARY_END}\n\nkept\n')
+        path.write_text(f'# Project\n\n{SUMMARY_START}\nold\n{SUMMARY_END}\n\nkept\n', encoding='utf-8')
         write_results_index(self.root)
-        after = path.read_text()
+        after = path.read_text(encoding='utf-8')
         self.assertTrue(after.endswith(f'{SUMMARY_END}\n\nkept\n'))
         self.assertIn('Evidence and reproduction', after)
         self.assertNotIn('\nold\n', after)
-        path.write_text('# Project without markers\n')
+        path.write_text('# Project without markers\n', encoding='utf-8')
         write_results_index(self.root)
-        self.assertEqual(path.read_text(), '# Project without markers\n')
+        self.assertEqual(path.read_text(encoding='utf-8'), '# Project without markers\n')
 
 
 class LegalRenameIndexTests(unittest.TestCase):
