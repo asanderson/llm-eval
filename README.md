@@ -28,7 +28,7 @@ The original target is the MSI Raider 18 HX AI with RTX 5090 Laptop 24 GiB, 64 G
 
 ## Executive summary
 
-The recommended model on each model platform, per experiment and hardware configuration, from the published results. Decision models run only on Ollama, the one platform here with the SystemOne API. The legal models experiment publishes its results by class and cohort and does not rank models. On the MSI Raider, every US model measured so far is a model-offloading run: no US model has been measured in hardware fit, and every decision model measured so far is fine-tuned from a Qwen base, so none is a US model. The [candidate review](docs/MODEL_CANDIDATES.md) lists the US models to measure next.
+The recommended model on each model platform, per experiment and hardware configuration, from the published results. Decision models run only on Ollama, the one platform here with the SystemOne API. The legal models experiment publishes its results by class and cohort and does not rank models. On the MSI Raider, US models have been measured in model offloading and, in WSL2 on 2026-11-24, in hardware fit (`inkling2-mini-26b` and `muse-glimmer-30b`) and decision models (`d1` and `d1-omni` of Liquid AI). The other decision models measured so far are fine-tuned from Qwen bases, except `laya`, whose origin is not recorded. The [candidate review](docs/MODEL_CANDIDATES.md) lists the US models to measure next.
 
 <!-- summary-recommended:start -->
 

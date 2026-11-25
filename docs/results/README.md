@@ -216,10 +216,10 @@ MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 285HX, NVIDIA RTX 5090 Laptop (24
 The laptop of `raider-windows` (MSI Raider 18 HX AI A2XWJG, Intel Core Ultra 9 285HX, NVIDIA RTX 5090 Laptop, 63.4 GiB RAM, Windows 11 Pro 10.0.26300, AC power, MSI Center "Best Performance", MUX in MSHybrid mode), measured inside WSL2 with Ubuntu 26.04 (WSL 2.7.12.0, kernel 6.18.33.2-microsoft-standard-WSL2, NVIDIA driver 610.74 as read in the guest). Model files and the Ollama and KoboldCpp runtimes live on the ext4 virtual disk of the guest, on the same NVMe volume; LM Studio runs from the vendor AppImage installed in the guest. The guest memory limit differs between two groups of Ollama and KoboldCpp jobs and is stated in the [WSL2 table](#wsl2-measurement-of-2026-11-17-and-2026-11-18); every LM Studio job ran with the 52 GB limit ([LM Studio section](#wsl2-lm-studio-measurement-of-2026-11-22)). Exceptions: in the hardware-fit jobs of `qwen38-27b`, the model file stayed on the Windows volume and was read through `/mnt/c`: on KoboldCpp and LM Studio on 2026-11-23 ([KoboldCpp](#hardware-fit-in-wsl2-of-2026-11-23), [LM Studio](#hardware-fit-on-ollama-and-lm-studio-in-wsl2-of-2026-11-23)) and on KoboldCpp on 2026-11-24 ([section](#hardware-fit-of-muse-glimmer-30b-and-inkling-2-mini-in-wsl2-of-2026-11-24)). The campaigns of 2026-11-24 ran with a soft memory limit of 32 GiB inside the guest, except the first of the two decision-models campaigns.
 
 <!-- hardware-fit-wsl-2026-11-24-bullet:start -->
-- **Hardware fit of Muse Glimmer 30B and Inkling 2 Mini in WSL2 of 2026-11-24** ([tables and notes](#hardware-fit-of-muse-glimmer-30b-and-inkling-2-mini-in-wsl2-of-2026-11-24)). The two US models of the candidate review stay inside VRAM at 4 bits on every harness that loads them: sampled peaks of 19,894 to 20,020 MiB for Inkling 2 Mini at IQ4_NL and of 17,532 to 17,745 MiB for Muse Glimmer 30B at KQuant Q4_K_M, of 24,463 MiB. Inkling 2 Mini passes 27 of 27 checks on LM Studio 0.4.28+2 (53 to 55 output tokens per second) and on KoboldCpp 1.125.1 (13), the first hardware-fit jobs to pass every check; Ollama 0.40.17 cannot load it. Muse Glimmer 30B passes 24 of 27 on Ollama and LM Studio (35 to 37 output tokens per second) and 18 of 27 on KoboldCpp. The results index now recommends Inkling 2 Mini on LM Studio for this experiment on `raider-wsl`.
+- **Hardware fit of Muse Glimmer 30B and Inkling 2 Mini in WSL2 of 2026-11-24** ([tables and notes](#hardware-fit-of-muse-glimmer-30b-and-inkling-2-mini-in-wsl2-of-2026-11-24)). The two US models that the candidate review added to the catalog stay inside VRAM at 4 bits on every harness that loads them: sampled peaks of 19,894 to 20,020 MiB for Inkling 2 Mini at IQ4_NL and of 17,532 to 17,745 MiB for Muse Glimmer 30B at KQuant Q4_K_M, of 24,463 MiB. Inkling 2 Mini passes 27 of 27 checks on LM Studio 0.4.28+2 (53 to 55 output tokens per second) and on KoboldCpp 1.125.1 (13), the first hardware-fit jobs to pass every check; Ollama 0.40.17 cannot load it. Muse Glimmer 30B passes 24 of 27 on Ollama and LM Studio (35 to 37 output tokens per second) and 18 of 27 on KoboldCpp. The results index now recommends Inkling 2 Mini on LM Studio for this experiment on `raider-wsl`.
 <!-- hardware-fit-wsl-2026-11-24-bullet:end -->
 <!-- decision-models-wsl-2026-11-24-bullet:start -->
-- **Decision models in WSL2 of 2026-11-24** ([table and notes](#decision-models-in-wsl2-of-2026-11-24)). All ten decision models of the Ollama library that can run on this laptop choose the right category for six of six prompts, on Ollama 0.40.16. The fastest, `d1`, decides in 12 ms; the slowest, `clef`, takes 0.3 to 0.5 s, because Ollama placed it only partly on the GPU. The two US models, `d1` and `d1-omni` of Liquid AI, are among the three fastest. A first campaign pushed the Windows host into paging; the ranked one ran with the guest's memory bounded.
+- **Decision models in WSL2 of 2026-11-24** ([table and notes](#decision-models-in-wsl2-of-2026-11-24)). All ten case templates of the experiment, nine decision models of the Ollama library with `tev1` at two sizes, choose the right category in six of six decisions (two prompts, three times each), on Ollama 0.40.16. The fastest, `d1`, decides in 12 ms; the slowest, `clef`, takes 0.3 to 0.5 s, because Ollama placed it only partly on the GPU. The two US models, `d1` and `d1-omni` of Liquid AI, are among the three fastest. A first campaign pushed the Windows host into paging; the ranked one ran with the guest's memory bounded.
 <!-- decision-models-wsl-2026-11-24-bullet:end -->
 <!-- hardware-fit-wsl-ollama-lmstudio-2026-11-23-bullet:start -->
 - **Hardware fit on Ollama and LM Studio in WSL2 of 2026-11-23** ([tables and notes](#hardware-fit-on-ollama-and-lm-studio-in-wsl2-of-2026-11-23)). The `qwen38-27b` UD-Q4_K_XL artifact of the KoboldCpp job below also stayed inside VRAM on Ollama 0.40.16 and LM Studio 0.4.28+2, and all three harnesses pass the same 24 of 27 checks. LM Studio is the fastest of the three: category medians of 0.75 to 0.97 s per request and 62 to 69 output tokens per second, against 1.4 to 2.0 s and about 33 on Ollama and 2.6 to 3.1 s and about 27 on KoboldCpp. The results index now recommends LM Studio for this experiment on `raider-wsl`.
@@ -245,7 +245,7 @@ Synthetic fixture run only. No conclusions.
 
 ### Hardware fit of Muse Glimmer 30B and Inkling 2 Mini in WSL2 of 2026-11-24
 
-The [candidate review](../MODEL_CANDIDATES.md) named two US models whose 4-bit files fit in VRAM. Both were measured on 2026-11-24 (UTC) in WSL2 (Ubuntu 26.04) on the host of `raider-windows`, on code revision `ce08c16`:
+The [candidate review](../MODEL_CANDIDATES.md) found two US models new to the catalog whose 4-bit files fit in VRAM. Both were measured on 2026-11-24 (UTC) in WSL2 (Ubuntu 26.04) on the host of `raider-windows`, on code revision `ce08c16`:
 
 - `muse-glimmer-30b` (Meta) at the publisher's KQuant Q4_K_M: one SHA256-locked GGUF of 16,756,683,904 bytes (15.61 GiB) from `meta-models/Muse-Glimmer-30B-GGUF`.
 - `inkling2-mini-26b` (Thinking Machines Lab) at IQ4_NL: one SHA256-locked GGUF of 17,627,940,768 bytes (16.42 GiB) from `ggml-org/Inkling-2-Mini-GGUF`, the repository the KoboldCpp release notes name for this model.
@@ -304,14 +304,14 @@ What to keep in mind:
 - **Both models leave room in VRAM, Inkling 2 Mini less.** The peaks of Muse Glimmer 30B stay 4,670 to 4,883 MiB below the limit of the capacity rule, those of Inkling 2 Mini 2,395 to 2,521 MiB. Inkling 2 Mini needs more beyond its weights: on KoboldCpp its buffers on the GPU add up to 17,860 MiB (model 16,331, cache 524, compute 1,005), against 15,914 MiB for Muse Glimmer 30B (15,246, 210 and 458) at the same context of 8192. The recorded rise is 110 % of the weights for Inkling 2 Mini and 100 to 101 % for Muse Glimmer 30B.
 - **Layer counts.** The engine reports 52 layers for Muse Glimmer 30B and 48 for Inkling 2 Mini, and its placement line counts one more in each case. The model card of Inkling 2 Mini counts 24 layers of weights, of which the middle 12 run three times: 48 layer applications, which is what the GGUF file describes.
 - **The new harness versions change little for Qwen 3.8 27B.** Both reruns place the model as on 2026-11-23, with the same model buffer of 15,718 MiB on the GPU, and pass the same 24 of 27 checks.
-  - *Ollama 0.40.17 against 0.40.16:* the category medians agree within 1.2 %: 1.98, 1.97 and 1.41 s per request against 1.99, 1.97 and 1.43 s, at 33 to 34 output tokens per second in both, with the same median token counts (67, 66 and 47).
-  - *KoboldCpp 1.125.1 against 1.124.2:* the token rate is the same (27.0 to 27.7 against 26.9 to 27.4), but the answers are longer. A measured request has 57 to 112 completion tokens where it had 6 to 126, and the coding median rose from 70 to 103 tokens and from 2.58 to 3.72 s. The math and reasoning medians are unchanged (2.76 and 3.04 s against 2.78 and 3.07 s).
+  - *Ollama 0.40.17 against 0.40.16:* the category medians of wall time and token rate agree within 1.3 %: 1.98, 1.97 and 1.41 s per request against 1.99, 1.97 and 1.43 s, at 33 to 34 output tokens per second in both, with the same median token counts (67, 66 and 47). The median first output differs by 1 to 5 ms.
+  - *KoboldCpp 1.125.1 against 1.124.2:* the token rate is the same (27.0 to 27.7 against 26.9 to 27.4), and every task returns the same answer, but the reasoning before it changed length. Two coding tasks reason longer (`coding-boundary` 6 to 91 completion tokens, `coding-trace` 70 to 103), two other tasks shorter (`math-algebra` 75 to 57, `reasoning-navigation` 126 to 102), and five change by at most two tokens; over the 27 measured requests the total rose by 10 %. The coding median rose from 70 to 103 tokens and from 2.58 to 3.72 s; the math and reasoning medians of wall time are about the same (2.76 and 3.04 s against 2.78 and 3.07 s).
   - LM Studio is the version of 2026-11-23, so its Qwen job was not repeated.
 - **LM Studio's verdicts rest on the VRAM counter.** Its managed launch keeps no placement lines, so the capacity and rise checks decided, as on 2026-11-23. Rises of 100 % and 110 % of the weights fit the weights, the cache and the compute buffers all on the GPU, but they are not a per-layer measurement. The bundle does not record LM Studio's engine either; the app listed its llama.cpp CUDA runtime 2.80.1 as selected before the campaign.
-- **The VRAM counter was steady.** It read 1,413 to 1,620 MiB before the launches and returned to that range after every job, so the recorded rises are not distorted the way the rise of the KoboldCpp job of 2026-11-23 was.
+- **The VRAM counter moved once during a job.** It read 1,413 to 1,620 MiB before the launches and after the jobs, and in seven jobs the reading after the job is within 12 MiB of the one before. In the Qwen job on KoboldCpp, other programs' share rose by 195 MiB while the model was loaded: the counter stepped from 18,654 to 18,849 MiB between two category runs, at 0 % GPU utilization, and read 1,620 MiB after the unload against 1,425 MiB before the launch. That job's recorded peak and rise (18,849 and 17,424 MiB, 104 % of the weights) include those 195 MiB. The model accounts for about 17,229 MiB, 103 % of the weights, as in the KoboldCpp job of 2026-11-23 once the change of the counter on that day is taken out ([that section](#hardware-fit-in-wsl2-of-2026-11-23)).
 - **Where each harness read the models.** The files of Muse Glimmer 30B and Inkling 2 Mini are on the guest's virtual disk, as the WSL profile expects. The Qwen file stayed on the Windows NTFS volume, as on 2026-11-23: KoboldCpp loaded it through `/mnt/c`, and Ollama imported its copy from there. Ollama imported a copy of each of the three files, 48.4 GiB together, into the private store of its new installation; the copies were removed after the campaign. LM Studio imported symbolic links, which were removed after its campaign.
-- **Two installations per harness.** KoboldCpp 1.125.1 and Ollama 0.40.17 were installed by the harness setup into new prefixes of the guest, from the URLs the installer catalog pins and with its SHA-256 check. The installations of 2026-11-16 (1.124.2 and 0.40.16) stay beside them; each case names its installation.
-- **The guest's memory was bounded.** Each campaign ran in a transient systemd scope with a soft memory limit (`memory.high`) of 32 GiB, after the guest's page cache was dropped. Without it, the page cache that file reads leave behind grows to the guest's 52 GB limit and the Windows host starts paging ([decision models of the same day](#decision-models-in-wsl2-of-2026-11-24)). All three campaigns reached the limit, so the kernel reclaimed page cache while files were read: the artifact is verified before the launch and before each category run, and loaded once. Requests read no file. The Qwen job on Ollama, whose figures agree with those of 2026-11-23 within 1.2 %, is the evidence that the limit did not change request times; the earlier runs had no such limit.
+- **Two installations per harness.** KoboldCpp 1.125.1 and Ollama 0.40.17 were installed by the harness setup into new prefixes of the guest, from the URLs the installer catalog pins and with its SHA-256 check. The installations of the earlier WSL2 runs (1.124.2 and 0.40.16) stay beside them; each case names its installation.
+- **The guest's memory was bounded.** Each campaign ran in a transient systemd scope with a soft memory limit (`memory.high`) of 32 GiB, after the guest's page cache was dropped. Without it, the page cache that file reads leave behind grows to the guest's 52 GB limit and the Windows host starts paging ([decision models of the same day](#decision-models-in-wsl2-of-2026-11-24)). All three campaigns reached the limit, so the kernel reclaimed page cache while files were read: the artifact is verified before the launch and before each category run, and loaded once. Requests read no file. The Qwen job on Ollama, whose wall times and token rates agree with those of 2026-11-23 within 1.3 %, is the evidence that the limit did not change request times; the earlier runs had no such limit.
 - **Programs and host memory.** The attestations list the consumer Ollama tray app, a Windows Ollama server, Microsoft Teams, the VMware tray and authorization service, the ProtonVPN client and the ChatGPT and Claude desktop apps, and no running virtual machine. The LM Studio desktop app was open in the guest during all three campaigns, with no model loaded during the first two. A sampler on the Windows host (`typeperf`, every 2 s) saw pages written out in 6 of the 458 samples of the KoboldCpp campaign (about 0.17 GiB, nearly all in the first three minutes), in 18 of the 419 samples of the Ollama campaign (about 0.03 GiB) and in none of the 173 samples of the LM Studio campaign. Available host memory stayed above 11,000 MiB throughout. The sampler's files are not part of the bundles.
 - **Two starts of the KoboldCpp campaign are not published.** The first was stopped by the operator after about a minute, before any request: its attestation named no Windows program, because the operator's helper had failed to read the process list. The second ended at once, with every job blocked by the reservation the first had left behind ([known tooling issues](#known-tooling-issues-observed)). Neither holds a measurement.
 - **No projection.** The candidate set of the projection covers the 17 models with model-offloading results, so neither new model has a projected fit to compare with. The facts a candidate entry needs are now in the backend logs: 52 layers, a trained context of 131,072 and 27.85B parameters for Muse Glimmer 30B; 48 layers, 1,048,576 and 26.07B for Inkling 2 Mini.
@@ -322,13 +322,13 @@ What to keep in mind:
 
 ### Decision models in WSL2 of 2026-11-24
 
-Until now the [decision models experiment](../../experiments/decision-models/README.md) had published results for two models, `nimble` and `tev1`. On 2026-11-24 (UTC) every decision model of the Ollama library that can run on this laptop was measured in WSL2 (Ubuntu 26.04) on the host of `raider-windows`: those two again, and `tev1:0.8b`, `nimble-v3`, `pplx-decider`, `clef`, `clef-flash`, `d1`, `d1-omni` and `laya` for the first time. The runs use Ollama 0.40.16, the version of the WSL2 run of 2026-11-18, and code revision `ce08c16`. Three more decision models of the library were not run: Ollama publishes them for its MLX runner only, which needs Apple silicon ([case templates](../../experiments/decision-models/README.md#decision-models-and-case-templates)).
+Until now the [decision models experiment](../../experiments/decision-models/README.md) had published results for two models, `nimble` and `tev1`. On 2026-11-24 (UTC) all ten case templates of the experiment were measured in WSL2 (Ubuntu 26.04) on the host of `raider-windows`: those two again, and `tev1:0.8b`, `nimble-v3`, `pplx-decider`, `clef`, `clef-flash`, `d1`, `d1-omni` and `laya` for the first time. The runs use Ollama 0.40.16, the version of the WSL2 run of 2026-11-18, and code revision `ce08c16`. The templates cover nine of the twelve decision models of the Ollama library, `tev1` at both of its sizes and the others at the size the template names; the 2B sizes of `d1` and `d1-omni` and the multilingual `laya` have no template and were not run. The other three decision models of the library were not run either: Ollama publishes them for its MLX runner only, which needs Apple silicon ([case templates](../../experiments/decision-models/README.md#decision-models-and-case-templates)).
 
-Each router chooses one of three categories (coding, math or general) for six labelled prompts: the workload `original-routing-smoke`, with one coding and one math task, three measured repetitions of each after one warm-up. Each model is a locked alias in the harness's private Ollama store and is identified by the digest the store reports.
+Each router chooses one of three categories (coding, math or general) in six labelled decisions: the workload `original-routing-smoke` has one coding and one math prompt, and each is decided three times after one warm-up. The three repetitions of a prompt return the same probabilities, so the six decisions of a model hold two distinct answers. Each model is a locked alias in the harness's private Ollama store and is identified by the digest the store reports.
 
-The campaign ran twice. The [first campaign](decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) pushed the Windows host into paging. The [second campaign](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) ran five minutes later with the guest's memory bounded, and the results index ranks it, as the newer of the two. The table is in the order of that ranking: by the median of the two category medians, which are over three decisions each.
+The campaign ran twice. The [first campaign](decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) pushed the Windows host into paging. The [second campaign](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) ran five minutes later with the guest's memory bounded, and the results index ranks it, as the newer of the two. The table is in the order of that ranking: by the median of the two category medians of wall time per request, which are over three decisions each (Ranked on). The other latencies are the time of the SystemOne call as the router measures it; its category medians are shorter than those of wall time by less than 0.1 ms.
 
-| Model | Developer | US model | File in the store | Correct | Coding ms | Math ms | Ranked on, ms | All six, ms: median / p95 | Brier (median) | First campaign, ms: coding, math |
+| Model | Developer | US model | File in the store | Correct | Coding, router ms | Math, router ms | Ranked on: wall ms | All six, router ms: median / p95 | Brier (median) | First campaign, router ms: coding, math |
 |---|---|---|---|---:|---:|---:|---:|---:|---:|---:|
 | `d1` | Liquid AI | yes | 3.47 GiB, Q8_0 | 6/6 | 12.1 | 11.7 | 11.9 | 11.9 / 15.5 | 0.0030 | 19.1, 14.0 |
 | `laya` | not recorded | not recorded | 0.79 GiB, BF16 | 6/6 | 18.8 | 8.4 | 13.6 | 17.9 / 51.3 | 0.0851 | 14.5, 13.8 |
@@ -343,15 +343,15 @@ The campaign ran twice. The [first campaign](decision-models/campaign-20261124T2
 
 What to keep in mind:
 
-- **Every router gets all six decisions right, in both campaigns.** Accuracy and macro F1 are 1.0 for all ten, so the smoke set does not separate them. Six labelled decisions show that a model answers through the SystemOne API with the right label on easy prompts. They do not establish routing quality on real traffic.
+- **Every router gets all six decisions right, in both campaigns.** Accuracy and macro F1 are 1.0 for all ten, so the smoke set does not separate them. Six labelled decisions on two prompts show that a model answers through the SystemOne API with the right label on easy prompts. They do not establish routing quality on real traffic.
 - **Latency follows model size, and the order among the fastest is within noise.** Four models decide in under 20 ms: `d1`, `laya`, `d1-omni` and `tev1:0.8b`. Their category medians rest on three decisions each, and single decisions of `laya` range from 8 to 61 ms in the second campaign. Between the two campaigns the order of these four changes.
-- **The two measured US models are among the three fastest.** `d1` and `d1-omni` are from Liquid AI, on its own base models, and are the only US models among the ten by the [model origins](../MODELS.md#model-origins). The origin of `laya` (Convai Innovations) is not recorded there, so it is not counted as a US model.
+- **The two measured US models are among the three fastest.** `d1` and `d1-omni` are from Liquid AI, on its own base models, and are the only US models among those measured, by the [model origins](../MODELS.md#model-origins). The origin of `laya` (Convai Innovations) is not recorded there, so it is not counted as a US model.
 - **`clef` is slow because it did not fit in VRAM.** Ollama's service log of the second campaign, which the bundle does not carry, shows 58 of 65 layers on the GPU for `clef` and every layer on the GPU for the other nine. `pplx-decider` has the same Qwen3.8-27B base and a smaller file (16.27 against 18.78 GiB), loaded completely at the same context of 16,384 tokens, and decides in about 100 ms where `clef` takes 290 to 510 ms. The contexts come from each model's own parameters in the library, from 512 tokens (`laya`) to 32,768 (`nimble-v3`); the harness sets none for SystemOne requests.
 - **Calibration differs by orders of magnitude.** All choices are right, but the median Brier score runs from below 0.0001 (`nimble`, `nimble-v3`, `pplx-decider`, `clef`) to 0.09 (`laya`, `d1-omni`): the smallest models put less probability on the label they choose. The probabilities, and so the scores, are the same in both campaigns.
 - **The peak GPU memory of the summary chart is not a per-model figure.** The sampler reads the device-wide VRAM use during each job, and Ollama keeps the model of the previous job loaded until the next one loads. Six of the ten jobs peak at their first sample, with the previous model still in VRAM: `d1`, a 3.47 GiB file, shows 14.4 GiB, the reading that `clef-flash` left behind, and ends at 5,485 MiB. The peak of `clef` itself, 23,755 of 24,463 MiB, fits its partial placement.
-- **The first campaign made the Windows host page.** In two minutes it loaded ten models with 72.8 GiB of files. The guest's page cache grew toward its 52 GB limit, more than the 63.4 GiB host can spare beside its own programs. A sampler on the Windows host (`typeperf`, every 2 s) saw available memory fall from 44,672 MiB to 26 MiB and pages written out in 25 of the 60 samples of the campaign, about 13.3 GiB in total. Model loads slowed down: the first warm-up of `clef-flash` took 26.3 s, against 7.1 s in the second campaign, and that of `d1-omni` 12.9 s against 3.3 s. The decisions of `d1-omni` took 22 to 54 ms, against 6 to 20 ms in the second campaign.
-- **The second campaign ran with the guest's memory bounded.** After the page cache was dropped, the campaign and its Ollama service ran in a transient systemd scope with a soft memory limit (`memory.high`) of 32 GiB. The scope reached that limit, so the kernel reclaimed page cache as models were loaded. The sampler saw pages written out in 2 of 37 samples, about 0.03 GiB, and at least 16,507 MiB of host memory available. The ten jobs took 68 s, against 117 s in the first campaign. The sampler's files and the service log are not part of the bundles.
-- **Against the earlier runs.** For `nimble` and `tev1`, with the same digests and the same Ollama version as in the WSL2 run of 2026-11-18: `nimble` 52.3 ms for coding and 50.4 ms for math (55.4 and 50.6 then), `tev1` 30.8 and 31.5 ms (26.1 and 24.4 then). Each figure is the median of three decisions.
+- **The first campaign made the Windows host page.** In two minutes it loaded ten models with 72.8 GiB of files. The guest's page cache grew toward its 52 GB limit, more than the 63.4 GiB host can spare beside its own programs. A sampler on the Windows host (`typeperf`, every 2 s) saw available memory fall from 43,321 MiB to 26 MiB and pages written out in 25 of the 58 samples of the campaign, about 13.3 GiB in total. Model loads slowed down: the first warm-up of `clef-flash` took 26.3 s, against 7.1 s in the second campaign, and that of `d1-omni` 12.9 s against 3.3 s. The decisions of `d1-omni` took 22 to 54 ms, against 6 to 20 ms in the second campaign.
+- **The second campaign ran with the guest's memory bounded.** After the page cache was dropped, the campaign and its Ollama service ran in a transient systemd scope with a soft memory limit (`memory.high`) of 32 GiB. The scope reached that limit, so the kernel reclaimed page cache as models were loaded. The sampler saw pages written out in 2 of 34 samples, about 0.03 GiB, and at least 16,507 MiB of host memory available. The ten jobs took 68 s, against 117 s in the first campaign. The sampler's files and the service log are not part of the bundles.
+- **Against the earlier runs.** For `nimble` and `tev1`, with the same digests and the same Ollama version as in the WSL2 run of 2026-11-18: `nimble` 52.3 ms for coding and 50.4 ms for math (55.4 and 50.6 then), `tev1` 30.8 and 31.5 ms (26.1 and 24.4 then). Each figure is the median router call time of three decisions.
 - **Conditions.** Decision cases carry no hardware attestation. The LM Studio desktop app was not running in the guest during these two campaigns; it was started afterwards for the [hardware-fit campaigns](#hardware-fit-of-muse-glimmer-30b-and-inkling-2-mini-in-wsl2-of-2026-11-24), whose attestations list the Windows programs that were running a few minutes later.
 
 <!-- decision-models-wsl-2026-11-24:end -->
@@ -818,6 +818,48 @@ Full table and per-category pages: [results index](index/README.md). Recommended
 <!-- results-index:end -->
 
 ## Results by experiment, harness and model
+
+### Experiment `decision-models`, formerly `llm-routing` (mode `decision`)
+
+A router model picks the category of each prompt; decisions are scored against labels. Workload `original-routing-smoke`, 3 requests in each of the coding and math categories.
+
+#### Harness: Ollama 0.40.16 (SystemOne API)
+
+##### Models: the ten case templates, nine decision models of the Ollama library with `tev1` at two sizes
+
+Hardware configuration `raider-wsl`, [run of 2026-11-24 22:46](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md), the second of two campaigns of that day ([notes](#decision-models-in-wsl2-of-2026-11-24)). Latency is over the six decisions of each model.
+
+| Model | Decisions | Accuracy | Macro F1 | Brier (median) | Router latency s (median / p95) |
+|---|---:|---:|---:|---:|---:|
+| `llm-eval-d1:locked` | 6 | 1.00 | 1.00 | 0.0030 | 0.012 / 0.015 |
+| `llm-eval-laya:locked` | 6 | 1.00 | 1.00 | 0.0851 | 0.018 / 0.051 |
+| `llm-eval-d1-omni:locked` | 6 | 1.00 | 1.00 | 0.0912 | 0.013 / 0.020 |
+| `llm-eval-tev1-0.8b:locked` | 6 | 1.00 | 1.00 | 0.0216 | 0.017 / 0.020 |
+| `llm-eval-tev1:locked` | 6 | 1.00 | 1.00 | 0.0009 | 0.031 / 0.038 |
+| `llm-eval-clef-flash:locked` | 6 | 1.00 | 1.00 | 0.0004 | 0.045 / 0.049 |
+| `llm-eval-nimble-v3:locked` | 6 | 1.00 | 1.00 | <0.0001 | 0.044 / 0.045 |
+| `llm-eval-nimble:locked` | 6 | 1.00 | 1.00 | <0.0001 | 0.051 / 0.054 |
+| `llm-eval-pplx-decider:locked` | 6 | 1.00 | 1.00 | <0.0001 | 0.104 / 0.108 |
+| `llm-eval-clef:locked` | 6 | 1.00 | 1.00 | <0.0001 | 0.441 / 0.500 |
+
+All ten routers classify the smoke prompts perfectly with no abstentions or policy violations. The four smallest models decide in under 20 ms; `clef`, the largest, takes about 0.44 s because Ollama placed only 58 of its 65 layers on the GPU. The smallest models are also the least sure of their right choices. Six labelled decisions per router is a smoke-level sample and does not establish routing quality on real traffic.
+
+#### Harness: Ollama 0.40.15 (SystemOne API)
+
+##### Models: `llm-eval-nimble:locked` and `llm-eval-tev1:locked`
+
+Hardware configuration `raider-windows`, [run of 2026-11-08 03:57](llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md).
+
+| Model | Decisions | Accuracy | Macro F1 | Brier (median) | Router latency s (median / p95) |
+|---|---:|---:|---:|---:|---:|
+| `llm-eval-nimble:locked` | 6 | 1.00 | 1.00 | <0.0001 | 0.050 / 0.070 |
+| `llm-eval-tev1:locked` | 6 | 1.00 | 1.00 | 0.0010 | 0.028 / 0.052 |
+
+Both routers classify the smoke prompts perfectly with no abstentions or policy violations. Tev1 is roughly 1.8x faster; Nimble is better calibrated. Six labelled decisions per router is a smoke-level sample and does not establish routing quality on real traffic.
+
+#### Harness: built-in `category` router (synthetic fixture)
+
+Declared for hardware configuration `raider-ubuntu`, [run of 2026-11-08 01:38](llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md): 2 synthetic requests, 0 errors. It validates the harness end to end (plan, run, report, status) at zero cost and establishes nothing about model quality or hardware performance. No real `raider-ubuntu` measurements exist yet.
 
 ### Experiment `model-offloading` (mode `category-smoke`)
 
@@ -1705,48 +1747,6 @@ Hardware configuration `raider-windows`, GPU offload ratio 0.308. The layer coun
 - **Ollama and KoboldCpp are interchangeable on speed and memory** for this model. LM Studio at its defaults costs a quarter of the throughput and about 11 GiB more RAM.
 - **Quality differences between harnesses are formatting, not capability.** Passes come in whole tasks: Ollama passes one coding task, KoboldCpp passes two, LM Studio passes one reasoning task, each on all three repeats. The weights are identical, so the spread reflects how each harness's template and sampling defaults shape the final line that the `exact` check reads.
 
-### Experiment `decision-models`, formerly `llm-routing` (mode `decision`)
-
-A router model picks the category of each prompt; decisions are scored against labels. Workload `original-routing-smoke`, 3 requests in each of the coding and math categories.
-
-#### Harness: Ollama 0.40.16 (SystemOne API)
-
-##### Models: the ten decision models of the Ollama library that run on this laptop
-
-Hardware configuration `raider-wsl`, [run of 2026-11-24 22:46](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md), the second of two campaigns of that day ([notes](#decision-models-in-wsl2-of-2026-11-24)). Latency is over the six decisions of each model.
-
-| Model | Decisions | Accuracy | Macro F1 | Brier (median) | Router latency s (median / p95) |
-|---|---:|---:|---:|---:|---:|
-| `llm-eval-d1:locked` | 6 | 1.00 | 1.00 | 0.0030 | 0.012 / 0.015 |
-| `llm-eval-laya:locked` | 6 | 1.00 | 1.00 | 0.0851 | 0.018 / 0.051 |
-| `llm-eval-d1-omni:locked` | 6 | 1.00 | 1.00 | 0.0912 | 0.013 / 0.020 |
-| `llm-eval-tev1-0.8b:locked` | 6 | 1.00 | 1.00 | 0.0216 | 0.017 / 0.020 |
-| `llm-eval-tev1:locked` | 6 | 1.00 | 1.00 | 0.0009 | 0.031 / 0.038 |
-| `llm-eval-clef-flash:locked` | 6 | 1.00 | 1.00 | 0.0004 | 0.045 / 0.049 |
-| `llm-eval-nimble-v3:locked` | 6 | 1.00 | 1.00 | <0.0001 | 0.044 / 0.045 |
-| `llm-eval-nimble:locked` | 6 | 1.00 | 1.00 | <0.0001 | 0.051 / 0.054 |
-| `llm-eval-pplx-decider:locked` | 6 | 1.00 | 1.00 | <0.0001 | 0.104 / 0.108 |
-| `llm-eval-clef:locked` | 6 | 1.00 | 1.00 | <0.0001 | 0.441 / 0.500 |
-
-All ten routers classify the smoke prompts perfectly with no abstentions or policy violations. The four smallest models decide in under 20 ms; `clef`, the largest, takes about 0.44 s because Ollama placed only 58 of its 65 layers on the GPU. The smallest models are also the least sure of their right choices. Six labelled decisions per router is a smoke-level sample and does not establish routing quality on real traffic.
-
-#### Harness: Ollama 0.40.15 (SystemOne API)
-
-##### Models: `llm-eval-nimble:locked` and `llm-eval-tev1:locked`
-
-Hardware configuration `raider-windows`, [run of 2026-11-08 03:57](llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/README.md).
-
-| Model | Decisions | Accuracy | Macro F1 | Brier (median) | Router latency s (median / p95) |
-|---|---:|---:|---:|---:|---:|
-| `llm-eval-nimble:locked` | 6 | 1.00 | 1.00 | <0.0001 | 0.050 / 0.070 |
-| `llm-eval-tev1:locked` | 6 | 1.00 | 1.00 | 0.0010 | 0.028 / 0.052 |
-
-Both routers classify the smoke prompts perfectly with no abstentions or policy violations. Tev1 is roughly 1.8x faster; Nimble is better calibrated. Six labelled decisions per router is a smoke-level sample and does not establish routing quality on real traffic.
-
-#### Harness: built-in `category` router (synthetic fixture)
-
-Declared for hardware configuration `raider-ubuntu`, [run of 2026-11-08 01:38](llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md): 2 synthetic requests, 0 errors. It validates the harness end to end (plan, run, report, status) at zero cost and establishes nothing about model quality or hardware performance. No real `raider-ubuntu` measurements exist yet.
-
 ## Known tooling issues observed
 
 - `scripts/readiness.ps1` reports Python as MISSING under Windows PowerShell 5.1 even when 3.12 is installed, because the embedded double quotes in its probe string are stripped. Running `py -3.12 scripts/readiness.py` directly works. The `model-downloader` readiness check likewise reports MISSING with `huggingface-hub==2.4.0` installed.
@@ -1763,7 +1763,7 @@ Declared for hardware configuration `raider-ubuntu`, [run of 2026-11-08 01:38](l
 - Models that return their thinking inline (Phi-4-reasoning-plus) report no reasoning field, so the harness counts the whole stream as the answer: on Ollama every request ran to the 2,048-token cap and scored nothing. The reasoning detection only sees a separate field.
 - On Windows, KoboldCpp never delivers a first token in under about 0.6 s (0.57 to 0.62 s on every short-answer model; in WSL whole requests take from 0.52 s), so for fast models with 2- to 7-token answers its wall time and token rate are set by that floor rather than by decode speed: Kimi Linear 48B answers in 0.6 s on KoboldCpp and in 0.1 to 0.3 s on Ollama and LM Studio.
 - Stopping a campaign leaves its reservations behind. The coordinator and the worker each reserve the host with a directory under the lock root, and nothing treats a reservation as expired. After the processes of a campaign were stopped on 2026-11-24, every job of the next campaign ended within a second as `blocked` with the reason `reservation_recovered` (`BlockingIOError`). By the code, `llm-eval resume` also keeps the reservation of an attempt whose worker left no result. The two reservation directories of the stopped attempt were removed by hand, after a check that no campaign process was running.
-- A WSL2 campaign that reads many large files can make the Windows host page. File reads leave page cache in the guest, which grows to the guest's memory limit (52 GB here, on a 63.4 GiB host). A decision-models campaign that loaded ten models with 72.8 GiB of files had about 13 GiB written to the Windows page file in two minutes. Running a campaign in a systemd scope with a soft memory limit (`memory.high` of 32 GiB) kept the page cache bounded and the host out of paging; see the [decision models of 2026-11-24](#decision-models-in-wsl2-of-2026-11-24).
+- A WSL2 campaign that reads many large files can make the Windows host page. File reads leave page cache in the guest, which grows to the guest's memory limit (52 GB here, on a 63.4 GiB host). A decision-models campaign that loaded ten models with 72.8 GiB of files had about 13 GiB written to the Windows page file in two minutes. Running a campaign in a systemd scope with a soft memory limit (`memory.high` of 32 GiB) kept the page cache bounded and cut the host's paging to between none and about 0.17 GiB per campaign, against about 13 GiB without it; see the [decision models of 2026-11-24](#decision-models-in-wsl2-of-2026-11-24).
 - A hardware-fit job whose engine cannot load the model ends with the verdict `not_in_vram` and the reason `gpu_use_below_weights`, the wording of a model that loaded elsewhere. Request records keep the type of an error and not its message, so the bundle of such a job shows only `RuntimeError`; the cause is in the backend log, which is not exported (Inkling 2 Mini on Ollama 0.40.17: `unknown model architecture: 'inkling2_loop'`).
 
 ## All published reports
