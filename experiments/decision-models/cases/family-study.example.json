@@ -1,0 +1,59 @@
+{
+  "id": "family-study",
+  "parameters": {
+    "suite": "../workloads/family-split.json",
+    "split": "development",
+    "router": {
+      "kind": "systemone",
+      "platform": "ollama",
+      "model": "d1",
+      "model_revision": "REPLACE_ROUTER_DIGEST",
+      "endpoint": "http://127.0.0.1:11434/v1/systemone",
+      "instructions": "Choose the primary skill needed. Choose clarify when the request lacks essential information.",
+      "criteria": {
+        "coding": "Read, write or debug software",
+        "math": "Quantitative reasoning or arithmetic",
+        "general": "Follow instructions or look up supplied facts",
+        "clarify": "Ask for missing information or resolve ambiguity"
+      }
+    },
+    "candidates": {
+      "cheap": {
+        "platform": "ollama",
+        "protocol": "ollama",
+        "model": "REPLACE_CHEAP_OLLAMA_TAG",
+        "model_revision": "REPLACE_CHEAP_DIGEST",
+        "endpoint": "http://127.0.0.1:11434/api/chat",
+        "context_tokens": 4096
+      },
+      "strong": {
+        "platform": "ollama",
+        "protocol": "ollama",
+        "model": "REPLACE_STRONG_OLLAMA_TAG",
+        "model_revision": "REPLACE_STRONG_DIGEST",
+        "endpoint": "http://127.0.0.1:11434/api/chat",
+        "context_tokens": 4096
+      }
+    },
+    "policy": {
+      "category_models": {
+        "coding": "strong",
+        "math": "strong",
+        "general": "cheap",
+        "clarify": "cheap"
+      },
+      "fallback": "strong",
+      "abstain_threshold": 0.7,
+      "objective": {
+        "quality_weight": 1,
+        "latency_weight": 0.1,
+        "cost_weight": 0
+      }
+    },
+    "seed": 1,
+    "temperature": 0,
+    "max_output_tokens": 32,
+    "warmups": 1,
+    "repeats": 3
+  }
+}

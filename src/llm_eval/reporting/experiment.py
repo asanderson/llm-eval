@@ -17,7 +17,7 @@ from llm_eval.common import read_json, digest, sha256_file
 from llm_eval.core.contracts import atomic_json, TERMINAL, identifier
 from llm_eval.report import quantile, safe_cell
 from .index import identity
-from llm_eval.experiments import plugin_hook, reporting_policy
+from llm_eval.experiments import canonical, plugin_hook, reporting_policy
 
 PRIVATE={'api_key','password','secret','token','access_token','authorization','endpoint','host','repo_root','work_root',
          'root','prefix','artifact_root','artifact_lock','offload_dir','installation_state','worker_python','python',
@@ -244,6 +244,15 @@ def build_report(experiment_dir):
         text=f"# {exp['experiment_id']} results\n\nStatus: **{status}**. Synthetic fixtures: **{str(synthetic).lower()}**.\n\n"
         text+=f"Campaign: `{plan['campaign_id']}`. Experiment run: `{exp['experiment_run_id']}`. Measured code: `{plan['code_revision']}`.\n\n"
         text+='[Raw measurements](raw/measurements.jsonl.gz) · [JSON summary](summary.json) · [CSV summary](summary.csv) · [Manifest](manifest.json) · [Resolved configuration](resolved-config.json)\n\n'
+        supplement = plugin_hook(exp['experiment_id'], 'report_supplement')
+        if supplement:
+            extra_data, extra_markdown = supplement(records)
+            if extra_data is not None:
+                filename = canonical(exp['experiment_id']) + '-summary.json'
+                (dest / filename).write_bytes(canonical_json(extra_data))
+                text += f'[Experiment-specific measurements]({filename})\n\n'
+            if extra_markdown:
+                text += extra_markdown.rstrip() + '\n\n'
         if benchmark_rows:
             text+='Upstream benchmark score tables: [JSON](benchmark-summary.json) · [CSV](benchmark-summary.csv). Each source cohort is retained separately.\n\n'
         text+='## Configuration coverage\n\n| Case | Hardware | OS | Harness | Model | Status |\n|---|---|---|---|---|---|\n'

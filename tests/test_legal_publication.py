@@ -1269,6 +1269,46 @@ class CohortTests(CohortCase):
             self.assertEqual(entry['metrics'][name]['value'], 0)
         self.assertEqual(entry['run_status'], 'complete')
 
+    def test_projection_reports_only_checkable_pinpoints_and_keeps_v1_metrics(self):
+        self.suite = contracts.load_suite(LOCK)
+        for i, matter in enumerate(self.suite['matters']['matters']):
+            output = fixture.draft(matter, self.suite['corpus'])
+            claim = output['claims'][0]
+            output.update(issues=[], adverse_authorities=[], claims=[claim])
+            if i == 0:
+                del claim['pinpoint']
+            elif i != 1:
+                claim['authority_id'] = 'unknown-authority'
+            self.replies[matter['matter_id']] = json.dumps(output)
+        directory = self.run_mode('conditional', 'generation', {'arms': ['no-context'], 'roles': {'generator': generator('FAKE_ENDPOINT')}}, lock=LOCK)
+        dest, _ = bundle_dir(self.report(directory))
+        metrics = read_json(dest / 'legal-summary.json')['cohorts'][0]['metrics']
+        for name, value in [('attempted', 16), ('resolved', 2), ('eligible', 2), ('checked', 1), ('correct', 1), ('missing_pinpoint', 1)]:
+            self.assertEqual(metrics['claim.' + name]['value'], value)
+        self.assertEqual((metrics['citation.pinpoint_accuracy']['value'], metrics['citation.pinpoint_accuracy']['n']), (1.0, 1))
+        self.assertEqual((metrics['criterion.pinpoints_correct']['value'], metrics['criterion.pinpoints_correct']['n']), (0.5, 2))
+        self.assertEqual(metrics['matter.pinpoint_accuracy']['missing'], 15)
+        self.assertEqual(metrics['error.missing_pinpoint']['value'], 1 / 16)
+        self.assertTrue(all(r['record_type'] != 'request' for r in raw_records(self.report(directory))))
+
+        # Archived smoke attempts have no scorer version or occurrence counts. Their original report has neither
+        # new metrics nor inferred denominators.
+        directory = self.smoke(LOCK, 'archived')
+        attempt = self.attempt(directory)
+        metadata = read_json(attempt / 'metadata.json')
+        metadata.pop('scorer_version')
+        write_json(attempt / 'metadata.json', metadata)
+        path = attempt / 'local/score-detail.jsonl'
+        records = lines(path)
+        for d in records:
+            del d['citation_counts']
+        path.write_text(''.join(json.dumps(d) + '\n' for d in records), encoding='utf-8')
+        self.rereceipt(directory)
+        old, _ = bundle_dir(build_report(self.experiment_dir(directory)))
+        original = read_json(old / 'legal-summary.json')['cohorts'][0]['metrics']
+        self.assertEqual(set(original), set(lr.ROW_METRICS) | set(grading.V1_METRICS))
+        self.assertEqual(original['criterion.pinpoints_correct']['n'], 16)
+
     def test_paired_differences_and_confusion_are_in_the_summary(self):
         directory = self.run_mode('paired', 'generation', {'arms': ['no-context', 'lexical-eligible', 'reference'],
                                                            'roles': {'generator': generator('FAKE_ENDPOINT')}})
@@ -2004,6 +2044,23 @@ class CohortSizeTests(CohortCase):
                     for g in contracts.RECOMMENDATIONS:      # a cell is suppressed when its gold class has fewer than five matters
                         cell = metrics[f'confusion.{g}.{g}']
                         self.assertEqual(cell['value'] is None, sum(v == g for v in gold.values()) < lr.MIN_COHORT, g)
+
+    def test_sparse_citation_opportunities_hide_the_entire_funnel(self):
+        lock = subset_suite(self.path / 'sparse-audit', self.SIZES[5])
+        self.suite = contracts.load_suite(lock)
+        for i, matter in enumerate(self.suite['matters']['matters']):
+            output = fixture.draft(matter, self.suite['corpus'])
+            if i:
+                for claim in output['claims']:
+                    claim['authority_id'] = 'unknown-authority'
+                output.update(issues=[], adverse_authorities=[])
+            self.replies[matter['matter_id']] = json.dumps(output)
+        directory = self.run_mode('sparse-audit', 'generation', {'arms': ['no-context'], 'roles': {'generator': generator('FAKE_ENDPOINT')}}, lock=lock)
+        dest, _ = bundle_dir(self.report(directory))
+        cohort = read_json(dest / 'legal-summary.json')['cohorts'][0]
+        self.assertFalse(cohort['suppressed'])
+        for name in grading.CITATION_METRICS:
+            self.assertEqual(cohort['metrics'][name], lr.SMALL_METRIC, name)
 
     def test_small_paired_differences_are_suppressed_and_exact_exports_are_exempt(self):
         directory = self.run_mode('paired', 'generation', {'arms': ['no-context', 'lexical-eligible'], 'roles': {'generator': generator('FAKE_ENDPOINT')}})

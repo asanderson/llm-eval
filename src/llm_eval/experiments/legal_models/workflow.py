@@ -362,7 +362,7 @@ def run_matter(view, matter, arm, roles, settings, mode, reference=None) -> dict
             verification = grading.verify(output, matter, view['corpus'], evidence, shown_passages(messages))
             if mode == 'workflow' and verification['status'] == 'failed':
                 revised = True
-                failures = [name for name in grading.CHECKS if not verification['checks'][name]]
+                failures = [name for name in grading.CHECKS if verification['checks'][name] is False]
                 revise = build_messages(matter, evidence, 'revise', analysis=analysis, failures=failures, previous=output)
                 revision = _step('revise', 'generator', the_generator, revise, s, matter, 'candidate', attempts)
                 if revision is None:

@@ -4,7 +4,8 @@
     "suite": "../../../experiments/legal-models/workloads/original-smoke/suite.lock.json",
     "arms": [
       "no-context",
-      "lexical-eligible"
+      "lexical-eligible",
+      "reference"
     ],
     "top_k": 5,
     "token_budget": 1200,

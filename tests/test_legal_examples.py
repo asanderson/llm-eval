@@ -376,7 +376,7 @@ class DocumentationTests(unittest.TestCase):
         read = set(re.findall(r"plugin_hook\([^,()]+(?:\([^()]*\))?[^,()]*,\s*'(\w+)'\)", shared))
         read |= set(re.findall(r"getattr\(get_experiment\([^()]*\),\s*'(\w+)'", shared))
         self.assertTrue(read)
-        self.assertLessEqual(read, set(HOOKS) | {'data_policy'})
+        self.assertLessEqual(read, set(HOOKS) | {'report_supplement'})
         self.assertLessEqual(read, set(table))
         for key in planner.PATH_KEYS:
             self.assertIn('`' + key + '`', guide, key)

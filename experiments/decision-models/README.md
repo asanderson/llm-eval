@@ -54,3 +54,86 @@ A replay JSON contains `suite_sha256`, `candidate_fingerprints`, and `rows`. Eac
 Live mode evaluates final answers with the existing deterministic exact/JSON checks when supplied. It does not execute generated code. The original offload experiment retains its upstream LiveBench grading integration. Routing replay can consume externally graded LiveBench outcomes after binding their exact suite and candidate fingerprints; live routing does not claim a full upstream LiveBench score automatically.
 
 Worker telemetry records the executing host. External generator hardware may be unknown, and is not assigned the local router's GPU profile. Co-resident router/generator configurations reserve the whole host; their service's load/swap behavior affects observed end-to-end timing. Separate isolated and contention studies.
+
+## Held-out classification and downstream routing
+
+The [authored pilot](workloads/family-split.json) has eight development tasks and 24 test tasks. Each split balances coding, math, general instruction following and requests that need clarification. The test questions include paraphrases, mixed intent, unfamiliar domains and requests with missing information. Each has a deterministic short-answer check. These original English questions and their source packets were written for this repository under its [MIT license](../../LICENSE). The source names identify editorial packets from the same author. Independent authors and natural user traffic would broaden the evidence.
+
+Select `split: "development"` or `"test"` in the case. The runner checks that family IDs, source packet IDs and exact message hashes stay within one partition. The optional `task_ids` list selects a subset from that partition. Only messages reach the router or generator. The public test split supports a pilot with a frozen policy. For a confirmatory study, have another contributor hold back new families and their labels until the policy is frozen.
+
+### Run the replay fixture
+
+From the repository root with the package and reporting extra installed, these commands generate the keyword, routed, fixed-cheap and fixed-strong cases, run them on the same test prompts and write a paired comparison. The routed arm in this fixture deliberately uses the identical keyword rule. All downstream quality, latency and cost entries in the corpus are hand-set examples. The hardware name is the example inventory selection.
+
+```sh
+study=experiments/decision-models
+protocol=llm_eval.experiments.decision_models.protocol
+python -m "$protocol" prepare --mode replay --split test \
+  --case "$study/cases/family-replay-fixture.json" \
+  --replay "$study/workloads/family-split.fixture-replay.json" \
+  --keywords "$study/workloads/keyword-router.json" \
+  --inventory configs/targets/local.example.json --hardware raider-ubuntu --out /tmp/routing-fixture
+llm-eval run --campaign /tmp/routing-fixture/campaign.json --output /tmp/routing-fixture-runs
+python -m "$protocol" compare --campaign-dir /tmp/routing-fixture-runs/campaign-* --out /tmp/fixture-pairs.json
+```
+
+Use a fresh directory per campaign. Substitute the precise campaign directory printed by `run` when a results directory contains several runs.
+
+### Collect a decision result and a separate downstream result
+
+Copy [family-study.example.json](cases/family-study.example.json) next to the template. Set the three served model names and loaded revisions, the generator precision and runtime versions, and your actual inventory. Set the output cap and objective before collecting outcomes. The worked commands use the shell variables below. Keep every generated campaign and report with its code revision, suite hash and resolved settings.
+
+```sh
+study=experiments/decision-models
+case_file="$study/cases/my-pinned-study.json"
+protocol=llm_eval.experiments.decision_models.protocol
+inventory=configs/targets/local.example.json
+hardware=raider-ubuntu
+prepare_study() {
+  python -m "$protocol" prepare --case "$case_file" --keywords "$study/workloads/keyword-router.json" \
+    --inventory "$inventory" --hardware "$hardware" "$@"
+}
+```
+
+1. Run the decision experiment on development. Examine the reliability bins, accepted accuracy against coverage, and the reversed-criteria arm. Choose the threshold on development and freeze it together with the instructions, criterion order, category map, generator identities and keyword rules. Then run the same protocol on test, including its label-order sensitivity check. Report accuracy for the originally frozen order.
+
+   ```sh
+   prepare_study --mode decision --split development --out /tmp/decision-dev
+   llm-eval run --campaign /tmp/decision-dev/campaign.json --output /tmp/dev-runs
+   # After freezing the policy
+   prepare_study --mode decision --split test --out /tmp/decision-test
+   llm-eval run --campaign /tmp/decision-test/campaign.json --output /tmp/decision-runs
+   ```
+
+2. Collect each fixed generator on the same eligible test questions and deterministic rubric, with identical generation settings. Freeze the first measured generation for each candidate and task. Failed or ineligible generations leave holes in the corpus. A missing quality check or unavailable token billing stays unknown. The frozen corpus binds the suite, model fingerprints, hardware ID, split and generation settings. For human grading, blind the scorer to arm identity and record the rubric version and provenance before importing outcomes.
+
+   ```sh
+   prepare_study --mode live --fixed-only --split test --out /tmp/fixed-test
+   llm-eval run --campaign /tmp/fixed-test/campaign.json --output /tmp/fixed-runs
+   python -m "$protocol" freeze --campaign-dir /tmp/fixed-runs/campaign-* --out /tmp/measured-corpus.json
+   prepare_study --mode replay --split test --replay /tmp/measured-corpus.json --out /tmp/replay-test
+   llm-eval run --campaign /tmp/replay-test/campaign.json --output /tmp/replay-runs
+   python -m "$protocol" compare --campaign-dir /tmp/replay-runs/campaign-* --out /tmp/replay-pairs.json
+   ```
+
+3. Select a stratified live subset from the replay panel. Record the selection rule and task IDs before live generation. Include agreements, disagreements, and abstentions where observed, covering the classes and baseline tradeoffs. The four IDs below illustrate the CLI. Replace them with the recorded selection or omit the filter to validate the full test set. Preserve the hardware and cache conditions, including service reloads and timeouts. For a decision-quality claim on the entire workload, use a representative sample or the full set. Disagreement-enriched subsets measure conditional performance.
+
+   ```sh
+   prepare_study --mode live --split test --out /tmp/live-test \
+     --task-ids test-coding-1 test-math-2 test-general-3 test-clarify-4
+   llm-eval run --campaign /tmp/live-test/campaign.json --output /tmp/live-runs
+   python -m "$protocol" compare --campaign-dir /tmp/replay-runs/campaign-* \
+     --paired-live /tmp/live-runs/campaign-* --out /tmp/paired-live.json
+   ```
+
+### Read the measures
+
+| Output | Population and interpretation |
+|---|---|
+| `decision-models-summary.json` in the report | One row per job and benchmark. The first scheduled non-warmup repetition of each task supplies its decision, including failures. Confusion pools categories. Per-class recall and macro-F1 cover reference classes present in that cohort. A missing choice is a false negative. Direct fixed-generator arms have no classification score when the topic labels fall outside the candidate vocabulary. |
+| Probability and deferral fields | Mean multiclass Brier sums squared class errors per task, then averages tasks with a known probability distribution and reference class. Ten reliability bins compare confidence in the actual choice with its accuracy, including confidence 1 in the last bin. The sensitivity curve uses only probability-bearing tasks. Accepted accuracy and share use the configured policy on all labelled tasks. Check the counts alongside each rate. |
+| Timing and failures | Router p50/p95 uses measured router timings, including decisions followed by failed generation. End-to-end p50/p95 uses successful requests over all measured repetitions. Request-status counts include failures. The per-task panel retains abstentions and fallbacks. Raw live rows have attempt errors, backend-reported load times and generation durations. |
+| Paired JSON from `compare` | For each metric, every displayed arm uses the same task IDs with known values in every arm. Inspect the candidate count and each arm's failures and unknown API costs. The quality–latency and quality–cost tables require joint coverage for each pair of metrics. The panel gives per-task scores, router overhead, selected generator and replay oracle regret. Replay end-to-end time adds the measured router and frozen generator durations. Live elapsed time includes all attempts. |
+| Fixed and paired comparisons | `routing-metadata.json` names the best fixed generator by the declared utility on complete eligible coverage. Per-task regret uses the eligible generator utilities. Those utilities exclude router overhead. The paired JSON compares actual end-to-end time and total API charges independently of that generator-only objective. Differences subtract the named reference from the arm. Intervals use 1,000 seeded paired bootstrap draws over task families, keeping paraphrases together. One-family intervals stay unavailable. |
+
+State the workload, fixed resource budget, achieved quality and coverage for each comparison. Local generator API charges are zero. Record metered energy separately when available. Accuracy, equal-budget superiority and generalization require a workload and sample size adequate for those claims.

@@ -25,7 +25,7 @@ from llm_eval import readiness
 from llm_eval.common import GIB, read_json, sha256_file, write_json
 from llm_eval.experiments import REGISTRY, list_experiments
 from llm_eval.experiments import hardware_fit as fit
-from llm_eval.experiments.hardware_fit import evidence, measured, projection
+from llm_eval.experiments.hardware_fit import evidence, measured, projection, study
 from llm_eval.orchestration import worker
 from llm_eval.orchestration.planner import compile_campaign, revision
 from llm_eval.orchestration.scheduler import initialize, run_campaign
@@ -112,7 +112,7 @@ class TempCase(unittest.TestCase):
         Planned from the checkout, the template's artifact lock is <checkout>/artifacts/selected.lock.json: the file the
         model-offloading guide tells an operator to write. A test must not depend on it."""
         case = 'experiments/hardware-fit/cases/measured-ollama.json'
-        for name in (case, 'experiments/hardware-fit/runs/ollama.example.json', 'workloads/smoke.json'):
+        for name in (case, 'experiments/hardware-fit/runs/ollama.example.json', REAL.relative_to(ROOT), 'workloads/smoke.json'):
             (self.path / name).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / name, self.path / name)
         return case
@@ -620,9 +620,9 @@ class RegistrationTests(unittest.TestCase):
         self.assertEqual(fit.host_requirements({}, 'measured'), {'gpu': True})
         self.assertEqual(fit.setup_platforms({}, 'projection'), [])
         self.assertEqual(fit.setup_platforms({'config': {'platform': 'koboldcpp'}}, 'measured'), ['koboldcpp'])
-        # Of the optional hooks the guide lists, the plugin exports these two: report, ranking and publication stay generic.
+        # The generic report includes the hardware evidence and prediction supplement.
         table = re.findall(r'^\| `(\w+)', (ROOT / 'docs/NEW_EXPERIMENT.md').read_text(encoding='utf-8'), re.M)
-        self.assertEqual(sorted(name for name in table if hasattr(fit, name)), ['host_requirements', 'setup_platforms'])
+        self.assertEqual(sorted(name for name in table if hasattr(fit, name)), ['host_requirements', 'report_supplement', 'setup_platforms'])
 
     def test_package_imports_without_optional_dependencies(self):
         # A child interpreter: in this process the modules are imported already (pattern: tests/test_legal_examples.py).
@@ -638,7 +638,7 @@ class RegistrationTests(unittest.TestCase):
         env = {**os.environ, 'PYTHONPATH': str(ROOT / 'src')}
         done = subprocess.run([sys.executable, '-c', code], cwd=ROOT, env=env, capture_output=True, text=True, timeout=120)
         self.assertEqual(done.returncode, 0, done.stderr)
-        self.assertEqual(done.stdout.split(), ['evidence', 'measured', 'projection'])
+        self.assertEqual(done.stdout.split(), ['evidence', 'measured', 'projection', 'study'])
 
 
 class ProjectionValidationTests(TempCase):
@@ -1039,7 +1039,7 @@ class MeasuredRunTests(MeasuredCase):
                   'hardware_attestation': {'power': 'fixture'}, **(config or {})}
         return self.case(self.config(**values), **changes)
 
-    def run_real(self, case, used=(1000.0, 18500.0), log=LOG_FULL, statuses=('completed',), failure=None, readings=None, out='attempt'):
+    def run_real(self, case, used=(1000.0, 18500.0), log=LOG_FULL, statuses=('completed',), failure=None, readings=None, out='attempt', rows=None):
         """Execute a real measured job with scripted GPU readings (before, while loaded), a scripted backend and a scripted runner.
 
         `readings` replaces the one-card readings: the rows of every reading, or a function of whether the model is loaded."""
@@ -1073,6 +1073,11 @@ class MeasuredRunTests(MeasuredCase):
             if not isinstance(status, str):
                 raise status
             write_json(Path(output) / f'run-{len(runs)}' / 'metadata.json', {'status': status})
+            request_rows = rows if rows is not None else [
+                {'status': 'ok' if status == 'completed' else 'error', 'warmup': False, 'prompt_tokens': 30, 'completion_tokens': 2}]
+            if status != 'skipped':
+                (Path(output) / f'run-{len(runs)}' / 'requests.jsonl').write_text(
+                    ''.join(json.dumps(r) + '\n' for r in request_rows), encoding='utf-8')
             return Path(output) / f'run-{len(runs)}'
         host = {'psutil_available': True, 'gpus': [{'name': GPU_NAME}], 'ac_connected': True}
         self.runs = runs
@@ -1134,6 +1139,9 @@ class MeasuredRunTests(MeasuredCase):
             'ollama_size_bytes': 17_500_000_000,
             'ollama_size_vram_bytes': 17_500_000_000, 'error_type': None, 'evidence_basis': ['gpu_telemetry', 'backend_log', 'ollama_ps'],
             'min_gpu_weight_fraction': 0.8, 'require_layer_evidence': False})
+        self.assertEqual(record['fit_class'], 'backend_confirmed')
+        self.assertEqual((record['headroom_mib'], record['sampler_interval_s']), (24463 - 2048 - 18500, 1.0))
+        self.assertEqual(record['prompt_usage']['prompt_tokens_min'], 30)
         self.assertEqual(self.handler.gets, 1)
         samples = read_json(self.out / 'fit/telemetry.json')
         self.assertTrue(isinstance(samples, list) and all(isinstance(s, dict) and 'gpus' in s for s in samples))
@@ -1144,6 +1152,14 @@ class MeasuredRunTests(MeasuredCase):
         records = raw_records(report)
         self.assertEqual(next(r['data'] for r in records if r['source_file'] == 'fit/metadata.json'), record)
         self.assertEqual([r['data'] for r in records if r['source_file'] == 'fit/telemetry.json'], samples)
+        supplement, markdown = fit.report_supplement(records + [{**r, 'latest_attempt': False} for r in records])
+        self.assertEqual(len(supplement['jobs']), 1)
+        self.assertIn('backend confirmed', markdown)
+        self.assertIn('30–30', markdown)
+        self.assertEqual(supplement['by_runtime'][0]['attempts'], 1)
+        bundle = report / 'bundle' / read_json(report / 'publication.json')['report_path']
+        self.assertEqual(read_json(bundle / 'hardware-fit-summary.json'), supplement)
+        self.assertIn('backend confirmed', (bundle / 'README.md').read_text(encoding='utf-8'))
         (indexed,) = collect(report / 'bundle')
         self.assertEqual((indexed['experiment'], indexed['harness'], indexed['model'], indexed['status'], indexed['synthetic'], indexed['gpu_gib']),
                          ('hardware-fit', 'ollama', 'qwen38-27b-q4_k_m', 'succeeded', False, 18500.0 / 1024))
@@ -1210,7 +1226,8 @@ class MeasuredRunTests(MeasuredCase):
                 result = self.run_real(self.real_case(), out=f'attempt-{index}', **changes)
                 self.assertEqual(result, {'status': 'failed', 'reason': reason, 'result_path': 'measurements', 'benchmark': 'category-smoke'})
                 self.assertEqual(self.evidence('verdict', 'reason', 'placement', 'error_type'),
-                                 {'verdict': 'not_in_vram', 'reason': reason, 'placement': placement, 'error_type': None})
+                                 {'verdict': 'not_assessed' if reason == 'gpu_use_below_weights' else 'not_in_vram',
+                                  'reason': reason, 'placement': placement, 'error_type': None})
                 self.assertEqual(self.launched.call_count, 1)      # the run happened: the verdict is drawn afterwards
         self.assertEqual(self.evidence('evidence_basis', 'layers_offloaded', 'ollama_size_vram_bytes'),
                          {'evidence_basis': ['gpu_telemetry', 'ollama_ps'], 'layers_offloaded': None, 'ollama_size_vram_bytes': 9_000_000_000})
@@ -1218,15 +1235,15 @@ class MeasuredRunTests(MeasuredCase):
     def test_runner_statuses_decide_before_the_verdict(self):
         case = self.real_case(categories=['reasoning', 'math'])
         result = self.run_real(case, statuses=('completed', 'completed_with_errors'))
-        self.assertEqual(result, {'status': 'failed', 'result_path': 'measurements', 'benchmark': 'category-smoke'})      # no reason: the requests failed
+        self.assertEqual(result, {'status': 'failed', 'reason': 'requests_incomplete', 'result_path': 'measurements', 'benchmark': 'category-smoke'})
         self.assertEqual([Path(r[0]['suite']).name for r in self.runs], ['reasoning.json', 'math.json'])
         self.assertEqual(self.launched.call_count, 1)      # one backend, one workdir, for every suite of the job
-        self.assertEqual(self.evidence('verdict', 'reason'), {'verdict': 'in_vram', 'reason': None})
+        self.assertEqual(self.evidence('fit_class', 'failure_stage'), {'fit_class': 'inconclusive', 'failure_stage': 'request'})
         self.assertEqual(self.run_real(case, statuses=('skipped', 'skipped'), out='skipped')['status'], 'skipped')
-        # Failed requests stay the result when the run also left VRAM: the verdict is recorded, the job carries no fit reason.
+        # An incomplete suite can retain its raw layer readings without establishing a fit verdict.
         result = self.run_real(case, statuses=('completed', 'completed_with_errors'), log=LOG_PARTIAL, out='both')
-        self.assertEqual(result, {'status': 'failed', 'result_path': 'measurements', 'benchmark': 'category-smoke'})
-        self.assertEqual(self.evidence('verdict', 'reason'), {'verdict': 'not_in_vram', 'reason': 'layers_on_cpu'})
+        self.assertEqual(result['reason'], 'requests_incomplete')
+        self.assertEqual(self.evidence('verdict', 'partial_loads'), {'verdict': 'not_assessed', 'partial_loads': 1})
         self.assertEqual(self.run_real(case, statuses=('skipped', 'skipped'), log=LOG_PARTIAL, out='skipped-partial')['status'], 'skipped')
 
     def test_lmstudio_rests_on_telemetry_unless_layer_evidence_is_required(self):
@@ -1238,11 +1255,12 @@ class MeasuredRunTests(MeasuredCase):
         self.assertEqual(self.evidence('verdict', 'placement', 'evidence_basis', 'ollama_size_bytes', 'requested'), {
             'verdict': 'in_vram', 'placement': 'unobserved', 'evidence_basis': ['gpu_telemetry'], 'ollama_size_bytes': None,
             'requested': {'platform': 'lmstudio', 'gpu_layers': None, 'gpu_offload': 'max', 'context_tokens': 8192, 'threads': None}})
+        self.assertEqual(self.evidence('fit_class'), {'fit_class': 'telemetry_consistent'})
         self.assertEqual(self.handler.gets, 0)      # /api/ps is asked of Ollama only
         strict = self.real_case(config=config, identity=identity, fit={'require_layer_evidence': True})
         self.assertEqual(self.run_real(strict, log=LOG_LMSTUDIO, out='strict'),
                          {'status': 'failed', 'reason': 'placement_unobserved', 'result_path': 'measurements', 'benchmark': 'category-smoke'})
-        self.assertEqual(self.evidence('verdict', 'require_layer_evidence'), {'verdict': 'not_in_vram', 'require_layer_evidence': True})
+        self.assertEqual(self.evidence('verdict', 'require_layer_evidence'), {'verdict': 'not_assessed', 'require_layer_evidence': True})
 
     def test_an_unanswered_ollama_status_is_recorded_as_null(self):
         port = self.server.server_port
@@ -1261,15 +1279,42 @@ class MeasuredRunTests(MeasuredCase):
         self.handler.ps_status, self.handler.ps = 200, b'{"models": '
         self.assertIsNone(measured.ollama_ps(port))
 
-    def test_a_failed_launch_keeps_the_evidence_and_draws_no_verdict(self):
+    def test_explicit_gpu_allocation_failure_is_distinct_from_loader_failure(self):
         log = 'ggml_backend_cuda_buffer_type_alloc_buffer: allocating 17000.00 MiB on device 0: cudaMalloc failed: out of memory\n'
         with self.assertRaisesRegex(RuntimeError, 'Backend exited during startup'):
             self.run_real(self.real_case(), failure=RuntimeError('Backend exited during startup; inspect its local log'), log=log)
         self.ran.assert_not_called()
         self.assertEqual(self.evidence('verdict', 'reason', 'error_type', 'baseline_used_mib', 'peak_used_mib', 'placement', 'evidence_basis'), {
-            'verdict': 'not_assessed', 'reason': 'run_incomplete', 'error_type': 'RuntimeError', 'baseline_used_mib': 1000.0, 'peak_used_mib': 1000.0,
-            'placement': None, 'evidence_basis': ['gpu_telemetry']})
+            'verdict': 'not_in_vram', 'reason': 'gpu_out_of_memory', 'error_type': 'RuntimeError', 'baseline_used_mib': 1000.0, 'peak_used_mib': 1000.0,
+            'placement': None, 'evidence_basis': ['gpu_telemetry', 'backend_log']})
         self.assertIsInstance(read_json(self.out / 'fit/telemetry.json'), list)
+
+    def test_loader_diagnostic_precedes_low_gpu_rise(self):
+        cause = "llama_model_load: error loading model: unknown model architecture: 'inkling2_loop'"
+        failed = self.run_real(self.real_case(), log=cause, statuses=('completed_with_errors',), used=(1000, 1200))
+        self.assertEqual((failed['status'], failed['reason']), ('failed', 'unsupported_model_architecture'))
+        self.assertEqual(self.evidence('verdict', 'fit_class', 'failure_stage', 'rise_ok'), {
+            'verdict': 'not_assessed', 'fit_class': 'loader_failure', 'failure_stage': 'model_load', 'rise_ok': None})
+        # Without a diagnostic, identical measurements only show an unsuccessful request.
+        self.run_real(self.real_case(), log='', statuses=('completed_with_errors',), used=(1000, 1200), out='unknown')
+        self.assertEqual(self.evidence('fit_class', 'failure_stage'), {'fit_class': 'inconclusive', 'failure_stage': 'request'})
+
+    def test_context_probe_requires_each_measured_request_to_exercise_the_target(self):
+        probe = {'target_prompt_tokens': 4096, 'tolerance_tokens': 32}
+        case = self.real_case(context_probe=probe)
+        row = {'warmup': False, 'status': 'ok', 'prompt_tokens': 4080, 'completion_tokens': 15}
+        warmup = {**row, 'warmup': True, 'prompt_tokens': 7}
+        success = self.run_real(case, rows=[warmup, row, {**row, 'prompt_tokens': 4128}])
+        self.assertEqual(success['status'], 'succeeded')
+        usage = self.evidence()['prompt_usage']
+        self.assertEqual((usage['configured_context_tokens'], usage['prompt_tokens_min'], usage['prompt_tokens_max'],
+                          usage['total_tokens_max'], usage['probe']['requests_in_band']), (8192, 4080, 4128, 4143, 2))
+        for i, bad in enumerate(({'prompt_tokens': 56}, {'prompt_tokens': None}, {'completion_tokens': None},
+                                 {'completion_tokens': 0}, {'completion_tokens': 257})):
+            fail = self.run_real(case, rows=[row, {**row, **bad}], out=f'short-{i}')
+            self.assertEqual(fail, {'status': 'failed', 'reason': 'context_target_unverified', 'result_path': 'measurements',
+                                    'benchmark': 'fit-context-boundary'})
+            self.assertFalse(self.evidence()['prompt_usage']['probe']['passed'])
 
     def test_an_interrupt_stops_the_backend_and_keeps_the_evidence(self):
         with self.assertRaises(KeyboardInterrupt):
@@ -1278,6 +1323,63 @@ class MeasuredRunTests(MeasuredCase):
         self.assertEqual(self.events[stop + 1:], ['reading'])
         self.assertEqual(self.evidence('verdict', 'reason', 'error_type', 'layers_offloaded'),
                          {'verdict': 'not_assessed', 'reason': 'run_incomplete', 'error_type': 'KeyboardInterrupt', 'layers_offloaded': 63})
+
+
+class ContextStudyTests(MeasuredCase):
+    def test_prepare_compiles_all_tiers_and_freezes_each_prompt(self):
+        inventory = ROOT / 'configs/targets/local.example.json'
+        source = X / 'cases/measured-ollama.json'
+        directory = self.path / 'boundary'
+        path = study.prepare(source, inventory, 'raider-ubuntu', directory)
+        jobs = compile_campaign(path, ROOT)['jobs']
+        self.assertEqual([j['case_id'] for j in jobs], ['prompt-2048', 'prompt-4096', 'prompt-8000'])
+        previous = None
+        for job in jobs:
+            params = job['parameters']
+            target = params['context_probe']['target_prompt_tokens']
+            self.assertEqual(params['config']['context_tokens'], target + 64 + 128)
+            self.assertEqual((params['config']['warmups'], params['config']['repeats']), (0, 1))
+            self.assertEqual(job['depends_on'], [previous] if previous else [])
+            previous = job['job_id']
+            suite = Path(params['config']['suite'])
+            self.assertIn({'path': str(suite), 'sha256': sha256_file(suite)}, job['input_files'])
+            self.assertEqual(read_json(suite)['tasks'][0]['messages'][0]['content'].count(' blue'), target - 32)
+        with self.assertRaises(FileExistsError):
+            study.prepare(source, inventory, 'raider-ubuntu', directory)
+        with self.assertRaisesRegex(ValueError, 'reserve the entire output'):
+            fit.validate(self.case(context_probe={'target_prompt_tokens': 8000, 'tolerance_tokens': 64}), ROOT, 'measured')
+
+    def test_frozen_prediction_and_false_fit_counts_use_matched_artifacts_and_assessed_runs(self):
+        source = projection.load_candidates(REAL)
+        candidate = next(c for c in source['candidates'] if c['id'] == 'qwen38-27b-ud-q4_k_xl')
+        spec = {'data': str(REAL), 'candidate_id': candidate['id'], 'policy': {'gpu_baseline_gib': 1.5}}
+        profile = read_json(ROOT / 'configs/hardware/msi-raider-18-hx-ai.json')
+        lock = {'files': [{**f, 'weight': True} for f in candidate['files']]}
+        predicted = study.frozen_prediction(spec, self.config(), profile, lock)
+        self.assertTrue(predicted['predicted_vram_fit'])
+        lock['files'][0]['sha256'] = 'd' * 64
+        with self.assertRaisesRegex(ValueError, 'hashes and sizes differ'):
+            study.frozen_prediction(spec, self.config(), profile, lock)
+        raw = self.path / 'measurements.jsonl.gz'
+        with gzip.open(raw, 'wt', encoding='utf-8') as out:
+            for i, kind in enumerate(('backend_confirmed', 'capacity_failure', 'placement_failure', 'loader_failure', 'telemetry_consistent')):
+                record = {'record': 'fit-evidence', 'fit_class': kind, 'prediction': dict(predicted), 'headroom_mib': predicted['predicted_headroom_mib'] - 100,
+                          'placement': 'all_layers_on_gpu', 'requested': {'platform': 'ollama'}, 'backend_version': '1.0'}
+                study.compare_prediction(record)
+                out.write(json.dumps({'source_file': 'fit/metadata.json', 'latest_attempt': True, 'job_id': str(i),
+                                      'attempt_id': str(i), 'data': record}) + '\n')
+        stats, = study.summarize([raw, raw])
+        self.assertEqual((stats['attempts'], stats['matched_predictions'], stats['assessed_predicted_fits'], stats['false_fits'],
+                          stats['mean_headroom_error_mib'], stats['mean_absolute_headroom_error_mib']), (5, 5, 3, 2, -100, 100))
+
+    def test_cache_types_and_compute_attribution(self):
+        self.assertEqual(evidence.cache_types(LOG_PARTIAL), [('f16', 'f16')])
+        process = SimpleNamespace(children=lambda recursive: [SimpleNamespace(pid=11)])
+        with patch('llm_eval.telemetry.psutil', SimpleNamespace(Process=lambda _: process, Error=ValueError)):
+            for csv, expected in [('10, 1500\n11, 10240\n12, 30', 30), ('11, 8000', 0),
+                                  ('2001, 1700', None), ('10, [N/A]', None)]:
+                with self.subTest(csv), patch('llm_eval.common.command', return_value=csv):
+                    self.assertEqual(evidence.other_compute_memory('0', 10), expected)
 
 
 class PreflightTests(TempCase):

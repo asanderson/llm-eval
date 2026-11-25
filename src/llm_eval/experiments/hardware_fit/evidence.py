@@ -35,7 +35,7 @@ def parse_backend_log(text):
         for start, end in zip(loads, [*loads[1:], len(lines)]):
             offloaded, total = (int(value) for value in OFFLOADED.search(lines[start]).groups())
             buffers = (BUFFER.search(line) for line in lines[start:end])
-            partial += offloaded < total or any(m and m.group(2) == 'KV' and not GPU.fullmatch(m.group(1)) for m in buffers)
+            partial += offloaded < total or any(m and m.group(2) == 'KV' and float(m.group(3)) > 0 and not GPU.fullmatch(m.group(1)) for m in buffers)
         facts.update(layers_offloaded=offloaded, layers_total=total, model_loads=len(loads), partial_loads=partial)
     caches, buffers = {}, {}
     for line in lines[loads[-1] if loads else 0:]:
@@ -95,9 +95,9 @@ def placement(log, ps):
     line = offloaded is not None and total is not None
     if log['partial_loads'] or (line and offloaded < total) or cpu_cache:
         return 'layers_on_cpu'
-    if line and offloaded == total:
+    if line and total > 0 and offloaded == total:
         return 'all_layers_on_gpu'
-    if not line and ps['size'] is not None and ps['size_vram'] is not None:
+    if not line and ps['size'] is not None and ps['size'] > 0 and ps['size_vram'] is not None and ps['size_vram'] >= 0:
         return 'reported_in_vram' if ps['size_vram'] >= ps['size'] else 'reported_partly_in_ram'
     return 'unobserved'
 
@@ -128,3 +128,43 @@ def verdict(weight_mib, total_mib, reserve_mib, baseline_used_mib, peak_used_mib
     else:
         reason = None
     return {'capacity_ok': capacity_ok, 'placement': where, 'gpu_rise_mib': rise, 'rise_ok': rise_ok, 'in_vram': reason is None, 'reason': reason}
+
+
+def load_failure(log_text):
+    """Narrow loader diagnostics only. An HTTP error or a small VRAM rise alone identifies no cause."""
+    if re.search(r'unknown (?:model )?architecture|unsupported (?:model )?architecture|architecture\b[^\n]{0,80}\bnot supported', log_text, re.I):
+        return 'unsupported_model_architecture'
+    if re.search(r'(?:cuda|gpu)[^\n]{0,140}(?:out of memory|erroroutofmemory)|out of (?:device|gpu) memory', log_text, re.I):
+        return 'gpu_out_of_memory'
+    if re.search(r'(?:error loading|failed to load) (?:the )?model\b', log_text, re.I):
+        return 'model_load_failed'
+    return None
+
+
+def cache_types(log_text):
+    """Cache precision pairs reported by llama.cpp. Multiple types can coexist in a hybrid model."""
+    return sorted({(k.lower(), v.lower()) for k, v in re.findall(
+        r'\bK \(([\w]+)\):[^\n]*?\bV \(([\w]+)\):', log_text, re.I)})
+
+
+def other_compute_memory(index, backend_pid):
+    """One post-request snapshot of compute allocations outside the managed process tree, when attributable."""
+    from llm_eval.common import command
+    from llm_eval.telemetry import psutil
+    if not psutil or not backend_pid:
+        return None
+    try:
+        owned = {backend_pid, *(p.pid for p in psutil.Process(backend_pid).children(recursive=True))}
+    except psutil.Error:
+        return None
+    data = command(['nvidia-smi', '-i', str(index), '--query-compute-apps=pid,used_gpu_memory',
+                    '--format=csv,noheader,nounits'], timeout=3)
+    if not data:
+        return None
+    try:
+        rows = [tuple(int(s.strip()) for s in line.split(',')) for line in data.splitlines()]
+        if not any(pid in owned for pid, _ in rows) or any(mib < 0 for _, mib in rows):
+            return None
+        return sum(mib for pid, mib in rows if pid not in owned)
+    except ValueError:  # WDDM and WSL can report unavailable process allocations.
+        return None

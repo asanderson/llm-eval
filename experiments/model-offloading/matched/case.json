@@ -1,0 +1,7 @@
+{
+  "id": "llama33-70b-q4km",
+  "parameters": {
+    "config": "run.json",
+    "server_mode": "managed"
+  }
+}

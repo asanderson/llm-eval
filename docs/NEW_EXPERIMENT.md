@@ -19,6 +19,7 @@ A plugin module may also export any of these. Experiments that do not export the
 | `host_requirements(parameters, mode)` | worker preflight, readiness | Returns `{'gpu': bool}` for a job that is not synthetic. `gpu: false` lets worker preflight skip the hardware-profile GPU check (every other preflight check still runs) and lets `readiness.select` count the job as needing no GPU. Without the hook every non-synthetic job needs the GPU. |
 | `data_policy(job)` | planner, scheduler, worker (run and collection) | Returns at least `{'admit': bool, 'transfer': bool, 'reason': str}`. `admit: false` refuses the job at plan time (`Job is not admitted by the data policy of <job>: <reason>`), fails it in the scheduler with reason `data_policy` before any attempt, and makes the worker refuse it (`Data policy refused the job`). `transfer: false` refuses an SSH target at plan time and refuses remote collection on both sides. Without the hook everything is admitted and transferable. |
 | `attempt_receipt(directory)` | scheduler, when an attempt finishes | Returns a dict merged into the attempt's record in `campaign.json` (the legal plugin records `file_sha256` and `output_manifest_sha256`). |
+| `report_supplement(records)` | generic report generation | Return a JSON value and Markdown derived from sanitized measurement records. Use the latest attempt per job and distinguish warmups, missing values and distinct prompts. Use `(None, '')` when the evidence is absent. A JSON value is published with canonical bytes as `EXPERIMENT-ID-summary.json` and covered by the bundle manifest. |
 | `report_projection(campaign_dir, plan, state, exp)` | report generation | Returns the projected report (records, summary, README, extra files, manifest keys). When present it replaces the generic scan of the attempt directories completely; the bundle is written as canonical bytes and has no chart. |
 | `verify_publication(report, root, base=None)` | `publish-results` | Raises `ValueError(<reason code>)` unless the bundle may be published. When present it replaces the `reporting_policy` publication check for that experiment. |
 | `claims_benchmark(name)` | `publish-results` (identity check) | True for a benchmark name the plugin writes. A bundle of another experiment that carries such a name is refused. |
@@ -26,7 +27,7 @@ A plugin module may also export any of these. Experiments that do not export the
 | `PROTECTED_PATHS` | `publish-results` | Repository paths a publication branch must not change relative to the fetched base branch (`Publication branch changes a protected file`). |
 | `GENERIC_RANKING` | results index | `False` keeps the experiment's results out of the generic top-combinations ranking. |
 
-`legal-models` uses every hook in this table; see [its README](../experiments/legal-models/README.md) and the [legal models walkthrough](LEGAL_MODELS_WALKTHROUGH.md).
+The legal experiment uses its own report projection, which takes precedence over generic supplements. Its publication and data policies are described in [its README](../experiments/legal-models/README.md) and the [legal models walkthrough](LEGAL_MODELS_WALKTHROUGH.md).
 
 ## Frozen inputs: path keys
 

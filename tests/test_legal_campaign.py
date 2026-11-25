@@ -744,7 +744,7 @@ class LegalCampaignTests(unittest.TestCase):
         self.assertEqual({(r['repetition'], r['arm'], r['criteria_total'], r['criteria_passed']) for r in rows}, {(0, 'smoke', 14, 14)})
         details = [json.loads(line) for line in (attempt / 'local/score-detail.jsonl').read_text(encoding='utf-8').splitlines()]
         self.assertEqual([set(d) for d in details], [{'matter_id', 'family_id', 'arm', 'repetition', 'status', 'grading_status', 'criteria',
-                                                       'errors', 'pending_dimensions', 'reviewed_dimensions', 'adjudicated',
+                                                       'citation_counts', 'errors', 'pending_dimensions', 'reviewed_dimensions', 'adjudicated',
                                                        'gold_recommendation', 'choice', 'author_choice', 'complete'}] * 16)
         self.assertTrue(all(d['arm'] == 'smoke' and d['repetition'] == 0 and d['grading_status'] == 'scored' and d['errors'] == []
                             and d['choice'] == d['author_choice'] == d['gold_recommendation'] and set(d['criteria']) == set(fixture.CRITERIA)

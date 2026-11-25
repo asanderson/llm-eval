@@ -9,7 +9,7 @@ It is the counterpart of [model offloading](../model-offloading/README.md). That
 | `projection` (default) | No GPU and no model files | For every candidate artifact: the VRAM, RAM and disk it needs, the limits it exceeds, and a shortlist. A projection, never a measurement. |
 | `measured` | The GPU of the hardware profile, a locked artifact, an installed harness | One artifact served with every layer requested on the GPU, the category suites of model offloading, and the evidence that the run stayed inside VRAM. |
 
-A succeeded `measured` job is ranked by the results index like any other measured run. The best-ranked combination of `hardware-fit` on a hardware configuration is the measured best fit, and the recommended setup page of that pair shows it. Projection rows carry no scored check, so a projection never enters that ranking.
+Read each measured run alongside its placement evidence, the input lengths the runtime served, and the checks its answers passed. Projection rows estimate capacity without running a model. [Browse hardware-fit results](../../docs/results/index/experiment/hardware-fit.md).
 
 ## The hardware configuration
 
@@ -122,7 +122,54 @@ One job measures one artifact on one harness. The case has the shape of a model-
 
 A run whose requests all completed but whose verdict is not `in_vram` returns `failed` with the reason, so it is not ranked.
 
-Once the artifact is verified against its lock, the evidence is written to `fit/metadata.json` in every outcome, also when the launch fails. The samples are written to `fit/telemetry.json` when a launch was attempted, so a job refused before the launch has no sample file. A job that ends earlier leaves no evidence file: a job skipped when it runs, a placeholder left in the run config, a failed host check, or an artifact that does not match its lock. Both files are exported into the published bundle.
+After preflight validates the optional matched prediction and verifies the artifact against its lock, the evidence is written to `fit/metadata.json` in every outcome, also when the launch fails. The samples are written to `fit/telemetry.json` when a launch was attempted, so a job refused before the launch has no sample file. A job that ends earlier leaves no evidence file: a job skipped when it runs, a placeholder left in the run config, a failed host check, or an artifact that does not match its lock. Both files are exported into the published bundle.
+
+### Reading a fit record
+
+Use `fit_class` for the strength of the claim. The existing `verdict`, individual readings and job status are also present. Earlier public bundles retain their original fields.
+
+| Fit class | Evidence |
+|---|---|
+| `projected` | Arithmetic in the projection metadata, with a frozen candidate set and declared policy. |
+| `backend_confirmed` | The workload succeeded, peak and rise checks passed, and the runtime reported full layer placement or full VRAM residency. The raw layer counts, CPU buffers and Ollama byte counts show what that runtime can confirm. |
+| `telemetry_consistent` | The workload succeeded and sampled device memory passed both checks. The runtime supplied no placement report. |
+| `capacity_failure` | The verified weights exceeded free space after reserve, the sampled peak exceeded the limit, or the failed backend explicitly logged a GPU out-of-memory error. |
+| `placement_failure` | The runtime reported layers or KV cache on the CPU, or reported that part of the model was in RAM. |
+| `loader_failure` | A failed startup or set of failed requests included a model-loader diagnostic. An unsupported architecture has its own reason, `unsupported_model_architecture`. |
+| `inconclusive` | Evidence is missing, a required usage target was missed, or execution failed without an attributable fit result. |
+
+`failure_stage` identifies preflight, backend startup, model load, GPU allocation, request execution, context validation or the fit check. A small VRAM rise alone cannot establish a loader or capacity failure. A completed run that fails a fit requirement still has a failed worker status. Historical Inkling 2 Mini on Ollama 0.40.17 is an example where the archived `gpu_use_below_weights` verdict and the operator's loader diagnosis must be read together.
+
+`prompt_usage` lists the configured window, reserved output, min/max backend-reported input and output lengths, largest paired input + output count, and request denominators. Ranges cover successful non-warmup requests. A missing count stays null. `headroom_mib` is reported device total minus reserve minus sampled peak. `sampler_interval_s`, layer and buffer counts, and reported KV key/value precisions in `cache_types` accompany it. An empty cache type list means the log omitted precision. The baseline includes the desktop, driver and other users of the GPU. `other_compute_mib_after_requests` is a separate snapshot of compute processes outside the identified backend tree on that card, taken while the backend is still loaded. It excludes graphics and driver allocations and is null when attribution is unavailable. The harness does not subtract this snapshot from the peak.
+
+### Context boundary study
+
+Start from a real measured case with a pinned artifact and backend. In its run config set `context_tokens` to the largest configured window to test, up to the model's catalog limit. The study uses a fresh managed launch for each tier and one unscored request with no warmup. For an 8,192-token limit, defaults request actual input lengths of 2,048, 4,096 and 8,000 tokens, each within 64 tokens, reserving 128 output tokens. The corresponding configured windows are 2,240, 4,288 and 8,192. With a higher supported ceiling, the generated campaign continues through doubling windows and ends at the declared ceiling. Jobs run in order and stop on failure. Hold the artifact, engine build, sampler interval, call options and hardware/power mode fixed across a sweep.
+
+The following commands assume your filled-in case lives at `configs/local/fit-case.json` and your inventory names the configured machine `raider-ubuntu`. Use a new output directory for each sweep.
+
+```bash
+python -m llm_eval.experiments.hardware_fit.study prepare \
+  --case configs/local/fit-case.json --inventory configs/targets/local.example.json \
+  --hardware raider-ubuntu --out configs/local/fit-boundary
+python -m llm_eval plan --campaign configs/local/fit-boundary/campaign.json
+python -m llm_eval run --campaign configs/local/fit-boundary/campaign.json
+```
+
+The generator writes deterministic text into hashed suite files. Acceptance uses the counts from the serving tokenizer. Every measured request must complete, report an input count inside the requested band, produce 1 through the reserved number of output tokens, and leave space for the entire output reserve. If usage is missing or the tokenizer misses the band, the point is inconclusive with `context_target_unverified`. Inspect the observed range, adjust the padding in a fresh copy of the generated suite, and plan a new campaign. Use the final passing observed range and the first failure stage when reporting a boundary. A sweep that reaches its ceiling establishes a lower bound at the tested workload.
+
+### Comparing projections with observations
+
+A measured case can freeze a `prediction` with the candidate set path in `data`, the exact `candidate_id`, and an optional projection `policy`. The [Ollama case](cases/measured-ollama.json) includes one. Set the assumed device baseline and cache/compute policy before running. At each tier the harness checks the hashes and sizes of all weight files against the selected candidate and uses its architecture at the actual configured window. The comparison concerns GPU VRAM only. The job exports the predicted headroom and fit, signed headroom error (sampled after-reserve headroom minus predicted headroom) and a false-fit indicator in `fit/metadata.json`.
+
+Each new report includes a fit evidence table and exports `hardware-fit-summary.json` with counts and errors by runtime. Combine multiple tier reports or campaigns with the following command.
+
+```bash
+python -m llm_eval.experiments.hardware_fit.study summarize \
+  docs/results/hardware-fit/*/raw/measurements.jsonl.gz
+```
+
+The summary groups by runtime and backend version, counts the latest attempt of each supplied job once, and separates matched predictions from assessed predicted fits. A false fit is a predicted fit followed by a capacity or reported placement failure. Loader failures, missing evidence and telemetry-only fit contribute no false-fit denominator. Sampled headroom errors require confirmed placement and a completed workload, including a reserve breach with that placement. Older bundles with no frozen prediction remain unmatched. The signed mean measures bias and the absolute mean gives its magnitude in MiB.
 
 ## Running
 
@@ -145,7 +192,6 @@ A measured campaign needs what a model-offloading campaign needs: an installed h
 ## Limits
 
 - **The published measured results cover three artifacts, one per model.** They are from WSL2: `qwen38-27b` at UD-Q4_K_XL on KoboldCpp, Ollama and LM Studio on 2026-11-23, with two projections ([results](../../docs/results/README.md#hardware-fit-on-ollama-and-lm-studio-in-wsl2-of-2026-11-23)), and `muse-glimmer-30b` at KQuant Q4_K_M and `inkling2-mini-26b` at IQ4_NL on the same three harnesses on 2026-11-24, with `qwen38-27b` again on KoboldCpp 1.125.1 and Ollama 0.40.17 ([results](../../docs/results/README.md#hardware-fit-of-muse-glimmer-30b-and-inkling-2-mini-in-wsl2-of-2026-11-24)). The measured best fit of the results index therefore compares three models at one quantization each, not the quantizations of a model, and the two newer models are not in the candidate set of the projection. No result is published for native Windows or native Ubuntu; the native Windows runs that [docs/VALIDATION.md](../../docs/VALIDATION.md#hardware-fit) records are validation runs.
-- **A model the engine cannot load reads as `not_in_vram`.** When the backend starts but every request fails because the engine does not know the model's architecture, the rise check fails and the evidence record carries the verdict `not_in_vram` with the reason `gpu_use_below_weights`. Request records keep the type of the error, not its message, so the cause is only in the backend log (Inkling 2 Mini on Ollama 0.40.17, 2026-11-24).
 - **In WSL2 the measured free disk space can be virtual.** The guest's filesystem is a virtual disk that grows on a Windows volume, and it reports its own free space, not that volume's. When the Windows volume is the real limit, declare `disk_free_gib` or point `artifact_root` at a directory on that volume.
 - **The profile's VRAM is the nominal size.** The projection subtracts from `gpu.vram_gib` of the profile; the measured capacity check subtracts from the total the card reports, which can be smaller. The difference belongs in `gpu_baseline_gib`.
 - **The cache estimate is an upper bound for some models.** It counts every layer's key and value elements for the whole context. Layers with a sliding window keep less, so the projection overestimates the cache of such models (the candidate set records `sliding_window_tokens`) and can call an artifact too large that would fit.

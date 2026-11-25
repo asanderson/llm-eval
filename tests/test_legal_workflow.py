@@ -913,7 +913,7 @@ METADATA_KEYS = {'schema_version', 'experiment', 'mode', 'execution_kind', 'synt
                  'template_sha256', 'arms', 'retrieval', 'generation', 'selector', 'roles', 'matters', 'families', 'rows', 'all_pass',
                  'review_required', 'scorer_fingerprint', 'reviewer_fingerprint', 'telemetry', 'unavailable'}
 SCORE_METADATA_KEYS = (METADATA_KEYS - {'telemetry', 'unavailable'}) | {'inference'}
-DETAIL_KEYS = {'matter_id', 'family_id', 'arm', 'repetition', 'status', 'grading_status', 'criteria', 'errors', 'pending_dimensions',
+DETAIL_KEYS = {'citation_counts', 'matter_id', 'family_id', 'arm', 'repetition', 'status', 'grading_status', 'criteria', 'errors', 'pending_dimensions',
                'reviewed_dimensions', 'adjudicated', 'dismissed', 'verifier_codes', 'gold_recommendation', 'choice', 'author_choice', 'complete'}
 
 
@@ -1104,6 +1104,53 @@ class GradingTests(unittest.TestCase):
         self.assertFalse(fake['criteria']['citations_resolve'])
         self.assertTrue(all(e['critical'] for e in real['errors'] + fake['errors']))
         self.assertEqual(next(e for e in fake['errors'] if e['code'] == 'fabricated_citation')['locator'], {'list': 'claims', 'index': 1})
+
+    def test_unresolved_missing_and_incorrect_pinpoints_have_distinct_denominators(self):
+        g = grading()
+        matter = self.matters['f1-ledger-a']
+        evidence = retrieval.retrieve(self.view, matter, 'lexical-eligible', settings(()))
+        output = good_output(self.suite, matter, evidence)
+        base_claim = output['claims'][0]
+        output.update(issues=[], adverse_authorities=[])
+        details = []
+        for repetition, (case, expected) in enumerate((
+                ('unknown', (1, 0, 0, 0, 0)), ('bad-version', (1, 0, 0, 0, 0)),
+                ('missing', (1, 1, 1, 0, 0)), ('wrong', (1, 1, 1, 1, 0)), ('correct', (1, 1, 1, 1, 1)),
+                ('empty', (0, 0, 0, 0, 0)))):
+            with self.subTest(case=case):
+                claim = dict(base_claim)
+                if case == 'unknown':
+                    claim['authority_id'] = 'unknown-authority'
+                if case == 'bad-version':
+                    claim['version'] = '9999'
+                if case == 'missing':
+                    del claim['pinpoint']
+                if case == 'wrong':
+                    claim['pinpoint'] = 'wrong'
+                output['claims'] = [] if case == 'empty' else [claim]
+                graded = g.grade(output, matter, self.gold[matter['matter_id']], self.suite['corpus'], evidence)
+                self.assertEqual(tuple(graded['citation_counts']['claims'].values()), expected)
+                verified = g.verify(output, matter, self.suite['corpus'], evidence)
+                if not expected[2]:
+                    self.assertIsNone(graded['criteria']['pinpoints_correct'])
+                    self.assertIsNone(verified['checks']['pinpoint'])
+                if case == 'missing':
+                    self.assertIn('missing_pinpoint', verified['critical'])
+                    self.assertIn('missing_pinpoint', self.codes(graded))
+                    self.assertNotIn('pinpoint_mismatch', self.codes(graded))
+                details.append(g.detail(matter, 'lexical-eligible', repetition, 'ok', graded, verified['critical'],
+                                        'defer', 'defer', self.gold[matter['matter_id']]))
+        summary = g.aggregate(details)
+        self.assertEqual(summary['claim.resolution_rate'], {'value': 0.6, 'n': 5, 'missing': 1})
+        self.assertEqual(summary['claim.pinpoint_accuracy'], {'value': 0.5, 'n': 2, 'missing': 4})
+        self.assertEqual(summary['claim.missing_pinpoint']['value'], 1)
+        self.assertEqual(summary['claim.unresolved']['value'], 2)
+        self.assertEqual(summary['claim.pinpoint_not_applicable']['value'], 2)
+        self.assertEqual(summary['claim.incorrect']['value'], 1)
+        self.assertEqual(summary['matter.pinpoint_accuracy'], {'value': 0.0, 'n': 1, 'missing': 0})
+        self.assertEqual(g.aggregate(details[:2])['claim.pinpoint_accuracy'], {'value': None, 'n': 0, 'missing': 2})
+        paired = g.paired_difference(details, details, 'criterion.pinpoints_correct')
+        self.assertEqual((paired['mean'], paired['n'], paired['missing']), (0.0, 3, 3))
 
     def test_wrong_version_and_absent_element_cannot_pass(self):
         g = grading()
@@ -1781,6 +1828,36 @@ class CampaignBase(unittest.TestCase):
 
 
 class ScoreTests(CampaignBase):
+    def test_compare_two_reviews_through_the_operator_command(self):
+        attempt = self.source(arms=('no-context',))
+        path_a, key = self.review(attempt)
+        directory = path_a.parent
+        a = read_json(path_a)
+        b = copy.deepcopy(a)
+        path_b = directory / 'review-b.json'
+        args = ['agreement', '--output-manifest', str(attempt / 'local/output-manifest.json'), '--review-key', str(key),
+                '--review-a', str(path_a), '--review-b', str(path_b), '--review-a-seconds', '12000', '--output', str(directory)]
+        write_json(path_b, b)
+        with self.assertRaisesRegex(ValueError, 'distinct reviewer tokens'):
+            grading().main(args)
+        b['reviewer']['reviewer_token'] = 'f' * 32
+        a['verdicts'][1]['critical'] = b['verdicts'][1]['critical'] = True
+        b['verdicts'][0].update(verdict='fail', critical=True)
+        b['verdicts'].pop()
+        write_json(path_a, a)
+        write_json(path_b, b)
+        self.assertEqual(grading().main(args), 0)
+        report = read_json(directory / 'review-agreement.json')
+        self.assertEqual(report['n'], len(b['verdicts']))
+        self.assertEqual(report['expected_verdicts'], len(a['verdicts']))
+        self.assertEqual(report['double_review_coverage'], round(report['n'] / report['expected_verdicts'], 6))
+        self.assertEqual(report['review_seconds'], [12000, None])
+        self.assertEqual(report['review_sha256'], [sha256_file(path_a), sha256_file(path_b)])
+        self.assertEqual(report['expected_critical_adjudications'], len(a['adjudications']))
+        self.assertEqual(report['adjudications_per_reviewer'], [len(a['adjudications'])] * 2)
+        self.assertEqual(report['critical_disagreements'], [[b['verdicts'][0]['item_id'], b['verdicts'][0]['dimension']]])
+        self.assertEqual(report['disagreements'], report['critical_disagreements'])
+
     def test_score_writes_a_new_attempt_with_lineage_and_leaves_the_source_untouched(self):
         g = grading()
         attempt = self.source()

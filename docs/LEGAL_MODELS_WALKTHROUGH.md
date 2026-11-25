@@ -117,6 +117,10 @@ llm-eval run --campaign configs/local/legal/raider-HOST/legal-evaluation-campaig
 
 `setup` installs nothing for a legal campaign (only `serving: managed` would need a runtime, and it is gated). Each generation or workflow attempt writes `requests.jsonl` and `metadata.json` (public rows), the private files under `local/` and, last, `local/output-manifest.json` (see [What stays local](../experiments/legal-models/README.md#what-stays-local)). When the attempt finishes, the coordinator records a receipt in `campaign.json`: `file_sha256` and `output_manifest_sha256` (see [Lineage](../experiments/legal-models/README.md#classification-gates-and-the-report-projection)).
 
+Use the same suite lock, role, token limits, matter order and repetition seed for the three generation arms. The shipped evaluation cases run each matter in all three. The `no-context` arm gets the matter's own evidence without authority passages. The `lexical-eligible` arm adds retrieved passages after applying the jurisdiction, venue and date rules. The `reference` arm supplies passages designated in the reviewed rubric and serves as an upper-bound comparison. Its decision and timing stay in the private attempt. Read its grading metrics in the cohort summary.
+
+For a small double-review pilot, use the approved public fictional `original-packets/suite.lock.json` for all three arms. This covers four matters in two intact families. For the larger fictional screening comparison use `original-smoke`, with eight paired families including date shifts, superseded authorities and adverse evidence. Keep both members of each family in the same split. Freeze the selection before inspecting responses. Compare retrieval's exact-version and adverse-authority recall with their applicable counts, drafting's claim support and citation accuracy, and the workflow's abstentions and critical errors. Reviewers assess whether the source at each locator supports the claim.
+
 To grade the stored outputs again, write a review packet, have it reviewed (see the [checklist](#human-rubric-review-checklist)), and run `score` in a later campaign whose case names the output manifest (and optionally `review_file` with `review_key`):
 
 ```bash
@@ -248,6 +252,20 @@ For a qualified legal reviewer, once per reviewed memo. The reviewer works from 
 - [ ] Every critical error of the item is adjudicated: one `adjudications` entry per critical code, `upheld: true` (the error stands) or `upheld: false` (dismissed).
 - [ ] The review is recorded as a review file for the packet: `kind: legal-review`, `reviewer` with `kind: human` and `blind: true`, verdicts and adjudications keyed by packet `item_id`, the packet's `packet_sha256` and the `rubric_version`.
 - [ ] The reviewer is identified by a random `reviewer_token` (32 hexadecimal characters) from the operator's local registry, never by a name, an address or a hash of one.
+
+### Independent review and adjudication
+
+Assign two qualified reviewers distinct local reviewer tokens. Prepare one packet for the designated suite and give each reviewer a separate copy of that packet, the fictional source records and the same rubric. The operator keeps the key and supplies the packet digest. Each reviewer completes all four dimensions and adjudicates the listed critical codes independently before seeing the other's judgments. Record active review time in seconds for each person.
+
+Compare the two original review files before adjudication. The optional `--review-a-seconds` and `--review-b-seconds` arguments record their times in the same order as the review files. Omitted times appear as null.
+
+```bash
+python -m llm_eval.experiments.legal_models.grading agreement --output-manifest ATTEMPT_DIR/local/output-manifest.json --review-key PRIVATE_DIR/review/review-key.json --review-a PRIVATE_DIR/reviewer-a.json --review-b PRIVATE_DIR/reviewer-b.json --output PRIVATE_DIR/comparison
+```
+
+The local `review-agreement.json` gives double-review coverage out of four verdicts per packet item, coverage of the required critical-code adjudications, raw agreement and Cohen's kappa on shared verdicts, and item IDs for disagreements about verdicts, critical flags and error adjudications. Kappa is undefined when the ratings have no usable variation. Compare the number of packet items with planned outputs and report any missing or invalid drafts. Resolve disagreements with a qualified adjudicator using the same packet. Preserve both originals, then supply the adjudicated review file and original key to the score case.
+
+For this fictional pilot, set the acceptance targets before generation to complete double-review coverage of assigned items, no unresolved critical disagreements and zero standing critical errors across the scored outputs (`critical_standing`). Count invalid drafts, missing responses and unreviewed outputs separately. Report the observed counts alongside each target. An incomplete pilot remains pending. Community review uses approved public fictional material and the existing manual publication procedure.
 
 Until such a review is scored, the four semantic dimensions (`semantic_entailment`, `admissibility`, `defense_arguments`, `sufficiency`) stay `pending`, and a row with a critical error stays `pending_human_review`. An illustrative review file (placeholders throughout):
 

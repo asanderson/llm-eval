@@ -1,0 +1,24 @@
+{
+  "schema_version": 2,
+  "id": "matched-offload",
+  "inventory": "inventory.json",
+  "phases": [
+    {
+      "id": "placement",
+      "experiments": [
+        {
+          "id": "model-offloading",
+          "version": 1,
+          "mode": "matched-performance",
+          "cases": [
+            "case.json"
+          ],
+          "hardware_configs": [
+            "raider-20-layers",
+            "raider-32-layers"
+          ]
+        }
+      ]
+    }
+  ]
+}
