@@ -97,26 +97,63 @@ def by_name(result):
     return {r.name: r for r in result['rows']}
 
 
+DOC_LINES = (ROOT / 'docs' / 'MODELS.md').read_text(encoding='utf-8').split('\n')
+
+
+def doc_rows(model_id):
+    """The rows of the revision table of docs/MODELS.md that list `model_id`."""
+    return [line for line in DOC_LINES if line.startswith(f'| `{model_id}` |')]
+
+
+# A pinned model that the revision table does not list, if there is one.
+UNLISTED = next((e for e in ARTIFACTS if not doc_rows(e['model_id'])), None)
+
+
+def publisher_tree(license_oid='9' * 40):
+    """A publisher repository's listing: a license file and a card, the same blobs at every commit unless a test says so."""
+    return [{'type': 'directory', 'oid': 'd' * 40, 'size': 0, 'path': 'original'},
+            {'type': 'file', 'oid': license_oid, 'size': 11357, 'path': 'LICENSE'},
+            {'type': 'file', 'oid': 'e' * 40, 'size': 15894, 'path': 'README.md'},
+            {'type': 'file', 'oid': '8' * 40, 'size': 120, 'path': 'original/LICENSE'}]
+
+
 class FakeNet:
-    """Scripted Hugging Face derived from the pins and the catalog: every repository starts at its pinned commit."""
+    """Scripted Hugging Face derived from the pins and the catalog: every repository starts at its pinned commit, and a
+    publisher repository reports the gated setting and safetensors counts that the catalog records for it, the same
+    model card license at every commit, and a listing with an unchanged license file."""
 
     def __init__(self, pins=PINS):
-        self.heads, self.trees, self.listings, self.errors, self.asked = {}, {}, {}, {}, []
+        self.heads, self.trees, self.listings, self.errors, self.asked, self.info = {}, {}, {}, {}, [], {}
+        self.at, self.publishers = {}, set()      # (repo, commit) -> model info fields at an older commit
         for entry in pins['artifacts']:
             self.heads[entry['source_repo']] = entry['source_revision']
             if entry['model_id'] in CATALOG:
-                self.heads[CATALOG[entry['model_id']]['upstream_repo']] = CATALOG[entry['model_id']]['source_revision']
+                model = CATALOG[entry['model_id']]
+                self.heads[model['upstream_repo']] = model['source_revision']
+                self.publishers.add(model['upstream_repo'])
+                meta = model.get('upstream_metadata')
+                if meta:
+                    self.info[model['upstream_repo']] = copy.deepcopy({'gated': meta['gated'], 'safetensors': meta['safetensors'],
+                                                                       'cardData': {'license': 'fixture-license'}})
 
-    def revision(self, repo):
-        self.asked.append(('revision', repo))
-        if repo in self.errors:
+    def revision(self, repo, revision='main'):
+        self.asked.append(('revision', repo) if revision == 'main' else ('revision', repo, revision))
+        if repo in self.errors and revision == 'main':
             raise self.errors[repo]
+        if (repo, revision) in self.errors:
+            raise self.errors[(repo, revision)]
         if repo not in self.heads:
-            raise mp.HttpStatus(404, f'https://huggingface.co/api/models/{repo}/revision/main')
-        return {'id': repo, 'sha': self.heads[repo], 'private': False}
+            raise mp.HttpStatus(404, f'https://huggingface.co/api/models/{repo}/revision/{revision}')
+        if revision == 'main':
+            return {'id': repo, 'sha': self.heads[repo], 'private': False, **copy.deepcopy(self.info.get(repo, {}))}
+        return {'id': repo, 'sha': revision, 'private': False, **copy.deepcopy(self.at.get((repo, revision), self.info.get(repo, {})))}
 
     def tree(self, repo, revision):
         self.asked.append(('tree', repo, revision))
+        if (repo, revision) in self.errors:
+            raise self.errors[(repo, revision)]
+        if (repo, revision) not in self.trees and repo in self.publishers:
+            return publisher_tree()
         return self.trees[(repo, revision)]
 
     def newest_models(self, org, limit):
@@ -139,7 +176,9 @@ class Base(unittest.TestCase):
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
         (root / 'catalog').mkdir()
+        (root / 'docs').mkdir()
         shutil.copyfile(ROOT / 'catalog/models.json', root / 'catalog/models.json')
+        shutil.copyfile(ROOT / 'docs/MODELS.md', root / 'docs/MODELS.md')
         shutil.copyfile(PINS_PATH, root / 'catalog/model-artifacts.json')
         if edit:
             pins = copy.deepcopy(PINS)
@@ -171,6 +210,20 @@ class RealPinFileTest(unittest.TestCase):
         for key in ('checked_on', 'new_models_since'):
             self.assertEqual(dt.date.fromisoformat(PINS[key]).isoformat(), PINS[key], key)
         self.assertIn('docs/MODELS.md', PINS['scope'])
+
+    def test_the_catalog_is_the_serialization_the_check_writes(self):
+        # --apply rewrites catalog/models.json as json.dumps(indent=2) when a publisher snapshot moves; a catalog in any
+        # other layout would be rewritten whole by the bot, unrelated entries included.
+        data = (ROOT / 'catalog' / 'models.json').read_bytes()
+        self.assertNotIn(b'\r', data)
+        self.assertEqual(data.decode('ascii'), json.dumps(json.loads(data), indent=2) + '\n')
+        # The revision table of docs/MODELS.md names the catalog revision of every model it lists.
+        for model in MODELS:
+            rows = doc_rows(model['id'])
+            with self.subTest(model['id']):
+                self.assertLessEqual(len(rows), 1)
+                if rows:
+                    self.assertIn(f"`{model['source_revision']}`", rows[0])
 
     def test_every_pin_names_a_catalog_model_in_catalog_order_with_a_full_revision_and_hashed_files(self):
         ids = [entry['model_id'] for entry in ARTIFACTS]
@@ -338,7 +391,7 @@ class CheckTest(Base):
         self.assertEqual((first.pinned, first.latest, first.policy), (FIRST['source_revision'][:12], FIRST['source_revision'][:12], 'bump'))
         snapshot = rows[name(FIRST, 'publisher snapshot')]
         revision = CATALOG[FIRST['model_id']]['source_revision']
-        self.assertEqual((snapshot.pinned, snapshot.latest, snapshot.policy, snapshot.detail), (revision[:12], revision[:12], 'report', ''))
+        self.assertEqual((snapshot.pinned, snapshot.latest, snapshot.policy, snapshot.detail), (revision[:12], revision[:12], 'bump', ''))
         # One revision lookup per artifact repository and per publisher repository, one listing per publisher org.
         orgs = list(dict.fromkeys(e['base_model'].split('/')[0] for e in ARTIFACTS))
         self.assertEqual(net.asked, [('revision', e['source_repo']) for e in ARTIFACTS]
@@ -463,20 +516,254 @@ class CheckTest(Base):
         self.assertNotIn(name(FIRST), names)
         self.assertNotIn(name(FIRST, 'publisher snapshot'), names)      # publisher snapshots are followed for pinned models
 
-    def test_a_moved_publisher_repository_is_reported_and_the_catalog_is_never_rewritten(self):
+    def expected_publisher_move(self, before, model_id, head, meta=None):
+        """catalog/models.json text after the publisher snapshot of `model_id` moved to `head`: as the file was, with
+        source_revision, upstream_metadata (when given) and checked_on of that one entry replaced."""
+        models = json.loads(before)
+        entry = next(m for m in models['models'] if m['id'] == model_id)
+        entry['source_revision'] = head
+        if meta is not None:
+            entry['upstream_metadata'] = meta
+        entry['checked_on'] = TODAY
+        return json.dumps(models, indent=2) + '\n'
+
+    def test_a_moved_publisher_repository_is_bumped_with_its_metadata_and_its_revision_row(self):
         root = self.fixture()
-        before = {p: p.read_bytes() for p in root.rglob('*') if p.is_file()}
+        files = ('catalog/models.json', 'docs/MODELS.md', 'catalog/model-artifacts.json')
+        before = {f: (root / f).read_text(encoding='utf-8') for f in files}
+        model = CATALOG[FIRST['model_id']]
+        old = model['source_revision']
+        self.assertEqual(len(doc_rows(FIRST['model_id'])), 1)      # the fixture's premise: listed once, with metadata
+        self.assertIsNotNone(model['upstream_metadata']['safetensors'])
         net = FakeNet()
         net.heads[FIRST['base_model']] = NEW
         result = self.run_check(root, net)
         row = by_name(result)[name(FIRST, 'publisher snapshot')]
-        self.assertEqual((row.status, row.changed, row.policy), ('manual', False, 'report'))
-        self.assertEqual((row.pinned, row.latest), (CATALOG[FIRST['model_id']]['source_revision'][:12], NEW[:12]))
-        self.assertEqual(row.detail, 'publisher repository moved; the catalog pin is reviewed by hand '
-                                     '(docs/MODELS.md, upstream_metadata, discovery anchors)')
-        self.assertEqual(result['manual'], [row])
-        self.assertFalse(result['changed'])
+        self.assertEqual((row.status, row.changed, row.policy, row.kind), ('bump', True, 'bump', 'publisher'))
+        self.assertEqual((row.pinned, row.latest), (old[:12], NEW[:12]))
+        self.assertEqual(row.detail, 'publisher repository moved; parameter counts unchanged')
+        self.assertEqual((result['manual'], result['failures'], result['moved']), ([], [], [row]))
+        self.assertTrue(result['changed'] and result['applied'])
+        self.assertEqual(result['touched'], ['catalog/models.json', 'docs/MODELS.md'])
+        # One entry moves as a whole, and the file keeps its exact layout (the real catalog is in that layout: RealPinFileTest).
+        meta = {**model['upstream_metadata'], 'sha': NEW}
+        self.assertEqual((root / 'catalog/models.json').read_text(encoding='utf-8'),
+                         self.expected_publisher_move(before['catalog/models.json'], FIRST['model_id'], NEW, meta))
+        lines = before['docs/MODELS.md'].split('\n')
+        index = next(i for i, line in enumerate(lines) if line.startswith(f"| `{FIRST['model_id']}` |"))
+        lines[index] = lines[index].replace(f'`{old}`', f'`{NEW}`')
+        self.assertEqual((root / 'docs/MODELS.md').read_text(encoding='utf-8'), '\n'.join(lines))
+        self.assertEqual((root / 'catalog/model-artifacts.json').read_text(encoding='utf-8'), before['catalog/model-artifacts.json'])
+        # The head answer, then the license at both commits: the old model info and both listings, and nothing else.
+        repo = FIRST['base_model']
+        asked = [a for a in net.asked if a[1] == repo]
+        self.assertEqual(asked, [('revision', repo), ('revision', repo, old), ('tree', repo, old), ('tree', repo, NEW)])
+
+    def test_a_license_change_is_noted_on_the_bump_and_holds_nothing_back(self):
+        repo = CATALOG[FIRST['model_id']]['upstream_repo']
+        old = CATALOG[FIRST['model_id']]['source_revision']
+        unchanged = 'publisher repository moved; parameter counts unchanged'
+        not_reviewed = ('the license recorded in catalog/models.json (and in the revision table of docs/MODELS.md, where it '
+                        'lists the model) was not re-reviewed')
+        self.assertEqual(mp.NOT_REVIEWED, not_reviewed)
+
+        def card(net):      # the old commit's card named another license
+            net.at[(repo, old)] = {**net.info[repo], 'cardData': {'license': 'other', 'license_name': 'earlier-terms'}}
+
+        def license_file(net):      # the license file at the new commit is another blob
+            net.trees[(repo, NEW)] = publisher_tree(license_oid='7' * 40)
+
+        def both(net):
+            card(net)
+            net.trees[(repo, NEW)] = [e for e in publisher_tree() if e['path'] != 'LICENSE'] + [
+                {'type': 'file', 'oid': '6' * 40, 'size': 900, 'path': 'USE_POLICY.md'}]
+
+        def gone(net):      # a rewritten history no longer serves the old commit
+            net.errors[(repo, old)] = mp.HttpStatus(404, f'https://huggingface.co/api/models/{repo}/revision/{old}')
+        cases = [
+            ('card', card, f"{unchanged}; license changed (the model card's license fields): {not_reviewed}"),
+            ('file', license_file, f'{unchanged}; license changed (the license files `LICENSE`): {not_reviewed}'),
+            ('card and files', both, f"{unchanged}; license changed (the model card's license fields and the license files "
+                                     f'`LICENSE`, `USE_POLICY.md`): {not_reviewed}'),
+            ('old commit gone', gone, f'{unchanged}; the license at `{old[:12]}` could not be read: {not_reviewed}'),
+        ]
+        for label, edit, detail in cases:
+            with self.subTest(label):
+                root = self.fixture()
+                net = FakeNet()
+                net.heads[repo] = NEW
+                edit(net)
+                result = self.run_check(root, net)
+                row = by_name(result)[name(FIRST, 'publisher snapshot')]
+                self.assertEqual((row.status, row.changed, row.detail), ('bump', True, detail))
+                self.assertEqual((result['manual'], result['failures']), ([], []))      # noted, never a decision
+                entry = next(m for m in json.loads((root / 'catalog/models.json').read_text(encoding='utf-8'))['models']
+                             if m['id'] == FIRST['model_id'])
+                self.assertEqual((entry['source_revision'], entry['license']), (NEW, CATALOG[FIRST['model_id']]['license']))
+        # A license file renamed with the same content is the same license: no note.
+        root = self.fixture()
+        net = FakeNet()
+        net.heads[repo] = NEW
+        net.trees[(repo, NEW)] = [{**e, 'path': 'LICENSE.md'} if e['path'] == 'LICENSE' else e for e in publisher_tree()]
+        row = by_name(self.run_check(root, net))[name(FIRST, 'publisher snapshot')]
+        self.assertEqual((row.status, row.detail), ('bump', unchanged))
+        # Another status for the old commit is a failed lookup: nothing is written.
+        root = self.fixture()
+        before = (root / 'catalog/models.json').read_bytes()
+        net = FakeNet()
+        net.heads[repo] = NEW
+        net.errors[(repo, old)] = mp.UpstreamError('HTTP 503 after 5 attempts')
+        row = by_name(self.run_check(root, net))[name(FIRST, 'publisher snapshot')]
+        self.assertEqual((row.status, row.move), ('failed', None))
+        self.assertEqual((root / 'catalog/models.json').read_bytes(), before)
+
+    def test_a_report_run_finds_the_moved_publisher_and_writes_nothing(self):
+        root = self.fixture()
+        before = {p: p.read_bytes() for p in root.rglob('*') if p.is_file()}
+        net = FakeNet()
+        net.heads[FIRST['base_model']] = NEW
+        result = self.run_check(root, net, apply=False)
+        row = by_name(result)[name(FIRST, 'publisher snapshot')]
+        self.assertEqual((row.status, row.changed), ('bump', False))
+        self.assertTrue(result['changed'])
+        self.assertFalse(result['applied'])
+        self.assertEqual(result['touched'], [])
         self.assertEqual({p: p.read_bytes() for p in root.rglob('*') if p.is_file()}, before)
+        old = CATALOG[FIRST['model_id']]['source_revision']
+        self.assertIn(f"| {name(FIRST, 'publisher snapshot')} | `{old[:12]}` | `{NEW[:12]}` | bump available | ", mp.markdown_summary(result))
+
+    def test_changed_parameter_counts_and_gating_are_recorded_and_the_curated_sizes_kept(self):
+        model = CATALOG[FIRST['model_id']]
+        repo, recorded = model['upstream_repo'], model['upstream_metadata']
+
+        def recording(block):
+            def edit(text):      # the fixture's catalog with `block` as the model's recorded counts
+                models = json.loads(text)
+                entry = next(m for m in models['models'] if m['id'] == FIRST['model_id'])
+                entry['upstream_metadata']['safetensors'] = block
+                return json.dumps(models, indent=2) + '\n'
+            return edit
+        with_ints = recording({'parameters': {'BF16': 1000, 'U8': 10}, 'total': 1010})
+        two_floats = recording({'parameters': {'BF16': 1000, 'F32': 10}, 'total': 1010})
+        cases = [
+            ('counts changed', None, {'parameters': {'BF16': 999}, 'total': 999}, recorded['gated'],
+             f"publisher repository moved; parameter counts changed (total {recorded['safetensors']['total']:,} to 999): "
+             'parameters_b and the planning sizes are curated and were not recomputed'),
+            ('integers recounted', with_ints, {'parameters': {'BF16': 1000, 'U8': 20}, 'total': 1010}, recorded['gated'],
+             'publisher repository moved; integer element counts recounted by Hugging Face; total and float counts unchanged'),
+            ('gated', None, recorded['safetensors'], 'auto',
+             'publisher repository moved; parameter counts unchanged; gated is now `auto`'),
+            ('float counts moved, same dtypes and total', two_floats, {'parameters': {'BF16': 990, 'F32': 20}, 'total': 1010},
+             recorded['gated'],
+             'publisher repository moved; parameter counts changed (the counts of `BF16, F32`, total unchanged): '
+             'parameters_b and the planning sizes are curated and were not recomputed'),
+            ('dtypes changed, same total', None,
+             {'parameters': {**recorded['safetensors']['parameters'], 'U8': 0}, 'total': recorded['safetensors']['total']},
+             recorded['gated'],
+             'publisher repository moved; parameter counts changed (the dtypes '
+             f"`{', '.join(sorted(recorded['safetensors']['parameters']))}` to "
+             f"`{', '.join(sorted([*recorded['safetensors']['parameters'], 'U8']))}`, total unchanged): "
+             'parameters_b and the planning sizes are curated and were not recomputed'),
+        ]
+        for label, edit, counts, gated, detail in cases:
+            with self.subTest(label):
+                root = self.fixture()
+                if edit:
+                    path = root / 'catalog/models.json'
+                    path.write_text(edit(path.read_text(encoding='utf-8')), encoding='utf-8', newline='\n')
+                before = (root / 'catalog/models.json').read_text(encoding='utf-8')
+                net = FakeNet()
+                net.heads[repo] = NEW
+                net.info[repo] = {'gated': gated, 'safetensors': counts}
+                result = self.run_check(root, net)
+                row = by_name(result)[name(FIRST, 'publisher snapshot')]
+                self.assertEqual((row.status, row.detail), ('bump', detail))
+                written = (root / 'catalog/models.json').read_text(encoding='utf-8')
+                self.assertEqual(written, self.expected_publisher_move(
+                    before, FIRST['model_id'], NEW, {'id': recorded['id'], 'sha': NEW, 'gated': gated, 'safetensors': counts}))
+                entry = next(m for m in json.loads(written)['models'] if m['id'] == FIRST['model_id'])
+                for key in ('parameters_b', 'active_parameters_b', 'planning_weight_gib'):
+                    self.assertEqual(entry.get(key), model.get(key), key)
+
+    def test_an_answer_the_catalog_cannot_record_is_a_manual_decision_that_names_the_head(self):
+        repo = CATALOG[FIRST['model_id']]['upstream_repo']
+        recorded = CATALOG[FIRST['model_id']]['upstream_metadata']
+        cases = {
+            'renamed or replaced': ({'id': 'someone/Else', 'gated': recorded['gated'], 'safetensors': recorded['safetensors']},
+                                    'publisher repository moved, and Hugging Face answers for it with `someone/Else` '
+                                    '(renamed or replaced); nothing is changed'),
+            'unknown gating': ({'gated': 'sometimes', 'safetensors': recorded['safetensors']},
+                               'publisher repository moved; gated is `sometimes`, a value this check does not record; '
+                               'nothing is changed'),
+            'no counts': ({'gated': recorded['gated']},
+                          'publisher repository moved; Hugging Face reports no safetensors counts at the new commit and the '
+                          'catalog records them; nothing is changed'),
+        }
+        for label, (info, detail) in cases.items():
+            with self.subTest(label):
+                root = self.fixture()
+                before = {p: p.read_bytes() for p in root.rglob('*') if p.is_file()}
+                net = FakeNet()
+                net.heads[repo] = NEW
+                net.info[repo] = info
+                result = self.run_check(root, net)
+                row = by_name(result)[name(FIRST, 'publisher snapshot')]
+                self.assertEqual((row.status, row.latest, row.changed, row.move, row.detail), ('manual', NEW[:12], False, None, detail))
+                self.assertEqual((result['manual'], result['failures']), ([row], []))      # the issue lists it every night
+                self.assertFalse(result['changed'] or result['applied'])
+                self.assertEqual({p: p.read_bytes() for p in root.rglob('*') if p.is_file()}, before)
+
+    def test_malformed_counts_fail_the_row_and_leave_every_file_alone(self):
+        repo = CATALOG[FIRST['model_id']]['upstream_repo']
+        recorded = CATALOG[FIRST['model_id']]['upstream_metadata']
+        broken = {
+            'empty counts': {'gated': recorded['gated'], 'safetensors': {'parameters': {}, 'total': 0}},
+            'negative count': {'gated': recorded['gated'], 'safetensors': {'parameters': {'BF16': -1}, 'total': 5}},
+            'total not a count': {'gated': recorded['gated'], 'safetensors': {'parameters': {'BF16': 5}, 'total': '5'}},
+            'a boolean count': {'gated': recorded['gated'], 'safetensors': {'parameters': {'BF16': True}, 'total': 5}},
+            'no repository id': {'id': None, 'gated': recorded['gated'], 'safetensors': recorded['safetensors']},
+        }
+        for label, info in broken.items():
+            with self.subTest(label):
+                root = self.fixture()
+                before = {p: p.read_bytes() for p in root.rglob('*') if p.is_file()}
+                net = FakeNet()
+                net.heads[repo] = NEW
+                net.info[repo] = info
+                result = self.run_check(root, net)
+                row = by_name(result)[name(FIRST, 'publisher snapshot')]
+                self.assertEqual((row.status, row.changed, row.move), ('failed', False, None))
+                self.assertEqual(result['failures'], [row])
+                self.assertFalse(result['changed'] or result['applied'])
+                self.assertEqual({p: p.read_bytes() for p in root.rglob('*') if p.is_file()}, before)
+
+    def test_the_revision_table_follows_only_a_row_that_names_the_old_commit(self):
+        # A model the table does not list: the catalog moves, the page is not touched and nothing is noted.
+        if UNLISTED is not None:
+            root = self.fixture()
+            page = (root / 'docs/MODELS.md').read_bytes()
+            net = FakeNet()
+            net.heads[UNLISTED['base_model']] = NEW
+            result = self.run_check(root, net)
+            row = by_name(result)[name(UNLISTED, 'publisher snapshot')]
+            self.assertEqual((row.status, row.detail), ('bump', 'publisher repository moved; parameter counts unchanged'))
+            self.assertEqual(result['touched'], ['catalog/models.json'])
+            self.assertEqual((root / 'docs/MODELS.md').read_bytes(), page)
+        # A listed model whose row names another commit: the catalog moves and the row says the page was not changed.
+        root = self.fixture()
+        path = root / 'docs/MODELS.md'
+        old = CATALOG[FIRST['model_id']]['source_revision']
+        path.write_text(path.read_text(encoding='utf-8').replace(f'`{old}`', f'`{ELSEWHERE}`'), encoding='utf-8', newline='\n')
+        page = path.read_bytes()
+        net = FakeNet()
+        net.heads[FIRST['base_model']] = NEW
+        result = self.run_check(root, net)
+        row = by_name(result)[name(FIRST, 'publisher snapshot')]
+        self.assertEqual(row.detail, 'publisher repository moved; parameter counts unchanged; docs/MODELS.md lists the model '
+                                     'without one row naming the old commit; its revision table was not changed')
+        self.assertEqual(result['touched'], ['catalog/models.json'])
+        self.assertEqual(path.read_bytes(), page)
+        self.assertEqual(result['manual'], [])
 
     def test_a_base_model_that_is_not_the_catalog_upstream_repo_is_a_manual_decision(self):
         def other_base(pins):
@@ -674,7 +961,7 @@ class CheckTest(Base):
         self.assertFalse(any(r.changed for r in result['rows']))
         self.assertEqual({p: p.read_bytes() for p in root.rglob('*') if p.is_file()}, before)
 
-    def test_apply_writes_nothing_but_the_pin_file(self):
+    def test_apply_writes_the_pin_file_the_catalog_and_the_revision_table_and_nothing_else(self):
         root = self.fixture()
         before = {p: p.read_bytes() for p in root.rglob('*') if p.is_file()}
         net = FakeNet()
@@ -683,11 +970,27 @@ class CheckTest(Base):
             net.heads[entry['base_model']] = NEWER_STILL
         net.listings[ORG] = [{'id': f'{ORG}/Brand-New-9B', 'createdAt': day(1)}]
         result = self.run_check(root, net)
-        self.assertEqual(len(result['moved']), len(ARTIFACTS))
+        self.assertEqual(len(result['moved']), 2 * len(ARTIFACTS))      # every artifact pin and every publisher snapshot
         after = {p: p.read_bytes() for p in root.rglob('*') if p.is_file()}
         self.assertEqual(sorted(after), sorted(before))
-        self.assertEqual([p.relative_to(root).as_posix() for p in before if after[p] != before[p]], ['catalog/model-artifacts.json'])
+        self.assertEqual(sorted(p.relative_to(root).as_posix() for p in before if after[p] != before[p]),
+                         ['catalog/model-artifacts.json', 'catalog/models.json', 'docs/MODELS.md'])
+        self.assertEqual(result['touched'], ['catalog/model-artifacts.json', 'catalog/models.json', 'docs/MODELS.md'])
         self.assertTrue(all(e['source_revision'] == NEW for e in pins_of(root)['artifacts']))
+        catalog = {m['id']: m for m in json.loads((root / 'catalog/models.json').read_text(encoding='utf-8'))['models']}
+        for entry in ARTIFACTS:
+            model = catalog[entry['model_id']]
+            self.assertEqual((model['source_revision'], model['upstream_metadata']['sha'], model['checked_on']),
+                             (NEWER_STILL, NEWER_STILL, TODAY), entry['model_id'])
+        # Models without a pin are not followed: their entries are byte for byte as they were.
+        unpinned = [m for m in MODELS if m['id'] not in {e['model_id'] for e in ARTIFACTS}]
+        self.assertTrue(unpinned)
+        self.assertEqual([catalog[m['id']] for m in unpinned], unpinned)
+        # Every listed model's row now names the new commit; no other line of the page changed.
+        page_before, page_after = before[root / 'docs/MODELS.md'].decode('utf-8'), after[root / 'docs/MODELS.md'].decode('utf-8')
+        changed = [(a, b) for a, b in zip(page_before.split('\n'), page_after.split('\n')) if a != b]
+        self.assertEqual(len(changed), sum(bool(doc_rows(e['model_id'])) for e in ARTIFACTS))
+        self.assertTrue(all(b.endswith(f'`{NEWER_STILL}` |') for _, b in changed), changed)
 
 
 class SummaryTest(Base):
@@ -710,7 +1013,7 @@ class SummaryTest(Base):
                                    '(the pinned revision) |')
         self.assertIn(f"| {name(ARTIFACTS[2])} | `{ARTIFACTS[2]['source_revision'][:12]}` | `{ARTIFACTS[2]['source_revision'][:12]}` | current |  |", table)
         self.assertIn(f"| {name(SECOND, 'publisher snapshot')} | `{CATALOG[SECOND['model_id']]['source_revision'][:12]}` | `{NEWER_STILL[:12]}` "
-                      f'| manual | {mp.PUBLISHER_MOVED} |', table)
+                      '| bumped | publisher repository moved; parameter counts unchanged |', table)
         self.assertEqual(table[-1], f'| new model `{ORG}/Brand-New-9B` | `none` | `{day(3)[:10]}` | manual | created {day(3)[:10]}; '
                                     'not in the catalog and no recorded decision |')
         for line in table:      # five cells, whatever a cell holds
@@ -719,15 +1022,19 @@ class SummaryTest(Base):
                          ['## Model pin check', '### What moved and what it means for the next run', '### Needs a manual decision'])
         moved = summary.split('### What moved and what it means for the next run\n', 1)[1].split('\n###', 1)[0]
         self.assertIn(f"- **{name(FIRST)}**: `{FIRST['source_revision'][:12]}` to `{NEW[:12]}`: repository moved; pinned files unchanged", moved)
+        self.assertIn(f"- **{name(SECOND, 'publisher snapshot')}**: `{CATALOG[SECOND['model_id']]['source_revision'][:12]}` to "
+                      f'`{NEWER_STILL[:12]}`: publisher repository moved; parameter counts unchanged', moved)
         # Stated plainly: a new cohort, published results keep their revision, a bound legal role is re-qualified.
         self.assertIn('A changed artifact revision is a new cohort.', moved)
         self.assertIn('Published results keep their recorded revision; nothing under `docs/results/` is rewritten.', moved)
         self.assertIn('must be re-qualified', moved)
         self.assertIn('`python scripts/model_pins.py --download-spec FILE`', moved)
-        self.assertIn('Rewritten: `catalog/model-artifacts.json`.', moved)
+        # And for the publisher snapshot: what the catalog records changes, nothing a run loads.
+        self.assertIn(mp.PUBLISHER_NOTE, moved)
+        self.assertIn('Nothing a run loads changes', mp.PUBLISHER_NOTE)
+        self.assertIn('Rewritten: `catalog/model-artifacts.json`, `catalog/models.json`, `docs/MODELS.md`.', moved)
         decisions = summary.split('### Needs a manual decision\n', 1)[1]
-        self.assertIn(f"- **{name(SECOND, 'publisher snapshot')}**: pinned `{CATALOG[SECOND['model_id']]['source_revision'][:12]}`, "
-                      f'upstream `{NEWER_STILL[:12]}`: {mp.PUBLISHER_MOVED}', decisions)
+        self.assertNotIn('publisher snapshot', decisions)      # a moved publisher repository needs no decision
         self.assertIn(f'- **new model `{ORG}/Brand-New-9B`**: pinned `none`, upstream `{day(3)[:10]}`: ', decisions)
         self.assertNotIn('Failed lookups', summary)
         self.assertTrue(summary.endswith('\n') and not summary.endswith('\n\n'))
@@ -987,9 +1294,16 @@ class MainTest(Base):
     def test_an_open_decision_is_announced_with_and_without_apply(self):
         for flags in ((), ('--apply',)):
             net = FakeNet()
-            net.heads[FIRST['base_model']] = NEW
+            net.listings[ORG] = [{'id': f'{ORG}/Brand-New-9B', 'createdAt': day(3)}]
             code, outputs, _, _, _ = self.main(net, *flags)
             self.assertEqual((code, outputs), (0, {'changed': 'false', 'manual': 'true', 'failed': 'false'}))
+
+    def test_a_moved_publisher_repository_is_a_change_and_no_decision(self):
+        for flags, changed in (((), 'false'), (('--apply',), 'true')):
+            net = FakeNet()
+            net.heads[FIRST['base_model']] = NEW
+            code, outputs, _, _, _ = self.main(net, *flags)
+            self.assertEqual((code, outputs), (0, {'changed': changed, 'manual': 'false', 'failed': 'false'}))
 
     def test_a_failed_lookup_is_announced_so_the_issue_is_not_closed_on_a_guess(self):
         net = FakeNet()
@@ -1004,7 +1318,7 @@ class MainTest(Base):
     def test_the_bodies_are_written_with_lf_and_nothing_is_written_without_github_output(self):
         root = self.fixture()
         net = self.moved()
-        net.heads[SECOND['base_model']] = NEW
+        net.listings[ORG] = [{'id': f'{ORG}/Brand-New-9B', 'createdAt': day(3)}]
         with mock.patch.dict(os.environ), contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             os.environ.pop('GITHUB_OUTPUT', None)
             code = mp.main(['--apply', '--summary', str(root / 'summary.md'), '--issue-summary', str(root / 'issue.md'),
@@ -1310,7 +1624,7 @@ class WorkflowTest(unittest.TestCase):
         def names(text):
             return dict(re.findall(r'^  (BRANCH|PR_TITLE|ISSUE_TITLE): (.+)$', text, re.M))
         mine, theirs = names(self.TEXT), names(self.PINS)
-        self.assertEqual(mine, {'BRANCH': 'auto/model-pins', 'PR_TITLE': '"Bump pinned model artifact revisions"',
+        self.assertEqual(mine, {'BRANCH': 'auto/model-pins', 'PR_TITLE': '"Bump pinned model revisions"',
                                 'ISSUE_TITLE': '"Model versions needing a manual decision"'})
         # The upstream pin check finds its pull request by branch and its issue by title: nothing is shared with it.
         self.assertEqual(sorted(theirs), sorted(mine))
@@ -1348,6 +1662,8 @@ class WorkflowTest(unittest.TestCase):
         checks = self.step('Run the offline checks CI would')
         self.assertIn("\n        if: steps.resolve.outputs.changed == 'true'\n", checks)
         self.assertIn("python3 -m unittest discover -s tests -p 'test_model_pins.py' -v", checks)
+        # A moved publisher snapshot rewrites the catalog that model discovery validates: its tests run before the PR too.
+        self.assertIn("python3 -m unittest discover -s tests -p 'test_model_discovery.py' -v", checks)
         self.assertLess(self.TEXT.index('- name: Run the offline checks CI would'),
                         self.TEXT.index('- name: Open or refresh the bump pull request'))
 
@@ -1370,9 +1686,15 @@ class WorkflowTest(unittest.TestCase):
         read = self.step('Read the tracking issue')
         refresh = self.step('Refresh the tracking issue with what needs a manual decision')
         close = self.step('Close the tracking issue once nothing needs a manual decision')
-        self.assertIn("\n        if: steps.resolve.outputs.manual == 'true'\n", refresh)
-        self.assertIn("\n        if: steps.resolve.outputs.manual == 'false' && steps.resolve.outputs.failed == 'false'\n", close)
-        self.assertNotIn('\n        if:', read)
+        # The issue steps run whether or not the offline checks refused a bump (only a cancelled run skips them); the
+        # issue is closed only when the checks did not fail, nothing waits on a decision and no lookup failed.
+        self.assertIn("\n        if: ${{ !cancelled() && steps.resolve.outputs.manual == 'true' }}\n", refresh)
+        self.assertIn("\n        if: ${{ !cancelled() && steps.checks.outcome != 'failure' && steps.resolve.outputs.manual == 'false' "
+                      "&& steps.resolve.outputs.failed == 'false' }}\n", close)
+        self.assertIn('\n        if: ${{ !cancelled() }}\n', read)
+        self.assertIn('\n        id: checks\n', self.step('Run the offline checks CI would'))
+        # The pull request step keeps the implicit success(): a bump the checks refused is never proposed.
+        self.assertNotIn('cancelled()', self.step('Open or refresh the bump pull request'))
         for text in (read, refresh, close):
             self.assertIn('          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n', text)      # the issue's author is github-actions[bot]
             self.assertNotIn('UPSTREAM_BUMP_TOKEN', text)
@@ -1405,7 +1727,8 @@ class WorkflowTest(unittest.TestCase):
     def test_the_header_says_what_is_checked_what_is_never_touched_and_how_the_nightly_jobs_relate(self):
         header, body = self.TEXT.split('\non:\n', 1)
         self.assertTrue(all(line.startswith('#') or not line for line in header.splitlines()[1:]))
-        for phrase in ('catalog/model-artifacts.json', 'Never touched: catalog/models.json', 'docs/results/', 'upstream-pins.yml (06:17 UTC)',
+        for phrase in ('catalog/model-artifacts.json', 'Never touched: the published results under docs/results/',
+                       'catalog/models.json and the revision table of docs/MODELS.md', 'upstream-pins.yml (06:17 UTC)',
                        'Dependabot', 'model-discovery.yml', '(06:47 UTC)', 'at 07:17 UTC', 'UPSTREAM_BUMP_TOKEN', 'HF_TOKEN is optional',
                        'docs/MODELS.md'):
             self.assertIn(phrase, header)
@@ -1413,7 +1736,7 @@ class WorkflowTest(unittest.TestCase):
         self.assertIn('cron: "17 6 * * *"', self.PINS)
         self.assertIn('cron: "47 6 * * *"', self.DISCOVERY)
         self.assertEqual(set(re.findall(r'cronjob: "([^"]+)"', self.DEPENDABOT)), {'17 6 * * *'})
-        # Below its header the workflow names no repository file but the script and its test module.
+        # Below its header the workflow names no repository file but the script (the test modules are named by pattern).
         self.assertEqual(sorted(set(re.findall(r'\b(?:catalog|docs|scripts|tests|src)/[\w./-]+', body))), ['scripts/model_pins.py'])
         self.assertIn('model-pins.yml', self.PINS.split('\non:\n', 1)[0])      # the upstream pin check points here
 

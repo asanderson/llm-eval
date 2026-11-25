@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Nightly check of catalog/model-artifacts.json against Hugging Face, with optional bump.
+"""Nightly check of catalog/model-artifacts.json and the publisher snapshots of catalog/models.json against Hugging
+Face, with optional bump.
 
   python3 scripts/model_pins.py                       report only
-  python3 scripts/model_pins.py --apply               rewrite catalog/model-artifacts.json where a pin moved
+  python3 scripts/model_pins.py --apply               rewrite catalog/model-artifacts.json, catalog/models.json and
+                                                      the revision table of docs/MODELS.md where a pin moved
   python3 scripts/model_pins.py --summary FILE        write the Markdown pull request body
   python3 scripts/model_pins.py --issue-summary FILE  write the tracking-issue body (same pin table and
                                                       decisions, without the section about the PR's diff)
@@ -24,15 +26,25 @@ What moves automatically (policy "bump"):
     still published there with a Git LFS sha256. The sizes and hashes listed at that
     commit are recorded, and the row says whether the pinned files are unchanged or
     the weights changed.
+  * a publisher snapshot: the catalog source_revision of a pinned model, to the head
+    commit of its upstream_repo. upstream_metadata is replaced by what Hugging Face
+    answers for that commit (sha, gated, safetensors), checked_on is stamped, and the
+    model's row in the revision table of docs/MODELS.md, where the table lists the
+    model, follows. The row says whether the parameter counts changed, and whether the
+    model card's license fields or a top-level license file changed (the license the
+    catalog records is not re-read). parameters_b and the planning sizes are curated
+    and are kept. Nothing a run loads changes: runs load the pinned artifact. Catalog
+    models without a pin are not followed.
 
 What is only reported (policy "report"); each of these needs a manual decision:
   * a pinned file that the head commit no longer publishes, or publishes without a
     Git LFS sha256 (the content cannot be verified); the pin stays;
+  * a moved publisher repository whose answer the catalog cannot record: it names
+    another repository (renamed or replaced), it reports no safetensors counts where
+    the catalog records them, or its gated value is not one the check knows;
   * a repository Hugging Face answers 401, 403, 404 or 410 for;
   * a model that the published model-offloading results measured and that has no pin;
-  * a publisher repository (upstream_repo in catalog/models.json) that moved past the
-    catalog source_revision, and a pin whose base_model is not that upstream_repo.
-    catalog/models.json is never rewritten;
+  * a pin whose base_model is not the catalog upstream_repo of its model;
   * a repository that a publisher org of a pinned model created on or after
     new_models_since, when it is not a catalog upstream_repo and no hf: decision in
     catalog/model-discovery.json covers it. Size and license are not judged here:
@@ -59,6 +71,7 @@ import urllib.request
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PINS_FILE = "catalog/model-artifacts.json"
 MODELS_FILE = "catalog/models.json"
+MODELS_DOC = "docs/MODELS.md"         # its revision table names in full the source_revision of each model it lists
 DISCOVERY_FILE = "catalog/model-discovery.json"
 # Published bundles of the experiment whose jobs name the artifact they loaded.
 PUBLISHED = "docs/results/model-offloading"
@@ -87,13 +100,27 @@ ORG_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*")
 SHA_RE = re.compile(r"[0-9a-f]{40}")
 SHA256_RE = re.compile(r"[0-9a-f]{64}")
 DATE_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
+# Integer element counts, which Hugging Face has recounted at unchanged revisions (packed U8 weights); the same list as
+# scripts/model_discovery.py, whose anchor check lets these differ and holds the total and the float counts exact.
+INT_DTYPES = ("U8", "I8", "U16", "I16", "U32", "I32", "U64", "I64", "BOOL")
+# What a publisher commit says about its license: these model card fields, and the top-level files whose names begin so.
+LICENSE_FIELDS = ("license", "license_name", "license_link")
+LICENSE_FILES = ("LICENSE", "LICENCE", "NOTICE", "USE_POLICY", "USAGE_POLICY")
 # tokenizer_revision of a published model-offloading job: "<repo>@<40 hex> (...)". The text after the revision varies.
 MEASURED_RE = re.compile(r"^([\w.-]+/[\w.-]+)@([0-9a-f]{40})")
 
 GONE = ("Hugging Face does not serve the repository to this run (gone, renamed, private or gated, or the token was "
         "refused); nothing is changed")
-PUBLISHER_MOVED = ("publisher repository moved; the catalog pin is reviewed by hand "
-                   "(docs/MODELS.md, upstream_metadata, discovery anchors)")
+PUBLISHER_NOTE = (
+    "A moved publisher snapshot changes what the catalog records about the publisher's repository: `source_revision`, "
+    "`upstream_metadata` and `checked_on` of the model in `catalog/models.json`, and, where the table lists the model, "
+    "its row in the revision table of `docs/MODELS.md`. Nothing a run loads changes, because runs load the pinned "
+    "artifact, and no published result changes. `parameters_b` and the planning sizes are curated and are kept; a row "
+    "whose parameter counts changed says so. The license the catalog records is not re-read: a row says when the model "
+    "card's license fields or a top-level license file changed between the two commits, and the operator still reviews "
+    "the license before setting `accept_license`. Where the model is an anchor of the model discovery, the anchor is "
+    "read at the new revision "
+    "(`docs/MODEL_DISCOVERY.md`).")
 MOVED_NOTE = (
     "A changed artifact revision is a new cohort. The next run loads the new revision, and its results belong to a "
     "different cohort from the results measured at the old one, even when the pinned files are byte-identical: the "
@@ -272,9 +299,10 @@ class Net:
         raise UpstreamError(f"{where}: {last} after {RETRIES} attempts")
 
     # --- Hugging Face views used by the checks ---------------------------------
-    def revision(self, repo: str) -> dict:
-        """Model info at the head of the default branch; the checks read its `sha`."""
-        return self.get(f"https://{HF_HOST}/api/models/{urllib.parse.quote(repo, safe='/')}/revision/main")[1]
+    def revision(self, repo: str, revision: str = "main") -> dict:
+        """Model info at `revision`, by default the head of the default branch; the checks read its `sha`."""
+        return self.get(f"https://{HF_HOST}/api/models/{urllib.parse.quote(repo, safe='/')}/revision/"
+                        f"{urllib.parse.quote(revision, safe='')}")[1]
 
     def tree(self, repo: str, revision: str) -> list:
         """Every entry of the repository at `revision`, following the rel="next" pages."""
@@ -409,11 +437,12 @@ def decision_for(repo: str, decisions: list):
 
 # --- checks -------------------------------------------------------------------------------------------------
 class Row:
-    def __init__(self, name, pinned, policy):
-        self.name, self.pinned, self.policy = name, pinned, policy
+    def __init__(self, name, pinned, policy, kind=None):
+        self.name, self.pinned, self.policy, self.kind = name, pinned, policy, kind
         self.latest, self.status, self.detail = None, "pending", ""
         self.changed = False
         self.org = None               # the publisher org of a new-model row; a long report counts such rows per org
+        self.move = None              # a moved publisher snapshot: (model id, old commit, new commit), for docs/MODELS.md
 
     def done(self, latest, status, detail=""):
         self.latest, self.status, self.detail = latest, status, detail
@@ -434,17 +463,61 @@ def paths(names) -> str:
     return ", ".join(md_code(name, EXCERPT_CAP) for name in names)
 
 
-def head_commit(net: Net, repo, row: Row):
-    """The head commit of `repo`; None, with `row` marked manual, when Hugging Face does not serve the repository."""
+def head_info(net: Net, repo, row: Row):
+    """The model info of `repo` at the head of its default branch, once it names a full commit; None, with `row` marked
+    manual, when Hugging Face does not serve the repository."""
     if not isinstance(repo, str) or not REPO_RE.fullmatch(repo):
         raise ValueError(f"not an org/name repository id: {repo!r}")
     try:
-        return head_sha(net.revision(repo))
+        doc = net.revision(repo)
     except HttpStatus as exc:
         if exc.code not in GONE_STATUSES:
             raise
         row.done(f"HTTP {exc.code}", "manual", GONE)
         return None
+    head_sha(doc)
+    return doc
+
+
+def head_commit(net: Net, repo, row: Row):
+    """The head commit of `repo`; None, with `row` marked manual, when Hugging Face does not serve the repository."""
+    doc = head_info(net, repo, row)
+    return None if doc is None else head_sha(doc)
+
+
+def safetensors_of(doc: dict, repo: str):
+    """The safetensors block of a model info answer, {parameters: {DTYPE: count}, total}, checked as
+    scripts/model_discovery.py checks a catalog upstream_metadata; None when the answer has none."""
+    value = doc.get("safetensors")
+    if value is None:
+        return None
+    params = value.get("parameters") if isinstance(value, dict) else None
+    total = value.get("total") if isinstance(value, dict) else None
+    if not isinstance(params, dict) or not params or not isinstance(total, int) or isinstance(total, bool) or total <= 0 \
+            or not all(isinstance(k, str) and isinstance(v, int) and not isinstance(v, bool) and v >= 0 for k, v in params.items()):
+        raise UpstreamError(f"expected safetensors {{parameters: {{DTYPE: count}}, total}} for {repo}; got {value!r}")
+    return {"parameters": dict(params), "total": total}
+
+
+def counts_change(old, new) -> str:
+    """How the parameter counts of a publisher snapshot changed between two revisions; '' when they did not. `new` is
+    None only when `old` is (bump_publisher refuses to drop recorded counts)."""
+    if old == new:
+        return ""
+    if old is None:
+        return "parameter counts first reported by Hugging Face"
+    before, after = old["parameters"], new["parameters"]
+    if old["total"] == new["total"] and set(before) == set(after) \
+            and all(after[k] == v for k, v in before.items() if k not in INT_DTYPES):
+        return "integer element counts recounted by Hugging Face; total and float counts unchanged"
+    if old["total"] == new["total"] and set(before) == set(after):
+        moved = sorted(k for k in after if after[k] != before[k])
+        how = f"the counts of {md_code(', '.join(moved))}, total unchanged"
+    elif old["total"] == new["total"]:
+        how = f"the dtypes {md_code(', '.join(sorted(before)))} to {md_code(', '.join(sorted(after)))}, total unchanged"
+    else:
+        how = f"total {old['total']:,} to {new['total']:,}"
+    return f"parameter counts changed ({how}): parameters_b and the planning sizes are curated and were not recomputed"
 
 
 def measured_note(entry: dict, measured: dict) -> str:
@@ -462,7 +535,7 @@ def measured_note(entry: dict, measured: dict) -> str:
 
 def bump_artifact(net: Net, entry: dict, measured: dict, rows: list):
     """One artifact pin: follow the head commit of its repository while every pinned file is still published there."""
-    row = Row(f"{md_code(entry.get('model_id'))} artifact", short(entry.get("source_revision")), "bump")
+    row = Row(f"{md_code(entry.get('model_id'))} artifact", short(entry.get("source_revision")), "bump", "artifact")
     rows.append(row)
     try:
         note = measured_note(entry, measured)
@@ -510,8 +583,9 @@ def report_unpinned(pins: dict, measured: dict, rows: list):
             f"measured in published results but not pinned ({where}, last measured on {created[:10]})"))
 
 
-def report_publisher(net: Net, entry: dict, catalog: dict, rows: list):
-    """The publisher snapshot behind one pinned model. Drift is reported; catalog/models.json is never rewritten."""
+def bump_publisher(net: Net, entry: dict, catalog: dict, rows: list, today: str):
+    """The publisher snapshot behind one pinned model: follow the head commit of its catalog upstream_repo, with the
+    upstream_metadata that Hugging Face reports for that commit. parameters_b and the planning sizes are left alone."""
     model_id, base = entry.get("model_id"), entry.get("base_model")
     model = catalog.get(model_id)
     if model is None:
@@ -522,18 +596,114 @@ def report_publisher(net: Net, entry: dict, catalog: dict, rows: list):
         rows.append(Row(f"{md_code(model_id)} base model", str(base), "report").done(
             str(model.get("upstream_repo")), "manual",
             "base_model is not the catalog upstream_repo; a run would refuse the lock"))
-    row = Row(f"{md_code(model_id)} publisher snapshot", short(model.get("source_revision")), "report")
+    row = Row(f"{md_code(model_id)} publisher snapshot", short(model.get("source_revision")), "bump", "publisher")
     rows.append(row)
     try:
-        head = head_commit(net, model.get("upstream_repo"), row)
-        if head is None:
+        repo, was = model.get("upstream_repo"), model.get("source_revision")
+        doc = head_info(net, repo, row)
+        if doc is None:
             return
-        if head == model.get("source_revision"):
+        head = head_sha(doc)
+        if head == was:
             row.done(short(head), "current")
-        else:
-            row.done(short(head), "manual", PUBLISHER_MOVED)
-    except Exception as exc:  # noqa: BLE001
+            return
+        if not isinstance(doc.get("id"), str):
+            raise UpstreamError(f"expected the repository id in the model info of {repo}; got {doc.get('id')!r}")
+        # What the catalog cannot record without a person: a manual decision that names the head, every night until settled.
+        if doc["id"].casefold() != repo.casefold():
+            row.done(short(head), "manual", f"publisher repository moved, and Hugging Face answers for it with "
+                                            f"{md_code(doc.get('id'))} (renamed or replaced); nothing is changed")
+            return
+        old = model.get("upstream_metadata")
+        meta, detail = None, "publisher repository moved; no upstream_metadata is recorded for it"
+        if old is not None:
+            gated = doc.get("gated")
+            if not (isinstance(gated, bool) or gated in ("auto", "manual")):
+                row.done(short(head), "manual", f"publisher repository moved; gated is {md_code(gated)}, a value this "
+                                                "check does not record; nothing is changed")
+                return
+            counts = safetensors_of(doc, repo)
+            if counts is None and old.get("safetensors") is not None:
+                # model discovery needs the counts of its anchors; a recorded block is never replaced by nothing
+                row.done(short(head), "manual", "publisher repository moved; Hugging Face reports no safetensors "
+                                                "counts at the new commit and the catalog records them; nothing is changed")
+                return
+            meta = {"id": old["id"], "sha": head, "gated": gated, "safetensors": counts}
+            change = counts_change(old.get("safetensors"), counts)
+            detail = joined("publisher repository moved", change or "parameter counts unchanged",
+                            f"gated is now {md_code(gated)}" if gated != old.get("gated") else "")
+        detail = joined(detail, license_change(net, repo, was, doc, head))
+        # Every value is resolved: only now is the entry rewritten, so a failed lookup never leaves half an entry.
+        row.move = (model_id, was, head)
+        model["source_revision"] = head
+        if meta is not None:
+            model["upstream_metadata"] = meta
+        model["checked_on"] = today
+        row.done(short(head), "bump", detail)
+        row.changed = True
+    except Exception as exc:  # noqa: BLE001 - reported, never fatal
         failed(row, exc)
+
+
+def license_basis(doc: dict, entries) -> tuple:
+    """What one commit says about the license: the model card's license fields, and the top-level license files of the
+    repository with their blob ids."""
+    card = doc.get("cardData") if isinstance(doc.get("cardData"), dict) else {}
+    fields = tuple(json.dumps(card.get(key), sort_keys=True) for key in LICENSE_FIELDS)
+    files = frozenset((path, str(entry.get("oid"))) for path, entry in tree_files(entries).items()
+                      if "/" not in path and path.upper().startswith(LICENSE_FILES))
+    return fields, files
+
+
+NOT_REVIEWED = (f"the license recorded in {MODELS_FILE} (and in the revision table of {MODELS_DOC}, where it lists the "
+                "model) was not re-reviewed")
+
+
+def license_change(net: Net, repo: str, was: str, doc: dict, head: str) -> str:
+    """'' when the model card's license fields and the contents of the top-level license files are the same at both
+    commits (a file renamed with the same content is the same); otherwise a note that the license the catalog records
+    was not re-reviewed. A bump is never held back for it."""
+    try:
+        before = license_basis(net.revision(repo, was), net.tree(repo, was))
+    except HttpStatus as exc:      # an old commit that a rewritten history no longer serves
+        if exc.code not in GONE_STATUSES:
+            raise
+        return f"the license at {md_code(short(was))} could not be read: {NOT_REVIEWED}"
+    after = license_basis(doc, net.tree(repo, head))
+    what = []
+    if before[0] != after[0]:
+        what.append("the model card's license fields")
+    if sorted(oid for _, oid in before[1]) != sorted(oid for _, oid in after[1]):
+        what.append("the license files " + paths(sorted({path for path, _ in before[1] ^ after[1]})))
+    return f"license changed ({' and '.join(what)}): {NOT_REVIEWED}" if what else ""
+
+
+def follow_models_doc(root: pathlib.Path, rows: list, write_it: bool) -> bool:
+    """Move each moved publisher snapshot in the revision table of docs/MODELS.md: the row that starts with the model id
+    in code and names the old commit in full. A model the table does not list is left alone; a model whose rows do not
+    name the old commit exactly once is noted on its pin row. Returns whether the page changed (and was written, with
+    write_it)."""
+    path = root / MODELS_DOC
+    try:
+        lines = path.read_text(encoding="utf-8").split("\n")
+    except FileNotFoundError:
+        lines = []
+    changed = False
+    for row in rows:
+        model_id, old, new = row.move
+        listed = [i for i, line in enumerate(lines) if line.startswith(f"| `{model_id}` |")]
+        if not listed:
+            continue
+        hits = [i for i in listed if f"`{old}`" in lines[i]]
+        if len(hits) != 1:
+            row.detail = joined(row.detail, f"{MODELS_DOC} lists the model without one row naming the old commit; "
+                                            "its revision table was not changed")
+            continue
+        lines[hits[0]] = lines[hits[0]].replace(f"`{old}`", f"`{new}`")
+        changed = True
+    if changed and write_it:
+        path.write_text("\n".join(lines), encoding="utf-8", newline="\n")
+    return changed
 
 
 def report_new_models(net: Net, pins: dict, catalog: dict, decisions: list, today: str, rows: list):
@@ -580,33 +750,44 @@ def report_new_models(net: Net, pins: dict, catalog: dict, decisions: list, toda
 
 
 def run(net: Net, root: pathlib.Path, apply: bool, today: str):
-    pins_path = root / PINS_FILE
+    pins_path, models_path = root / PINS_FILE, root / MODELS_FILE
     pins = json.loads(pins_path.read_text(encoding="utf-8"))
     before = json.dumps(pins, indent=2)
-    catalog = {model["id"]: model for model in json.loads((root / MODELS_FILE).read_text(encoding="utf-8"))["models"]}
+    models = json.loads(models_path.read_text(encoding="utf-8"))
+    models_before = json.dumps(models, indent=2)
+    catalog = {model["id"]: model for model in models["models"]}
     decisions = hf_decisions(json.loads((root / DISCOVERY_FILE).read_text(encoding="utf-8")))
     measured = published_use(root)
     rows, touched = [], []
 
     for entry in pins["artifacts"]:
         bump_artifact(net, entry, measured, rows)
-    moved = [row for row in rows if row.status == "bump"]
     report_unpinned(pins, measured, rows)
     for entry in pins["artifacts"]:
-        report_publisher(net, entry, catalog, rows)
+        bump_publisher(net, entry, catalog, rows, today)
+    moved = [row for row in rows if row.status == "bump"]
     first_new = len(rows)
     report_new_models(net, pins, catalog, decisions, today, rows)
     new_models = [row for row in rows[first_new:] if row.status == "manual"]
 
-    changed = json.dumps(pins, indent=2) != before
+    pins_changed = json.dumps(pins, indent=2) != before
+    models_changed = json.dumps(models, indent=2) != models_before
+    doc_changed = follow_models_doc(root, [row for row in moved if row.move], apply)
+    changed = pins_changed or models_changed
     if not apply:  # report mode: nothing was bumped, only found
         for row in rows:
             row.changed = False
-    if changed:
+    if pins_changed:
         pins["checked_on"] = today
         if apply:
             pins_path.write_text(json.dumps(pins, indent=2) + "\n", encoding="utf-8", newline="\n")
             touched.append(PINS_FILE)
+    if models_changed and apply:
+        # json.dumps(indent=2) of the parsed catalog is byte-identical to the file as the repository keeps it.
+        models_path.write_text(json.dumps(models, indent=2) + "\n", encoding="utf-8", newline="\n")
+        touched.append(MODELS_FILE)
+        if doc_changed:
+            touched.append(MODELS_DOC)
     manual = [row for row in rows if row.status == "manual"]
     failures = [row for row in rows if row.status == "failed"]
     return {"rows": rows, "changed": changed, "applied": apply and changed, "touched": touched,
@@ -642,7 +823,10 @@ def summary_text(result: dict, issue: bool, rows: list) -> str:
     if result["moved"] and not issue:
         lines += ["", "### What moved and what it means for the next run", ""]
         lines += [f"- **{r.name}**: {md_code(r.pinned)} to {md_code(r.latest)}: {r.detail}" for r in result["moved"]]
-        lines += ["", MOVED_NOTE]
+        if any(r.kind == "artifact" for r in result["moved"]):
+            lines += ["", MOVED_NOTE]
+        if any(r.kind == "publisher" for r in result["moved"]):
+            lines += ["", PUBLISHER_NOTE]
         if result["touched"]:
             lines += ["", "Rewritten: " + ", ".join(f"`{rel}`" for rel in result["touched"]) + "."]
     if manual:
@@ -710,7 +894,8 @@ def emit(text, stream=None):
 
 def parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--apply", action="store_true", help="rewrite catalog/model-artifacts.json where a pin moved")
+    ap.add_argument("--apply", action="store_true",
+                    help="rewrite catalog/model-artifacts.json, catalog/models.json and docs/MODELS.md where a pin moved")
     ap.add_argument("--summary", metavar="FILE", help="write the Markdown pull request body here")
     ap.add_argument("--issue-summary", metavar="FILE", help="write the Markdown tracking-issue body here")
     ap.add_argument("--github-output", action="store_true", help="append changed=/manual=/failed= to $GITHUB_OUTPUT")

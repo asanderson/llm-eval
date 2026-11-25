@@ -908,16 +908,16 @@
       "sources": [
         "https://huggingface.co/Qwen/Qwen3.8-27B"
       ],
-      "source_revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+      "source_revision": "37561816e66b5b9153b1b64c10968c18c1e6f4a0",
       "artifact_revision": null,
       "artifact_status": "selection_and_hashing_required",
       "hardware_validation": "not_measured",
-      "checked_on": "2026-10-05",
+      "checked_on": "2026-11-25",
       "max_context_for_initial_plan": 32768,
       "default_context_tokens": 8192,
       "upstream_metadata": {
         "id": "Qwen/Qwen3.8-27B",
-        "sha": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+        "sha": "37561816e66b5b9153b1b64c10968c18c1e6f4a0",
         "gated": false,
         "safetensors": {
           "parameters": {
@@ -946,16 +946,16 @@
       "sources": [
         "https://huggingface.co/Qwen/Qwen3.5-35B-A3B"
       ],
-      "source_revision": "59d61f3ce65a6d9863b86d2e96597125219dc754",
+      "source_revision": "2508b2437e382c605eb0fc52b83f5545960f6b4a",
       "artifact_revision": null,
       "artifact_status": "selection_and_hashing_required",
       "hardware_validation": "not_measured",
-      "checked_on": "2026-10-05",
+      "checked_on": "2026-11-25",
       "max_context_for_initial_plan": 32768,
       "default_context_tokens": 8192,
       "upstream_metadata": {
         "id": "Qwen/Qwen3.5-35B-A3B",
-        "sha": "59d61f3ce65a6d9863b86d2e96597125219dc754",
+        "sha": "2508b2437e382c605eb0fc52b83f5545960f6b4a",
         "gated": false,
         "safetensors": {
           "parameters": {
@@ -1240,17 +1240,17 @@
         "https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503",
         "https://github.com/LiveBench/new-livebench/blob/caa4253c8a3aa93b5c7ec234e681d4f120a20240/public/table_2025_04_25.csv"
       ],
-      "source_revision": "68faf511d618ef198fef186659617cfd2eb8e33a",
+      "source_revision": "6422280d08bb8453a133c022ef110d6fdef41559",
       "artifact_revision": null,
       "artifact_status": "selection_and_hashing_required",
       "hardware_validation": "not_measured",
-      "checked_on": "2026-10-05",
+      "checked_on": "2026-11-25",
       "max_context_for_initial_plan": 32768,
       "default_context_tokens": 8192,
       "planning_weight_gib": 44.7,
       "upstream_metadata": {
         "id": "mistralai/Mistral-Small-3.1-24B-Instruct-2503",
-        "sha": "68faf511d618ef198fef186659617cfd2eb8e33a",
+        "sha": "6422280d08bb8453a133c022ef110d6fdef41559",
         "gated": false,
         "safetensors": {
           "parameters": {

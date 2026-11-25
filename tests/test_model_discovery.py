@@ -1617,7 +1617,8 @@ class ParameterTest(Base):
         meta = lambda cid: BY_ID[cid]['upstream_metadata']['safetensors']
         names = lambda cid: md.tokens(BY_ID[cid]['upstream_repo'], BY_ID[cid]['upstream_repo'].split('/')[0])
         p = md.parameter_count(meta('qwen38-27b'), names('qwen38-27b'), self.B)
-        self.assertEqual((p.kind, p.value), ('float', 27_781_427_952))
+        # Read from the catalog: the nightly model pin check moves this publisher snapshot, counts included.
+        self.assertEqual((p.kind, p.value), ('float', meta('qwen38-27b')['total']))
         p = md.parameter_count(meta('qwen38-flash-next-strata'), names('qwen38-flash-next-strata'), self.B)
         self.assertEqual((p.kind, p.value), ('float', 179_999_981_459))   # 35 I64 elements: still float
         p = md.parameter_count(meta('nemotron-super-120b'), names('nemotron-super-120b'), self.B)
