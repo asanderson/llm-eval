@@ -4,6 +4,8 @@ from llm_eval.core.contracts import fields, integer
 from llm_eval.common import finite_number, read_json
 from llm_eval.adapters import configured_endpoint
 from llm_eval.runner import load_suite
+from .workload import selected_tasks
+from .metrics import report_supplement
 
 MANIFEST={'id':'decision-models','version':1,'modes':['decision','replay','live'],
           'description':'Decision model accuracy, and the quality, latency and cost of the generators they route to'}
@@ -11,7 +13,7 @@ MANIFEST={'id':'decision-models','version':1,'modes':['decision','replay','live'
 
 def validate(case, root, mode='decision'):
     fields(case, {'suite','router','candidates','replay','policy','repeats','warmups','synthetic','save_outputs',
-                  'budget_usd','max_output_tokens','seed','temperature','request_concurrency'}, ['suite','router'])
+                  'split','task_ids','budget_usd','max_output_tokens','seed','temperature','request_concurrency'}, ['suite','router'])
     integer(case.get('repeats',1),'repeats',high=100)
     integer(case.get('warmups',0),'warmups',low=0,high=20)
     integer(case.get('max_output_tokens',256),'max_output_tokens',high=8192)
@@ -19,7 +21,7 @@ def validate(case, root, mode='decision'):
     integer(case.get('seed',1),'seed',low=0,high=2**31-1)
     finite_number(case.get('temperature',0),'temperature',0,2)
     finite_number(case.get('budget_usd',0),'budget_usd',0)
-    suite=load_suite(case['suite']);router=case['router']
+    suite=load_suite(case['suite']);tasks=selected_tasks(suite,case);router=case['router']
     fields(router, {'kind','choice','default_category','keywords','platform','model','model_revision','endpoint',
                     'instructions','criteria','timeout_s','api_key_env','network','pricing','context_tokens'}, ['kind'])
     if router['kind']=='fixed':
@@ -58,11 +60,17 @@ def validate(case, root, mode='decision'):
     fields(policy.get('objective',{}),{'quality_weight','latency_weight','cost_weight'})
     for k,v in policy.get('objective',{}).items():finite_number(v,k,0)
     if policy.get('fallback') and policy['fallback'] not in candidates:raise ValueError('Unknown fallback candidate')
-    for t in suite['tasks']:
+    for t in tasks:
         if 'eligible_candidates' in t and (not t['eligible_candidates'] or set(t['eligible_candidates'])-set(candidates)):raise ValueError('Unknown eligible candidate')
     if mode=='replay':
-        from .evaluation import corpus_index, candidate_fingerprint
+        from .evaluation import corpus_index, candidate_fingerprint, generation_settings
         corpus=read_json(case['replay']);corpus_index(corpus,suite)
+        if corpus.get('synthetic') and not case.get('synthetic'):
+            raise ValueError('A synthetic replay corpus requires synthetic: true')
+        if 'generation' in corpus and corpus['generation']!=generation_settings(case):
+            raise ValueError('Replay generation settings mismatch')
+        if 'split' in corpus and corpus['split']!=case.get('split'):
+            raise ValueError('Replay split mismatch')
         for cid,c in candidates.items():
             if corpus.get('candidate_fingerprints',{}).get(cid)!=candidate_fingerprint(c):raise ValueError('Replay candidate fingerprint mismatch')
         for row in corpus['rows']:

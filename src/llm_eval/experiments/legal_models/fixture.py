@@ -177,7 +177,47 @@ def _claims_stated(output, matter, gold, corpus, versions):
     return True
 
 
-def score(output, matter, gold, corpus, shown=None):
+CITATION_SECTIONS = ('issues', 'claims', 'adverse_authorities')
+CITATION_STAGES = ('attempted', 'resolved', 'eligible', 'checked', 'correct')
+
+
+def citation_counts(output, corpus):
+    """Count citation occurrences by output section. An issue has no pinpoint field in candidate output v1."""
+    versions = {(a['authority_id'], a['version']): a['pinpoint'] for a in corpus['authorities']}
+    result = {}
+    for section in CITATION_SECTIONS:
+        counts = dict.fromkeys(CITATION_STAGES, 0)
+        for item in output[section]:
+            if 'authority_id' not in item:
+                continue
+            counts['attempted'] += 1
+            expected = versions.get((item['authority_id'], item['version']))
+            if expected is None:
+                continue
+            counts['resolved'] += 1
+            if section == 'issues':
+                continue
+            counts['eligible'] += 1
+            if 'pinpoint' in item:
+                counts['checked'] += 1
+                counts['correct'] += item['pinpoint'] == expected
+        result[section] = counts
+    return result
+
+
+def citation_criteria(counts):
+    attempted, resolved, eligible, _, correct = (sum(group[k] for group in counts.values()) for k in CITATION_STAGES)
+    return {'citations_resolve': resolved == attempted if attempted else None,
+            'pinpoints_correct': correct == eligible if eligible else None}
+
+
+def criteria_pass(criteria):
+    """Only the two conditional checks can be inapplicable on a scored, valid output."""
+    return all(value is True or (value is None and name in ('citations_resolve', 'pinpoints_correct'))
+               for name, value in criteria.items())
+
+
+def score(output, matter, gold, corpus, shown=None, *, counts=None):
     """{criterion: passed} for one output against its grader entry, always exactly the keys of CRITERIA. All must pass for
     the matter to pass. `shown`: the span ids shown to the author, when not every span was (None: all of them)."""
     try:
@@ -216,8 +256,7 @@ def score(output, matter, gold, corpus, shown=None):
         'untrusted_instruction_flagged': flagged == injected,
         'evidence_grounding': _grounded(output, gold, errors),
         'claim_status': _claims_stated(output, matter, gold, corpus, versions),
-        'citations_resolve': not errors & {'fabricated_citation', 'unknown_version'},
-        'pinpoints_correct': 'pinpoint_mismatch' not in errors,
+        **citation_criteria(counts if counts is not None else citation_counts(output, corpus)),
         'insufficiency_flagged': {f['code'] for f in output['verification_flags'] if f['code'] in INSUFFICIENCY_FLAGS[:2]} == insufficient,
     }
 
@@ -264,7 +303,7 @@ def check(parameters, suite, root, mode):
 
 
 def run(job, suite, output, root):
-    from . import BENCHMARK, MANIFEST
+    from . import BENCHMARK, MANIFEST, grading
     parameters = job['parameters']
     gold = {g['matter_id']: g for g in suite['rubric']['matters']}
     rows, drafts, details = [], [], []
@@ -273,18 +312,19 @@ def run(job, suite, output, root):
         started = time.perf_counter()
         candidate = draft(matter, suite['corpus'], parameters.get('top_k', 3))
         elapsed = time.perf_counter() - started
-        criteria = score(candidate, matter, entry, suite['corpus'])
+        counts = citation_counts(candidate, suite['corpus'])
+        criteria = score(candidate, matter, entry, suite['corpus'], counts=counts)
         expected = entry['recommendation']
         rows.append({'task_id': matter['matter_id'], 'family_id': matter['family_id'], 'category': entry['scenario'], 'arm': 'smoke',
                      'benchmark': BENCHMARK, 'status': 'ok', 'repetition': 0, 'warmup': False, 'synthetic': True,
                      'execution_kind': 'fixture', 'data_class': suite['lock']['data_class'], 'elapsed_s': elapsed,
                      'parse_status': 'valid' if criteria['schema_valid'] else 'invalid', 'review_status': 'pending_human_review',
                      'expected_choice': expected, 'choice': candidate['recommendation'], 'decision_correct': candidate['recommendation'] == expected,
-                     'quality_check_applicable': True, 'quality_pass': all(criteria.values()),
-                     'criteria_passed': sum(criteria.values()), 'criteria_total': len(CRITERIA)})
+                     'quality_check_applicable': True, 'quality_pass': criteria_pass(criteria),
+                     'criteria_passed': sum(v is True for v in criteria.values()), 'criteria_total': len(CRITERIA)})
         drafts.append(candidate)
         details.append({'matter_id': matter['matter_id'], 'family_id': matter['family_id'], 'arm': 'smoke', 'repetition': 0, 'status': 'ok',
-                        'grading_status': 'scored', 'criteria': criteria, 'errors': [], 'pending_dimensions': [], 'reviewed_dimensions': {},
+                        'grading_status': 'scored', 'criteria': criteria, 'citation_counts': counts, 'errors': [], 'pending_dimensions': [], 'reviewed_dimensions': {},
                         'adjudicated': [], 'gold_recommendation': expected, 'choice': candidate['recommendation'],
                         'author_choice': candidate['recommendation'], 'complete': not entry['missing_elements'] and not entry['conflict_elements']})
     # Candidate drafts and grader detail stay under local/. The generic report builder exports files by name at any depth,
@@ -298,5 +338,5 @@ def run(job, suite, output, root):
         'data_class': lock['data_class'], 'benchmark_id': lock['benchmark_id'], 'suite_revision': lock['revision'],
         'split_id': lock['split_id'], 'jurisdiction_profile': lock['jurisdiction_profile'], 'suite_lock_sha256': suite['lock_sha256'],
         'rubric_version': suite['rubric']['rubric_version'], 'matters': len(rows), 'families': len({r['family_id'] for r in rows}),
-        'all_pass': sum(r['quality_pass'] for r in rows), 'review_required': True})
+        'all_pass': sum(r['quality_pass'] for r in rows), 'review_required': True, 'scorer_version': grading.SCORER_VERSION})
     return {'status': 'succeeded', 'result_path': '.', 'benchmark': BENCHMARK}

@@ -23,15 +23,15 @@ from llm_eval.core.contracts import atomic_json, fields, integer
 
 from . import authority, contracts, fixture, profiles
 
-SCORER_VERSION = 'legal-scorer-1'
+SCORER_VERSION = 'legal-scorer-2'
 CHECKS = ('schema', 'source_exists', 'version', 'pinpoint', 'scope', 'span_digest', 'quote_fidelity')
 PENDING_DIMENSIONS = ('semantic_entailment', 'admissibility', 'defense_arguments', 'sufficiency')
 REASONS = ('schema_invalid', 'fabricated_citation', 'unknown_version', 'pinpoint_mismatch', 'unknown_span', 'ineligible_version',
            'unverified_validity', 'out_of_scope_citation', 'unsupportive_citation', 'unsupported_charge', 'span_digest_mismatch',
-           'quote_mismatch', 'wrong_version', 'false_charge', 'dangerous_commitment', 'absent_element')
+           'quote_mismatch', 'wrong_version', 'false_charge', 'dangerous_commitment', 'missing_pinpoint', 'absent_element')
 CRITICAL = REASONS[:-1]                    # every code but absent_element
 CHECK_OF = {'schema_invalid': 'schema', 'fabricated_citation': 'source_exists', 'unknown_version': 'source_exists',
-            'unknown_span': 'source_exists', 'pinpoint_mismatch': 'pinpoint', 'ineligible_version': 'version',
+            'unknown_span': 'source_exists', 'missing_pinpoint': 'pinpoint', 'pinpoint_mismatch': 'pinpoint', 'ineligible_version': 'version',
             'unverified_validity': 'version', 'out_of_scope_citation': 'scope', 'unsupportive_citation': 'scope',
             'unsupported_charge': 'scope', 'span_digest_mismatch': 'span_digest', 'quote_mismatch': 'quote_fidelity'}
 QUOTES = re.compile('"([^"]*)"|\u201c([^\u201c\u201d]*)\u201d|\u00ab([^\u00ab\u00bb]*)\u00bb|\u2018([^\u2018\u2019]*)\u2019(?!\\w)'
@@ -70,13 +70,15 @@ def verify(output, matter, corpus, evidence, shown=None) -> dict:
     first_record = versions.get((first['authority_id'], first['version'])) if first else None
     found = []
 
-    def cite(item):
+    def cite(item, needs_pinpoint=False):
         """Codes of one citation and its record (also for a pinpoint mismatch), with the shared decision."""
         resolved = authority.resolve_citation({k: item[k] for k in ('authority_id', 'version', 'pinpoint') if k in item}, corpus, matter)
         codes = [] if resolved['resolved'] else list(resolved['reason_codes'])
         record = resolved['authority']
         if record is None:
             return codes, None, None
+        if needs_pinpoint and 'pinpoint' not in item:
+            codes.append('missing_pinpoint')
         if context and _key(item) not in listed:
             codes.append('out_of_scope_citation')
         return codes, record, authority.decide(record, matter, corpus)[0]
@@ -110,7 +112,7 @@ def verify(output, matter, corpus, evidence, shown=None) -> dict:
                                              or (record['authority_type'] == 'exemption' and record.get('relates_to') == first_record['authority_id']))
     claims = []
     for claim in output['claims']:
-        codes, record, decision = cite(claim)
+        codes, record, decision = cite(claim, needs_pinpoint=True)
         if record is not None:
             if decision == 'ineligible' and claim['status'] != 'insufficient':
                 codes.append('ineligible_version')
@@ -124,7 +126,7 @@ def verify(output, matter, corpus, evidence, shown=None) -> dict:
                 if len(quoted) >= MIN_QUOTE and quoted not in text:
                     codes.append('quote_mismatch')
         claims.append({'claim_id': claim['claim_id'], 'codes': codes,
-                       'locator': {'authority_id': claim['authority_id'], 'version': claim['version'], 'pinpoint': claim['pinpoint']}})
+                       'locator': {'authority_id': claim['authority_id'], 'version': claim['version'], 'pinpoint': claim.get('pinpoint')}})
     charge = output['recommendation'] == 'charge'
     elements = []
     for element in output['elements']:
@@ -134,7 +136,7 @@ def verify(output, matter, corpus, evidence, shown=None) -> dict:
         elements.append({'element_id': element['element_id'], 'codes': codes,
                          'locator': {'span_ids': element['evidence_span_ids'] + element['adverse_span_ids']}})
     for adverse in output['adverse_authorities']:
-        codes, record, decision = cite(adverse)
+        codes, record, decision = cite(adverse, needs_pinpoint=True)
         if record is not None and adverse['status'] == 'established':
             if decision == 'ineligible':
                 codes.append('ineligible_version')
@@ -160,7 +162,8 @@ def verify(output, matter, corpus, evidence, shown=None) -> dict:
 
     def verdict(codes):
         return 'rejected' if any(c in CRITICAL for c in codes) else 'unverified' if codes else 'checks_passed'
-    return {'status': 'passed' if all(checks.values()) else 'failed', 'checks': checks,
+    checks['pinpoint'] = fixture.citation_criteria(fixture.citation_counts(output, corpus))['pinpoints_correct']
+    return {'status': 'failed' if False in checks.values() else 'passed', 'checks': checks,
             'claims': [{'claim_id': c['claim_id'], 'verdict': verdict(c['codes']), 'reason_codes': _ordered(c['codes']), 'locator': c['locator']}
                        for c in claims],
             'elements': [{'element_id': e['element_id'], 'verdict': verdict(e['codes']), 'reason_codes': _ordered(e['codes']),
@@ -189,7 +192,9 @@ def _errors(output, matter, gold, corpus):
         if key not in versions:
             add('wrong_version', locator)      # the authority exists, the cited version does not
             return None
-        if 'pinpoint' in item and item['pinpoint'] != versions[key]['pinpoint']:
+        if name != 'issues' and 'pinpoint' not in item:
+            add('missing_pinpoint', locator)
+        elif 'pinpoint' in item and item['pinpoint'] != versions[key]['pinpoint']:
             add('pinpoint_mismatch', locator)
         if support and key in ineligible:
             add('wrong_version', locator)
@@ -240,13 +245,12 @@ def grade(output, matter, gold, corpus, evidence=None, review=None) -> dict:
             contracts.validate_structure(output, matter)
         except ValueError:
             valid = False
+    counts = fixture.citation_counts(output, corpus) if valid else None
     if gold is None:
         criteria = {name: None for name in fixture.CRITERIA}
         errors = []
         if valid:
-            codes = {e['code'] for e in contracts.reference_errors(output, matter, corpus)}
-            criteria.update(schema_valid=True, citations_resolve=not codes & {'fabricated_citation', 'unknown_version'},
-                            pinpoints_correct='pinpoint_mismatch' not in codes)
+            criteria.update(schema_valid=True, **fixture.citation_criteria(counts))
             errors = _errors(output, matter, None, corpus)
         else:
             criteria.update(schema_valid=False, citations_resolve=False, pinpoints_correct=False)
@@ -258,11 +262,11 @@ def grade(output, matter, gold, corpus, evidence=None, review=None) -> dict:
         status = 'scored'
     else:
         shown = [p['passage_id'] for p in evidence['evidence']] if evidence is not None else None
-        criteria = fixture.score(output, matter, gold, corpus, shown)
+        criteria = fixture.score(output, matter, gold, corpus, shown, counts=counts)
         errors = _errors(output, matter, gold, corpus)
         status = 'scored'
     critical = _ordered(e['code'] for e in errors if e['critical'])
-    return {'grading_status': status, 'criteria': criteria, 'errors': errors, **base,
+    return {'grading_status': status, 'criteria': criteria, 'citation_counts': counts, 'errors': errors, **base,
             'adjudicated': [c for c in critical if c in adjudications]}
 
 
@@ -306,7 +310,7 @@ def decision_fields(status, graded, verified, choice, review=None) -> dict:
     _, adjudications = _review_of(review)
     scored = graded['grading_status'] == 'scored'
     critical = critical_codes(graded, verified)
-    passed = scored and all(v is True for v in graded['criteria'].values()) and 'fail' not in graded['reviewed_dimensions'].values() \
+    passed = scored and fixture.criteria_pass(graded['criteria']) and 'fail' not in graded['reviewed_dimensions'].values() \
         and not _standing(critical, adjudications)
     return {'grading_status': graded['grading_status'], 'review_status': review_status(graded, critical, review),
             'quality_check_applicable': scored, 'quality_pass': passed if scored else None,
@@ -318,11 +322,13 @@ def decision_fields(status, graded, verified, choice, review=None) -> dict:
 
 
 def detail(matter, arm, repetition, status, graded, verified, choice, author_choice, gold, review=None) -> dict:
-    """Score-detail record v1. `errors` holds what `grade` found, as `{code, critical}` (distinct, REASONS order; the
+    """Score-detail record. `citation_counts` holds the counts from an auditable final output, otherwise None.
+    `errors` holds what `grade` found, as `{code, critical}` (distinct, REASONS order; the
     locators can hold model-written strings and are not written); `verifier_codes` holds the verifier's critical codes;
     `adjudicated` the critical codes a review adjudicated and `dismissed` those it dismissed (`upheld: false`)."""
     base = {'matter_id': matter['matter_id'], 'family_id': matter['family_id'], 'arm': arm, 'repetition': repetition, 'status': status,
-            'verifier_codes': _ordered(verified), 'choice': choice, 'author_choice': author_choice}
+            'verifier_codes': _ordered(verified), 'choice': choice, 'author_choice': author_choice,
+            'citation_counts': graded['citation_counts'] if graded else None}
     if graded is None:
         return {**base, 'grading_status': 'not_applicable', 'criteria': {name: None for name in fixture.CRITERIA}, 'errors': [],
                 'pending_dimensions': [], 'reviewed_dimensions': {}, 'adjudicated': [], 'dismissed': [],
@@ -349,7 +355,7 @@ def deferral_detail(matter, arm, repetition, gold, reason) -> dict:
     """Score-detail record of a selector deferral: every criterion False, no error, the workflow choice `defer`, and the
     route reason under `selector_deferral` (an insufficiency label or `no_eligible_candidate`)."""
     return {'matter_id': matter['matter_id'], 'family_id': matter['family_id'], 'arm': arm, 'repetition': repetition, 'status': 'ok',
-            'verifier_codes': [], 'choice': 'defer', 'author_choice': None, 'grading_status': 'scored',
+            'verifier_codes': [], 'choice': 'defer', 'author_choice': None, 'grading_status': 'scored', 'citation_counts': None,
             'criteria': {name: False for name in fixture.CRITERIA}, 'errors': [], 'pending_dimensions': [], 'reviewed_dimensions': {},
             'adjudicated': [], 'dismissed': [], 'gold_recommendation': gold['recommendation'] if gold else None,
             'complete': (not gold['missing_elements'] and not gold['conflict_elements']) if gold else None, 'selector_deferral': reason}
@@ -358,11 +364,19 @@ def deferral_detail(matter, arm, repetition, gold, reason) -> dict:
 # Aggregate metrics ----------------------------------------------------------------------------------------------------
 
 _CHOICES = contracts.RECOMMENDATIONS
+CITATION_RATES = {'resolution_rate': ('resolved', 'attempted'), 'pinpoint_coverage': ('checked', 'eligible'),
+                  'pinpoint_accuracy': ('correct', 'checked')}
+CITATION_COUNTS = (*fixture.CITATION_STAGES, 'unresolved', 'pinpoint_not_applicable', 'missing_pinpoint', 'incorrect')
+CITATION_METRICS = (*(f'{scope}.{stage}' for scope in ('citation', 'claim')
+                      for stage in (*CITATION_COUNTS, *CITATION_RATES)),
+                    *('matter.' + rate for rate in CITATION_RATES))
 METRICS = ('all_pass', 'all_pass_deterministic', 'all_pass_reviewed', *('criterion.' + c for c in fixture.CRITERIA), *('error.' + c for c in REASONS),
            'author_false_charge', 'workflow_false_charge', 'author_false_defer', 'workflow_false_defer', 'author_dangerous_commitment',
            'workflow_dangerous_commitment', 'abstention', 'forced_defer',
            *(f'confusion.{g}.{a}' for g in _CHOICES for a in _CHOICES + ('none',)), *(f'workflow_confusion.{g}.{c}' for g in _CHOICES for c in _CHOICES),
-           'critical_errors', 'critical_unreviewed', 'missing.pending', 'missing.unavailable', 'missing.no_response')
+           'critical_errors', 'critical_unreviewed', 'critical_standing', 'missing.pending', 'missing.unavailable', 'missing.no_response', *CITATION_METRICS)
+# Rebuilding a v1 projection must reproduce its original metric set, values and order.
+V1_METRICS = tuple(name for name in METRICS if name not in CITATION_METRICS and name not in ('error.missing_pinpoint', 'critical_standing'))
 
 
 def _rate(numerator, denominator):
@@ -370,7 +384,9 @@ def _rate(numerator, denominator):
 
 
 def _passes(d):
-    return all(v is True for v in d['criteria'].values())
+    if 'citation_counts' not in d:      # original scorer required every criterion to be true
+        return all(v is True for v in d['criteria'].values())
+    return fixture.criteria_pass(d['criteria'])
 
 
 def _union(d):
@@ -409,6 +425,51 @@ def _indicator(d, metric):
     raise ValueError('Unknown per-record metric: ' + str(metric))
 
 
+def criterion_records(details, name):
+    """V2 counts only outputs with a checkable criterion. V1 stored booleans without applicability."""
+    if name not in ('citations_resolve', 'pinpoints_correct'):
+        return details
+    return [d for d in details if 'citation_counts' not in d or
+            (d['citation_counts'] is not None and d['criteria'][name] is not None)]
+
+
+def citation_metrics(details):
+    """Citation occurrences, the material-claim subset and distinct matters, with each metric's contributing matters."""
+    audited = [d for d in details if d['grading_status'] == 'scored' and d.get('citation_counts') is not None]
+    all_matters = {d['matter_id'] for d in details}
+    out = {}
+    for scope in ('citation', 'claim'):
+        rows = []
+        by_matter = {}
+        for d in audited:
+            sections = d['citation_counts'].values() if scope == 'citation' else [d['citation_counts']['claims']]
+            counts = {key: sum(section[key] for section in sections) for key in fixture.CITATION_STAGES}
+            counts['unresolved'] = counts['attempted'] - counts['resolved']
+            counts['pinpoint_not_applicable'] = counts['attempted'] - counts['eligible']
+            counts['missing_pinpoint'] = counts['eligible'] - counts['checked']
+            counts['incorrect'] = counts['checked'] - counts['correct']
+            matter = d['matter_id']
+            rows.append((matter, counts))
+            total = by_matter.setdefault(matter, dict.fromkeys(counts, 0))
+            for key, count in counts.items():
+                total[key] += count
+        for stage in CITATION_COUNTS:
+            value = sum(counts[stage] for _, counts in rows) if rows else None
+            contributors = {matter for matter, counts in rows if counts[stage]}
+            out[f'{scope}.{stage}'] = ({'value': value, 'n': len(rows), 'missing': len(details) - len(rows)}, contributors)
+        for rate, (num, den) in CITATION_RATES.items():
+            applicable = [(matter, counts) for matter, counts in rows if counts[den]]
+            contributors = {matter for matter, _ in applicable}
+            n = sum(counts[den] for _, counts in applicable)
+            value = _rate(sum(counts[num] for _, counts in applicable), n)
+            out[f'{scope}.{rate}'] = ({'value': value, 'n': n, 'missing': len(details) - len(applicable)}, contributors)
+            if scope == 'citation':
+                passed = sum(by_matter[m][num] == by_matter[m][den] for m in contributors)
+                out['matter.' + rate] = ({'value': _rate(passed, len(contributors)), 'n': len(contributors),
+                                          'missing': len(all_matters - contributors)}, contributors)
+    return out
+
+
 def aggregate(details) -> dict:
     """{metric: {'value', 'n', 'missing'}} over the score-detail records of one arm. Only `scored` records are in a
     denominator; every other record is counted in `missing` and in exactly one of `missing.pending`, `missing.unavailable`
@@ -438,7 +499,8 @@ def aggregate(details) -> dict:
     if len(full) < len(scored):
         out['all_pass_reviewed']['value'] = None      # undecided while any scored record waits for review
     for name in fixture.CRITERIA:
-        put('criterion.' + name, scored, lambda d, name=name: d['criteria'].get(name) is True)
+        applicable = criterion_records(scored, name)
+        put('criterion.' + name, applicable, lambda d, name=name: d['criteria'].get(name) is True, len(scored) - len(applicable))
     for code in REASONS:
         put('error.' + code, scored, lambda d, code=code: code in {e['code'] for e in d['errors']})
     refused = [d for d in scored if d['gold_recommendation'] in ('decline', 'defer')]
@@ -459,8 +521,10 @@ def aggregate(details) -> dict:
                                                   'n': len(scored), 'missing': missing}
     put('critical_errors', scored, lambda d: bool(_union(d)))
     put('critical_unreviewed', scored, lambda d: bool(_union(d) - set(d['adjudicated'])))
+    put('critical_standing', scored, lambda d: bool(standing_critical(d)))
     for name, count in (('missing.pending', pending), ('missing.unavailable', unavailable), ('missing.no_response', missing - pending - unavailable)):
         out[name] = {'value': count, 'n': len(details), 'missing': 0}
+    out.update({name: entry for name, (entry, _) in citation_metrics(details).items()})
     return {name: out[name] for name in METRICS}
 
 
@@ -502,12 +566,12 @@ def paired_difference(details_a, details_b, metric='all_pass', seed=1, samples=1
             found[key] = d
         return found
     a, b = index(details_a), index(details_b)
-    pairs, missing = [], 0
-    for key in sorted(set(a) | set(b)):
-        if key in a and key in b and a[key]['grading_status'] == 'scored' and b[key]['grading_status'] == 'scored':
+    pairs = []
+    for key in sorted(a.keys() & b.keys()):
+        records = [a[key], b[key]]
+        if all(d['grading_status'] == 'scored' for d in records) and len(criterion_records(records, metric.removeprefix('criterion.'))) == 2:
             pairs.append(key)
-        else:
-            missing += 1
+    missing = len(a.keys() | b.keys()) - len(pairs)
     families = {}
     for key in pairs:
         families.setdefault(key[0], []).append(Fraction(_indicator(a[key], metric) - _indicator(b[key], metric)))
@@ -565,7 +629,7 @@ def load_review(path, key_path) -> dict:
     """Review file v1 joined to its key table: {'reviewer', 'rubric_version', 'packet_sha256', 'output_manifest_sha256',
     'key', 'items': {(matter_id, arm, repetition): {'verdicts': {dimension: verdict}, 'adjudications': {code: upheld}}}}.
     Closed key sets, no free text. `upheld: true` means the error stands; `upheld: false` dismisses it."""
-    review, _ = contracts.read_json_strict(path)
+    review, review_sha = contracts.read_json_strict(path)
     key, _ = contracts.read_json_strict(key_path)
     fields(key, KEY_KEYS, KEY_KEYS)
     _version_one(key, 'legal-review-key', 'review key')
@@ -620,7 +684,8 @@ def load_review(path, key_path) -> dict:
                     raise ValueError('Malformed review adjudication')
                 target[entry['code']] = entry['upheld']
     return {'reviewer': dict(reviewer), 'rubric_version': review['rubric_version'], 'packet_sha256': review['packet_sha256'],
-            'output_manifest_sha256': key['output_manifest_sha256'], 'key': key, 'items': items}
+            'output_manifest_sha256': key['output_manifest_sha256'], 'key': key, 'items': items,
+            'verdicts': review['verdicts'], 'adjudications': review['adjudications'], 'review_sha256': review_sha}
 
 
 def reviewer_fingerprint(review) -> str | None:
@@ -633,18 +698,26 @@ def agreement(review_a, review_b) -> dict:
     """Agreement and Cohen's kappa of two reviews of one packet over their common (item_id, dimension) keys."""
     if review_a['packet_sha256'] != review_b['packet_sha256']:
         raise ValueError('The reviews belong to another packet')
+    if review_a['rubric_version'] != review_b['rubric_version']:
+        raise ValueError('The reviews belong to different rubric versions')
+    if review_a['reviewer']['reviewer_token'] == review_b['reviewer']['reviewer_token']:
+        raise ValueError('Independent reviews require distinct reviewer tokens')
     a = {(v['item_id'], v['dimension']): v for v in review_a['verdicts']}
     b = {(v['item_id'], v['dimension']): v for v in review_b['verdicts']}
     common = sorted(set(a) & set(b))
     n = len(common)
-    if not n:
-        return {'n': 0, 'agreement': None, 'kappa': None, 'critical_disagreements': []}
-    observed = Fraction(sum(a[k]['verdict'] == b[k]['verdict'] for k in common), n)
+    observed = Fraction(sum(a[k]['verdict'] == b[k]['verdict'] for k in common), n) if n else None
     expected = sum((Fraction(sum(a[k]['verdict'] == label for k in common), n) * Fraction(sum(b[k]['verdict'] == label for k in common), n)
-                    for label in ('pass', 'fail')), Fraction(0))
-    return {'n': n, 'agreement': round(float(observed), 6),
-            'kappa': None if expected == 1 else round(float((observed - expected) / (1 - expected)), 6),
-            'critical_disagreements': [list(k) for k in common if a[k]['critical'] or b[k]['critical']]}
+                    for label in ('pass', 'fail')), Fraction(0)) if n else None
+    disagreed = [k for k in common if a[k]['verdict'] != b[k]['verdict']]
+    critical = [k for k in common if a[k]['critical'] != b[k]['critical'] or
+                (a[k]['critical'] and a[k]['verdict'] != b[k]['verdict'])]
+    adjudications = [{(e['item_id'], e['code']): e['upheld'] for e in review['adjudications']} for review in (review_a, review_b)]
+    x, y = adjudications
+    return {'n': n, 'agreement': round(float(observed), 6) if n else None,
+            'kappa': None if not n or expected == 1 else round(float((observed - expected) / (1 - expected)), 6),
+            'disagreements': [list(k) for k in disagreed], 'critical_disagreements': [list(k) for k in critical],
+            'adjudication_disagreements': [list(k) for k in sorted(x.keys() & y.keys()) if x[k] != y[k]]}
 
 
 # The `score` mode -----------------------------------------------------------------------------------------------------
@@ -828,6 +901,8 @@ def _review(parameters, suite, attempt, manifest_sha, source=None):
     entries = review['key']['items']
     if {(e['matter_id'], e['arm'], e['repetition']) for e in entries} != set(outputs) or digest(_packet(entries, outputs)) != review['packet_sha256']:
         raise ValueError('Review packet does not match the scored outputs')
+    review['expected_adjudications'] = {(e['item_id'], code) for e in entries
+                                        for code in outputs[(e['matter_id'], e['arm'], e['repetition'])]['critical_codes']}
     return review
 
 
@@ -922,16 +997,22 @@ _inside_attempt = contracts.inside_attempt
 
 
 def main(argv=None):
-    """`packet --output-manifest FILE --output DIR [--suite LOCK]`: the blind review packet and its private key table,
+    """Build a blind packet and its private key table, or compare two reviews of a verified packet. Operator files are
     written outside any attempt directory, outside the repository and outside any directory the report builder scans.
     `--suite` names the suite lock when it is no longer at the path the attempt was planned with (an attempt of before
     the rename of the experiment directory, say); the manifest must name that lock's digest either way."""
     parser = argparse.ArgumentParser(prog='python -m llm_eval.experiments.legal_models.grading')
     commands = parser.add_subparsers(dest='command', required=True)
     packet = commands.add_parser('packet', help='write review-packet.json and review-key.json for one output manifest')
-    packet.add_argument('--output-manifest', required=True)
-    packet.add_argument('--output', required=True)
-    packet.add_argument('--suite', help='the suite lock of the outputs; default: the path the attempt was planned with')
+    compare = commands.add_parser('agreement', help='compare two independent human reviews of the same blind packet')
+    for command in (packet, compare):
+        command.add_argument('--output-manifest', required=True)
+        command.add_argument('--output', required=True, help='local directory outside the checkout and campaign attempts')
+        command.add_argument('--suite', help='the suite lock of the outputs; defaults to the path the attempt was planned with')
+    compare.add_argument('--review-key', required=True)
+    for side in ('a', 'b'):
+        compare.add_argument('--review-' + side, required=True)
+        compare.add_argument('--review-' + side + '-seconds', type=int, help='active review time, if recorded')
     args = parser.parse_args(argv)
     path = Path(args.output_manifest).resolve()
     try:
@@ -947,6 +1028,30 @@ def main(argv=None):
     if out.is_relative_to(attempt.resolve()):
         raise ValueError('The review packet must not be written inside an attempt directory')
     contracts.check_output(out / 'review-packet.json', 'The review packet')      # the one rule of every operator command
+    if args.command == 'agreement':
+        source = _source(attempt)
+        reviews = [_review({'review_file': p, 'review_key': args.review_key}, suite, attempt, sha, source)
+                   for p in (args.review_a, args.review_b)]
+        if any(review['reviewer']['kind'] != 'human' for review in reviews):
+            raise ValueError('The agreement command requires two blind human reviews')
+        compared = agreement(*reviews)
+        critical = reviews[0]['expected_adjudications']
+        adjudicated = [{(e['item_id'], e['code']) for e in review['adjudications']} for review in reviews]
+        if any(entries - critical for entries in adjudicated):
+            raise ValueError('Review adjudicates a critical code absent from the packet item')
+        expected = len(reviews[0]['key']['items']) * len(PENDING_DIMENSIONS)
+        seconds = [args.review_a_seconds, args.review_b_seconds]
+        if any(value is not None and value < 0 for value in seconds):
+            raise ValueError('Review time in seconds must be nonnegative')
+        result = {'schema_version': 1, 'kind': 'legal-review-agreement', 'packet_sha256': reviews[0]['packet_sha256'],
+                  'output_manifest_sha256': sha, 'rubric_version': reviews[0]['rubric_version'], 'review_seconds': seconds,
+                  'review_sha256': [r['review_sha256'] for r in reviews],
+                  'expected_verdicts': expected, 'verdicts_per_reviewer': [len(r['verdicts']) for r in reviews],
+                  'double_review_coverage': _rate(compared['n'], expected), 'expected_critical_adjudications': len(critical),
+                  'adjudications_per_reviewer': [len(v) for v in adjudicated],
+                  'double_adjudication_coverage': _rate(len(adjudicated[0] & adjudicated[1]), len(critical)), **compared}
+        atomic_json(contracts.check_output(out / 'review-agreement.json', 'The agreement report'), result)
+        return 0
     outputs = _packet_outputs(attempt, suite)
     review_packet_, key = review_packet([{'matter_id': m, 'arm': a, 'repetition': r, **v} for (m, a, r), v in outputs.items()], sha)
     atomic_json(out / 'review-packet.json', review_packet_)

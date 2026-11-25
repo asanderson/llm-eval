@@ -285,6 +285,7 @@ METADATA = _object({
 DETAIL = _object({
     'matter_id': ID, 'family_id': ID, 'arm': ARM, 'repetition': COUNT, 'status': ID, 'grading_status': ID,
     'criteria': _object({c: _null(BOOL) for c in fixture.CRITERIA}),
+    'citation_counts': _null(_object({s: _object({k: COUNT for k in fixture.CITATION_STAGES}) for s in fixture.CITATION_SECTIONS})),
     'errors': _list(_object({'code': _enum(*grading.REASONS), 'critical': BOOL})), 'verifier_codes': _list(_enum(*grading.REASONS)),
     'pending_dimensions': _list(_enum(*grading.PENDING_DIMENSIONS)), 'reviewed_dimensions': ('map', _enum(*grading.PENDING_DIMENSIONS), _enum('pass', 'fail')),
     'adjudicated': _list(_enum(*grading.CRITICAL)), 'dismissed': _list(_enum(*grading.CRITICAL)), 'gold_recommendation': CHOICE, 'choice': CHOICE,
@@ -531,6 +532,8 @@ def _row_metrics(rows):
 def _denominator(name, details):
     """The score-detail records a `grading.aggregate` metric is computed over (its denominator), as `aggregate` defines them."""
     scored = [d for d in details if d['grading_status'] == 'scored']
+    if name.startswith('criterion.'):
+        return grading.criterion_records(scored, name.split('.')[1])
     if name.startswith('missing.'):
         return details
     if name == 'all_pass_reviewed':
@@ -547,27 +550,39 @@ def _denominator(name, details):
     return scored
 
 
-def _grading_metrics(details):
+def _grading_metrics(details, names):
     try:
         values = grading.aggregate(details)
     except ValueError:
         raise ProjectionRejected('score_detail') from None
-    out = {name: _metric(entry['value'], entry['n'], entry['missing']) for name, entry in values.items()}
-    scored = [d for d in details if d['grading_status'] == 'scored']
+    out = {name: _metric(entry['value'], entry['n'], entry['missing']) for name, entry in values.items() if name in names}
     for name in INTERVAL_METRICS:
+        if name not in out:
+            continue
         families = {}
-        for d in scored:
+        for d in _denominator(name, details):
             families.setdefault(d['family_id'], []).append(grading._indicator(d, name))
         interval = grading.bootstrap(families)
         if interval is not None:
             out[name]['low'], out[name]['high'] = interval
-    return {name: (entry, {d['matter_id'] for d in _denominator(name, details)}) for name, entry in out.items()}
+    citation = grading.citation_metrics(details)
+    return {name: (entry, citation[name][1] if name in citation else {d['matter_id'] for d in _denominator(name, details)})
+            for name, entry in out.items()}
 
 
-def _check_detail(d):
+def _check_detail(d, audit_required=False):
     validate_projection(d, DETAIL, 'score_detail')
     if set(d['criteria']) != set(fixture.CRITERIA):
         _reject('score_detail.criteria')
+    if ('citation_counts' in d) != audit_required:
+        _reject('score_detail.citation_counts')
+    counts = d.get('citation_counts')
+    if counts is not None:
+        for section, stages in counts.items():
+            attempted, resolved, eligible, checked, correct = (stages[k] for k in fixture.CITATION_STAGES)
+            if not (0 <= correct <= checked <= eligible <= resolved <= attempted <= contracts.MAX_ITEMS) or \
+                    eligible != (0 if section == 'issues' else resolved):
+                _reject('score_detail.citation_counts')
 
 
 def _public_job(job, classification, metadata, cohorts):
@@ -698,8 +713,15 @@ def _project(campaign_dir, plan, state, exp, create_salt):
                 else:
                     details = _json_lines(data, 'score_detail')
                     for d in details:
-                        _check_detail(d)
+                        _check_detail(d, metadata.get('scorer_version') == grading.SCORER_VERSION)
                 _bound(attempt, 'local/score-detail.jsonl', data)
+                if metadata.get('scorer_version') == grading.SCORER_VERSION:
+                    for d in details:
+                        counts = d['citation_counts']
+                        if (counts is not None) != (d['criteria']['schema_valid'] is True):
+                            _reject('score_detail.citation_counts')
+                        if counts is not None and any(d['criteria'][k] is not v for k, v in fixture.citation_criteria(counts).items()):
+                            _reject('score_detail.criteria')
             if latest:
                 latest_rows, latest_metadata, latest_details = rows, metadata, details
             head = {'job_id': jid, 'attempt_id': attempt['attempt_id'], 'latest_attempt': latest}
@@ -736,25 +758,33 @@ def _project(campaign_dir, plan, state, exp, create_salt):
             measured = [r for r in latest_rows if not r['warmup']]
             # An invalid answer is an incorrect answer, not an execution failure.
             complete = job_state['status'] == 'succeeded' and not any(r['status'] in ('error', 'missing') for r in measured)
+            grading_names = grading.METRICS if latest_metadata.get('scorer_version') == grading.SCORER_VERSION else grading.V1_METRICS
             by_arm, small = {}, set()
             for arm in arms:
                 rows_a = [r for r in measured if r['arm'] == arm]
                 by_arm[arm] = [d for d in details if d['arm'] == arm]
                 computed = _row_metrics(rows_a)
                 if mode in GRADING_MODES:
-                    computed.update(_grading_metrics(by_arm[arm]))
+                    computed.update(_grading_metrics(by_arm[arm], grading_names))
                 value, sha = cohort(job, latest_metadata, arm)
                 public = {k: (None if k in AUTHOR_KEYS and not exact else v) for k, v in value.items()}
                 digests.append(sha)
                 if reduced and len({r['task_id'] for r in rows_a} | {d['matter_id'] for d in by_arm[arm]}) < MIN_COHORT:
                     # Too few matters for any number: every metric the mode can produce, in one shape with no number in it.
                     small.add(arm)
-                    names = ROW_METRICS + (grading.METRICS if mode in GRADING_MODES else ())
+                    names = ROW_METRICS + (grading_names if mode in GRADING_MODES else ())
                     cohorts.append({'job_id': jid, 'arm': arm, 'cohort_sha256': sha, 'cohort': public, 'suppressed': True, 'run_status': None,
                                     'metrics': {name: dict(SMALL_METRIC) for name in names}})
                     continue
-                metrics = {name: (_suppressed(m) if reduced and m['n'] and len(matters) < MIN_COHORT else m)
+                metrics = {name: (_suppressed(m) if reduced and name not in grading.CITATION_METRICS and m['n'] and len(matters) < MIN_COHORT else m)
                            for name, (m, matters) in computed.items()}
+                # One sparse stage could be reconstructed from adjacent totals or ratios. Withhold the whole
+                # citation table together, including opportunity counts, whenever a stage has too few contributors.
+                audited_matters = {d['matter_id'] for d in by_arm[arm] if d['grading_status'] == 'scored' and d.get('citation_counts') is not None}
+                sparse_audit = (0 < len(audited_matters) < MIN_COHORT or
+                                any(0 < len(ids) < MIN_COHORT for name, (_, ids) in computed.items() if name in grading.CITATION_METRICS))
+                if reduced and sparse_audit:
+                    metrics.update({name: dict(SMALL_METRIC) for name in grading.CITATION_METRICS})
                 cohorts.append({'job_id': jid, 'arm': arm, 'cohort_sha256': sha, 'cohort': public, 'suppressed': False,
                                 'run_status': 'complete' if complete else 'incomplete', 'metrics': metrics})
             if small:

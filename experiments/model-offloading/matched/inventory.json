@@ -1,0 +1,34 @@
+{
+  "targets": {
+    "raider": {
+      "transport": "local",
+      "physical_host_id": "raider"
+    }
+  },
+  "hardware_configs": {
+    "raider-20-layers": {
+      "target": "raider",
+      "hardware_profile": "msi-raider-18-hx-ai",
+      "os_id": "ubuntu-26.04-native",
+      "overrides": {
+        "launch": {
+          "model_file": "Llama-3.3-70B-Instruct-Q4_K_M.gguf",
+          "threads": 16,
+          "gpu_layers": 20
+        }
+      }
+    },
+    "raider-32-layers": {
+      "target": "raider",
+      "hardware_profile": "msi-raider-18-hx-ai",
+      "os_id": "ubuntu-26.04-native",
+      "overrides": {
+        "launch": {
+          "model_file": "Llama-3.3-70B-Instruct-Q4_K_M.gguf",
+          "threads": 16,
+          "gpu_layers": 32
+        }
+      }
+    }
+  }
+}

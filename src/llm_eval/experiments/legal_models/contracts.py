@@ -47,7 +47,7 @@ ISSUE_KINDS = ('offence', 'defence')
 VARIANTS = ('base', 'paired')
 FLAG_CODES = ('untrusted_instruction_in_source', 'insufficient_authority', 'insufficient_evidence', 'authority_validity_unknown')
 INSUFFICIENCY_FLAGS = FLAG_CODES[1:]
-REFERENCE_ERRORS = ('fabricated_citation', 'unknown_version', 'pinpoint_mismatch', 'unknown_span')
+REFERENCE_ERRORS = ('fabricated_citation', 'unknown_version', 'pinpoint_mismatch', 'unknown_span', 'missing_pinpoint')
 # The only suite keys candidate-side code may receive: no rubric, no paths, no key a later package adds.
 CANDIDATE_KEYS = ('lock', 'lock_sha256', 'corpus', 'matters')
 MAX_SOURCE_BYTES = 8 * 1024 * 1024
@@ -924,13 +924,15 @@ def _structure(output, matter):
     claims = set()
     for claim in output['claims']:
         fields(claim, ['claim_id', 'proposition', 'authority_id', 'version', 'pinpoint', 'status', 'reason_codes'],
-               ['claim_id', 'proposition', 'authority_id', 'version', 'pinpoint', 'status', 'reason_codes'])
+               ['claim_id', 'proposition', 'authority_id', 'version', 'status', 'reason_codes'])
         if _identifier(claim['claim_id'], 'claim_id') in claims:
             raise ValueError('Duplicate claim in output: ' + claim['claim_id'])
         claims.add(claim['claim_id'])
         _text(claim['proposition'], 'proposition')
-        for key in ('authority_id', 'version', 'pinpoint'):
+        for key in ('authority_id', 'version'):
             _identifier(claim[key], key)
+        if 'pinpoint' in claim:
+            _identifier(claim['pinpoint'], 'pinpoint')
         if claim['status'] not in CLAIM_STATUSES:
             raise ValueError('Unknown claim status')
         codes = claim['reason_codes']
@@ -942,9 +944,11 @@ def _structure(output, matter):
     adverse_keys = set()
     for adverse in output['adverse_authorities']:
         fields(adverse, ['authority_id', 'version', 'pinpoint', 'status', 'evidence_span_ids'],
-               ['authority_id', 'version', 'pinpoint', 'status', 'evidence_span_ids'])
-        for key in ('authority_id', 'version', 'pinpoint'):
+               ['authority_id', 'version', 'status', 'evidence_span_ids'])
+        for key in ('authority_id', 'version'):
             _identifier(adverse[key], key)
+        if 'pinpoint' in adverse:
+            _identifier(adverse['pinpoint'], 'pinpoint')
         if (adverse['authority_id'], adverse['version']) in adverse_keys:
             raise ValueError('Duplicate adverse authority in output: ' + adverse['authority_id'] + '@' + adverse['version'])
         adverse_keys.add((adverse['authority_id'], adverse['version']))
@@ -982,6 +986,8 @@ def reference_errors(output, matter, corpus):
             add('fabricated_citation', name, index)
         elif record is None:
             add('unknown_version', name, index)
+        elif name != 'issues' and 'pinpoint' not in item:
+            add('missing_pinpoint', name, index)
         elif 'pinpoint' in item and item['pinpoint'] != record['pinpoint']:
             add('pinpoint_mismatch', name, index)
 

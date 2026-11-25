@@ -1,0 +1,20 @@
+{
+  "kind": "category",
+  "default_category": "general",
+  "keywords": {
+    "clarify": [
+      "no options",
+      "no office",
+      "no information"
+    ],
+    "coding": [
+      "python",
+      "script"
+    ],
+    "math": [
+      "cost",
+      "credits",
+      "how much"
+    ]
+  }
+}

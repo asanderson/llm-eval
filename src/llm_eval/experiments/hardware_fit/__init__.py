@@ -55,7 +55,7 @@ def _projection(case):
 
 
 def _measured(case, root):
-    fields(case, {'identity', 'config', 'server_mode', 'categories', 'installation_state', 'fit', 'synthetic'},
+    fields(case, {'identity', 'config', 'server_mode', 'categories', 'installation_state', 'fit', 'context_probe', 'prediction', 'synthetic'},
            ['identity', 'config', 'server_mode'])
     harness, label = _identity(case)
     synthetic = _synthetic(case)
@@ -97,6 +97,15 @@ def _measured(case, root):
     finite_number(thresholds.get('min_gpu_weight_fraction', evidence.MIN_GPU_WEIGHT_FRACTION), 'fit.min_gpu_weight_fraction', 0, 1)
     if not isinstance(thresholds.get('require_layer_evidence', False), bool):
         raise ValueError('fit.require_layer_evidence must be true or false')
+    if 'context_probe' in case:
+        from .study import check_probe
+        check_probe(case['context_probe'], config)
+    if 'prediction' in case:
+        spec = fields(case['prediction'], {'data', 'candidate_id', 'policy'}, ['data', 'candidate_id'])
+        identifier(spec['candidate_id'])
+        projection.check_policy(spec.get('policy', {}))
+        if not isinstance(spec['data'], str) or not Path(spec['data']).is_file():
+            raise ValueError('Prediction data must name an existing candidate set')
     if engine['os_support'][config['os_id']] == 'unsupported' or model['status'] == 'excluded' or model['id'] in engine.get('blocked_models', []):
         return 'unsupported_os_or_excluded_model'
     lock = config.get('artifact_lock')
@@ -144,3 +153,8 @@ def host_requirements(parameters, mode):
 def setup_platforms(parameters, mode):
     """A projection installs nothing; a measured run needs the platform of its run config."""
     return [parameters['config']['platform']] if mode == 'measured' else []
+
+
+def report_supplement(records):
+    from . import study
+    return study.report_supplement(records)

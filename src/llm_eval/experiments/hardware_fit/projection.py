@@ -167,18 +167,22 @@ def hardware_view(job, root):
     return view
 
 
+def vram_needs(weight_bytes, model, context_tokens, policy):
+    kv_bytes = model['kv_elements_per_token'] * context_tokens * policy['kv_bytes_per_element']
+    compute_bytes = policy['compute_buffer_gib'] * GIB
+    return {'kv_bytes': kv_bytes, 'compute_bytes': compute_bytes, 'vram_required': weight_bytes + kv_bytes + compute_bytes}
+
+
 def fit(weight_bytes, model, view, context_tokens, policy):
     """Byte needs of one artifact at one context length, and the limits it exceeds in the order vram, ram, disk, cpu, context.
 
     The cache need is every layer's key and value elements for the whole context. Sliding-window layers keep less, so the
     figure is an overestimate for models that have them."""
-    kv_bytes = model['kv_elements_per_token'] * context_tokens * policy['kv_bytes_per_element']
-    needs = {'kv_bytes': kv_bytes, 'compute_bytes': policy['compute_buffer_gib'] * GIB,
+    needs = {**vram_needs(weight_bytes, model, context_tokens, policy),
              'vram_available': (view['vram_gib'] - view['vram_reserve_gib'] - policy['gpu_baseline_gib']) * GIB,
              'ram_required': policy['host_ram_overhead_gib'] * GIB + policy['host_ram_weight_fraction'] * weight_bytes,
              'disk_required': weight_bytes * policy['disk_copies'] + policy['disk_headroom_gib'] * GIB,
              'bits_per_weight': weight_bytes * 8 / model['parameters']}
-    needs['vram_required'] = weight_bytes + kv_bytes + needs['compute_bytes']
     exceeded = (('vram', needs['vram_required'] > needs['vram_available']),
                 ('ram', needs['ram_required'] > view['ram_budget_gib'] * GIB),
                 ('disk', needs['disk_required'] > view['disk_free_gib'] * GIB),
@@ -270,7 +274,7 @@ def execute(job, output, root):
             handle.write(json.dumps(row, allow_nan=False) + '\n')
     shortlist = sorted((r for r in rows if r['rank']), key=lambda r: r['rank'])
     metadata = {
-        'experiment': 'hardware-fit', 'record': BENCHMARK, 'schema_version': 1, 'synthetic': synthetic,
+        'experiment': 'hardware-fit', 'record': BENCHMARK, 'fit_class': 'projected', 'schema_version': 1, 'synthetic': synthetic,
         'candidate_set': {'id': candidate_set['id'], 'retrieved_on': candidate_set['retrieved_on'], 'sha256': sha256_file(case['data']),
                           'model_count': len(candidate_set['models']), 'candidate_count': len(candidate_set['candidates'])},
         'context_tokens': case['context_tokens'], 'policy': policy,

@@ -81,6 +81,140 @@ class RoutingTests(unittest.TestCase):
             self.assertAlmostEqual(read_json(p/'out/routing-metadata.json')['cost_charged_or_reserved_usd'],1.271)
 
 
+class HeldOutStudyTests(unittest.TestCase):
+    root = Path(__file__).resolve().parents[1]
+    examples = root / 'experiments' / 'decision-models'
+
+    def test_pooled_f1_counts_first_attempt_even_when_repeats_disagree(self):
+        from llm_eval.experiments.decision_models.metrics import decision_report, report_supplement
+        rows = [
+            {'task_id': 'a', 'category': 'coding', 'expected_choice': 'coding', 'choice': 'coding',
+             'probabilities': {'coding': .8, 'math': .2}},
+            {'task_id': 'b', 'category': 'math', 'expected_choice': 'math', 'choice': 'coding',
+             'probabilities': {'coding': .8, 'math': .2}},
+            {'task_id': 'b', 'category': 'math', 'expected_choice': 'math', 'choice': 'math', 'repetition': 2},
+        ]
+        records = [{'job_id': 'job', 'record_type': 'request', 'latest_attempt': True,
+                    'data': {'status': 'ok', 'router_s': .2, 'repetition': 1, **r}} for r in rows]
+        records += [{**records[0], 'latest_attempt': False},
+                    {**records[0], 'data': {**records[0]['data'], 'warmup': True, 'repetition': 0}}]
+        report = decision_report(records)[0]
+        self.assertEqual((report['unique_tasks'], report['measured_requests'], report['decision_accuracy']), (2, 3, .5))
+        self.assertAlmostEqual(report['macro_f1'], 1 / 3)
+        self.assertIn('decision-models-summary.json', report_supplement(records)[1])
+        self.assertEqual(report_supplement([]), (None, ''))
+        self.assertAlmostEqual(report['mean_multiclass_brier'], .68)
+        self.assertEqual([r['recall'] for r in report['per_class']], [1, 0])
+        self.assertEqual(report['reliability_bins'][8]['accuracy'], .5)
+        self.assertEqual(report['timing_all_measured_repetitions']['router_s']['requests'], 3)
+        self.assertEqual(report['threshold_sensitivity'][-1]['accepted_tasks'], 0)
+        records[0]['data'].update(status='error', choice=None, probabilities=None)
+        failed = decision_report(records)[0]
+        self.assertEqual((failed['decision_accuracy'], failed['tasks_without_choice'], failed['probability_tasks']), (0, 1, 1))
+
+    def test_abstained_choice_is_scored_separately_from_fallback_success(self):
+        from llm_eval.experiments.decision_models.metrics import decision_metrics
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp)
+            write_json(path/'suite.json', {'tasks': [{'id': 't', 'expected_choice': 'math',
+                       'messages': [{'role':'user','content':'2+2?'}], 'check': {'type':'exact','expected':'4'}}]})
+            case = {'suite': str(path/'suite.json'), 'router': {'kind': 'systemone'},
+                    'policy': {'category_models': {'math':'cheap','general':'cheap'}, 'abstain_threshold': .8, 'fallback': 'strong'},
+                    'candidates': {c: {'model': c} for c in ('cheap','strong')}}
+            decision = {'choice': 'math', 'probabilities': {'math': .6, 'general': .4}, 'router_s': .02}
+            with patch('llm_eval.experiments.decision_models.evaluation.decide', return_value=decision), \
+                 patch('llm_eval.experiments.decision_models.evaluation.HTTPAdapter') as adapter:
+                adapter.return_value.generate.return_value={'text':'4','elapsed_s':1,'prompt_tokens':4,'completion_tokens':1}
+                execute({'mode':'live','parameters':case}, path/'out', path)
+            row = json.loads((path/'out/requests.jsonl').read_text())
+            report = decision_metrics([row])
+            self.assertEqual((row['selected_model'], report['abstentions'], report['fallback_answers_passed']), ('strong', 1, 1))
+            self.assertEqual(report['decision_accuracy'], 1)
+            self.assertEqual(report['accepted_share'], 0)
+            self.assertIsNone(report['accepted_accuracy'])
+
+    def test_split_selection_rejects_cross_partition_leaks_and_subset_ids(self):
+        from copy import deepcopy
+        from llm_eval.experiments.decision_models.workload import selected_tasks
+        suite = read_json(self.examples / 'workloads/family-split.json')
+        test = selected_tasks(suite, {'split': 'test'})
+        self.assertEqual(len(test), 24)
+        for field, message in [('family', 'family'), ('source', 'source'), ('messages', 'prompt')]:
+            bad = deepcopy(suite)
+            bad['tasks'][-1][field] = bad['tasks'][0][field]
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError, message):
+                selected_tasks(bad, {'split': 'test'})
+        with self.assertRaisesRegex(ValueError, 'task_ids'):
+            selected_tasks(suite, {'split': 'test', 'task_ids': [suite['tasks'][0]['id']]})
+        with self.assertRaisesRegex(ValueError, 'Select'):
+            selected_tasks(suite, {})
+
+    def test_prepare_compiles_each_arm_and_keeps_original_criteria_order(self):
+        from llm_eval.experiments.decision_models.protocol import prepare
+        from llm_eval.orchestration.planner import compile_campaign
+        with tempfile.TemporaryDirectory() as directory:
+            for mode in ('decision', 'live', 'replay'):
+                fixture = mode == 'replay'
+                case = 'family-replay-fixture.json' if fixture else 'family-study.example.json'
+                out = Path(directory) / mode
+                prepare(self.examples / 'cases' / case, self.examples / 'workloads/keyword-router.json',
+                        self.root / 'configs/targets/local.example.json', 'raider-ubuntu', mode, 'test', out,
+                        self.examples / 'workloads/family-split.fixture-replay.json' if fixture else None)
+                plan = compile_campaign(out / 'campaign.json', self.root)
+                arms = {j['case_id']: j['parameters'] for j in plan['jobs']}
+                if mode == 'decision':
+                    self.assertEqual(list(arms['reversed-criteria']['router']['criteria']),
+                                     list(reversed(arms['routed']['router']['criteria'])))
+                else:
+                    self.assertEqual(set(arms), {'routed', 'keyword', 'fixed-cheap', 'fixed-strong'})
+                    self.assertNotIn('fallback', arms['fixed-cheap']['policy'])
+                self.assertTrue(all(p['split'] == 'test' for p in arms.values()))
+
+    def test_freeze_and_compare_require_matched_prompts_and_report_missing_cost(self):
+        from copy import deepcopy
+        from llm_eval.experiments.decision_models.protocol import compare, freeze
+        names = ('cheap', 'strong')
+        candidates = {name: {'model': name, 'model_revision': 'r1', 'platform': 'fixture'} for name in names}
+        arms = {}
+        for arm_name, choice in (('fixed-cheap', 'cheap'), ('fixed-strong', 'strong'), ('routed', 'strong'), ('keyword', 'cheap')):
+            config = {'router': {'kind': 'fixed', 'choice': choice}, 'candidates': candidates, 'split': 'test'}
+            tasks = {str(i): {'status': 'ok', 'selected_model': choice, 'prompt_sha256': str(i), 'task_family': str(i),
+                              'quality_pass': i == 1 or choice == 'strong', 'elapsed_s': 2, 'generation_s': 1.5,
+                              'cost_usd': 0, 'total_cost_usd': 0} for i in range(3)}
+            arms[arm_name] = {'mode': 'live', 'hardware_config_id': 'fixture', 'config': config, 'synthetic': True,
+                              'suite_sha256': 'suite', 'policy_sha256': 'policy', 'code_revision': 'rev', 'tasks': tasks}
+        arms['fixed-cheap']['tasks']['0']['status'] = 'error'
+        fixed = freeze(arms)
+        self.assertEqual(len(fixed['rows']), 5)
+        self.assertEqual(fixed['generation']['seed'], 1)
+        self.assertTrue(fixed['synthetic'])
+        replay = deepcopy(arms)
+        for arm in replay.values():
+            arm['mode'] = 'replay'
+            for row in arm['tasks'].values():
+                row.update(quality=row['quality_pass'], estimated_total_cost_usd=0, estimated_end_to_end_s=1.75)
+        arms['routed']['tasks']['1']['total_cost_usd'] = None
+        paired = compare(replay, arms)
+        self.assertEqual(paired['coverage']['live/routed']['unknown_api_cost_tasks'], 1)
+        self.assertEqual(paired['comparisons']['quality']['common_tasks'], 2)
+        self.assertEqual(paired['comparisons']['api_usd']['common_tasks'], 1)
+        self.assertEqual(paired['quality_resource_tradeoffs']['api_usd']['common_tasks'], 1)
+        self.assertEqual(paired['comparisons']['end_to_end_s']['common_task_means']['replay/routed'], 1.75)
+        arms['routed']['tasks']['1']['prompt_sha256'] = 'other'
+        with self.assertRaisesRegex(ValueError, 'prompt hash'):
+            compare(replay, arms)
+        arms['routed']['config']['seed'] = 3
+        with self.assertRaisesRegex(ValueError, 'settings differ'):
+            compare(replay, arms)
+
+    def test_incomplete_utilities_do_not_erase_other_common_tasks(self):
+        from llm_eval.experiments.decision_models.evaluation import baseline_scores
+        rows = {('a','x'): {'quality': 1}, ('b','x'): {'quality': None}, ('a','y'): {'quality': .7}, ('b','y'): {'quality': .1}}
+        result = baseline_scores(rows, [{'id':'a'}, {'id':'b'}], ['x','y'], {})
+        self.assertEqual((result['common_coverage_tasks'], result['best_fixed_candidate']), (1, 'x'))
+        self.assertEqual(result['candidate_utility']['y'], .7)
+
+
 class RenamedExperimentTests(unittest.TestCase):
     """The experiment was `llm-routing` until it became `decision-models`."""
     def test_the_former_id_resolves_to_the_plugin_but_is_not_listed(self):

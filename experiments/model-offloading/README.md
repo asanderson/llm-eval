@@ -2,7 +2,7 @@
 
 A reproducible lab for evaluating **local LLMs larger than GPU VRAM** across inference platforms, hardware, and operating systems. Initial target: **[MSI Raider 18 HX AI A2XWJG-069US][msi-spec]**, [RTX 5090 **Laptop**][nvidia-laptop] 24 GiB, [Intel Core Ultra 9 285HX][intel-cpu] (8P + 16E), 64 GiB DDR5-6400, factory 2 TB NVMe plus [WD_BLACK SN7100 4 TB Gen4][sn7100].
 
-**Status: benchmark harness and researched experiment plan, not measured laptop results.** The test suite uses small local fixtures. No large model has been downloaded or benchmarked by this project yet. Source evidence was checked on **2026-10-05**. Recommendations are hypotheses to test, not a measured quality/performance ranking.
+**Published Raider measurements.** The experiment index lists each measured model, backend, OS, request count, status and source bundle. The 2026-11-17 WSL2 Kimi Linear Q6_K run illustrates why workload length matters. Ollama returned two tokens on 18 of its 27 measured category-smoke requests. Use the matched protocol below to measure longer inputs and sustained generation. [Published offloading runs](../../docs/results/index/experiment/model-offloading.md) · [Kimi run and raw measurements](../../docs/results/model-offloading/campaign-20261117T043857Z-d2cbbd81-offload-model-offloading-1/README.md) · [Matched performance and quality protocol](matched/README.md)
 
 [Downloads](#downloads-and-setup-references) · [How it works](#how-the-evaluation-works) · [Quick start](#start-here) · [Setup/run scripts](../../docs/WORKFLOWS.md) · [LiveBench categories](../../docs/LIVEBENCH.md) · [Report card](#evaluation-report-card) · [Model links](#model-links)
 
@@ -120,7 +120,7 @@ Remove `--dry-run` from setup to install. The run example requires prepared and 
 
 ## LiveBench categories
 
-The [current LiveBench leaderboard][livebench] defines these seven categories for release **2026-06-25**. Use their IDs with `--categories`, or select `all`.
+The pinned LiveBench v1 release **2026-06-25** defines these seven categories. Use their IDs with `--categories`, or select `all`.
 
 | Category | CLI ID | Local evaluation scope |
 |---|---|---|
@@ -150,7 +150,7 @@ The leaderboard review adds **[DeepSeek R1 Distill 32B][model-deepseek-r1-32b] (
 | Setup and lifecycle | Pinned per-platform environments/builds or verified release assets (LM Studio: operator-installed pinned app, version verified at launch); optional explicit model downloads; managed loopback server or external mode |
 | Security defaults | Literal loopback endpoints, bounded responses/deadlines, credentials via environment references, verified artifacts, no generated-code execution in smoke mode; explicit upstream/container execution lane |
 
-**Limits:** setup recipes and launch plans are implemented but GPU installations and inference remain untested on the target laptop. Model/engine support is not inferred from API compatibility. Direct-library workers expose neither streaming TTFT nor isolated decode rate. Initial performance runs are single-request and text-only. Standalone [SWE-bench][swe-bench]/[EvalPlus][evalplus] integrations and automated cold boots are not implemented. Strata conversion and KT representation selection remain model-specific preparation steps. See [validation status](../../docs/VALIDATION.md).
+The [published runs](../../docs/results/index/experiment/model-offloading.md) identify tested backend, model and OS combinations. Other combinations still require direct validation. Direct-library workers expose neither streaming TTFT nor isolated decode rate. Initial performance runs are single-request and text-only. Standalone [SWE-bench][swe-bench]/[EvalPlus][evalplus] integrations and automated cold boots are not implemented. Strata conversion and KT representation selection remain model-specific preparation steps. See [validation status](../../docs/VALIDATION.md).
 
 ## Initial experiment priorities
 
@@ -162,38 +162,7 @@ The 120B class is conditional. No catalog entry promises that the sum of RAM and
 
 ## Evaluation report card
 
-**No laptop evaluation results have been recorded yet.** The matrix below tracks execution status, not performance. Each measured result must identify one exact model artifact, precision, platform version, OS build, and context size; one successful model does not qualify every model on that platform. See the [990-combination eligibility matrix](../../docs/evaluation-matrix.csv) for individual model gates.
-
-| Platform | Ubuntu 26.04 native | Windows 11 Pro native | Windows 11 Pro + WSL2 |
-|---|---|---|---|
-| [llama.cpp][llama-cpp] | Not run | Not run | Not run |
-| [ik_llama.cpp][ik-llama] | Not run | Not run | Not run |
-| [KTransformers][ktransformers] | Not run | Unsupported | Not run |
-| [Ollama][ollama] | Not run | Not run | Not run |
-| [KoboldCpp][koboldcpp] | Not run | Not run | Not run |
-| [Hugging Face Accelerate][accelerate] | Not run | Not run | Not run |
-| [AirLLM][airllm] | Not run | Not run | Not run |
-| [vLLM][vllm] | Not run | Unsupported | Not run |
-| [Strata][strata] | Not run | Not run | Not run |
-| [LM Studio][lmstudio] | Not run | Not run | Not run |
-
-**Status key:** Not run = no target-laptop measurements; Unsupported = blocked by the current native-OS catalog entry. Conditional and unverified combinations still require compatibility checks. Future entries should link to an individual run report and distinguish Passed, Failed, and Skipped; none implies a quality ranking by itself.
-
-### Category results placeholder
-
-Copy this table per exact model/artifact/platform/OS/context. **No scores or laptop timings have been measured.** Keep local smoke rates and upstream LiveBench results in separate columns; never use either to fill the other.
-
-| Category | Smoke checks passed / measured requests | LiveBench score / release / question coverage | Median first output / output tokens/s | Status |
-|---|---|---|---|---|
-| Reasoning | — | — | — | Not run |
-| Coding | — | — | — | Not run |
-| Agentic Coding | — (planning proxy) | — (actual agent tasks) | — | Not run |
-| Mathematics | — | — | — | Not run |
-| Data Analysis | — | — | — | Not run |
-| Language | — | — | — | Not run |
-| Instruction Following | — | — | — | Not run |
-
-Link the raw session, artifact lock, category report or upstream judgment files, scorer revision and settings before replacing placeholders. Upstream scores do not provide the core harness timing metrics automatically.
+Use the [experiment index](../../docs/results/index/experiment/model-offloading.md) for completed and failed jobs, and each linked bundle for its artifact, platform version, OS build, settings and raw observations. The [eligibility matrix](../../docs/evaluation-matrix.csv) records catalog gates. The [matched protocol](matched/README.md) defines the next performance and upstream quality measurements.
 
 ### Result template for each evaluated configuration
 
@@ -216,7 +185,7 @@ Copy this card for each model/precision/platform/OS/context combination. Replace
 | Raw run artifacts and generated report | — |
 | Hardware-fit verdict and comparison notes | Not assessed |
 
-Generate reports with `python -m llm_eval report --input results --output results/report`. Keep measured configurations separate as described in the [methodology](../../docs/METHODOLOGY.md). The report card is a manually maintained summary; the CLI does not update this README. Result files are ignored by Git by default, so review them for private data before publishing any evidence links.
+Generate reports with `python -m llm_eval report --input results --output results/report`. Keep measured configurations separate as described in the [methodology](../../docs/METHODOLOGY.md). The published experiment index is generated from report bundles. Result files are ignored by Git by default, so review them for private data before publishing any evidence links.
 
 ## Model links
 

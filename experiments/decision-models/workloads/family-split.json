@@ -1,0 +1,741 @@
+{
+  "benchmark": "authored-routing-pilot-v1",
+  "tasks": [
+    {
+      "id": "development-coding-1",
+      "category": "coding",
+      "family": "python-slices",
+      "source": "dev-language-lab",
+      "split": "development",
+      "challenge": "plain",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "What does Python's 'pencil'[1:3] return? Reply only with the resulting text."
+        }
+      ],
+      "expected_choice": "coding",
+      "check": {
+        "type": "exact",
+        "expected": "en"
+      }
+    },
+    {
+      "id": "development-coding-2",
+      "category": "coding",
+      "family": "python-slices",
+      "source": "dev-language-lab",
+      "split": "development",
+      "challenge": "paraphrase",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "A script prints 'harbor'[::-1]. Write only what appears."
+        }
+      ],
+      "expected_choice": "coding",
+      "check": {
+        "type": "exact",
+        "expected": "robrah"
+      }
+    },
+    {
+      "id": "development-math-1",
+      "category": "math",
+      "family": "unit-price",
+      "source": "dev-market-notes",
+      "split": "development",
+      "challenge": "plain",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "Three notebooks cost 12 credits altogether. Reply only with the unit price."
+        }
+      ],
+      "expected_choice": "math",
+      "check": {
+        "type": "exact",
+        "expected": "4"
+      }
+    },
+    {
+      "id": "development-math-2",
+      "category": "math",
+      "family": "unit-price",
+      "source": "dev-market-notes",
+      "split": "development",
+      "challenge": "paraphrase",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "A package of six costs 18. How much does one cost? Give only the number."
+        }
+      ],
+      "expected_choice": "math",
+      "check": {
+        "type": "exact",
+        "expected": "3"
+      }
+    },
+    {
+      "id": "development-general-1",
+      "category": "general",
+      "family": "sorting-names",
+      "source": "dev-office-exercises",
+      "split": "development",
+      "challenge": "plain",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "Alphabetize Mango, Apple, Pear. Reply with the first name only."
+        }
+      ],
+      "expected_choice": "general",
+      "check": {
+        "type": "exact",
+        "expected": "Apple"
+      }
+    },
+    {
+      "id": "development-general-2",
+      "category": "general",
+      "family": "sorting-names",
+      "source": "dev-office-exercises",
+      "split": "development",
+      "challenge": "paraphrase",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "File these words in dictionary order: robin, amber, fern. Which comes last? Answer with that word only."
+        }
+      ],
+      "expected_choice": "general",
+      "check": {
+        "type": "exact",
+        "expected": "robin"
+      }
+    },
+    {
+      "id": "development-clarify-1",
+      "category": "clarify",
+      "family": "missing-referent",
+      "source": "dev-support-notes",
+      "split": "development",
+      "challenge": "unanswerable",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "Which of them should I approve? I have given no options."
+        }
+      ],
+      "expected_choice": "clarify",
+      "check": {
+        "type": "exact",
+        "expected": "?"
+      }
+    },
+    {
+      "id": "development-clarify-2",
+      "category": "clarify",
+      "family": "missing-referent",
+      "source": "dev-support-notes",
+      "split": "development",
+      "challenge": "ambiguous",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "Send it to the usual office. No office or item is identified."
+        }
+      ],
+      "expected_choice": "clarify",
+      "check": {
+        "type": "exact",
+        "expected": "?"
+      }
+    },
+    {
+      "id": "test-coding-1",
+      "category": "coding",
+      "family": "sql-aggregation",
+      "source": "test-database-lab",
+      "split": "test",
+      "challenge": "mixed-intent",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "A SQL table has three rows with id values 4, 4, 7. What does COUNT(DISTINCT id) return? Reply with one number."
+        }
+      ],
+      "expected_choice": "coding",
+      "check": {
+        "type": "exact",
+        "expected": "2"
+      }
+    },
+    {
+      "id": "test-coding-2",
+      "category": "coding",
+      "family": "sql-aggregation",
+      "source": "test-database-lab",
+      "split": "test",
+      "challenge": "paraphrase",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "How many rows does SELECT DISTINCT color return over red, red, red, blue? Give just the count."
+        }
+      ],
+      "expected_choice": "coding",
+      "check": {
+        "type": "exact",
+        "expected": "2"
+      }
+    },
+    {
+      "id": "test-coding-3",
+      "category": "coding",
+      "family": "boolean-expressions",
+      "source": "test-js-notes",
+      "split": "test",
+      "challenge": "plain",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "In JavaScript, what does Boolean(\"\") return? Use lowercase true or false."
+        }
+      ],
+      "expected_choice": "coding",
+      "check": {
+        "type": "exact",
+        "expected": "false"
+      }
+    },
+    {
+      "id": "test-coding-4",
+      "category": "coding",
+      "family": "boolean-expressions",
+      "source": "test-js-notes",
+      "split": "test",
+      "challenge": "paraphrase",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "Our UI prints String(!0). Which word appears? Give only that word."
+        }
+      ],
+      "expected_choice": "coding",
+      "check": {
+        "type": "exact",
+        "expected": "true"
+      }
+    },
+    {
+      "id": "test-coding-5",
+      "category": "coding",
+      "family": "git-concepts",
+      "source": "test-versioning-notes",
+      "split": "test",
+      "challenge": "plain",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "Which Git command lists local branches? Reply with the two words of the command."
+        }
+      ],
+      "expected_choice": "coding",
+      "check": {
+        "type": "exact",
+        "expected": "git branch"
+      }
+    },
+    {
+      "id": "test-coding-6",
+      "category": "coding",
+      "family": "git-concepts",
+      "source": "test-versioning-notes",
+      "split": "test",
+      "challenge": "plain",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "I need the checked-out branch and changed files. Which two-word Git command shows this short working-tree report by default?"
+        }
+      ],
+      "expected_choice": "coding",
+      "check": {
+        "type": "exact",
+        "expected": "git status"
+      }
+    },
+    {
+      "id": "test-math-1",
+      "category": "math",
+      "family": "percentage-change",
+      "source": "test-budget-briefs",
+      "split": "test",
+      "challenge": "plain",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "A repair quote fell from 80 to 60 credits. What percentage decrease is that? Reply with digits only."
+        }
+      ],
+      "expected_choice": "math",
+      "check": {
+        "type": "exact",
+        "expected": "25"
+      }
+    },
+    {
+      "id": "test-math-2",
+      "category": "math",
+      "family": "percentage-change",
+      "source": "test-budget-briefs",
+      "split": "test",
+      "challenge": "paraphrase",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "A budget line was 40 and is now 50. Express the percentage increase in digits only."
+        }
+      ],
+      "expected_choice": "math",
+      "check": {
+        "type": "exact",
+        "expected": "25"
+      }
+    },
+    {
+      "id": "test-math-3",
+      "category": "math",
+      "family": "clock-arithmetic",
+      "source": "test-shift-log",
+      "split": "test",
+      "challenge": "mixed-intent",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "My script started at 09:48 and ended at 10:03. How many minutes elapsed? Give just the number."
+        }
+      ],
+      "expected_choice": "math",
+      "check": {
+        "type": "exact",
+        "expected": "15"
+      }
+    },
+    {
+      "id": "test-math-4",
+      "category": "math",
+      "family": "clock-arithmetic",
+      "source": "test-shift-log",
+      "split": "test",
+      "challenge": "paraphrase",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "A train pulls out at 13:56. It arrives at 14:08. Return the travel time in whole minutes as digits."
+        }
+      ],
+      "expected_choice": "math",
+      "check": {
+        "type": "exact",
+        "expected": "12"
+      }
+    },
+    {
+      "id": "test-math-5",
+      "category": "math",
+      "family": "ratio-mixtures",
+      "source": "test-recipe-cards",
+      "split": "test",
+      "challenge": "out-of-domain",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "A dye bath uses 2 parts red to 3 parts blue. In 20 total liters, how many liters are blue? Return only the number."
+        }
+      ],
+      "expected_choice": "math",
+      "check": {
+        "type": "exact",
+        "expected": "12"
+      }
+    },
+    {
+      "id": "test-math-6",
+      "category": "math",
+      "family": "ratio-mixtures",
+      "source": "test-recipe-cards",
+      "split": "test",
+      "challenge": "paraphrase",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "A blend contains 1 part A to 4 parts B. For 35 grams total, return only the grams of A."
+        }
+      ],
+      "expected_choice": "math",
+      "check": {
+        "type": "exact",
+        "expected": "7"
+      }
+    },
+    {
+      "id": "test-general-1",
+      "category": "general",
+      "family": "symbol-lookup",
+      "source": "test-museum-labels",
+      "split": "test",
+      "challenge": "out-of-domain",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "Our museum label says a triangle means pottery and a circle means glass. The shard bears a triangle. Return its material only."
+        }
+      ],
+      "expected_choice": "general",
+      "check": {
+        "type": "exact",
+        "expected": "pottery"
+      }
+    },
+    {
+      "id": "test-general-2",
+      "category": "general",
+      "family": "symbol-lookup",
+      "source": "test-museum-labels",
+      "split": "test",
+      "challenge": "paraphrase",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "In this field key, dot = wetland and dash = forest. A map tile shows a dash. Return only the habitat."
+        }
+      ],
+      "expected_choice": "general",
+      "check": {
+        "type": "exact",
+        "expected": "forest"
+      }
+    },
+    {
+      "id": "test-general-3",
+      "category": "general",
+      "family": "instruction-extraction",
+      "source": "test-service-bulletins",
+      "split": "test",
+      "challenge": "plain",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "The order form says: staple white sheets, archive yellow sheets. What action applies to yellow sheets? Reply with the verb only."
+        }
+      ],
+      "expected_choice": "general",
+      "check": {
+        "type": "exact",
+        "expected": "archive"
+      }
+    },
+    {
+      "id": "test-general-4",
+      "category": "general",
+      "family": "instruction-extraction",
+      "source": "test-service-bulletins",
+      "split": "test",
+      "challenge": "mixed-intent",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "A coding workshop email reads: Doors at noon. Bring a pencil. What item should attendees bring? Reply with the noun only."
+        }
+      ],
+      "expected_choice": "general",
+      "check": {
+        "type": "exact",
+        "expected": "pencil"
+      }
+    },
+    {
+      "id": "test-general-5",
+      "category": "general",
+      "family": "text-formatting",
+      "source": "test-copy-desk",
+      "split": "test",
+      "challenge": "plain",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "Convert the heading river atlas to uppercase. Return only the heading."
+        }
+      ],
+      "expected_choice": "general",
+      "check": {
+        "type": "exact",
+        "expected": "RIVER ATLAS"
+      }
+    },
+    {
+      "id": "test-general-6",
+      "category": "general",
+      "family": "text-formatting",
+      "source": "test-copy-desk",
+      "split": "test",
+      "challenge": "paraphrase",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "For a poster, lowercase the words OPEN HOUSE. Return those words only."
+        }
+      ],
+      "expected_choice": "general",
+      "check": {
+        "type": "exact",
+        "expected": "open house"
+      }
+    },
+    {
+      "id": "test-clarify-1",
+      "category": "clarify",
+      "family": "missing-data",
+      "source": "test-planning-inbox",
+      "split": "test",
+      "challenge": "unanswerable",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "What is the median of my readings? I have not attached them."
+        }
+      ],
+      "expected_choice": "clarify",
+      "check": {
+        "type": "exact",
+        "expected": "?"
+      }
+    },
+    {
+      "id": "test-clarify-2",
+      "category": "clarify",
+      "family": "missing-data",
+      "source": "test-planning-inbox",
+      "split": "test",
+      "challenge": "unanswerable",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "We need the total from the invoice, but its amount is blank."
+        }
+      ],
+      "expected_choice": "clarify",
+      "check": {
+        "type": "exact",
+        "expected": "?"
+      }
+    },
+    {
+      "id": "test-clarify-3",
+      "category": "clarify",
+      "family": "ambiguous-policy",
+      "source": "test-dispatch-book",
+      "split": "test",
+      "challenge": "ambiguous",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "Route parcel X by priority or by distance. Both rules apply and no tie breaker is given."
+        }
+      ],
+      "expected_choice": "clarify",
+      "check": {
+        "type": "exact",
+        "expected": "?"
+      }
+    },
+    {
+      "id": "test-clarify-4",
+      "category": "clarify",
+      "family": "ambiguous-policy",
+      "source": "test-dispatch-book",
+      "split": "test",
+      "challenge": "ambiguous",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "Two branches share the name Lakeview. The caller asks for Lakeview without an address."
+        }
+      ],
+      "expected_choice": "clarify",
+      "check": {
+        "type": "exact",
+        "expected": "?"
+      }
+    },
+    {
+      "id": "test-clarify-5",
+      "category": "clarify",
+      "family": "private-state",
+      "source": "test-unobserved-log",
+      "split": "test",
+      "challenge": "out-of-domain",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "How many people are in my studio right now? You have no observations."
+        }
+      ],
+      "expected_choice": "clarify",
+      "check": {
+        "type": "exact",
+        "expected": "?"
+      }
+    },
+    {
+      "id": "test-clarify-6",
+      "category": "clarify",
+      "family": "private-state",
+      "source": "test-unobserved-log",
+      "split": "test",
+      "challenge": "unanswerable",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Follow the requested output format. If essential information is missing, reply with a single question mark."
+        },
+        {
+          "role": "user",
+          "content": "Which lamp is lit in my sealed workroom? No sensor reading is available."
+        }
+      ],
+      "expected_choice": "clarify",
+      "check": {
+        "type": "exact",
+        "expected": "?"
+      }
+    }
+  ]
+}

@@ -1,0 +1,458 @@
+{
+  "synthetic": true,
+  "suite_sha256": "c44f90d21649f842bd289efb456b4fc6f383e23c7253819a35982954cab00fc6",
+  "candidate_fingerprints": {
+    "cheap": "5bf85efecd7892c7cc2be2a5c27ca2e729c31b36291bce152a7360ac6681b8e2",
+    "strong": "f0f1304bda29572ecd046539803d45b15eb5773ea82741d5be8546b62921ebd5"
+  },
+  "rows": [
+    {
+      "task_id": "development-coding-1",
+      "candidate": "cheap",
+      "quality": 0,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "development-coding-1",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "development-coding-2",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "development-coding-2",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "development-math-1",
+      "candidate": "cheap",
+      "quality": 0,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "development-math-1",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "development-math-2",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "development-math-2",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "development-general-1",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "development-general-1",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "development-general-2",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "development-general-2",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "development-clarify-1",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "development-clarify-1",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "development-clarify-2",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "development-clarify-2",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-coding-1",
+      "candidate": "cheap",
+      "quality": 0,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-coding-1",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-coding-2",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-coding-2",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-coding-3",
+      "candidate": "cheap",
+      "quality": 0,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-coding-3",
+      "candidate": "strong",
+      "quality": 0,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-coding-4",
+      "candidate": "cheap",
+      "quality": 0,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-coding-4",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-coding-5",
+      "candidate": "cheap",
+      "quality": 0,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-coding-5",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-coding-6",
+      "candidate": "cheap",
+      "quality": 0,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-coding-6",
+      "candidate": "strong",
+      "quality": 0,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-math-1",
+      "candidate": "cheap",
+      "quality": 0,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-math-1",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-math-2",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-math-2",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-math-3",
+      "candidate": "cheap",
+      "quality": 0,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-math-3",
+      "candidate": "strong",
+      "quality": 0,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-math-4",
+      "candidate": "cheap",
+      "quality": 0,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-math-4",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-math-5",
+      "candidate": "cheap",
+      "quality": 0,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-math-5",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-math-6",
+      "candidate": "cheap",
+      "quality": 0,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-math-6",
+      "candidate": "strong",
+      "quality": 0,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-general-1",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-general-1",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-general-2",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-general-2",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-general-3",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-general-3",
+      "candidate": "strong",
+      "quality": 0,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-general-4",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-general-4",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-general-5",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-general-5",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-general-6",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-general-6",
+      "candidate": "strong",
+      "quality": 0,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-clarify-1",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-clarify-1",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-clarify-2",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-clarify-2",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-clarify-3",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-clarify-3",
+      "candidate": "strong",
+      "quality": 0,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-clarify-4",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-clarify-4",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-clarify-5",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-clarify-5",
+      "candidate": "strong",
+      "quality": 1,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-clarify-6",
+      "candidate": "cheap",
+      "quality": 1,
+      "latency_s": 0.2,
+      "cost_usd": 0
+    },
+    {
+      "task_id": "test-clarify-6",
+      "candidate": "strong",
+      "quality": 0,
+      "latency_s": 1.2,
+      "cost_usd": 0
+    }
+  ]
+}

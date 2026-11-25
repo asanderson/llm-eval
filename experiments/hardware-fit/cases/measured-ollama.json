@@ -15,6 +15,13 @@
     "fit": {
       "min_gpu_weight_fraction": 0.8,
       "require_layer_evidence": false
+    },
+    "prediction": {
+      "data": "../candidates/measured-models-gguf.json",
+      "candidate_id": "qwen38-27b-ud-q4_k_xl",
+      "policy": {
+        "gpu_baseline_gib": 0.0
+      }
     }
   }
 }
