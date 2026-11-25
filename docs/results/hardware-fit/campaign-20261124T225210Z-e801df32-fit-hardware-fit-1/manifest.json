@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "experiment_id": "hardware-fit",
+  "experiment_run_id": "fit-hardware-fit-1",
+  "publication_id": "campaign-20261124T225210Z-e801df32-fit-hardware-fit-1",
+  "campaign_id": "fit-wsl-us-koboldcpp",
+  "created_utc": "2026-11-24T22:52:10.518917+00:00",
+  "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+  "status": "complete",
+  "synthetic": false,
+  "coverage": [
+    {
+      "job_id": "fit-hardware-fit-1-2672aee4239f",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "fit-hardware-fit-1-681665f3272a",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "fit-hardware-fit-1-1479e5e031a5",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    }
+  ],
+  "raw_records": 1252,
+  "removed_fields": [
+    "absolute_path_values",
+    "artifact_lock",
+    "artifact_root",
+    "backend_pid",
+    "endpoint",
+    "host",
+    "installation_state",
+    "lock_root",
+    "offload_dir",
+    "python"
+  ],
+  "files": {
+    "diagrams/results/hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/latency.png": "9cede3e7b81a948d61ae6b68583420faff872cbd3a5345e1b9012e1e9a8caad4",
+    "docs/results/hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md": "f46a9a5f08c0130947ca199486f709a8635c2907ce32928a164ca07b6e5170e0",
+    "docs/results/hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/benchmark-summary.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/results/hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/benchmark-summary.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "docs/results/hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/raw/measurements.jsonl.gz": "d84963576f3abcade42cac66479e8128530f5277ab565030ce0e76bbd5774d53",
+    "docs/results/hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/resolved-config.json": "1a19ad428e1933849db3ca5b5ecdd5f827b596eecf5edf67f83056117e0efc4d",
+    "docs/results/hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/summary.csv": "5d752d5f3c63ea8ca5624e7d143fab9e9a245672d4d3ac32711677e9262d3f66",
+    "docs/results/hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/summary.json": "d455684e6792d34b491f4a923ee5db4195e4cb57d9483ce9cc0c6547293b92e3"
+  },
+  "report_fingerprint": "751a93cde139861f86678d2b56db369ede9fa6bfb99c9e3af18154159f62d7e6"
+}

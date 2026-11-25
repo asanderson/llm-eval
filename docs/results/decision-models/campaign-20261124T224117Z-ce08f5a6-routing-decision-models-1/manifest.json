@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "experiment_id": "decision-models",
+  "experiment_run_id": "routing-decision-models-1",
+  "publication_id": "campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1",
+  "campaign_id": "raider-wsl-decision-models-2026-11-24",
+  "created_utc": "2026-11-24T22:41:17.740366+00:00",
+  "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+  "status": "complete",
+  "synthetic": false,
+  "coverage": [
+    {
+      "job_id": "routing-decision-models-1-ac901abb4fcd",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "routing-decision-models-1-c6e41214da48",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "routing-decision-models-1-49a41a2986fd",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "routing-decision-models-1-2cfe79fef460",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "routing-decision-models-1-efcc2160debc",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "routing-decision-models-1-cff82f501cf5",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "routing-decision-models-1-0701e943af0c",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "routing-decision-models-1-b72471bb152f",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "routing-decision-models-1-473146c3e729",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    },
+    {
+      "job_id": "routing-decision-models-1-8f34219dcce9",
+      "status": "succeeded",
+      "reason": null,
+      "attempts": 1
+    }
+  ],
+  "raw_records": 335,
+  "removed_fields": [
+    "absolute_path_values",
+    "endpoint",
+    "lock_root",
+    "python"
+  ],
+  "files": {
+    "diagrams/results/decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/latency.png": "48eb6b10f49c0bc6006a00f16072985694b40b50bc6bdcc36d2ab96ececa4e03",
+    "docs/results/decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md": "8b405d3535c71ba98c119a26b67a740c854193a9f11755caed544892f3f0f78f",
+    "docs/results/decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/benchmark-summary.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/results/decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/benchmark-summary.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "docs/results/decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/raw/measurements.jsonl.gz": "99da55e5e0f32e16af852d39aa0aa505f54545984c54ac9c6a9787d6eb71fadd",
+    "docs/results/decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/resolved-config.json": "e7764b32603835b7a49508be6e022f5af58155e6f50f448825a20d0c0c557877",
+    "docs/results/decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/summary.csv": "30b3134ac25067e7e2638a8ef18a00f45970e095d6cf76d5351e588072af140c",
+    "docs/results/decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/summary.json": "233f36016edaa3e83458d7fc7e1c624988fdad2329b454489428e15fe9fb09f4"
+  },
+  "report_fingerprint": "55d436e81eed89c96655fc633d39b43bcec39e56b32c2e1c99f49cefdbaba6e2"
+}
