@@ -1,15 +1,25 @@
-# Recommended setup, harness and model: decision-models on raider-ubuntu
+# decision-models on raider-ubuntu
 
-[Recommended setups](../README.md) · [Results index](../../README.md) · [Executive summary](../../../README.md)
+[Setup evidence](../README.md) · [Results index](../../README.md)
 
-Generated from the published bundles by `llm-eval index-results`; do not edit by hand. 1 published result(s) for this experiment and hardware configuration; 0 harness and model combination(s) are ranked.
+These runs exercised a synthetic fixture. A measured model run on this configuration is still open.
 
-## No recommendation
+## Reproduce a run
 
-Every published run of this pair is a synthetic fixture, which measures no model. Its published results are listed below.
+Choose a dated report in the table. The manifest pins the code revision. Config records the planned job, input hashes and launch settings. CSV contains category summaries. Raw contains the published measurements. Some older bundles omit artifacts or runtime details. Local paths have been removed.
 
-## Published results of this pair
+[Read the reproduction recipe](../../../../REPRODUCE.md) · [Download the comparison manifest](decision-models.json).
 
-| Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
-|---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
-| [2026-11-08](../../date/2026-11-08.md) | [decision-models](../../experiment/decision-models.md) | [raider-ubuntu](../../hardware/raider-ubuntu.md) | [category](../../harness/category.md) | [category](../../model/category.md) | category-smoke | – | succeeded (synthetic) | 2 | 0 | 1.81e-05–4.97e-05 | – | – | 2/2 | [report](../../../llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md) |
+For the newest listed job (category-smoke) run this from the repository root.
+
+```sh
+llm-eval result-inputs --input docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1 --job routing-llm-routing-1-290257f5d5ab
+```
+
+## Run history
+
+One row per published job, newest first. A completed request can still fail its check. Output-cap and reload conditions can differ between rows. Use a matched group for a controlled comparison. Projection rows count candidate settings. Legal jobs expose aggregate evidence by cohort.
+
+| Date | Model / runtime | Mode and status | Actual workload | Completed | Checks passed | Median wall s | First visible text s | Backend decode tok/s | Evidence |
+|---|---|---|---|---:|---:|---:|---:|---:|---|
+| 2026-11-08 | category · category | fixture · succeeded | 2 tasks × 1 measured attempts | 2/2 | 2/2 | 3.39e-05 | not recorded | not recorded | [Report](../../../llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md) · [Config](../../../llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/resolved-config.json) · [Manifest](../../../llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/manifest.json) · [CSV](../../../llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/summary.csv) · [Raw](../../../llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/raw/measurements.jsonl.gz) |

@@ -1,0 +1,3675 @@
+{
+  "comparison_unit": "model package within a single publication, workload and named runtime",
+  "jobs": [
+    {
+      "artifact_sha256": [
+        "2119516474c153cff098b669ae016a4a4876511b7737c7f086a1593dd50be0df"
+      ],
+      "candidate_comparison_sha256": "7ef98f17e14e2718be65323fdf923edc7cdb2eeb043d43bb9c2cfee20342c3fb",
+      "case": "nemotron-super-49b-koboldcpp",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "698d2c2e8aa7f162474f74783d0fcbb2ae3cca9b3821952b9b88b8c994085d4c",
+      "job_id": "offload-model-offloading-1-e10f80682fcb",
+      "model": "nemotron-super-49b",
+      "observed_output_tokens": [
+        402,
+        1260
+      ],
+      "observed_prompt_tokens": [
+        28,
+        52
+      ],
+      "report": "model-offloading/campaign-20261116T201001Z-56cd5073-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "2119516474c153cff098b669ae016a4a4876511b7737c7f086a1593dd50be0df"
+      ],
+      "candidate_comparison_sha256": "e0d29a0f4d20b54e80f7a47b475bdff4c1b93a4e3b75687dbd6852f2e11097cb",
+      "case": "nemotron-super-49b-lmstudio",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "e9c033de5bdabc72fdd99bf5a097ce39f2484b724d7e2f992f76fdfc52c605e9",
+      "job_id": "offload-model-offloading-1-39784eb03258",
+      "model": "nemotron-super-49b",
+      "observed_output_tokens": [
+        361,
+        1536
+      ],
+      "observed_prompt_tokens": [
+        27,
+        51
+      ],
+      "report": "model-offloading/campaign-20261116T201001Z-56cd5073-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "2119516474c153cff098b669ae016a4a4876511b7737c7f086a1593dd50be0df"
+      ],
+      "candidate_comparison_sha256": "7ada1f26dde2d703622ee12c47e2fef527618133bedf639b7b6eda09f1c72125",
+      "case": "nemotron-super-49b-ollama",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "355e06a10569d87b9b69c45afd3b133afec2161410080cf5407edb6484a0c521",
+      "job_id": "offload-model-offloading-1-f8f3b4e3e15b",
+      "model": "nemotron-super-49b",
+      "observed_output_tokens": [
+        327,
+        964
+      ],
+      "observed_prompt_tokens": [
+        27,
+        51
+      ],
+      "report": "model-offloading/campaign-20261116T201001Z-56cd5073-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "85f5cc03dbee1471b6b52b0786970b5ae8eae335ded14335a1e7becec85a2d86"
+      ],
+      "candidate_comparison_sha256": "0817fc6fc6410da76f823e6efc7e4928104a568dd5b5bd3883c62de739ec51ec",
+      "case": "phi4-reasoning-plus-koboldcpp",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "c37bdfbe64101889afce49b8f1f117bcff9e8e51423fbad25cc9ff1288eda086",
+      "job_id": "offload-model-offloading-1-daebf80475d1",
+      "model": "phi4-reasoning-plus",
+      "observed_output_tokens": [
+        2,
+        2048
+      ],
+      "observed_prompt_tokens": [
+        26,
+        50
+      ],
+      "report": "model-offloading/campaign-20261116T133213Z-8dbe93fd-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "85f5cc03dbee1471b6b52b0786970b5ae8eae335ded14335a1e7becec85a2d86"
+      ],
+      "candidate_comparison_sha256": "af75f2f99232a3dd6b6176248e213d8e1221f7dab5c502c76953445afd21451e",
+      "case": "phi4-reasoning-plus-lmstudio",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "29f456b37b22682d487192bde16d335dc3616bb025827d846d3a549f0bf48c30",
+      "job_id": "offload-model-offloading-1-dbb471ed01d8",
+      "model": "phi4-reasoning-plus",
+      "observed_output_tokens": [
+        190,
+        2048
+      ],
+      "observed_prompt_tokens": [
+        250,
+        274
+      ],
+      "report": "model-offloading/campaign-20261116T133213Z-8dbe93fd-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "85f5cc03dbee1471b6b52b0786970b5ae8eae335ded14335a1e7becec85a2d86"
+      ],
+      "candidate_comparison_sha256": "11125fbff61012e0386e1dcf8d752c4b077c9c1e6dc2ec9326866cbb8ba9815f",
+      "case": "phi4-reasoning-plus-ollama",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "56f1e9f033405eb1c8184973f9fb46c41e0b24b09f30b9100d6478fcdde1bb9d",
+      "job_id": "offload-model-offloading-1-7f239688f788",
+      "model": "phi4-reasoning-plus",
+      "observed_output_tokens": [
+        2048,
+        2048
+      ],
+      "observed_prompt_tokens": [
+        250,
+        274
+      ],
+      "report": "model-offloading/campaign-20261116T133213Z-8dbe93fd-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "63f92b5ab4762e2a517f5f49f5c33f7b7e25711bd126735ec0d558660eece68e"
+      ],
+      "candidate_comparison_sha256": "b456f6feaa015baa2e78dc3e703f69dc98d5a9486b47572e36fd74526f879e51",
+      "case": "kimi-dev-72b-koboldcpp",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "15c158c3672e22e7a650cd2bf352572603cec0b1e8cb786d7377be80daad3ff7",
+      "job_id": "offload-model-offloading-1-7274223fc38b",
+      "model": "kimi-dev-72b",
+      "observed_output_tokens": [
+        106,
+        641
+      ],
+      "observed_prompt_tokens": [
+        22,
+        44
+      ],
+      "report": "model-offloading/campaign-20261116T080605Z-9fa41c54-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "63f92b5ab4762e2a517f5f49f5c33f7b7e25711bd126735ec0d558660eece68e"
+      ],
+      "candidate_comparison_sha256": null,
+      "case": "kimi-dev-72b-lmstudio",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "e98903e9cc5af62b6c0c918e9ce87fe05739266eea9860711bc596bab9d1bf2d",
+      "job_id": "offload-model-offloading-1-d23d1c519653",
+      "model": "kimi-dev-72b",
+      "observed_output_tokens": [
+        147,
+        1542
+      ],
+      "observed_prompt_tokens": [
+        43,
+        65
+      ],
+      "report": "model-offloading/campaign-20261116T080605Z-9fa41c54-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "failed",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "63f92b5ab4762e2a517f5f49f5c33f7b7e25711bd126735ec0d558660eece68e"
+      ],
+      "candidate_comparison_sha256": "7d8ac3d7bfc9d1a217d8e228a5b76631f937c5711cbb6569b7fb929ae0b31093",
+      "case": "kimi-dev-72b-ollama",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "ee7bbc37f20a6d56f31a3273286aed7199eae15f70fbe964f27ab0868c53819c",
+      "job_id": "offload-model-offloading-1-d5ee683b6c7c",
+      "model": "kimi-dev-72b",
+      "observed_output_tokens": [
+        112,
+        1208
+      ],
+      "observed_prompt_tokens": [
+        43,
+        65
+      ],
+      "report": "model-offloading/campaign-20261116T080605Z-9fa41c54-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "6bc67d88e8e395aa46ad1df9650e5938bdb64a0158d7e70974c3f8075cfafb67"
+      ],
+      "candidate_comparison_sha256": "a114c234a45f71e7e16260ef0c0804a58a40acaf1eccd3fbfbe6688da17d4818",
+      "case": "deepseek-r1-70b-koboldcpp",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "8d60ef4e57e1e5ad60f331e02513ce69ea0b4b9fc9d2fc845525ae35826f5026",
+      "job_id": "offload-model-offloading-1-0bb8048f47a6",
+      "model": "deepseek-r1-70b",
+      "observed_output_tokens": [
+        242,
+        614
+      ],
+      "observed_prompt_tokens": [
+        15,
+        39
+      ],
+      "report": "model-offloading/campaign-20261116T025021Z-920ba116-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "6bc67d88e8e395aa46ad1df9650e5938bdb64a0158d7e70974c3f8075cfafb67"
+      ],
+      "candidate_comparison_sha256": "76078133146c82aadf0e942bb55d9346f8dcea09a4826ea2b635d610b1b29e23",
+      "case": "deepseek-r1-70b-lmstudio",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "13c8c02b343df5c66b311bf3a5ddc155a4e8014f661ca6b4db95f67d7e6f2888",
+      "job_id": "offload-model-offloading-1-f3eeb54d9350",
+      "model": "deepseek-r1-70b",
+      "observed_output_tokens": [
+        202,
+        565
+      ],
+      "observed_prompt_tokens": [
+        15,
+        39
+      ],
+      "report": "model-offloading/campaign-20261116T025021Z-920ba116-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "6bc67d88e8e395aa46ad1df9650e5938bdb64a0158d7e70974c3f8075cfafb67"
+      ],
+      "candidate_comparison_sha256": "681664ad1f046bc3131d29ce0a6fd1b31065c6a5106df0a9f57af1b0a4d0c0b6",
+      "case": "deepseek-r1-70b-ollama",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "a367a4e7aad1191cbe3b7b5eb77ef714550d36f536a79d20cfaf5b3cf56d2957",
+      "job_id": "offload-model-offloading-1-7a0671b05227",
+      "model": "deepseek-r1-70b",
+      "observed_output_tokens": [
+        242,
+        551
+      ],
+      "observed_prompt_tokens": [
+        15,
+        39
+      ],
+      "report": "model-offloading/campaign-20261116T025021Z-920ba116-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "cdb0278f609227e90e778f3816207b853a3a142ce075b93c6c06a540ccf82433"
+      ],
+      "candidate_comparison_sha256": "d51eef1577209b2a62b8fa71bc1661db3f88fa881cffe1e355069b26351d864c",
+      "case": "deepseek-r1-32b-koboldcpp",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "a6b27eb11b41e75ef01c22964bf602e24762d6dbd05f4386b15a5eb3b33a6058",
+      "job_id": "offload-model-offloading-1-f98a74d7c1d6",
+      "model": "deepseek-r1-32b",
+      "observed_output_tokens": [
+        232,
+        460
+      ],
+      "observed_prompt_tokens": [
+        17,
+        39
+      ],
+      "report": "model-offloading/campaign-20261115T230200Z-261eec44-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "cdb0278f609227e90e778f3816207b853a3a142ce075b93c6c06a540ccf82433"
+      ],
+      "candidate_comparison_sha256": "97b3e434c3bb07e7e760fc4469f04f4b734a275cb565e7f6b066b48cab748236",
+      "case": "deepseek-r1-32b-lmstudio",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "bd310e7e9290bca599d95273a0b1a34709b42fdc1980d0eebfd1e0882a7ad224",
+      "job_id": "offload-model-offloading-1-8cd707175ee0",
+      "model": "deepseek-r1-32b",
+      "observed_output_tokens": [
+        249,
+        612
+      ],
+      "observed_prompt_tokens": [
+        17,
+        39
+      ],
+      "report": "model-offloading/campaign-20261115T230200Z-261eec44-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "cdb0278f609227e90e778f3816207b853a3a142ce075b93c6c06a540ccf82433"
+      ],
+      "candidate_comparison_sha256": "bc48485d9b63d7e51ef5eb97e7b859bcd49895e1582ab70fc567732a0dd7003e",
+      "case": "deepseek-r1-32b-ollama",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "d919aebf787b7f215ffae8ff23a18bcdbb40ac7a6e15860b4756fba39bc50157",
+      "job_id": "offload-model-offloading-1-a5f32470b1c5",
+      "model": "deepseek-r1-32b",
+      "observed_output_tokens": [
+        237,
+        457
+      ],
+      "observed_prompt_tokens": [
+        17,
+        39
+      ],
+      "report": "model-offloading/campaign-20261115T230200Z-261eec44-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "0149d02e96c34bb6da3c613b7614cf5dd60aa3bde4e3812d80088d1432f85ea0"
+      ],
+      "candidate_comparison_sha256": "ff4faa2f4d9ee55e2d7d2c558b3891bf41fe21d7d2d0e7dcd0180f7593b86192",
+      "case": "qwen38-27b-koboldcpp",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "65e216bfe991357144b27048c06945585111c16ca53ae1969980a7c66b0bf910",
+      "job_id": "offload-model-offloading-1-a9c9aeebbc4d",
+      "model": "qwen38-27b",
+      "observed_output_tokens": [
+        60,
+        111
+      ],
+      "observed_prompt_tokens": [
+        23,
+        45
+      ],
+      "report": "model-offloading/campaign-20261115T222422Z-7671e746-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "0149d02e96c34bb6da3c613b7614cf5dd60aa3bde4e3812d80088d1432f85ea0"
+      ],
+      "candidate_comparison_sha256": "f55b96d9c4a771eb5bed14e4bb685adb6aa29af7c92e57c112267c3decb8daf0",
+      "case": "qwen38-27b-lmstudio",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "37a63de17dc1033e59556e3494ced99c0db1d255f43adf932484deac8a6fce6b",
+      "job_id": "offload-model-offloading-1-fac3127225ae",
+      "model": "qwen38-27b",
+      "observed_output_tokens": [
+        36,
+        111
+      ],
+      "observed_prompt_tokens": [
+        66,
+        88
+      ],
+      "report": "model-offloading/campaign-20261115T222422Z-7671e746-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "0149d02e96c34bb6da3c613b7614cf5dd60aa3bde4e3812d80088d1432f85ea0"
+      ],
+      "candidate_comparison_sha256": "063170f7466e874be380ac8c5666ee2e3480a3ef9fad483aecd2953d81223ee6",
+      "case": "qwen38-27b-ollama",
+      "code_revision": "4c11da3344793596cf51aa0b4b979c56f35fe36b",
+      "cohort_digests": [],
+      "config_sha256": "6fb8a8aec166f968fb95518659e4eeadcfd584d7832621916b6675e4df475c80",
+      "job_id": "offload-model-offloading-1-e1feb0ce918f",
+      "model": "qwen38-27b",
+      "observed_output_tokens": [
+        42,
+        96
+      ],
+      "observed_prompt_tokens": [
+        66,
+        88
+      ],
+      "report": "model-offloading/campaign-20261115T222422Z-7671e746-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "793af583a708a8f920690ca7700ffb3b925ce185dd23f537402650a4c05f7aa9"
+      ],
+      "candidate_comparison_sha256": "08a69d386986c276c9aef4cd9caa17de79a409e718db596f262f7a141eda8717",
+      "case": "llama3-70b-koboldcpp",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "3cd796e476c1ed8ccb954cbec2090c7b8585d5b22a1e020804264b6affc4c58b",
+      "job_id": "offload-model-offloading-1-c2e750a5613c",
+      "model": "llama3-70b",
+      "observed_output_tokens": [
+        2,
+        101
+      ],
+      "observed_prompt_tokens": [
+        22,
+        46
+      ],
+      "report": "model-offloading/campaign-20261115T215231Z-b6016170-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "793af583a708a8f920690ca7700ffb3b925ce185dd23f537402650a4c05f7aa9"
+      ],
+      "candidate_comparison_sha256": "08c6345f0c477ac8e5bd938610214e4b2d91e37e758f37adc6d81d4a47e5a137",
+      "case": "llama3-70b-lmstudio",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "0a6f664e7b11f9538f462959b336889637d3d63f1dd954e145e896f190306eb3",
+      "job_id": "offload-model-offloading-1-efa5ea7463d1",
+      "model": "llama3-70b",
+      "observed_output_tokens": [
+        2,
+        100
+      ],
+      "observed_prompt_tokens": [
+        22,
+        46
+      ],
+      "report": "model-offloading/campaign-20261115T215231Z-b6016170-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "793af583a708a8f920690ca7700ffb3b925ce185dd23f537402650a4c05f7aa9"
+      ],
+      "candidate_comparison_sha256": "97bdf0b59fff56fd6d8933a81f58d765b4069726ad27a1dde9989d89d0142568",
+      "case": "llama3-70b-ollama",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "bc6bbc11be560fd9cb041918101ff2dab8bc88b860f3dda9cbd601976c0e9d5a",
+      "job_id": "offload-model-offloading-1-fcb1df403f7f",
+      "model": "llama3-70b",
+      "observed_output_tokens": [
+        2,
+        101
+      ],
+      "observed_prompt_tokens": [
+        22,
+        46
+      ],
+      "report": "model-offloading/campaign-20261115T215231Z-b6016170-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "c932be5abf66ebff3e40947b46b176f0b76758cad707072350878ccf4bf547eb"
+      ],
+      "candidate_comparison_sha256": "a36807fa57f224aa00178a754195e62e96b9874470753f8e2fc5e31ebc0b4378",
+      "case": "llama31-70b-koboldcpp",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "a53a1e63730f85e0d776ed2e358607095539fa51fe360fe504f3283c7ebd8384",
+      "job_id": "offload-model-offloading-1-b9f131a1a9c3",
+      "model": "llama31-70b",
+      "observed_output_tokens": [
+        2,
+        124
+      ],
+      "observed_prompt_tokens": [
+        22,
+        46
+      ],
+      "report": "model-offloading/campaign-20261115T210503Z-4b066e90-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "c932be5abf66ebff3e40947b46b176f0b76758cad707072350878ccf4bf547eb"
+      ],
+      "candidate_comparison_sha256": "6edd4dfc357729cd4129c510529862c110f32476f7bdd11da154a09941889153",
+      "case": "llama31-70b-lmstudio",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "b1f50a8b3c83af930289272811489d644a42be6ceb2cfa6421d8797329d04c39",
+      "job_id": "offload-model-offloading-1-c10fd55e6c38",
+      "model": "llama31-70b",
+      "observed_output_tokens": [
+        20,
+        41
+      ],
+      "observed_prompt_tokens": [
+        103,
+        127
+      ],
+      "report": "model-offloading/campaign-20261115T210503Z-4b066e90-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "c932be5abf66ebff3e40947b46b176f0b76758cad707072350878ccf4bf547eb"
+      ],
+      "candidate_comparison_sha256": "41f6c87833175c2d5bdc8e40d8b981d7edec1df3ec738531a01941c372bec4f7",
+      "case": "llama31-70b-ollama",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "6cf7ed1908c18c7cdac5aea6a3c7b2023d52266c66958e95a745d5d1acdb1e95",
+      "job_id": "offload-model-offloading-1-ca78ec6a2979",
+      "model": "llama31-70b",
+      "observed_output_tokens": [
+        18,
+        41
+      ],
+      "observed_prompt_tokens": [
+        103,
+        127
+      ],
+      "report": "model-offloading/campaign-20261115T210503Z-4b066e90-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "5bdcb9b7a23e8829881ed4cedd95b318a8e61979e927846b93e99d3d200f2b1b"
+      ],
+      "candidate_comparison_sha256": "60f69761f4a74144a6f569c194579c8ac7c0b21791f6f9dcee5ef02914fc9a61",
+      "case": "llama33-70b-koboldcpp",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "d83b48aeb5b83b02422ba55274d1d457e02c04d8225da28769bd0f68a7007a95",
+      "job_id": "offload-model-offloading-1-2974ef96487f",
+      "model": "llama33-70b",
+      "observed_output_tokens": [
+        2,
+        151
+      ],
+      "observed_prompt_tokens": [
+        22,
+        46
+      ],
+      "report": "model-offloading/campaign-20261115T201525Z-d393f04a-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "5bdcb9b7a23e8829881ed4cedd95b318a8e61979e927846b93e99d3d200f2b1b"
+      ],
+      "candidate_comparison_sha256": "20455557e5eac7bab6e04d99c672e6bbfe3518e1deb02899a3af7eb8ffd3b2fc",
+      "case": "llama33-70b-lmstudio",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "7e7cde09fa08cb32e58a9a8504679a5492ebe240f050bc4ada5e1a53a43528b9",
+      "job_id": "offload-model-offloading-1-0390c62a7124",
+      "model": "llama33-70b",
+      "observed_output_tokens": [
+        2,
+        92
+      ],
+      "observed_prompt_tokens": [
+        47,
+        71
+      ],
+      "report": "model-offloading/campaign-20261115T201525Z-d393f04a-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "5bdcb9b7a23e8829881ed4cedd95b318a8e61979e927846b93e99d3d200f2b1b"
+      ],
+      "candidate_comparison_sha256": "ebb628dcc352c5ab53ade9e7e378c742ad0686726b5ffddf164d8472068212a6",
+      "case": "llama33-70b-ollama",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "e422843c2ab17d7d1f7c4171965bc1b5860a220c791230b88b89fb916f750536",
+      "job_id": "offload-model-offloading-1-691c92382f24",
+      "model": "llama33-70b",
+      "observed_output_tokens": [
+        2,
+        120
+      ],
+      "observed_prompt_tokens": [
+        47,
+        71
+      ],
+      "report": "model-offloading/campaign-20261115T201525Z-d393f04a-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "716affb860a4e4fb393b936781c1b379757bb6f00bda0e00889272e757980fea"
+      ],
+      "candidate_comparison_sha256": "aeeb6fef5413d1f5022f6e7bc70eb503a9ea01c6b46dfe812b1c9375e0a59c3e",
+      "case": "gemma3-27b-koboldcpp",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "10c21b19ffe7007268e641a1429ed066a473b3dc44990558a4a6bdb994db7b3a",
+      "job_id": "offload-model-offloading-1-0eaa61bbc9e3",
+      "model": "gemma3-27b",
+      "observed_output_tokens": [
+        3,
+        194
+      ],
+      "observed_prompt_tokens": [
+        23,
+        46
+      ],
+      "report": "model-offloading/campaign-20261115T193835Z-720b0164-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "716affb860a4e4fb393b936781c1b379757bb6f00bda0e00889272e757980fea"
+      ],
+      "candidate_comparison_sha256": "a7a2f302d1b61194bc9093dbc3d32ba9c4d7e54cc7c3a8e3d36fd4bb2e3cc4d2",
+      "case": "gemma3-27b-lmstudio",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "a8775b1eb9ba95ecaaed7f3198d399b627b55b60b51e91a91f9177c6828bdc08",
+      "job_id": "offload-model-offloading-1-ad850e1a7450",
+      "model": "gemma3-27b",
+      "observed_output_tokens": [
+        2,
+        133
+      ],
+      "observed_prompt_tokens": [
+        23,
+        46
+      ],
+      "report": "model-offloading/campaign-20261115T193835Z-720b0164-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "716affb860a4e4fb393b936781c1b379757bb6f00bda0e00889272e757980fea"
+      ],
+      "candidate_comparison_sha256": "15aeff7905aeb36067dcb34a87ce6df364faa2064857cfebd712cbdd43452c00",
+      "case": "gemma3-27b-ollama",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "e940445558a38b41d9b52c02b3e78c92d403b150220fda93b6de179b1a64598b",
+      "job_id": "offload-model-offloading-1-9a75229f3b0d",
+      "model": "gemma3-27b",
+      "observed_output_tokens": [
+        3,
+        136
+      ],
+      "observed_prompt_tokens": [
+        23,
+        46
+      ],
+      "report": "model-offloading/campaign-20261115T193835Z-720b0164-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "75458563efb26e2a2f3e258b1b93e67ae4a812dee7b607d890ea1400637869b0"
+      ],
+      "candidate_comparison_sha256": "42029d61a260a0183c51993f1b12327f013553add93bdd715f945de1de3ca51e",
+      "case": "mistral-small31-koboldcpp",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "448ec5279df421ba8673a41dba23db6c044d389e14e7f31af500384a8650b7f8",
+      "job_id": "offload-model-offloading-1-129abf22eb9d",
+      "model": "mistral-small31",
+      "observed_output_tokens": [
+        2,
+        126
+      ],
+      "observed_prompt_tokens": [
+        17,
+        41
+      ],
+      "report": "model-offloading/campaign-20261115T184931Z-b2407d9b-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "75458563efb26e2a2f3e258b1b93e67ae4a812dee7b607d890ea1400637869b0"
+      ],
+      "candidate_comparison_sha256": "900f87860a5a1256543bbd9222a2186ff1819dc83ec466b76d81a2ec5c080af2",
+      "case": "mistral-small31-lmstudio",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "ef80c011830905d69a74882345066be06d9f3dbfae5013c64343be48dc57cca3",
+      "job_id": "offload-model-offloading-1-d7be41a213b0",
+      "model": "mistral-small31",
+      "observed_output_tokens": [
+        2,
+        173
+      ],
+      "observed_prompt_tokens": [
+        175,
+        199
+      ],
+      "report": "model-offloading/campaign-20261115T184931Z-b2407d9b-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "75458563efb26e2a2f3e258b1b93e67ae4a812dee7b607d890ea1400637869b0"
+      ],
+      "candidate_comparison_sha256": "21f4f3593f386833c97539ecb3ad7d3fa0c71ab9d174485a56642664109bbe15",
+      "case": "mistral-small31-ollama",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "f3a6a36d67c81cbbb5b16d11fe8b857fe9b5f997ae09cfa05d4ba867d3385562",
+      "job_id": "offload-model-offloading-1-7fe65a7e7e83",
+      "model": "mistral-small31",
+      "observed_output_tokens": [
+        2,
+        129
+      ],
+      "observed_prompt_tokens": [
+        175,
+        199
+      ],
+      "report": "model-offloading/campaign-20261115T184931Z-b2407d9b-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "03bf7b4a0973fdb85409f7d72108d1f066ecb52fb2378baeee7411693b727e60"
+      ],
+      "candidate_comparison_sha256": "87309c2b0682fc7a05082efa13604504e25d386346c4a0da9258e5b8568a8b81",
+      "case": "qwen35-35b-moe-koboldcpp",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "adad9485e6651405cbabba9ff702efb9632c3db475b11cdef6e353ddc8d47955",
+      "job_id": "offload-model-offloading-1-3440c611be06",
+      "model": "qwen35-35b-moe",
+      "observed_output_tokens": [
+        6,
+        2048
+      ],
+      "observed_prompt_tokens": [
+        22,
+        44
+      ],
+      "report": "model-offloading/campaign-20261115T180032Z-22d1b837-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "03bf7b4a0973fdb85409f7d72108d1f066ecb52fb2378baeee7411693b727e60"
+      ],
+      "candidate_comparison_sha256": "ec500d0fc8c1d2938636911797710bc6a0776a30a809c340daa6e21be84ca4f6",
+      "case": "qwen35-35b-moe-lmstudio",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "4bf9abe548c69d2765cee65990d20d8fb4bd2057c5aa6cb41ef2b2d4677058c4",
+      "job_id": "offload-model-offloading-1-dccf5345b081",
+      "model": "qwen35-35b-moe",
+      "observed_output_tokens": [
+        241,
+        2048
+      ],
+      "observed_prompt_tokens": [
+        24,
+        46
+      ],
+      "report": "model-offloading/campaign-20261115T180032Z-22d1b837-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "03bf7b4a0973fdb85409f7d72108d1f066ecb52fb2378baeee7411693b727e60"
+      ],
+      "candidate_comparison_sha256": "732f5100e1feb30a71937ad6258424a78824218038e760da5beafb33e0dd0ab3",
+      "case": "qwen35-35b-moe-ollama",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "c1d2de32a173d88558af59a396c57cdc80b94e80b79457efed533859efe71d39",
+      "job_id": "offload-model-offloading-1-11dcd9c81ae3",
+      "model": "qwen35-35b-moe",
+      "observed_output_tokens": [
+        233,
+        2048
+      ],
+      "observed_prompt_tokens": [
+        24,
+        46
+      ],
+      "report": "model-offloading/campaign-20261115T180032Z-22d1b837-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "dd3a45dbe1132c8bd774adcb4278a775118394849d09612b430dbb654f512bd1"
+      ],
+      "candidate_comparison_sha256": "57daa9b6b7ee4564599531b281ef713364612bf89223ed0042a70d2427d3d52e",
+      "case": "nemotron-nano-30b-koboldcpp",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "f48a5f2d6bc404f7a669b07415bbb8bd9f2924f2c18d4521831c5b0475af7898",
+      "job_id": "offload-model-offloading-1-d181c9d1571a",
+      "model": "nemotron-nano-30b",
+      "observed_output_tokens": [
+        2,
+        196
+      ],
+      "observed_prompt_tokens": [
+        23,
+        47
+      ],
+      "report": "model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "dd3a45dbe1132c8bd774adcb4278a775118394849d09612b430dbb654f512bd1"
+      ],
+      "candidate_comparison_sha256": "98ddfa6c0f7f476d924fb24a32819a4d218dcea666cd4f74b857000408532229",
+      "case": "nemotron-nano-30b-lmstudio",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "d9d2893d0ed25b65e9b95ebb37b52ba9282d9c3280f5c7996a4912beec719c43",
+      "job_id": "offload-model-offloading-1-efb881da8017",
+      "model": "nemotron-nano-30b",
+      "observed_output_tokens": [
+        38,
+        192
+      ],
+      "observed_prompt_tokens": [
+        30,
+        54
+      ],
+      "report": "model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "dd3a45dbe1132c8bd774adcb4278a775118394849d09612b430dbb654f512bd1"
+      ],
+      "candidate_comparison_sha256": "d005a34bfc24700391a42121a29a06f171e5a8ab4798e3bbde172b9ada1f9903",
+      "case": "nemotron-nano-30b-ollama",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "70a4bc73242f4fe90594a23d83a4b36952015d6993e05d397cf20081bb753560",
+      "job_id": "offload-model-offloading-1-0ea783c16fdf",
+      "model": "nemotron-nano-30b",
+      "observed_output_tokens": [
+        53,
+        187
+      ],
+      "observed_prompt_tokens": [
+        30,
+        54
+      ],
+      "report": "model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "e2fcc3401d23cae4fa7c86c8d5cb05ef52eaedabef26c12b85d7c5ad9cc3a529"
+      ],
+      "candidate_comparison_sha256": "5613fae27e19d79293195654efd3a6687736fa31287399cb7596d2ebd12a868f",
+      "case": "laguna-xs21-koboldcpp",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "7da35c6a879d13d91429c5092419c2c3684bd713842a0d1e0b74c155475ec80b",
+      "job_id": "offload-model-offloading-1-935056637371",
+      "model": "laguna-xs21",
+      "observed_output_tokens": [
+        2,
+        189
+      ],
+      "observed_prompt_tokens": [
+        57,
+        78
+      ],
+      "report": "model-offloading/campaign-20261115T164043Z-6fc5883d-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "e2fcc3401d23cae4fa7c86c8d5cb05ef52eaedabef26c12b85d7c5ad9cc3a529"
+      ],
+      "candidate_comparison_sha256": "b54dcd5ad238fb6cbcd18db111a0d34f4d4365fc15bcd785a4a8e56218a805bf",
+      "case": "laguna-xs21-lmstudio",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "32d9303408dbcc0b7a68fd3908f81adfb6b5c1324a0c1c79c977a654ed232197",
+      "job_id": "offload-model-offloading-1-de7260ca9c77",
+      "model": "laguna-xs21",
+      "observed_output_tokens": [
+        259,
+        1580
+      ],
+      "observed_prompt_tokens": [
+        56,
+        77
+      ],
+      "report": "model-offloading/campaign-20261115T164043Z-6fc5883d-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "e2fcc3401d23cae4fa7c86c8d5cb05ef52eaedabef26c12b85d7c5ad9cc3a529"
+      ],
+      "candidate_comparison_sha256": "e9fa059b193482a7f36b400c8fdedf217526f93dc4b8932ea6434a1c4edd5933",
+      "case": "laguna-xs21-ollama",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "8a16f4c80fa965fc52bbe7ffb004ac431ce54de9c1732f08dacd06984fce22f9",
+      "job_id": "offload-model-offloading-1-2506bfe7a950",
+      "model": "laguna-xs21",
+      "observed_output_tokens": [
+        200,
+        1666
+      ],
+      "observed_prompt_tokens": [
+        64,
+        85
+      ],
+      "report": "model-offloading/campaign-20261115T164043Z-6fc5883d-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "5637b5d24941a7d06efa245e879a37280c32d76f0275d1e657447f2e1389f1e8"
+      ],
+      "candidate_comparison_sha256": "f478d7a6f250d99e6aa7d3e24fb22dbcf93979b463d71ef8a81c5e5988b2c095",
+      "case": "gemma4-26b-moe-koboldcpp",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "a645cfcce234d9b5942d2dc126408d0c5cc5f92f7c2f48b10f7125e23807f14e",
+      "job_id": "offload-model-offloading-1-38ffad82cecc",
+      "model": "gemma4-26b-moe",
+      "observed_output_tokens": [
+        2,
+        12
+      ],
+      "observed_prompt_tokens": [
+        27,
+        50
+      ],
+      "report": "model-offloading/campaign-20261115T161112Z-fff50610-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "5637b5d24941a7d06efa245e879a37280c32d76f0275d1e657447f2e1389f1e8"
+      ],
+      "candidate_comparison_sha256": "944b1ff548a7335e6595b6f1566a4a3a37ae961c922e8ed8348d3b81f4706c8f",
+      "case": "gemma4-26b-moe-lmstudio",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "62e0ab3c256666155283c09710fe42ffbcedaf3142b53706979458c4ea59d47e",
+      "job_id": "offload-model-offloading-1-a02fb7d85449",
+      "model": "gemma4-26b-moe",
+      "observed_output_tokens": [
+        103,
+        398
+      ],
+      "observed_prompt_tokens": [
+        30,
+        53
+      ],
+      "report": "model-offloading/campaign-20261115T161112Z-fff50610-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": null,
+      "case": "gemma4-26b-moe-ollama",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "b692c1e967039756d77a9c505dc43630bb822fc96399b4dedc743a22adfaae96",
+      "job_id": "offload-model-offloading-1-f39ebde89ef6",
+      "model": "gemma4-26b-moe",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [],
+      "report": "model-offloading/campaign-20261115T161112Z-fff50610-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "failed",
+      "suite_sha256": {}
+    },
+    {
+      "artifact_sha256": [
+        "3355f8fe67ee4ddddce4cd6d10c320598fa05aaa981a3b15c865111f7a1498c1"
+      ],
+      "candidate_comparison_sha256": "c801eb14881827621fe083c660ce3dc6920cf3c6a1f5e9158ba6c88c0d53946f",
+      "case": "gemma4-31b-koboldcpp",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "3100d08b768156f62b40c4ff53d38ea34d894bdf725452fb24772e9624c84008",
+      "job_id": "offload-model-offloading-1-44feab011446",
+      "model": "gemma4-31b",
+      "observed_output_tokens": [
+        2,
+        12
+      ],
+      "observed_prompt_tokens": [
+        27,
+        50
+      ],
+      "report": "model-offloading/campaign-20261115T143606Z-03f6333f-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "3355f8fe67ee4ddddce4cd6d10c320598fa05aaa981a3b15c865111f7a1498c1"
+      ],
+      "candidate_comparison_sha256": "ec5f1eda52464e2991b94992e7b8e9739b2387205f7f8b7180f6198fc5efe8d9",
+      "case": "gemma4-31b-lmstudio",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "56ada793f3c6fb3959a21be3e260e881c0b36e929dd9040d567061697cec743f",
+      "job_id": "offload-model-offloading-1-814628ba9504",
+      "model": "gemma4-31b",
+      "observed_output_tokens": [
+        84,
+        401
+      ],
+      "observed_prompt_tokens": [
+        30,
+        53
+      ],
+      "report": "model-offloading/campaign-20261115T143606Z-03f6333f-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "3355f8fe67ee4ddddce4cd6d10c320598fa05aaa981a3b15c865111f7a1498c1"
+      ],
+      "candidate_comparison_sha256": "1cdcde4aee745b214da7d474821a1e76cfe076903040ac5eb8469832e2ad8e1c",
+      "case": "gemma4-31b-ollama",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "1dbd2f7ecb3166d02a368943c9f910b2e20c605d302d5485e2e8b0b2daa3ec73",
+      "job_id": "offload-model-offloading-1-19937807a7ec",
+      "model": "gemma4-31b",
+      "observed_output_tokens": [
+        75,
+        291
+      ],
+      "observed_prompt_tokens": [
+        30,
+        53
+      ],
+      "report": "model-offloading/campaign-20261115T143606Z-03f6333f-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "f5702d198d056349a98203943b98c213831c4d486f9b2962f23b842bb5a13bb2"
+      ],
+      "candidate_comparison_sha256": "1595064c799f8c5f1bbad8ffe072db42f7197b45c33cce2a874301a43182cc62",
+      "case": "kimi-linear-48b-koboldcpp",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "ff1d9051cca35845163059750f20bcefe7dec4c1276b9a1a4292eefe96910855",
+      "job_id": "offload-model-offloading-1-82c7918309af",
+      "model": "kimi-linear-48b",
+      "observed_output_tokens": [
+        2,
+        7
+      ],
+      "observed_prompt_tokens": [
+        20,
+        43
+      ],
+      "report": "model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "f5702d198d056349a98203943b98c213831c4d486f9b2962f23b842bb5a13bb2"
+      ],
+      "candidate_comparison_sha256": "5947e95789bcf348534cffc95c75dc055f80b8b849821ec25f6d10b6e8c99ae0",
+      "case": "kimi-linear-48b-lmstudio",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "9f6dd52aa666d5e219ec25e6b0a354542850425194fe586b1950cff444c60c35",
+      "job_id": "offload-model-offloading-1-fdca39ed8f98",
+      "model": "kimi-linear-48b",
+      "observed_output_tokens": [
+        2,
+        23
+      ],
+      "observed_prompt_tokens": [
+        19,
+        42
+      ],
+      "report": "model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "f5702d198d056349a98203943b98c213831c4d486f9b2962f23b842bb5a13bb2"
+      ],
+      "candidate_comparison_sha256": "719c4f4b2b87f06f7ba1104c90608b9ea18c0685894d5795a6c94eb1fcf947a2",
+      "case": "kimi-linear-48b-ollama",
+      "code_revision": "e69e23c502609a24da6b89744c32be3ea65f5fbd",
+      "cohort_digests": [],
+      "config_sha256": "913d2379da19f45f95ced1c4b2ddd84800a3dce0bb1592808e56dca600b8b16a",
+      "job_id": "offload-model-offloading-1-400d91c422e5",
+      "model": "kimi-linear-48b",
+      "observed_output_tokens": [
+        2,
+        7
+      ],
+      "observed_prompt_tokens": [
+        19,
+        42
+      ],
+      "report": "model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "5637b5d24941a7d06efa245e879a37280c32d76f0275d1e657447f2e1389f1e8"
+      ],
+      "candidate_comparison_sha256": "bef722befaca5bfa4f151116e8197bea27914178abf1fb0ab264d1b0df3ef76f",
+      "case": "gemma4-26b-moe-koboldcpp",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "8c6a1986151b489f3afc45c06e21f21a9517716ec11767f467358d465db82960",
+      "job_id": "offload-model-offloading-1-38ffad82cecc",
+      "model": "gemma4-26b-moe",
+      "observed_output_tokens": [
+        2,
+        12
+      ],
+      "observed_prompt_tokens": [
+        27,
+        50
+      ],
+      "report": "model-offloading/campaign-20261111T110234Z-68c0f219-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "5637b5d24941a7d06efa245e879a37280c32d76f0275d1e657447f2e1389f1e8"
+      ],
+      "candidate_comparison_sha256": "ddf150b11882d8b9df03b52a02a380637ee1c40b459f46104fc9427f91fbb5ae",
+      "case": "gemma4-26b-moe-lmstudio",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "0bf6c1b65ce519f35dca46e36c772e382e37206d081a5d8b3ba416d051692a84",
+      "job_id": "offload-model-offloading-1-a02fb7d85449",
+      "model": "gemma4-26b-moe",
+      "observed_output_tokens": [
+        103,
+        398
+      ],
+      "observed_prompt_tokens": [
+        30,
+        53
+      ],
+      "report": "model-offloading/campaign-20261111T110234Z-68c0f219-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": null,
+      "case": "gemma4-26b-moe-ollama",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "833d2a8ae48f8fa2172dc3c736b5539ca9e9845df7862fcd2fa27f2f3a426301",
+      "job_id": "offload-model-offloading-1-f39ebde89ef6",
+      "model": "gemma4-26b-moe",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [],
+      "report": "model-offloading/campaign-20261111T110234Z-68c0f219-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "failed",
+      "suite_sha256": {}
+    },
+    {
+      "artifact_sha256": [
+        "63f92b5ab4762e2a517f5f49f5c33f7b7e25711bd126735ec0d558660eece68e"
+      ],
+      "candidate_comparison_sha256": "6ec827bffca68c0bf79e4f85ca54232ceef7228175439da3590fea39ff4c2142",
+      "case": "kimi-dev-72b-koboldcpp",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "b8db2761e99d1375bc9cf6b0ff7e4b6930288bd91fa5ad5e3f7b2840f0121e76",
+      "job_id": "offload-model-offloading-1-7274223fc38b",
+      "model": "kimi-dev-72b",
+      "observed_output_tokens": [
+        106,
+        641
+      ],
+      "observed_prompt_tokens": [
+        22,
+        44
+      ],
+      "report": "model-offloading/campaign-20261110T194147Z-d3ca2090-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "63f92b5ab4762e2a517f5f49f5c33f7b7e25711bd126735ec0d558660eece68e"
+      ],
+      "candidate_comparison_sha256": null,
+      "case": "kimi-dev-72b-lmstudio",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "8eca39c87acab07c10bd96a385092d9814e09bd90d9414e00bd0ad1a2c7ce9f9",
+      "job_id": "offload-model-offloading-1-d23d1c519653",
+      "model": "kimi-dev-72b",
+      "observed_output_tokens": [
+        147,
+        1542
+      ],
+      "observed_prompt_tokens": [
+        43,
+        65
+      ],
+      "report": "model-offloading/campaign-20261110T194147Z-d3ca2090-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "failed",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "63f92b5ab4762e2a517f5f49f5c33f7b7e25711bd126735ec0d558660eece68e"
+      ],
+      "candidate_comparison_sha256": "791d0a14273aaa1b82184ec8b5a740915299e85f2528f5b53f972154c2a56676",
+      "case": "kimi-dev-72b-ollama",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "f95f6e159bc6f977cd2681762d8a41c458b004ba6d8e3a8c76a3ccdb0167c963",
+      "job_id": "offload-model-offloading-1-d5ee683b6c7c",
+      "model": "kimi-dev-72b",
+      "observed_output_tokens": [
+        112,
+        1208
+      ],
+      "observed_prompt_tokens": [
+        43,
+        65
+      ],
+      "report": "model-offloading/campaign-20261110T194147Z-d3ca2090-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "6bc67d88e8e395aa46ad1df9650e5938bdb64a0158d7e70974c3f8075cfafb67"
+      ],
+      "candidate_comparison_sha256": "457a0cfa63115033f4a75856361fdd88a6d8edcd073823e262d7b063adf5c15c",
+      "case": "deepseek-r1-70b-koboldcpp",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "c5a36f620a4c965eef2e66d3644ad5e9aff28164592cc1c0a978fda31e183224",
+      "job_id": "offload-model-offloading-1-0bb8048f47a6",
+      "model": "deepseek-r1-70b",
+      "observed_output_tokens": [
+        242,
+        614
+      ],
+      "observed_prompt_tokens": [
+        15,
+        39
+      ],
+      "report": "model-offloading/campaign-20261110T142645Z-46f987f0-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "6bc67d88e8e395aa46ad1df9650e5938bdb64a0158d7e70974c3f8075cfafb67"
+      ],
+      "candidate_comparison_sha256": "2555455c9a28c725b4c22b6c6932f17d7b4d5f4d1db1c06f3fb02cf135240aa6",
+      "case": "deepseek-r1-70b-lmstudio",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "9579027107d2d300ad6cd64457d113d322de98c9e9d69d938ed0bc366a9a47d2",
+      "job_id": "offload-model-offloading-1-f3eeb54d9350",
+      "model": "deepseek-r1-70b",
+      "observed_output_tokens": [
+        202,
+        570
+      ],
+      "observed_prompt_tokens": [
+        15,
+        39
+      ],
+      "report": "model-offloading/campaign-20261110T142645Z-46f987f0-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "6bc67d88e8e395aa46ad1df9650e5938bdb64a0158d7e70974c3f8075cfafb67"
+      ],
+      "candidate_comparison_sha256": "a93aa9f8d15b2701bee010ed30932dead07bb51ce97510e9e1751ee72a75f1e5",
+      "case": "deepseek-r1-70b-ollama",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "cf32736bca0c1cf9160c0f69f0d7110f1fd8a6343eb80d6cbd682cfa0908da5e",
+      "job_id": "offload-model-offloading-1-7a0671b05227",
+      "model": "deepseek-r1-70b",
+      "observed_output_tokens": [
+        242,
+        551
+      ],
+      "observed_prompt_tokens": [
+        15,
+        39
+      ],
+      "report": "model-offloading/campaign-20261110T142645Z-46f987f0-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "793af583a708a8f920690ca7700ffb3b925ce185dd23f537402650a4c05f7aa9"
+      ],
+      "candidate_comparison_sha256": "29dfc580b91f5bbd444fe5673e54e19258088ed11f7041a2b0ac7984e0c61128",
+      "case": "llama3-70b-koboldcpp",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "56abeafefd30c543c3cfb953c44a76d0d5da3091ef0a235ebca3d8c07ff498da",
+      "job_id": "offload-model-offloading-1-c2e750a5613c",
+      "model": "llama3-70b",
+      "observed_output_tokens": [
+        2,
+        101
+      ],
+      "observed_prompt_tokens": [
+        22,
+        46
+      ],
+      "report": "model-offloading/campaign-20261110T130729Z-161fd0ce-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "793af583a708a8f920690ca7700ffb3b925ce185dd23f537402650a4c05f7aa9"
+      ],
+      "candidate_comparison_sha256": "279187c4dbdaba0fd6be06862ff3d97d466681b9e64acac6402d019a4177defc",
+      "case": "llama3-70b-lmstudio",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "e67831a80b41a9256e95ea729c24224f52282a8323ad9a3cbce635f56f0b1faa",
+      "job_id": "offload-model-offloading-1-efa5ea7463d1",
+      "model": "llama3-70b",
+      "observed_output_tokens": [
+        2,
+        100
+      ],
+      "observed_prompt_tokens": [
+        22,
+        46
+      ],
+      "report": "model-offloading/campaign-20261110T130729Z-161fd0ce-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "793af583a708a8f920690ca7700ffb3b925ce185dd23f537402650a4c05f7aa9"
+      ],
+      "candidate_comparison_sha256": "111083408ad8332b03de4a3489664189268d7945a5eb71efcefaeba527e4c853",
+      "case": "llama3-70b-ollama",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "428ec859a262bd6967c72b9e97501675e9106f8664851b8aff5008a62c5cdc40",
+      "job_id": "offload-model-offloading-1-fcb1df403f7f",
+      "model": "llama3-70b",
+      "observed_output_tokens": [
+        2,
+        101
+      ],
+      "observed_prompt_tokens": [
+        22,
+        46
+      ],
+      "report": "model-offloading/campaign-20261110T130729Z-161fd0ce-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "c932be5abf66ebff3e40947b46b176f0b76758cad707072350878ccf4bf547eb"
+      ],
+      "candidate_comparison_sha256": "a8121da8a8b51742b81b480df45f7432012a1c83c60e9cb0c88ce03b625cabb9",
+      "case": "llama31-70b-koboldcpp",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "92f8cc2a31cb0013a626464c1415fb08839798cfd5aabf184e1532962a0fd63f",
+      "job_id": "offload-model-offloading-1-b9f131a1a9c3",
+      "model": "llama31-70b",
+      "observed_output_tokens": [
+        2,
+        124
+      ],
+      "observed_prompt_tokens": [
+        22,
+        46
+      ],
+      "report": "model-offloading/campaign-20261110T122314Z-d7f8e7e5-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "c932be5abf66ebff3e40947b46b176f0b76758cad707072350878ccf4bf547eb"
+      ],
+      "candidate_comparison_sha256": "316cce9b7a3e91940f7b6b320c2137864a5fb410ee74486c0dfcaa57d4d48969",
+      "case": "llama31-70b-lmstudio",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "e56c49e48d9f2b7699a54fc0fa9b121b797e2e56af4321cca496926f03ce5faa",
+      "job_id": "offload-model-offloading-1-c10fd55e6c38",
+      "model": "llama31-70b",
+      "observed_output_tokens": [
+        20,
+        41
+      ],
+      "observed_prompt_tokens": [
+        103,
+        127
+      ],
+      "report": "model-offloading/campaign-20261110T122314Z-d7f8e7e5-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "c932be5abf66ebff3e40947b46b176f0b76758cad707072350878ccf4bf547eb"
+      ],
+      "candidate_comparison_sha256": "f0c23c0669153099d56f34f6f8a2d9af5700a7d7744166ed81f3315437fdc7db",
+      "case": "llama31-70b-ollama",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "d25fd9214cd28639ee5b08cab31a0040901afa175e46f3d6be90f5e6af33e8d8",
+      "job_id": "offload-model-offloading-1-ca78ec6a2979",
+      "model": "llama31-70b",
+      "observed_output_tokens": [
+        22,
+        41
+      ],
+      "observed_prompt_tokens": [
+        103,
+        127
+      ],
+      "report": "model-offloading/campaign-20261110T122314Z-d7f8e7e5-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "5bdcb9b7a23e8829881ed4cedd95b318a8e61979e927846b93e99d3d200f2b1b"
+      ],
+      "candidate_comparison_sha256": "048577cf289f845cff0d17540211487f95d165cf460e33afa6a6134128b4b6bd",
+      "case": "llama33-70b-koboldcpp",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "a02f672db9ddad6f8c8efd1ec2316d284b92196f2e48aadb54db25c172e880a9",
+      "job_id": "offload-model-offloading-1-2974ef96487f",
+      "model": "llama33-70b",
+      "observed_output_tokens": [
+        2,
+        151
+      ],
+      "observed_prompt_tokens": [
+        22,
+        46
+      ],
+      "report": "model-offloading/campaign-20261110T113659Z-f9bb2ca8-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "5bdcb9b7a23e8829881ed4cedd95b318a8e61979e927846b93e99d3d200f2b1b"
+      ],
+      "candidate_comparison_sha256": "92df7f3e091427b107e1575b3c325b6e699fefc0ffff9a0d522846ed1a2e85dc",
+      "case": "llama33-70b-lmstudio",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "a791265688049ea354d1d56d45944faea39248a2deed56d5ae2a9fc51fac314e",
+      "job_id": "offload-model-offloading-1-0390c62a7124",
+      "model": "llama33-70b",
+      "observed_output_tokens": [
+        2,
+        92
+      ],
+      "observed_prompt_tokens": [
+        47,
+        71
+      ],
+      "report": "model-offloading/campaign-20261110T113659Z-f9bb2ca8-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "5bdcb9b7a23e8829881ed4cedd95b318a8e61979e927846b93e99d3d200f2b1b"
+      ],
+      "candidate_comparison_sha256": "e1835179db6d19dd1f9055ac2f903bcff56da7c4177cd0f6c57d3dceb163d74e",
+      "case": "llama33-70b-ollama",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "5a7d93ad7d63055825fd9debcb299546f6e7d8d75e4f4c5d5ec699f802752048",
+      "job_id": "offload-model-offloading-1-691c92382f24",
+      "model": "llama33-70b",
+      "observed_output_tokens": [
+        2,
+        117
+      ],
+      "observed_prompt_tokens": [
+        47,
+        71
+      ],
+      "report": "model-offloading/campaign-20261110T113659Z-f9bb2ca8-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "f5702d198d056349a98203943b98c213831c4d486f9b2962f23b842bb5a13bb2"
+      ],
+      "candidate_comparison_sha256": "f2211161caa1f14e7b50500649c70ecb191fb2542d464f2094f529cd3ab442c0",
+      "case": "kimi-linear-48b-koboldcpp",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "9b38d1c19d1047a5d8c677f10430c9980ec145386683295cb60d8523fcfd3c0f",
+      "job_id": "offload-model-offloading-1-82c7918309af",
+      "model": "kimi-linear-48b",
+      "observed_output_tokens": [
+        2,
+        7
+      ],
+      "observed_prompt_tokens": [
+        20,
+        43
+      ],
+      "report": "model-offloading/campaign-20261110T111300Z-172c453b-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "f5702d198d056349a98203943b98c213831c4d486f9b2962f23b842bb5a13bb2"
+      ],
+      "candidate_comparison_sha256": "5916d16c3b012d687043c66bfb2ec93781c18e7472eee5b817db9bae13532f53",
+      "case": "kimi-linear-48b-lmstudio",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "63b9a5c031386e700e1fe6c04252cb82f0bc23336aedba32ca464c2881ed6cd2",
+      "job_id": "offload-model-offloading-1-fdca39ed8f98",
+      "model": "kimi-linear-48b",
+      "observed_output_tokens": [
+        2,
+        23
+      ],
+      "observed_prompt_tokens": [
+        19,
+        42
+      ],
+      "report": "model-offloading/campaign-20261110T111300Z-172c453b-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "f5702d198d056349a98203943b98c213831c4d486f9b2962f23b842bb5a13bb2"
+      ],
+      "candidate_comparison_sha256": "4adfcf0465f10cde77d4b23f322ffd1ad45541a4bd302df45aa102209f649d1c",
+      "case": "kimi-linear-48b-ollama",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "8d0b63fe11d621159585bd2471a244852feb3fabea8783334fc91afa5aadd5cb",
+      "job_id": "offload-model-offloading-1-400d91c422e5",
+      "model": "kimi-linear-48b",
+      "observed_output_tokens": [
+        2,
+        7
+      ],
+      "observed_prompt_tokens": [
+        19,
+        42
+      ],
+      "report": "model-offloading/campaign-20261110T111300Z-172c453b-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "e2fcc3401d23cae4fa7c86c8d5cb05ef52eaedabef26c12b85d7c5ad9cc3a529"
+      ],
+      "candidate_comparison_sha256": "765cc95ab933d2fa6b0c05a752f025492e489d3128661ff7ac826c5896da89af",
+      "case": "laguna-xs21-koboldcpp",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "3cd1a83dc3ca4ec04c0ec2fbed33950a4e24f5ad00face7f78e613886a06d4de",
+      "job_id": "offload-model-offloading-1-935056637371",
+      "model": "laguna-xs21",
+      "observed_output_tokens": [
+        2,
+        189
+      ],
+      "observed_prompt_tokens": [
+        57,
+        78
+      ],
+      "report": "model-offloading/campaign-20261110T102703Z-ee68ff15-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "e2fcc3401d23cae4fa7c86c8d5cb05ef52eaedabef26c12b85d7c5ad9cc3a529"
+      ],
+      "candidate_comparison_sha256": "70e4854db2efa6f42fb1bd8aa844724d7be5b3659e5448b0bd362a397394bf8a",
+      "case": "laguna-xs21-lmstudio",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "8918cdfdbf7637615c4a17679680fbcdbf9df42d8eb027b3957a9245ca40b391",
+      "job_id": "offload-model-offloading-1-de7260ca9c77",
+      "model": "laguna-xs21",
+      "observed_output_tokens": [
+        236,
+        1345
+      ],
+      "observed_prompt_tokens": [
+        56,
+        77
+      ],
+      "report": "model-offloading/campaign-20261110T102703Z-ee68ff15-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "e2fcc3401d23cae4fa7c86c8d5cb05ef52eaedabef26c12b85d7c5ad9cc3a529"
+      ],
+      "candidate_comparison_sha256": "79af69f68a71b780a526fa421a33f1c12246034d17d1e3f4c4dc1e463b84556a",
+      "case": "laguna-xs21-ollama",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "1e08abca6bc049a6eb0fa30306860f5e97ba85bd3ecbe31089a25c34683f4b77",
+      "job_id": "offload-model-offloading-1-2506bfe7a950",
+      "model": "laguna-xs21",
+      "observed_output_tokens": [
+        200,
+        1666
+      ],
+      "observed_prompt_tokens": [
+        64,
+        85
+      ],
+      "report": "model-offloading/campaign-20261110T102703Z-ee68ff15-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "03bf7b4a0973fdb85409f7d72108d1f066ecb52fb2378baeee7411693b727e60"
+      ],
+      "candidate_comparison_sha256": "63d748925e6615afec1531eae2e47a6cbd1c558fe4a0b0f8c5a782f11720b8e8",
+      "case": "qwen35-35b-moe-koboldcpp",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "6ab621280b5cb0fa9852e92b5daca975f40f4114063f596af2802058b4bf97e0",
+      "job_id": "offload-model-offloading-1-3440c611be06",
+      "model": "qwen35-35b-moe",
+      "observed_output_tokens": [
+        6,
+        2048
+      ],
+      "observed_prompt_tokens": [
+        22,
+        44
+      ],
+      "report": "model-offloading/campaign-20261110T094556Z-ba2a02ce-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "03bf7b4a0973fdb85409f7d72108d1f066ecb52fb2378baeee7411693b727e60"
+      ],
+      "candidate_comparison_sha256": "cbba0f39d650a8120893df39d8b4f6ea9a25a84a7b5deeabc435581e4bb0f8e3",
+      "case": "qwen35-35b-moe-lmstudio",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "b113c6c4b771c22b33904350bfccb5bd49de25cc9ddf5286d0800e258941335c",
+      "job_id": "offload-model-offloading-1-dccf5345b081",
+      "model": "qwen35-35b-moe",
+      "observed_output_tokens": [
+        244,
+        761
+      ],
+      "observed_prompt_tokens": [
+        24,
+        46
+      ],
+      "report": "model-offloading/campaign-20261110T094556Z-ba2a02ce-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "03bf7b4a0973fdb85409f7d72108d1f066ecb52fb2378baeee7411693b727e60"
+      ],
+      "candidate_comparison_sha256": "d32981dc7f32e20523730e1dc881678110352667b3d219e7293558dc8817e5fc",
+      "case": "qwen35-35b-moe-ollama",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "7a06d1468447fdb72d6fe1bcddb8b42dabfe4642269b96924b6595cd590971bd",
+      "job_id": "offload-model-offloading-1-11dcd9c81ae3",
+      "model": "qwen35-35b-moe",
+      "observed_output_tokens": [
+        233,
+        2048
+      ],
+      "observed_prompt_tokens": [
+        24,
+        46
+      ],
+      "report": "model-offloading/campaign-20261110T094556Z-ba2a02ce-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "75458563efb26e2a2f3e258b1b93e67ae4a812dee7b607d890ea1400637869b0"
+      ],
+      "candidate_comparison_sha256": "2899322ca42380b25683a3a9eb8fdcc595268d0db5f4846eb64a5385cb4a0160",
+      "case": "mistral-small31-koboldcpp",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "d1db3efe29d9c4c47eac48cf45093872196284c021efc2f438e425bf5ab9fb4d",
+      "job_id": "offload-model-offloading-1-129abf22eb9d",
+      "model": "mistral-small31",
+      "observed_output_tokens": [
+        2,
+        126
+      ],
+      "observed_prompt_tokens": [
+        17,
+        41
+      ],
+      "report": "model-offloading/campaign-20261110T083434Z-6ad3fdfe-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "75458563efb26e2a2f3e258b1b93e67ae4a812dee7b607d890ea1400637869b0"
+      ],
+      "candidate_comparison_sha256": "32877ac34cd4dba071b76065c4c616db65157d178b78a84f0d49779ff54299d0",
+      "case": "mistral-small31-lmstudio",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "f92933f14436117813c9ab4f736afaf924a62383a5962256f98076588c21a32f",
+      "job_id": "offload-model-offloading-1-d7be41a213b0",
+      "model": "mistral-small31",
+      "observed_output_tokens": [
+        2,
+        173
+      ],
+      "observed_prompt_tokens": [
+        175,
+        199
+      ],
+      "report": "model-offloading/campaign-20261110T083434Z-6ad3fdfe-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "75458563efb26e2a2f3e258b1b93e67ae4a812dee7b607d890ea1400637869b0"
+      ],
+      "candidate_comparison_sha256": "d31ab0e4021d45286660f8998bab860e79cefd577ff5d122cad2627897e7a501",
+      "case": "mistral-small31-ollama",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "8e107ad171facd3039a6488211ad21634500899377c5b1ae1368997391d556b3",
+      "job_id": "offload-model-offloading-1-7fe65a7e7e83",
+      "model": "mistral-small31",
+      "observed_output_tokens": [
+        2,
+        129
+      ],
+      "observed_prompt_tokens": [
+        175,
+        199
+      ],
+      "report": "model-offloading/campaign-20261110T083434Z-6ad3fdfe-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "85f5cc03dbee1471b6b52b0786970b5ae8eae335ded14335a1e7becec85a2d86"
+      ],
+      "candidate_comparison_sha256": "8a4c97fdb4095efcb0d4dfdb2330d30970ecd0a55a633390da84667595482a79",
+      "case": "phi4-reasoning-plus-koboldcpp",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "e7f551ad1183677a5973618ae771c8d3b5b0d5079e67ec2cf30a56e02a4dcd1d",
+      "job_id": "offload-model-offloading-1-daebf80475d1",
+      "model": "phi4-reasoning-plus",
+      "observed_output_tokens": [
+        2,
+        2048
+      ],
+      "observed_prompt_tokens": [
+        26,
+        50
+      ],
+      "report": "model-offloading/campaign-20261110T014022Z-9e4b4e08-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "85f5cc03dbee1471b6b52b0786970b5ae8eae335ded14335a1e7becec85a2d86"
+      ],
+      "candidate_comparison_sha256": "d764b877c4f832456a07133f545a58ccb83c7200b4de912e1b8dc11c4b817539",
+      "case": "phi4-reasoning-plus-lmstudio",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "7c9fa73ccaa1d7c205b4508d2f179ce9f2de24c60ef2ea691bffec0dd6d6cf09",
+      "job_id": "offload-model-offloading-1-dbb471ed01d8",
+      "model": "phi4-reasoning-plus",
+      "observed_output_tokens": [
+        190,
+        2048
+      ],
+      "observed_prompt_tokens": [
+        250,
+        274
+      ],
+      "report": "model-offloading/campaign-20261110T014022Z-9e4b4e08-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "85f5cc03dbee1471b6b52b0786970b5ae8eae335ded14335a1e7becec85a2d86"
+      ],
+      "candidate_comparison_sha256": "4dade46a364028014356f0a13fc5008ea05c9643c2c3276b4e7b84f3692f1705",
+      "case": "phi4-reasoning-plus-ollama",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "f06ef0ef1facdbd5a000a2d95e107993af25192323afaaa4d7a55904bfb51c71",
+      "job_id": "offload-model-offloading-1-7f239688f788",
+      "model": "phi4-reasoning-plus",
+      "observed_output_tokens": [
+        2048,
+        2048
+      ],
+      "observed_prompt_tokens": [
+        250,
+        274
+      ],
+      "report": "model-offloading/campaign-20261110T014022Z-9e4b4e08-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "2119516474c153cff098b669ae016a4a4876511b7737c7f086a1593dd50be0df"
+      ],
+      "candidate_comparison_sha256": "898146305a42b39c8bbc97e08d263e6e9127d574823684205e96a9a81da812df",
+      "case": "nemotron-super-49b-koboldcpp",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "70419c36a303cf00595baf6106fdba578e0b350529e814f072692c52517bd095",
+      "job_id": "offload-model-offloading-1-e10f80682fcb",
+      "model": "nemotron-super-49b",
+      "observed_output_tokens": [
+        402,
+        1260
+      ],
+      "observed_prompt_tokens": [
+        28,
+        52
+      ],
+      "report": "model-offloading/campaign-20261109T184809Z-c073d721-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "2119516474c153cff098b669ae016a4a4876511b7737c7f086a1593dd50be0df"
+      ],
+      "candidate_comparison_sha256": "4425e74652d26984e8a4905855306a3e55e840bd69507f956d06e4366e1d4165",
+      "case": "nemotron-super-49b-lmstudio",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "0a4f5dd0c177d8bf69ec3fe75006e02f6074bcc933f83ecd6b11544a26397bab",
+      "job_id": "offload-model-offloading-1-39784eb03258",
+      "model": "nemotron-super-49b",
+      "observed_output_tokens": [
+        400,
+        992
+      ],
+      "observed_prompt_tokens": [
+        27,
+        51
+      ],
+      "report": "model-offloading/campaign-20261109T184809Z-c073d721-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "2119516474c153cff098b669ae016a4a4876511b7737c7f086a1593dd50be0df"
+      ],
+      "candidate_comparison_sha256": "02590728e1a6830aeb5ceb24ef95d345090e2076bf2e3429829a8138a3567df7",
+      "case": "nemotron-super-49b-ollama",
+      "code_revision": "e64ec842608c30a6b4cba9f44b1711cc5e53ca19",
+      "cohort_digests": [],
+      "config_sha256": "bd51142bb06f753214ef3c3b06a8fde32e72c524af3c70417ac9d1ac4022afc8",
+      "job_id": "offload-model-offloading-1-f8f3b4e3e15b",
+      "model": "nemotron-super-49b",
+      "observed_output_tokens": [
+        327,
+        964
+      ],
+      "observed_prompt_tokens": [
+        27,
+        51
+      ],
+      "report": "model-offloading/campaign-20261109T184809Z-c073d721-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "3355f8fe67ee4ddddce4cd6d10c320598fa05aaa981a3b15c865111f7a1498c1"
+      ],
+      "candidate_comparison_sha256": "f07323e24c9f3ca6fc546a915ea8caa3f0f28190c753018d0109c6879de9f3d1",
+      "case": "gemma4-31b-ollama",
+      "code_revision": "0d1144c391964a75dac4353d3525ec8a84c994de",
+      "cohort_digests": [],
+      "config_sha256": "6bc00b788bcedb654db197e84c7fff2cb013146d4ebe66a3fe4cdc066410a526",
+      "job_id": "offload-model-offloading-1-19937807a7ec",
+      "model": "gemma4-31b",
+      "observed_output_tokens": [
+        75,
+        291
+      ],
+      "observed_prompt_tokens": [
+        30,
+        53
+      ],
+      "report": "model-offloading/campaign-20261109T180247Z-c38f462b-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "dd3a45dbe1132c8bd774adcb4278a775118394849d09612b430dbb654f512bd1"
+      ],
+      "candidate_comparison_sha256": "602d4be6746fdc3e8236e3873d2ce5ba6a0ca70dff453891400d3f15a2f6ed62",
+      "case": "nemotron-nano-30b-koboldcpp",
+      "code_revision": "0d1144c391964a75dac4353d3525ec8a84c994de",
+      "cohort_digests": [],
+      "config_sha256": "d1582ec3468e045c42f3393d8c112dacc6b7b02ca276f8a4b236e3c875a7a94b",
+      "job_id": "offload-model-offloading-1-d181c9d1571a",
+      "model": "nemotron-nano-30b",
+      "observed_output_tokens": [
+        2,
+        196
+      ],
+      "observed_prompt_tokens": [
+        23,
+        47
+      ],
+      "report": "model-offloading/campaign-20261109T174915Z-128e3dcf-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "dd3a45dbe1132c8bd774adcb4278a775118394849d09612b430dbb654f512bd1"
+      ],
+      "candidate_comparison_sha256": "5620401823a546b659f9fe922f6efc0788434290c12a419b0c34d07d5847d8de",
+      "case": "nemotron-nano-30b-lmstudio",
+      "code_revision": "0d1144c391964a75dac4353d3525ec8a84c994de",
+      "cohort_digests": [],
+      "config_sha256": "75c98c1eda38a6b7ac54c52b0acfe7b17b4b4db964515c840e220bba7ec48282",
+      "job_id": "offload-model-offloading-1-efb881da8017",
+      "model": "nemotron-nano-30b",
+      "observed_output_tokens": [
+        38,
+        192
+      ],
+      "observed_prompt_tokens": [
+        30,
+        54
+      ],
+      "report": "model-offloading/campaign-20261109T174915Z-128e3dcf-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "dd3a45dbe1132c8bd774adcb4278a775118394849d09612b430dbb654f512bd1"
+      ],
+      "candidate_comparison_sha256": "3d34e106f7a0ec34a7e5c52e79421c381f4bd8d61d588bbe03f65356cddc6bfb",
+      "case": "nemotron-nano-30b-ollama",
+      "code_revision": "0d1144c391964a75dac4353d3525ec8a84c994de",
+      "cohort_digests": [],
+      "config_sha256": "7055915d38d512ef41387961c4c80236b531fb0c9c0255162f73610ceb8d378d",
+      "job_id": "offload-model-offloading-1-0ea783c16fdf",
+      "model": "nemotron-nano-30b",
+      "observed_output_tokens": [
+        53,
+        187
+      ],
+      "observed_prompt_tokens": [
+        30,
+        54
+      ],
+      "report": "model-offloading/campaign-20261109T174915Z-128e3dcf-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "716affb860a4e4fb393b936781c1b379757bb6f00bda0e00889272e757980fea"
+      ],
+      "candidate_comparison_sha256": "01f7e6439b2a392f212c29433c889d525a2371dc0f11d8e7812ca02cd15844bb",
+      "case": "gemma3-27b-koboldcpp",
+      "code_revision": "22875f4287b73f06d0539b5af605bc5fb1fb706d",
+      "cohort_digests": [],
+      "config_sha256": "b9c418227cef70bd44e31f41dfd5349c80e9587c0ca42eaef69c024ac8743a62",
+      "job_id": "offload-model-offloading-1-0eaa61bbc9e3",
+      "model": "gemma3-27b",
+      "observed_output_tokens": [
+        3,
+        194
+      ],
+      "observed_prompt_tokens": [
+        23,
+        46
+      ],
+      "report": "model-offloading/campaign-20261109T171430Z-c1c4ab49-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "716affb860a4e4fb393b936781c1b379757bb6f00bda0e00889272e757980fea"
+      ],
+      "candidate_comparison_sha256": "b90e1a9c9d82a5027a4c674fdabd305d0ac8d911e75fb70f44c4f978b47e7d67",
+      "case": "gemma3-27b-lmstudio",
+      "code_revision": "22875f4287b73f06d0539b5af605bc5fb1fb706d",
+      "cohort_digests": [],
+      "config_sha256": "059ef33002d210b141860b9ab53579ff4624ce564bbf109a29388e5228f4aa88",
+      "job_id": "offload-model-offloading-1-ad850e1a7450",
+      "model": "gemma3-27b",
+      "observed_output_tokens": [
+        3,
+        133
+      ],
+      "observed_prompt_tokens": [
+        23,
+        46
+      ],
+      "report": "model-offloading/campaign-20261109T171430Z-c1c4ab49-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "716affb860a4e4fb393b936781c1b379757bb6f00bda0e00889272e757980fea"
+      ],
+      "candidate_comparison_sha256": "6149d314125971fba44a3266d87f3c12a18d3d96c7d4611c4a5996ebc026aab8",
+      "case": "gemma3-27b-ollama",
+      "code_revision": "22875f4287b73f06d0539b5af605bc5fb1fb706d",
+      "cohort_digests": [],
+      "config_sha256": "e8b31ea8111d7922cd9452f57d434d1c1538d0b3e568e1cd4e5b994434051ddb",
+      "job_id": "offload-model-offloading-1-9a75229f3b0d",
+      "model": "gemma3-27b",
+      "observed_output_tokens": [
+        3,
+        136
+      ],
+      "observed_prompt_tokens": [
+        23,
+        46
+      ],
+      "report": "model-offloading/campaign-20261109T171430Z-c1c4ab49-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "3355f8fe67ee4ddddce4cd6d10c320598fa05aaa981a3b15c865111f7a1498c1"
+      ],
+      "candidate_comparison_sha256": "081cf279b306ce21e8339f49e8c63bc08d35d0c1a79669390fd98caba99724a4",
+      "case": "gemma4-31b-koboldcpp",
+      "code_revision": "22875f4287b73f06d0539b5af605bc5fb1fb706d",
+      "cohort_digests": [],
+      "config_sha256": "576baeb88c1ddfed1d4cf0379c01dbb0e1506eaca6da101262303ee4c645e09b",
+      "job_id": "offload-model-offloading-1-44feab011446",
+      "model": "gemma4-31b",
+      "observed_output_tokens": [
+        2,
+        12
+      ],
+      "observed_prompt_tokens": [
+        27,
+        50
+      ],
+      "report": "model-offloading/campaign-20261109T154341Z-1e8d354f-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "3355f8fe67ee4ddddce4cd6d10c320598fa05aaa981a3b15c865111f7a1498c1"
+      ],
+      "candidate_comparison_sha256": "ab86decbb6a3b9a785bb5a99d5c516816b52f7d44f6ec897f2ca8c909d9863aa",
+      "case": "gemma4-31b-lmstudio",
+      "code_revision": "22875f4287b73f06d0539b5af605bc5fb1fb706d",
+      "cohort_digests": [],
+      "config_sha256": "bd7b18d4e2222aa8f3b137f8284e6515119eb78e7fc1d8a87a2d1ced5c1ce125",
+      "job_id": "offload-model-offloading-1-814628ba9504",
+      "model": "gemma4-31b",
+      "observed_output_tokens": [
+        84,
+        401
+      ],
+      "observed_prompt_tokens": [
+        30,
+        53
+      ],
+      "report": "model-offloading/campaign-20261109T154341Z-1e8d354f-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "3355f8fe67ee4ddddce4cd6d10c320598fa05aaa981a3b15c865111f7a1498c1"
+      ],
+      "candidate_comparison_sha256": null,
+      "case": "gemma4-31b-ollama",
+      "code_revision": "22875f4287b73f06d0539b5af605bc5fb1fb706d",
+      "cohort_digests": [],
+      "config_sha256": "6bc00b788bcedb654db197e84c7fff2cb013146d4ebe66a3fe4cdc066410a526",
+      "job_id": "offload-model-offloading-1-19937807a7ec",
+      "model": "gemma4-31b",
+      "observed_output_tokens": [
+        75,
+        291
+      ],
+      "observed_prompt_tokens": [
+        30,
+        53
+      ],
+      "report": "model-offloading/campaign-20261109T154341Z-1e8d354f-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "failed",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "0149d02e96c34bb6da3c613b7614cf5dd60aa3bde4e3812d80088d1432f85ea0"
+      ],
+      "candidate_comparison_sha256": "9f9f3d40fd965456b913eb162a580c211977ceb1879963bcf06e7df7bac230d8",
+      "case": "qwen38-27b-koboldcpp",
+      "code_revision": "22875f4287b73f06d0539b5af605bc5fb1fb706d",
+      "cohort_digests": [],
+      "config_sha256": "82e32d23e1a5bc9a2f99fc09ef1d7a37d33e5d88cf340ec03fa6a62df1a47d54",
+      "job_id": "offload-model-offloading-1-a9c9aeebbc4d",
+      "model": "qwen38-27b",
+      "observed_output_tokens": [
+        60,
+        111
+      ],
+      "observed_prompt_tokens": [
+        23,
+        45
+      ],
+      "report": "model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "0149d02e96c34bb6da3c613b7614cf5dd60aa3bde4e3812d80088d1432f85ea0"
+      ],
+      "candidate_comparison_sha256": "90dcde45efb2236a05654c6afb5d88228844f3c9e0d86e2d1172495fe51c545e",
+      "case": "qwen38-27b-lmstudio",
+      "code_revision": "22875f4287b73f06d0539b5af605bc5fb1fb706d",
+      "cohort_digests": [],
+      "config_sha256": "4a3582f9fe424818b768e2857da8fbbac8cb5c248c02d32dc35899f47a4a82ab",
+      "job_id": "offload-model-offloading-1-fac3127225ae",
+      "model": "qwen38-27b",
+      "observed_output_tokens": [
+        36,
+        111
+      ],
+      "observed_prompt_tokens": [
+        66,
+        88
+      ],
+      "report": "model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "0149d02e96c34bb6da3c613b7614cf5dd60aa3bde4e3812d80088d1432f85ea0"
+      ],
+      "candidate_comparison_sha256": "e25be8d2affca5773998e85894918dfa1ed924b00a3fd75011dac2d559046cc0",
+      "case": "qwen38-27b-ollama",
+      "code_revision": "22875f4287b73f06d0539b5af605bc5fb1fb706d",
+      "cohort_digests": [],
+      "config_sha256": "940e27b041aa812ddc0d2195a2d4c7987cf7554ff168881372cb11a0237c70bd",
+      "job_id": "offload-model-offloading-1-e1feb0ce918f",
+      "model": "qwen38-27b",
+      "observed_output_tokens": [
+        42,
+        96
+      ],
+      "observed_prompt_tokens": [
+        66,
+        88
+      ],
+      "report": "model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "cdb0278f609227e90e778f3816207b853a3a142ce075b93c6c06a540ccf82433"
+      ],
+      "candidate_comparison_sha256": "c0ae289bfef81b4f756ac4fb2371c1bd3c26394f5f6b692fd707d6ee9a65358e",
+      "case": "deepseek-r1-32b-koboldcpp",
+      "code_revision": "46ebbf59b39d5dced9a885331fc55f25c388f122",
+      "cohort_digests": [],
+      "config_sha256": "62ed5b71fbf414b86c3dbe83cd0deca06ddb32e4e16f34e883bb0a660e54bbe2",
+      "job_id": "offload-model-offloading-1-f98a74d7c1d6",
+      "model": "deepseek-r1-32b",
+      "observed_output_tokens": [
+        232,
+        460
+      ],
+      "observed_prompt_tokens": [
+        17,
+        39
+      ],
+      "report": "model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "cdb0278f609227e90e778f3816207b853a3a142ce075b93c6c06a540ccf82433"
+      ],
+      "candidate_comparison_sha256": "36b2a5d36a455fa81a794186b6a8844e4843616d1a9231fc86aa8ed35e0e05ab",
+      "case": "deepseek-r1-32b-lmstudio",
+      "code_revision": "46ebbf59b39d5dced9a885331fc55f25c388f122",
+      "cohort_digests": [],
+      "config_sha256": "4d809e9a98ef9e7f518c5da16c2b828bf4a2f187d4125ca42f7cc6797031ec8b",
+      "job_id": "offload-model-offloading-1-8cd707175ee0",
+      "model": "deepseek-r1-32b",
+      "observed_output_tokens": [
+        247,
+        749
+      ],
+      "observed_prompt_tokens": [
+        17,
+        39
+      ],
+      "report": "model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "cdb0278f609227e90e778f3816207b853a3a142ce075b93c6c06a540ccf82433"
+      ],
+      "candidate_comparison_sha256": "e584bf397132fc2b54d4a1eeab658ea248d5ad103d613f9dffccb04be149ca68",
+      "case": "deepseek-r1-32b-ollama",
+      "code_revision": "46ebbf59b39d5dced9a885331fc55f25c388f122",
+      "cohort_digests": [],
+      "config_sha256": "f3664594054275c327c602f9d9ca796b8d883615a57d060c60958930433fbc10",
+      "job_id": "offload-model-offloading-1-a5f32470b1c5",
+      "model": "deepseek-r1-32b",
+      "observed_output_tokens": [
+        237,
+        457
+      ],
+      "observed_prompt_tokens": [
+        17,
+        39
+      ],
+      "report": "model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "cdb0278f609227e90e778f3816207b853a3a142ce075b93c6c06a540ccf82433"
+      ],
+      "candidate_comparison_sha256": "e6b308a39b4f5571923e7ff16d2a193095a9e7a13806eb3721d27eef25d97c2a",
+      "case": "deepseek-r1-32b-q8",
+      "code_revision": "3fc8f649b2d5756dc3db2dcaa6142f40e719512b",
+      "cohort_digests": [],
+      "config_sha256": "cbf4b1392fedf2747a39ddb742f2196dffef59e63dfe25ee8e1bb04923e206bb",
+      "job_id": "offload-model-offloading-1-db17c5930ec0",
+      "model": "deepseek-r1-32b",
+      "observed_output_tokens": [
+        237,
+        457
+      ],
+      "observed_prompt_tokens": [
+        17,
+        39
+      ],
+      "report": "model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "cdb0278f609227e90e778f3816207b853a3a142ce075b93c6c06a540ccf82433"
+      ],
+      "candidate_comparison_sha256": "13af2b391d6bd42a65eeb81648cee31c850ef0f2814ebc9bb7f39aaa6f128be5",
+      "case": "deepseek-r1-32b-q8",
+      "code_revision": "3fc8f649b2d5756dc3db2dcaa6142f40e719512b",
+      "cohort_digests": [],
+      "config_sha256": "6a7d6050ac347e00dfac76022b1ed3a6e9ee300303721eca710ed35bc5996d07",
+      "job_id": "offload-model-offloading-1-db17c5930ec0",
+      "model": "deepseek-r1-32b",
+      "observed_output_tokens": [
+        237,
+        256
+      ],
+      "observed_prompt_tokens": [
+        17,
+        39
+      ],
+      "report": "model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "cdb0278f609227e90e778f3816207b853a3a142ce075b93c6c06a540ccf82433"
+      ],
+      "candidate_comparison_sha256": null,
+      "case": "deepseek-r1-32b-q8",
+      "code_revision": "3fc8f649b2d5756dc3db2dcaa6142f40e719512b",
+      "cohort_digests": [],
+      "config_sha256": "9dc6cddeb7898d825d7f8f372fa5888bd05302af75afd3dbf8dee2ea52cddcbf",
+      "job_id": "offload-model-offloading-1-db17c5930ec0",
+      "model": "deepseek-r1-32b",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [],
+      "report": "model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "failed",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    }
+  ],
+  "matched_groups": {},
+  "schema_version": 1
+}

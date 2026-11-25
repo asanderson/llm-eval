@@ -1,190 +1,49 @@
 # Experiment results
 
-Results of the llm-eval experiments on the hardware configurations measured so far. The page opens with the **executive summary**: the five best harness and model combinations per experiment for each hardware configuration, the five best models where a model repeats among them, the same rankings restricted to US models ([model origins](../MODELS.md#model-origins)), a comparison chart for each, and the conclusions per hardware configuration. After it come the navigation index (by hardware configuration, experiment, harness, model and date), the detailed results by experiment, harness and model, the tooling issues observed, and the list of every published report.
+Read the measured workload, completion counts and placement evidence for each setup. The setup pages contain run settings, raw records and machine-readable comparisons. Use the [reproduction guide](../REPRODUCE.md) to inspect a pinned job or [contribute a run](../HARDWARE_PARTICIPATION.md) on another machine.
 
-Tables and charts between `results-*` markers are generated from the published bundles by `llm-eval index-results`; everything else is operator-written. Results are listed newest first: experiments by their newest result, models within a harness by their newest run, and runs within a table by date. Figures are medians over measured (non-warmup) requests unless stated otherwise. Each linked report includes raw measurements, summaries, its own latency chart and reproducibility metadata. Synthetic fixtures are explicitly labeled.
+The tables between markers are generated from published bundles. The dated field notes below describe individual campaigns and include operator observations outside the exported measurements.
 
 ## Executive summary
 
 <!-- results-top:start -->
 
-### Top 5 harness and model combinations per experiment and hardware configuration
+### What ran on this hardware?
 
-Ranked by share of checks passed (correct decisions for decision models, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians. Where a model repeats among the best combinations, a second table ranks the models, each by its best combination.
-Each pair then ranks US models alone. US models only, by the same ranking: models whose developer, and the developer of every base model they were fine-tuned, distilled or pruned from, are headquartered in the United States ([model origins](../MODELS.md#model-origins)).
+**inkling2-mini-26b-iq4_nl** on raider-wsl (windows-11-wsl2-ubuntu-26.04). NVIDIA GeForce RTX 5090 Laptop GPU, 24 GiB of GPU memory. Each row is the latest published test of this artifact name on that runtime.
 
-**[hardware-fit](index/experiment/hardware-fit.md) on [raider-wsl](index/hardware/raider-wsl.md)**
+| Model and runtime | Job status | Completed | Checks passed | Prompt tokens observed | Time until text appears (median s) | Placement evidence | Source |
+|---|---|---:|---:|---:|---:|---|---|
+| inkling2-mini-26b-iq4_nl · KoboldCpp | succeeded | 27/27 | 27/27 | 15–44 | 6.48 | 49 of 49 layers reported on GPU | [Report](hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
+| inkling2-mini-26b-iq4_nl · LM Studio | succeeded | 27/27 | 27/27 | 27–56 | 1.72 | fit inferred from device memory, layer count unknown | [Report](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
+| inkling2-mini-26b-iq4_nl · Ollama | failed | 0/27 | 0/27 | not recorded | not recorded | failed before any request completed | [Report](hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
 
-| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---:|---:|---:|---|
-| 1 | [lmstudio](index/harness/lmstudio.md) | [inkling2-mini-26b-iq4_nl](index/model/inkling2-mini-26b-iq4_nl.md) | 27/27 | 1.75 | 54.3 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
-| 2 | [koboldcpp](index/harness/koboldcpp.md) | [inkling2-mini-26b-iq4_nl](index/model/inkling2-mini-26b-iq4_nl.md) | 27/27 | 6.66 | 12.8 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
-| 3 | [lmstudio](index/harness/lmstudio.md) | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 0.886 | 68.6 | [2026-11-23 cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
-| 4 | [ollama](index/harness/ollama.md) | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 1.97 | 33.7 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
-| 5 | [koboldcpp](index/harness/koboldcpp.md) | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 3.04 | 27 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
+Each run recorded 9 tasks × 3 measured attempts. The configured context window was 8192 tokens. The longest prompt with a recorded token count used 56 tokens. Checks refer to the published workload. Repeated attempts on one question count as one distinct task.
 
-Top 5 models, each on its best-ranked harness:
+[Inspect the run settings, device memory and raw records](index/recommended/raider-wsl/hardware-fit.md).
 
-| Rank | Model | Harness | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---:|---:|---:|---|
-| 1 | [inkling2-mini-26b-iq4_nl](index/model/inkling2-mini-26b-iq4_nl.md) | [lmstudio](index/harness/lmstudio.md) | 27/27 | 1.75 | 54.3 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
-| 2 | [qwen38-27b-ud-q4_k_xl](index/model/qwen38-27b-ud-q4_k_xl.md) | [lmstudio](index/harness/lmstudio.md) | 24/27 | 0.886 | 68.6 | [2026-11-23 cap 2048](hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
-| 3 | [muse-glimmer-30b-kquant-17gb-q4_k_m](index/model/muse-glimmer-30b-kquant-17gb-q4_k_m.md) | [ollama](index/harness/ollama.md) | 24/27 | 4.07 | 37.1 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
+| Experiment and hardware | Evidence available | Read the runs |
+|---|---|---|
+| hardware-fit · raider-wsl | 11 model runs, 2 projections (1 failed) | [Evidence and reproduction](index/recommended/raider-wsl/hardware-fit.md) |
+| decision-models · raider-wsl | 22 model runs | [Evidence and reproduction](index/recommended/raider-wsl/decision-models.md) |
+| model-offloading · raider-wsl | 54 model runs (2 failed) | [Evidence and reproduction](index/recommended/raider-wsl/model-offloading.md) |
+| legal-models · raider-wsl | 1 fixture, 2 measured model runs, 1 rescore | [Evidence and reproduction](index/recommended/raider-wsl/legal-models.md) |
+| model-offloading · raider-windows | 106 model runs (6 failed) | [Evidence and reproduction](index/recommended/raider-windows/model-offloading.md) |
+| legal-models · raider-windows | 1 fixture, 2 measured model runs, 1 rescore | [Evidence and reproduction](index/recommended/raider-windows/legal-models.md) |
+| decision-models · raider-windows | 4 model runs | [Evidence and reproduction](index/recommended/raider-windows/decision-models.md) |
+| decision-models · raider-ubuntu | 1 fixture | [Evidence and reproduction](index/recommended/raider-ubuntu/decision-models.md) |
 
-Top 5 harness and model combinations of US models:
+**Human review is pending** in 6 published legal jobs on fictional matters. See the [review denominators](index/recommended/raider-wsl/legal-models.md#legal-evaluation).
 
-| Rank | Harness | Model | Developer | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---|---:|---:|---:|---|
-| 1 | [lmstudio](index/harness/lmstudio.md) | [inkling2-mini-26b-iq4_nl](index/model/inkling2-mini-26b-iq4_nl.md) | Thinking Machines Lab | 27/27 | 1.75 | 54.3 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
-| 2 | [koboldcpp](index/harness/koboldcpp.md) | [inkling2-mini-26b-iq4_nl](index/model/inkling2-mini-26b-iq4_nl.md) | Thinking Machines Lab | 27/27 | 6.66 | 12.8 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
-| 3 | [ollama](index/harness/ollama.md) | [muse-glimmer-30b-kquant-17gb-q4_k_m](index/model/muse-glimmer-30b-kquant-17gb-q4_k_m.md) | Meta | 24/27 | 4.07 | 37.1 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
-| 4 | [lmstudio](index/harness/lmstudio.md) | [muse-glimmer-30b-kquant-17gb-q4_k_m](index/model/muse-glimmer-30b-kquant-17gb-q4_k_m.md) | Meta | 24/27 | 4.16 | 35.6 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
-| 5 | [koboldcpp](index/harness/koboldcpp.md) | [muse-glimmer-30b-kquant-17gb-q4_k_m](index/model/muse-glimmer-30b-kquant-17gb-q4_k_m.md) | Meta | 18/27 | 0.524 | 3.82 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
+Native Ubuntu on the Raider has fixture coverage only. A measured result there is still open.
 
-Top 5 US models, each on its best-ranked harness:
-
-| Rank | Model | Harness | Developer | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---|---:|---:|---:|---|
-| 1 | [inkling2-mini-26b-iq4_nl](index/model/inkling2-mini-26b-iq4_nl.md) | [lmstudio](index/harness/lmstudio.md) | Thinking Machines Lab | 27/27 | 1.75 | 54.3 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
-| 2 | [muse-glimmer-30b-kquant-17gb-q4_k_m](index/model/muse-glimmer-30b-kquant-17gb-q4_k_m.md) | [ollama](index/harness/ollama.md) | Meta | 24/27 | 4.07 | 37.1 | [2026-11-24 cap 2048](hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
-
-![hardware-fit on raider-wsl: harness and model combinations compared](../../diagrams/results/summary/hardware-fit-raider-wsl.png)
-
-Chart: every ranked combination, best-ranked model first, one color per harness. Each panel has its own axis; wall time is on a log scale. Exact values are in the tables of this page and in the linked reports.
-
-**[decision-models](index/experiment/decision-models.md) on [raider-wsl](index/hardware/raider-wsl.md)**
-
-| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---:|---:|---:|---|
-| 1 | [ollama](index/harness/ollama.md) | [llm-eval-d1:locked](index/model/llm-eval-d1-locked.md) | 6/6 | 0.0119 | – | [2026-11-24](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| 2 | [ollama](index/harness/ollama.md) | [llm-eval-laya:locked](index/model/llm-eval-laya-locked.md) | 6/6 | 0.0136 | – | [2026-11-24](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| 3 | [ollama](index/harness/ollama.md) | [llm-eval-d1-omni:locked](index/model/llm-eval-d1-omni-locked.md) | 6/6 | 0.0146 | – | [2026-11-24](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| 4 | [ollama](index/harness/ollama.md) | [llm-eval-tev1-0.8b:locked](index/model/llm-eval-tev1-0.8b-locked.md) | 6/6 | 0.017 | – | [2026-11-24](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| 5 | [ollama](index/harness/ollama.md) | [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) | 6/6 | 0.0311 | – | [2026-11-24](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-
-Top 5 harness and model combinations of US models:
-
-| Rank | Harness | Model | Developer | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---|---:|---:|---:|---|
-| 1 | [ollama](index/harness/ollama.md) | [llm-eval-d1:locked](index/model/llm-eval-d1-locked.md) | Liquid AI | 6/6 | 0.0119 | – | [2026-11-24](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| 2 | [ollama](index/harness/ollama.md) | [llm-eval-d1-omni:locked](index/model/llm-eval-d1-omni-locked.md) | Liquid AI | 6/6 | 0.0146 | – | [2026-11-24](decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-
-Origin not recorded, so not ranked among US models: `llm-eval-laya:locked`.
-
-![decision-models on raider-wsl: harness and model combinations compared](../../diagrams/results/summary/decision-models-raider-wsl.png)
-
-Chart: every ranked combination, best-ranked model first, one color per harness. Each panel has its own axis; wall time is on a log scale. Exact values are in the tables of this page and in the linked reports.
-
-**[model-offloading](index/experiment/model-offloading.md) on [raider-wsl](index/hardware/raider-wsl.md)**
-
-| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---:|---:|---:|---|
-| 1 | [lmstudio](index/harness/lmstudio.md) | [qwen35-35b-moe](index/model/qwen35-35b-moe.md) | 27/27 | 8.32 | 42.4 | [2026-11-22 cap 2048](model-offloading/campaign-20261122T083921Z-1f20982a-offload-model-offloading-1/README.md) |
-| 2 | [lmstudio](index/harness/lmstudio.md) | [kimi-linear-48b](index/model/kimi-linear-48b.md) | 24/27 | 0.138 | 15.4 | [2026-11-22 cap 2048](model-offloading/campaign-20261122T001756Z-e1adff6b-offload-model-offloading-1/README.md) |
-| 3 | [ollama](index/harness/ollama.md) | [kimi-linear-48b](index/model/kimi-linear-48b.md) | 24/27 | 0.149 | 15.7 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T043857Z-d2cbbd81-offload-model-offloading-1/README.md) |
-| 4 | [koboldcpp](index/harness/koboldcpp.md) | [kimi-linear-48b](index/model/kimi-linear-48b.md) | 24/27 | 0.524 | 3.82 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T043857Z-d2cbbd81-offload-model-offloading-1/README.md) |
-| 5 | [ollama](index/harness/ollama.md) | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | 24/27 | 2.71 | 27 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/README.md) |
-
-Top 5 models, each on its best-ranked harness:
-
-| Rank | Model | Harness | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---:|---:|---:|---|
-| 1 | [qwen35-35b-moe](index/model/qwen35-35b-moe.md) | [lmstudio](index/harness/lmstudio.md) | 27/27 | 8.32 | 42.4 | [2026-11-22 cap 2048](model-offloading/campaign-20261122T083921Z-1f20982a-offload-model-offloading-1/README.md) |
-| 2 | [kimi-linear-48b](index/model/kimi-linear-48b.md) | [lmstudio](index/harness/lmstudio.md) | 24/27 | 0.138 | 15.4 | [2026-11-22 cap 2048](model-offloading/campaign-20261122T001756Z-e1adff6b-offload-model-offloading-1/README.md) |
-| 3 | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | [ollama](index/harness/ollama.md) | 24/27 | 2.71 | 27 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/README.md) |
-| 4 | [qwen38-27b](index/model/qwen38-27b.md) | [lmstudio](index/harness/lmstudio.md) | 24/27 | 7.06 | 7.03 | [2026-11-22 cap 2048](model-offloading/campaign-20261122T010725Z-569a049b-offload-model-offloading-1/README.md) |
-| 5 | [gemma4-26b-moe](index/model/gemma4-26b-moe.md) | [ollama](index/harness/ollama.md) | 24/27 | 12.6 | 15.9 | [2026-11-23 cap 2048](model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/README.md) |
-
-Top 5 harness and model combinations of US models:
-
-| Rank | Harness | Model | Developer | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---|---:|---:|---:|---|
-| 1 | [ollama](index/harness/ollama.md) | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | NVIDIA | 24/27 | 2.71 | 27 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/README.md) |
-| 2 | [lmstudio](index/harness/lmstudio.md) | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | NVIDIA | 24/27 | 5.09 | 14.5 | [2026-11-22 cap 2048](model-offloading/campaign-20261122T003348Z-8d8d894b-offload-model-offloading-1/README.md) |
-| 3 | [ollama](index/harness/ollama.md) | [gemma4-26b-moe](index/model/gemma4-26b-moe.md) | Google | 24/27 | 12.6 | 15.9 | [2026-11-23 cap 2048](model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/README.md) |
-| 4 | [ollama](index/harness/ollama.md) | [gemma4-31b](index/model/gemma4-31b.md) | Google | 24/27 | 44.8 | 3.36 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T052908Z-16a250ab-offload-model-offloading-1/README.md) |
-| 5 | [lmstudio](index/harness/lmstudio.md) | [gemma4-31b](index/model/gemma4-31b.md) | Google | 24/27 | 52.5 | 2.81 | [2026-11-22 cap 2048](model-offloading/campaign-20261122T030132Z-4cfa054c-offload-model-offloading-1/README.md) |
-
-Top 5 US models, each on its best-ranked harness:
-
-| Rank | Model | Harness | Developer | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---|---:|---:|---:|---|
-| 1 | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | [ollama](index/harness/ollama.md) | NVIDIA | 24/27 | 2.71 | 27 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/README.md) |
-| 2 | [gemma4-26b-moe](index/model/gemma4-26b-moe.md) | [ollama](index/harness/ollama.md) | Google | 24/27 | 12.6 | 15.9 | [2026-11-23 cap 2048](model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/README.md) |
-| 3 | [gemma4-31b](index/model/gemma4-31b.md) | [ollama](index/harness/ollama.md) | Google | 24/27 | 44.8 | 3.36 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T052908Z-16a250ab-offload-model-offloading-1/README.md) |
-| 4 | [laguna-xs21](index/model/laguna-xs21.md) | [ollama](index/harness/ollama.md) | Poolside | 21/27 | 18 | 29.8 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T061720Z-22ef705a-offload-model-offloading-1/README.md) |
-| 5 | [gemma3-27b](index/model/gemma3-27b.md) | [ollama](index/harness/ollama.md) | Google | 18/27 | 1.4 | 2.85 | [2026-11-17 cap 2048](model-offloading/campaign-20261117T073753Z-bee9d8ce-offload-model-offloading-1/README.md) |
-
-![model-offloading on raider-wsl: harness and model combinations compared](../../diagrams/results/summary/model-offloading-raider-wsl.png)
-
-Chart: every ranked combination, best-ranked model first, one color per harness. Each panel has its own axis; wall time is on a log scale. Exact values are in the tables of this page and in the linked reports.
-
-**[model-offloading](index/experiment/model-offloading.md) on [raider-windows](index/hardware/raider-windows.md)**
-
-| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---:|---:|---:|---|
-| 1 | [ollama](index/harness/ollama.md) | [kimi-linear-48b](index/model/kimi-linear-48b.md) | 24/27 | 0.141 | 16.8 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md) |
-| 2 | [lmstudio](index/harness/lmstudio.md) | [kimi-linear-48b](index/model/kimi-linear-48b.md) | 24/27 | 0.147 | 15.8 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md) |
-| 3 | [koboldcpp](index/harness/koboldcpp.md) | [kimi-linear-48b](index/model/kimi-linear-48b.md) | 24/27 | 0.58 | 3.54 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md) |
-| 4 | [ollama](index/harness/ollama.md) | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | 24/27 | 2.47 | 29.5 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) |
-| 5 | [lmstudio](index/harness/lmstudio.md) | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | 24/27 | 4.62 | 14.4 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) |
-
-Top 5 models, each on its best-ranked harness:
-
-| Rank | Model | Harness | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---:|---:|---:|---|
-| 1 | [kimi-linear-48b](index/model/kimi-linear-48b.md) | [ollama](index/harness/ollama.md) | 24/27 | 0.141 | 16.8 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/README.md) |
-| 2 | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | [ollama](index/harness/ollama.md) | 24/27 | 2.47 | 29.5 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) |
-| 3 | [qwen38-27b](index/model/qwen38-27b.md) | [lmstudio](index/harness/lmstudio.md) | 24/27 | 7.92 | 6.44 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T222422Z-7671e746-offload-model-offloading-1/README.md) |
-| 4 | [gemma4-31b](index/model/gemma4-31b.md) | [ollama](index/harness/ollama.md) | 24/27 | 46.9 | 3.39 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T143606Z-03f6333f-offload-model-offloading-1/README.md) |
-| 5 | [gemma4-26b-moe](index/model/gemma4-26b-moe.md) | [koboldcpp](index/harness/koboldcpp.md) | 21/27 | 0.582 | 3.53 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T161112Z-fff50610-offload-model-offloading-1/README.md) |
-
-Top 5 harness and model combinations of US models:
-
-| Rank | Harness | Model | Developer | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---|---:|---:|---:|---|
-| 1 | [ollama](index/harness/ollama.md) | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | NVIDIA | 24/27 | 2.47 | 29.5 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) |
-| 2 | [lmstudio](index/harness/lmstudio.md) | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | NVIDIA | 24/27 | 4.62 | 14.4 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) |
-| 3 | [ollama](index/harness/ollama.md) | [gemma4-31b](index/model/gemma4-31b.md) | Google | 24/27 | 46.9 | 3.39 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T143606Z-03f6333f-offload-model-offloading-1/README.md) |
-| 4 | [lmstudio](index/harness/lmstudio.md) | [gemma4-31b](index/model/gemma4-31b.md) | Google | 24/27 | 58.5 | 2.53 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T143606Z-03f6333f-offload-model-offloading-1/README.md) |
-| 5 | [koboldcpp](index/harness/koboldcpp.md) | [gemma4-26b-moe](index/model/gemma4-26b-moe.md) | Google | 21/27 | 0.582 | 3.53 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T161112Z-fff50610-offload-model-offloading-1/README.md) |
-
-Top 5 US models, each on its best-ranked harness:
-
-| Rank | Model | Harness | Developer | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---|---:|---:|---:|---|
-| 1 | [nemotron-nano-30b](index/model/nemotron-nano-30b.md) | [ollama](index/harness/ollama.md) | NVIDIA | 24/27 | 2.47 | 29.5 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/README.md) |
-| 2 | [gemma4-31b](index/model/gemma4-31b.md) | [ollama](index/harness/ollama.md) | Google | 24/27 | 46.9 | 3.39 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T143606Z-03f6333f-offload-model-offloading-1/README.md) |
-| 3 | [gemma4-26b-moe](index/model/gemma4-26b-moe.md) | [koboldcpp](index/harness/koboldcpp.md) | Google | 21/27 | 0.582 | 3.53 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T161112Z-fff50610-offload-model-offloading-1/README.md) |
-| 4 | [gemma3-27b](index/model/gemma3-27b.md) | [koboldcpp](index/harness/koboldcpp.md) | Google | 18/27 | 1.29 | 3.1 | [2026-11-15 cap 2048](model-offloading/campaign-20261115T193835Z-720b0164-offload-model-offloading-1/README.md) |
-| 5 | [phi4-reasoning-plus](index/model/phi4-reasoning-plus.md) | [koboldcpp](index/harness/koboldcpp.md) | Microsoft | 15/27 | 0.595 | 3.45 | [2026-11-16 cap 2048](model-offloading/campaign-20261116T133213Z-8dbe93fd-offload-model-offloading-1/README.md) |
-
-![model-offloading on raider-windows: harness and model combinations compared](../../diagrams/results/summary/model-offloading-raider-windows.png)
-
-Chart: every ranked combination, best-ranked model first, one color per harness. Each panel has its own axis; wall time is on a log scale. Exact values are in the tables of this page and in the linked reports.
-
-**[decision-models](index/experiment/decision-models.md) on [raider-windows](index/hardware/raider-windows.md)**
-
-| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---:|---:|---:|---|
-| 1 | [ollama](index/harness/ollama.md) | [llm-eval-tev1:locked](index/model/llm-eval-tev1-locked.md) | 6/6 | 0.0367 | – | [2026-11-15](llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md) |
-| 2 | [ollama](index/harness/ollama.md) | [llm-eval-nimble:locked](index/model/llm-eval-nimble-locked.md) | 6/6 | 0.0602 | – | [2026-11-15](llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/README.md) |
-
-Top 5 harness and model combinations of US models:
-
-No measured run of a US model with scored checks has been published for this pair.
-
-![decision-models on raider-windows: harness and model combinations compared](../../diagrams/results/summary/decision-models-raider-windows.png)
-
-Chart: every ranked combination, best-ranked model first, one color per harness. Each panel has its own axis; wall time is on a log scale. Exact values are in the tables of this page and in the linked reports.
-
-**[decision-models](index/experiment/decision-models.md) on [raider-ubuntu](index/hardware/raider-ubuntu.md)**
-
-No measured run with scored checks has been published yet.
+[Browse by model, date or runtime](index/README.md) · [US model results](index/origin/us.md).
 
 <!-- results-top:end -->
 
-### Conclusions by hardware configuration
+## Historical run notes by hardware configuration
+
+These notes describe the dated campaigns below. Later reruns, different protocols and missing placement evidence limit comparisons. Use the setup evidence above to inspect the observed conditions.
 
 #### `raider-windows`
 
@@ -813,7 +672,7 @@ These results are not ranked with other experiments. Two runs are comparable onl
 | [legal-models](index/experiment/legal-models.md) | 1ebf89d17c04, 79bcd479444d | score | windows-11-wsl2-ubuntu-26.04 | [ollama](index/harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) | succeeded (score-only) | 0/32 | [2026-11-18](legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/README.md) |
 | [legal-models](index/experiment/legal-models.md) | 2a8c00595072, 91eb97d690a1 | score | windows-11-native | [ollama](index/harness/ollama.md) | [llm-eval-kimi-linear-48b:locked](index/model/llm-eval-kimi-linear-48b-locked.md) | succeeded (score-only) | 0/32 | [2026-11-15](legal-benchmark/campaign-20261115T140033Z-ed2177f1-score-legal-benchmark-1/README.md) |
 
-Full table and per-category pages: [results index](index/README.md). Recommended setup, harness and model per hardware configuration and experiment: [recommended setups](index/recommended/README.md).
+Full table and per-category pages: [results index](index/README.md). Inspect workloads, placement and reproducibility details in the [setup evidence](index/recommended/README.md).
 
 <!-- results-index:end -->
 
@@ -1770,7 +1629,7 @@ Hardware configuration `raider-windows`, GPU offload ratio 0.308. The layer coun
 
 <!-- results-list:start -->
 
-| Experiment | Run time UTC | Status | Synthetic | Results |
+| Experiment | Publication time UTC | Status | Synthetic flag or execution kinds | Results |
 |---|---|---|---|---|
 | hardware-fit | 2026-11-24T23:22:44.997235+00:00 | complete | False | [Report](hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
 | hardware-fit | 2026-11-24T23:08:11.066043+00:00 | incomplete | False | [Report](hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |

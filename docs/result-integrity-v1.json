@@ -1,0 +1,1728 @@
+{
+  "version": 1,
+  "source_commit": "ee8c7b56f09adc9ef83007ecd27534e33175b928",
+  "manifests": {
+    "docs/results/decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/manifest.json": {
+      "manifest_blob": "b080fe80bf0a2495785292ac62211e31a6b53578",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "30b3134ac25067e7e2638a8ef18a00f45970e095d6cf76d5351e588072af140c",
+          "git_blob": "af2bd3eacaf109e53a190f7d5649b2cafd2c0bdd",
+          "checkout_sha256": "6967e23e9aad3a5552562bad62c208387a9986fcaa7c481ddf87eb2d7d720eb4"
+        }
+      }
+    },
+    "docs/results/decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/manifest.json": {
+      "manifest_blob": "358603cd62d57142534c7cc7ff26667d1aedb2d4",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "bdb37e618c4d0c93b2df999d9586e16f6c20dd1ed0112a500ed85012637db1e8",
+          "git_blob": "035e092601f28554f1e2776dd2789d5008cd0a10",
+          "checkout_sha256": "ce9ed9bc9ab8c088282b9bcba6d357c10ae2d2a67b30b8e43616427c05967755"
+        }
+      }
+    },
+    "docs/results/hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/manifest.json": {
+      "manifest_blob": "eb637585ea5e290e8a4cc40d5f8c8bc380879b9b",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "9984ea6c2b209ca0a29cc2946ee445c1753f18bd23d50b3fa40ba90d56867987",
+          "git_blob": "5c0f1457ed85d7e8630fa543be87e7f9d1e3d125",
+          "checkout_sha256": "ff703a7de1f374ab56f729bb37956f9e3c873d7a7f595af56e3271fb52143247"
+        }
+      }
+    },
+    "docs/results/hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/manifest.json": {
+      "manifest_blob": "2e3113709ddcd5b6d566043b8540f6ee9ad52c5c",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "a06365857bcba502d9ad00b08d5707005fd5e49b61832699333a242fc01f3d7f",
+          "git_blob": "5c6c78ef86ac9070ceb30bef38ad8501ce256f21",
+          "checkout_sha256": "b21833490b12885b0c98491d061e3a37c36f6bf2b5c035be95f9d0e081bce879"
+        }
+      }
+    },
+    "docs/results/hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/manifest.json": {
+      "manifest_blob": "939af5de44b2cb9381a401346067ceff61a84d12",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "9a7984e3c7e042ce7cd6f7ac22248c88354ec3f72be0d3a3388802cd37f4c0e4",
+          "git_blob": "9321130bc78481b6040acb65a755eebdefa3f72d",
+          "checkout_sha256": "8e23c61d498144fd7440d78136737952803fd7b481131f0b757c25c906582537"
+        }
+      }
+    },
+    "docs/results/hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/manifest.json": {
+      "manifest_blob": "39dbbb17f7a0ffdbed0ce3a0b54cf49e8d4dae76",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "5d752d5f3c63ea8ca5624e7d143fab9e9a245672d4d3ac32711677e9262d3f66",
+          "git_blob": "6470561727df55e706ad24a9235ea7efe8f2aeda",
+          "checkout_sha256": "1a048fd76454d79fdcbbc75c7c6fa878e99a1d7ba3d1ffcbeeabca3c3b24c049"
+        }
+      }
+    },
+    "docs/results/hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/manifest.json": {
+      "manifest_blob": "609c71a58f7cc8bc6fb5f80a5398f308909591f3",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "4b3fab05a031f2bee6dee931a83c93edeee8d58298f6a983e97e06c0a65f71e6",
+          "git_blob": "6cc0c99d883b9ba46cb541f59efea541c285f4aa",
+          "checkout_sha256": "40c77a40bb8c214deaf665c7a5ef386e29ef70bc546221e1d0715fd265efec4f"
+        }
+      }
+    },
+    "docs/results/hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/manifest.json": {
+      "manifest_blob": "f992f3962523a9bebf04910bf475ffa81fba3ae5",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "d723989d9428b646a311d1f4bd01c1be1b8c083595c4cdeaf416401a2f634ef8",
+          "git_blob": "1da17d2353236cd28e295f6be67ed625bf7e85df",
+          "checkout_sha256": "5f6f62f499a8f13c767c0c87e93f358819cff55a36ab800ba551230f04ade99a"
+        }
+      }
+    },
+    "docs/results/legal-benchmark/campaign-20261115T133729Z-ff84f63f-generation-legal-benchmark-1/manifest.json": {
+      "manifest_blob": "f0f75d61c19ca710e948e002ad30fe0f779f4bcf",
+      "crlf_exceptions": {}
+    },
+    "docs/results/legal-benchmark/campaign-20261115T133729Z-ff84f63f-retrieval-legal-benchmark-1/manifest.json": {
+      "manifest_blob": "3c9076ff59052f99214a4b2ca8846f6c6fec9de0",
+      "crlf_exceptions": {}
+    },
+    "docs/results/legal-benchmark/campaign-20261115T133729Z-ff84f63f-workflow-legal-benchmark-1/manifest.json": {
+      "manifest_blob": "43d2e8e4ab1b4706c5bab79d0df4352dc136dfa7",
+      "crlf_exceptions": {}
+    },
+    "docs/results/legal-benchmark/campaign-20261115T140033Z-ed2177f1-score-legal-benchmark-1/manifest.json": {
+      "manifest_blob": "c5ad21568043a11fe220225dcd84b6ad305903d5",
+      "crlf_exceptions": {}
+    },
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-generation-legal-benchmark-1/manifest.json": {
+      "manifest_blob": "746c08bf05527526d930290fb46d9b12da7b39aa",
+      "crlf_exceptions": {}
+    },
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-retrieval-legal-benchmark-1/manifest.json": {
+      "manifest_blob": "25f91add46388dba04426caf46a6f73f4752373e",
+      "crlf_exceptions": {}
+    },
+    "docs/results/legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/manifest.json": {
+      "manifest_blob": "3ec65ce14afbf843aa3e4738ab0fe9cc7cbdaeb2",
+      "crlf_exceptions": {}
+    },
+    "docs/results/legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/manifest.json": {
+      "manifest_blob": "1961e7b9468e5da9cc5e258a78244962b6ab2a59",
+      "crlf_exceptions": {}
+    },
+    "docs/results/llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/manifest.json": {
+      "manifest_blob": "2cd0f533735dc5456599fa3873c4a9ff320dda49",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "286eb1316401c1d136ef74c7341176338f48070bf9e5f6542c3de607b24b73b7",
+          "git_blob": "7389b9fd7f79959ab156204a8a003e497bb5d860",
+          "checkout_sha256": "6db789d54aa0e3ee82e6d59e93f1f55faf335e9f633dc3c3b55c5a8958326041"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "24ae937ea6dcd6be9c5bdc1322ea240b1476b61a9210a3fcf0e2d4c1ee5c60b6",
+          "git_blob": "53f0ec703092a69f8f8473e0d9d14b205d9433f0",
+          "checkout_sha256": "4450019ce939f7254daf66de9991e5f53449dcb1c44b519350383c75eb555d19"
+        },
+        "summary.csv": {
+          "original_sha256": "38e5608af07b4462e2cb1c530f1740c78ca0927f9d5456108cefee27256788e6",
+          "git_blob": "84da47edb9e68ff0a6c8e9dbf6ef4d134af1159c",
+          "checkout_sha256": "62ef8b54e899fabfaea59cda4e254deefffcfa85dee75f9e7247fcb26607a9fa"
+        },
+        "summary.json": {
+          "original_sha256": "0681de7b79f76f308b8dfcf55b8d16272203b847a777b0b9263a81b7963e17c0",
+          "git_blob": "a2e8ed0018853b137a8a696203fbd2a3e209c711",
+          "checkout_sha256": "33cba85e453df7157e0c76b2187f406c25dab4a0ebb630a9c4609f21256cae9a"
+        }
+      }
+    },
+    "docs/results/llm-routing/campaign-20261108T035738Z-332b0246-routing-llm-routing-1/manifest.json": {
+      "manifest_blob": "9c03fe33d1999c59a9e7efc51f882a3e7416ecf2",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "1ab0c7b101f0efcc606b105772d65944ed141e3d23db85cdcfe25d41a465be1f",
+          "git_blob": "79e3eeded6abc4ec3a8b1a5f59086b1c918aaf1d",
+          "checkout_sha256": "e0e37215e94fc51e8a1e309e1fc9493615ad08a3749685b9ff9fd3694ff81dc8"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "491b32337fba99f13f1ef6b51262df7c2b5ac1d37c1d6fe93836ca9fd79a836a",
+          "git_blob": "54efcd3077771fcf6a2369a27cd207f56db43380",
+          "checkout_sha256": "f0be2f598fa26b612c0a5af730a87e8273cb84032e0e9ab6354a6d08ca9b61fe"
+        },
+        "summary.csv": {
+          "original_sha256": "83838b6e33c60bb103196d2bca6a7acbaa0e1aa931e230ffae065f0dba55988a",
+          "git_blob": "4d77070ebab669dcb4b02696669c22bca00cdaf2",
+          "checkout_sha256": "22fe766e5005c3089f4fe61a65ebfeb6a273b9463c5fa2cd8c2b178295c59005"
+        },
+        "summary.json": {
+          "original_sha256": "d81c6b66e51d23daf16b5a650a980308f8a61d7c6a6459c8a0e4bf5ceca448f1",
+          "git_blob": "9ce644ea1701a6a5193513c858a84ef2e2abde13",
+          "checkout_sha256": "84c63fa56d4a38732b3c9d3f8948814363bacb0efa917b03b2000b722ef73bec"
+        }
+      }
+    },
+    "docs/results/llm-routing/campaign-20261115T130420Z-a4e6c761-routing-llm-routing-1/manifest.json": {
+      "manifest_blob": "e013f1f62599a0839bc0b4db52bc91493d4b1431",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "1aaf8a747507c9965a7be054f837afd1eaee2a55754b6b8072aee0675ef245fe",
+          "git_blob": "6a7d5ab351ed3ad1dd03fa0d199727806b0c9bbb",
+          "checkout_sha256": "a47ca7c8e518e28e033e094e680de3989c74c35d105737ca097fcd0bd03d7970"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "293de351a00c12b4d9c7181ca6afea0808275871c46c3fd966838c1d133a20f8",
+          "git_blob": "d3f157ac13c25df27e842d167d209a02df89bf00",
+          "checkout_sha256": "5263392b464119451c143c44b37c3e5b941b97bd8bbc1a21c29d933a127a31c0"
+        },
+        "summary.csv": {
+          "original_sha256": "a715f6dd6e0f92ddcb882dd15539fc50c00b9758cc386fd0d05be88f0965dc60",
+          "git_blob": "a3ae22004116f3db4161c52970a7fc79e2a84d10",
+          "checkout_sha256": "73acde92e9a5980c51deb6d9a12856262e54f7e853ff38421026dcfd0259246e"
+        },
+        "summary.json": {
+          "original_sha256": "cce3503597a8eb7ac44e5e90bc8acc84bc429672a1fed5aec176ca304c4b4b84",
+          "git_blob": "fe3dd790d8d33d1ba335da46a694311db799827e",
+          "checkout_sha256": "277fe656c870063f49b14597dff807e4ae49b152df5620b6f5c2bdc5d61b2109"
+        }
+      }
+    },
+    "docs/results/llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/manifest.json": {
+      "manifest_blob": "f53ff2d194a81d2c01e3274df7942f403b124c9d",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "3b787f5839e6d20b3a2ecc5fe1f9d89fd366bfdad9d3f30158bf8d1a92d4abfc",
+          "git_blob": "f73d91ca7e83073f85408753bb534d9255fb0ca7",
+          "checkout_sha256": "9d9af28e2ab09bfd7bebeae2f8b525fbbcad7b33c054dc6327868092e8a915ca"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261108T035331Z-833eafe8-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "d018b4b1f42f0f36803d701dc200b5e7ed434051",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "63476eb550d15c00707da7afb971a1e42ca748bec7e4e47f420be2440539815d",
+          "git_blob": "2c6ecc03f167c8d80da45c027cd42a48e159870f",
+          "checkout_sha256": "bd5e2dfd30a5715985c9750c037159733d2bc126c79f544ee6847a0e15464527"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "d3118d79adccd6980db59a7d98d50cc0af8cdf8a2b9fbb929398af5893f7e4b4",
+          "git_blob": "58b29bccfd0fd5cf312e93fab79dedb8462deb25",
+          "checkout_sha256": "114cc03dcb6dd40f517e8e5253488f3e44a9f2ae416cd2a65e4728268fde0eff"
+        },
+        "summary.csv": {
+          "original_sha256": "f2a8e45368f7a51d5dea239594e6669d9f7fd972b85cba94058eceac70dcbf23",
+          "git_blob": "4b72d822cbf1f77566610584aa2168519a5764a5",
+          "checkout_sha256": "e9a6ca13db0f1efae108d7cb5d2e2f4aeb0906d0926ec5f1002cb6b4eb617433"
+        },
+        "summary.json": {
+          "original_sha256": "935e4dd406693a5a3c32c60ce7a243228cf86f6b5c9a16bf35336fddbc865ca2",
+          "git_blob": "fe12d25c9e08797918eb3e1295c558be7ddfd99b",
+          "checkout_sha256": "9df9f9cbcf953e0d058f442a290aad516cfb4f67848792ab7fbf9dd04faf6a95"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261108T035738Z-332b0246-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "a6dc5e9145b08d6f42e1026729c9ede93b92aab1",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "e3b2cbf2f606f2497b56748151bfa5f5d97c3d045bbd987c3f67fbd9c480c7ac",
+          "git_blob": "26f9e2b1152622cccbb225f27c98960a1241dd0a",
+          "checkout_sha256": "909113690f450b238e605eb1d6737437bc21a8a770a82a1ca805958ac8f8c9ab"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "dc12ce12aaac52635c8f3a1ef2a074312e6755d29f60362fd1f4bfc830167cd0",
+          "git_blob": "bb359b5aec403b5d1c4ce3361026040137ac34ac",
+          "checkout_sha256": "51292d9453988e47ca8615725eacf3358f49c80710e84133d53aad94f54f347f"
+        },
+        "summary.csv": {
+          "original_sha256": "8af5dc0a80894330310fe1feec3e08e949425ff1fd6cac5001b09fae2872160c",
+          "git_blob": "d9c0dc2e170020f13f27293352f31f56db8bb973",
+          "checkout_sha256": "5c9416ac84df79df0a26ecf9fa5d9d08cac0b7bfddae790b2b7ad5414b884e5e"
+        },
+        "summary.json": {
+          "original_sha256": "8ee08e7f267778386e901749c17993d52ea380070d0b918d3b40f14b1a14b28e",
+          "git_blob": "b6d97034356a761f38d41a0c731a33363b7178fe",
+          "checkout_sha256": "d1c2f7ebf1e27bb8e7355d09e842ded7f56919962dbc80494d8c842f278bc089"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261108T140651Z-a0b0cfdf-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "7ae5f8f37b51191f95073a39a2d036fc6648a83a",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "41c5bacf98f3e908593c30cf0eaa5956015bf7a0304ad4381ed585c6ba3d2f08",
+          "git_blob": "a856ac5956049aa7468ea0c60705a5b3a41dfa22",
+          "checkout_sha256": "61065dd4c4aad4234e940aa1e4ae5c4be77d59d10e66a8756a1bfb3b7ef70184"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "493c6a36387e9e86169c4ec119c6891399412736880b82a61fb7b5fb50e65991",
+          "git_blob": "fb13c9d3df9b914c01fdcb1e05b7380eb62bcb68",
+          "checkout_sha256": "47ef7d6375f5157f2432735e34f35a2cbf2cdb6724ff676f973c1e45fd46e97a"
+        },
+        "summary.csv": {
+          "original_sha256": "556086c3acb1359b20a6e568844c71cb0e5895810fa41bd9fcaca11f98a5ba21",
+          "git_blob": "88b12bbf29ec9dc04e42cd203001f706ed841796",
+          "checkout_sha256": "6ad6372f9129710ca0a7348e61e8f73440c90ac1fb19ebc2ffdc0694d34915b2"
+        },
+        "summary.json": {
+          "original_sha256": "d2ae39785e0e616abe4f1d219da03b09b1db4d1979ef97e7133e41fe7f34d1e6",
+          "git_blob": "a2b25b2c9956682117c595e865da6673ee717d34",
+          "checkout_sha256": "435725ed573081d33ed1ca9e9d98a1b366a966e26a2ed3641035c9add0d724d6"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261109T111225Z-8bf20361-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "9bff5d5e448934e5d2049a7c637fba6060060046",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "7c446afa7db79794633f6ac3842ba72d0d2f719ae61186d8dfba72814f959adc",
+          "git_blob": "daedca374408544f6e2576c44f9a1cbe0fb9de5a",
+          "checkout_sha256": "545afc547fe93b60e6a470513789e50d1e7ffc52631c314c66c464e7c230503e"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "246503290660d6c2bd50ad81c9103158c9f304ff291c2314746a617b1d49d4d8",
+          "git_blob": "20c1a874bde1711686786296e6f2e57d80d7275c",
+          "checkout_sha256": "35789c37f1231849e357f3f8802cfc8f4412431e8a7df24ea348888030eba7d0"
+        },
+        "summary.csv": {
+          "original_sha256": "9793c17ed3ebd6091a3ecddb2b8911b3c6ea9f1817d1427cffb3e237af80a02c",
+          "git_blob": "f66e7eea103088a60a3789e648a84952385b1394",
+          "checkout_sha256": "e63fe461f8600402c8f37d11db5262e8137f0d3ab11f44351c016c92c3c4bfdb"
+        },
+        "summary.json": {
+          "original_sha256": "36283ac41d11c85c31f2c5aed95ec62b7ef0c2ac55796303a8f26cab12ea788e",
+          "git_blob": "706ca3f3792d0bb5d022d1f3cce3497187939a3e",
+          "checkout_sha256": "02c6609397f091d54742d2dbb392c53a6c99a09efafc7bdcb45ff54ede62d5a2"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261109T145255Z-9e9ae761-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "659494a316e7e60f5913a43f0ae0fbb27ca870fb",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "d559f57d0fbf36aa7d7fc0ecb8420c946c6ee909f0baa51e4bf31c41152516c7",
+          "git_blob": "b3dcda535e1cf3ecfd086e5b25360ea7d010e337",
+          "checkout_sha256": "5f70abd26f11fb5255662e96bfef77c444984d069501907da49d65401a9d78f7"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "f53e56a9730133aeade449b92c8a2c937ab4353d8feb7218e144ebdcec2db66c",
+          "git_blob": "83aeb1f596636dfcaf313c204dd8cd608b6caafe",
+          "checkout_sha256": "89b7c9e471b029a860221cca8d735b86b4cfe1926040680699276ef406438d14"
+        },
+        "summary.csv": {
+          "original_sha256": "3bf6b502813ffeecbd85ff8c2ff4b95b409ee192eb5c48e33bfa83a737822d9d",
+          "git_blob": "88e3d1126e701ae5f471a12d58feccb6e1fe3416",
+          "checkout_sha256": "b80d4d4ea26374dfa6777ea20be3da7a48ef98095ec8469ad14ba22728284de5"
+        },
+        "summary.json": {
+          "original_sha256": "57c4f4b8e2ece16e20f39904fd4b2318797223cbf9484a02cb6ec89f97a11634",
+          "git_blob": "c831dcdfe87c30782ea9b6e58913e3e32cc6e3c2",
+          "checkout_sha256": "d821a89b3cc55985ed1d7efbfc271c93b534c3b55a03f496719fae047ee27b10"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261109T154341Z-1e8d354f-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "64cec445e8446fb377e9ebe1977e36e71e7af9ee",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "72f0d4fd9870b2d75ea13cddcbd696f752b4e6bbf08962e036e6f76376c4174e",
+          "git_blob": "bdefbce97d5c0d522cb9a9d55593ec16b9ecaf2b",
+          "checkout_sha256": "6eb71ba19ac46f8e9807d674fba5b5ef2beb8be8f2fe3029cfd5ed6e104c91f8"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "503d0183331ffa9c91c18af2d02c60ca17116f25e8d302c3aedda12d79018695",
+          "git_blob": "8962b8f3ab686446a569333082d0829bd18fd23d",
+          "checkout_sha256": "7b19350ac3a9caf06c313ec26bda6d34bc5aedf8ff19c85b49ce75ce985314ff"
+        },
+        "summary.csv": {
+          "original_sha256": "149f0ca58b87604e1886ace5b672476d09fa6c5de38b3e122bc5e37dc6bda6f4",
+          "git_blob": "8fe4e89d5222a18b4e054f3e4c9bc099538689c6",
+          "checkout_sha256": "cd60b28fd195387f523b2023d18feec4032ad56bfdc68375cfe023859a922433"
+        },
+        "summary.json": {
+          "original_sha256": "07443515c3ae91401bc0e032714554217ffed9ce8049b93a7f40e464a0d5ad41",
+          "git_blob": "bdd3236cc1891ea3de5a4e83cf53ce6313353eef",
+          "checkout_sha256": "062cbe493add20378d240d9615369637593c4dbe6a77a7375caf0cc640247a73"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261109T171430Z-c1c4ab49-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "64389ea5a3ab444a4f5ff97913e2e67d363af340",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "54476eaf586e6fbb04ac744c185b63c111a27114d56e2111d6bff00292cadac3",
+          "git_blob": "75ef33322c452d33347b7ecb3f0b1f2b1ebd8b66",
+          "checkout_sha256": "61e7690104746ff21aa40307fa1c81349e4afe8603a700fdd5ca0da694238a4c"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "7e43245aa105f9e45dfd9b0ec20a68f70d1d61043f2505c80f767bfce2868022",
+          "git_blob": "b5e3cad26c0671827816dec8d54412444b68f758",
+          "checkout_sha256": "a0c841340eaeaec05b0de860303b1b1f40646175e182eda17da89b858c6f0148"
+        },
+        "summary.csv": {
+          "original_sha256": "4a2d3082452e54d927c2772373deedb2b33698916779d26f6da221be0110959b",
+          "git_blob": "4d58fcccbd9f95ff4fde08c6b8a4a3d8507a6693",
+          "checkout_sha256": "23a49810b26179991473eff31faa055115577f9d098d8d189358a1f5d353b3b1"
+        },
+        "summary.json": {
+          "original_sha256": "e3f4ac3cc9836c84f017fc227e88066660d5058922b374f47c9cf236376456f2",
+          "git_blob": "82adfa88575f05dc15fbe49d69b464bbeed6c248",
+          "checkout_sha256": "9c6a43be6677bf774ea1c07efaa44b60ad63e4d1e3b84efa2765803ae865fab3"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261109T174915Z-128e3dcf-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "8b58e5314f506451199ecafa82e7c889a0619b9e",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "1771b5ffcb8b9ccd808cc41123224225264ae4dbf1ce99340c716cd70ed68f3a",
+          "git_blob": "a72654f8b24ad12c6c8e69801768296f07d50249",
+          "checkout_sha256": "38a9fd8a1600724636b8ed6cc43435f6612f4547fa738bf52c186b1f0fba9695"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "63bfd211f115114e01198b36171c42b77d059e813d8280a552bc2f585f18e714",
+          "git_blob": "292a47a457f50ac1139c14a4ae5f7ca8032b4b7a",
+          "checkout_sha256": "3c99d693cb10ec93bdc279dca59df8bd157397d22c37f87e64fb97ba6b12e2b2"
+        },
+        "summary.csv": {
+          "original_sha256": "e80ab2a7d87c4bc44aa30bc33d0ceb9d5217d286d6b7fe47a3194c59ce934687",
+          "git_blob": "8ee680ccf726f6e441be37c76cfe61f5357e514e",
+          "checkout_sha256": "00cd28ef1eb805564ff9a36bc0e26d1a34267a7e811557c4e8d46b5e9478f8fd"
+        },
+        "summary.json": {
+          "original_sha256": "f4cf422cf54f70f656c2055e96f047020a5a54b7ec871b3c1cc0986223cfd17d",
+          "git_blob": "d3f086a42e7267853cf36e75b6900d7714e19976",
+          "checkout_sha256": "7a9050cccaea85b3cc07a3a3d167ff9a3ebb68f9caaa3f36f80cf4b5f9c83bc6"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261109T180247Z-c38f462b-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "92688e001dd1f2011dacc45c63b1c8e4d693e539",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "2d0133c03067b74bc530c12f5425d1eb55f756d9c8fedb8c54305ddb8524f331",
+          "git_blob": "11c9e3019f394928ca4657084daab58a06577ae9",
+          "checkout_sha256": "595f0e8223d7487b344976c3a1a9d2147ab294b8f564e95e41d5c502d9500cc3"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "40893d036fa0abc10c63f22ae7aa3012a6cbdca4ceb7b782a627cc4b7842422d",
+          "git_blob": "3f7819a0d23b9818eb69ec6ccec61d15bd24471c",
+          "checkout_sha256": "d335d2d52e736c04930a958d56a901a6443acfa4ca126ef27f3769ce5339cb87"
+        },
+        "summary.csv": {
+          "original_sha256": "f9869d0bdeb3d309d535834650c29cb87b93249cfb6f4d25f640cefc4ddf12ee",
+          "git_blob": "69234554ffb2b7b873f827e958e63f9892c7c1a1",
+          "checkout_sha256": "66807533f39b80cc760732f0cadae84ca5aed6c3c7013f4600813e71adc399f2"
+        },
+        "summary.json": {
+          "original_sha256": "cd62366313838bee9186708778aef3943079df513993aa7c7a28695cf004cd70",
+          "git_blob": "31836c93a3c983944d395f9e32be22ef5674bca7",
+          "checkout_sha256": "1b7841dab6926a5de0590215b7ad591dfcc57fb67a3e13ab210aaa4ef31e5407"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261109T184809Z-c073d721-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "2394f0703e56cf2cf166f3769b5d4837d1d4616b",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "198a9c9e0fab2276194765db1285293ed375d47dc38137b9288359f0e789f76f",
+          "git_blob": "fff479130e9d2b1ac19f7634b2e5388a616258ef",
+          "checkout_sha256": "3769561b3d9c06943dfc2552eff6ef48e00e044c637fede9ff673f212cf8f921"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "386208091b7feb950e5e0d42d07cd0c375765c67193e8126fc05a53b1cfd0632",
+          "git_blob": "da6b70b0830e9b472124df0a0cb2f0922462491b",
+          "checkout_sha256": "596a2c20f11818befea223c31d2705dbacc2b7c0a5cc0de0ecbb88f5ad3e600a"
+        },
+        "summary.csv": {
+          "original_sha256": "e39639dbde1dd7765d94f3ea86dd8ab5114e9619686fd815bc77ad6e572f6bbc",
+          "git_blob": "951608e1546cbfdf412f21d46c1d0bac0920872b",
+          "checkout_sha256": "793bdd317a979c1ea01255ba379d6275a1658747db81bd38f91f951a14f73af3"
+        },
+        "summary.json": {
+          "original_sha256": "3000ed538b0441fbbcbcf61fe45ca304c450260f14782471fd618761da3c906c",
+          "git_blob": "cbf921b5c2786cf4879245e9b21616d2f6271d57",
+          "checkout_sha256": "6bf7d597191302c66e0f8da27666de0c86c5b86ee5e152af310fb9a25333b8dd"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261110T014022Z-9e4b4e08-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "4d5cd42e5e6847322df06d6b12b70ac99a147a5e",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "240666390244715bdd651a07530653955bf1f0fd5c70c364cfa0447ce09e8665",
+          "git_blob": "fdeced682f366ed1e8589730ac0981efcc88333c",
+          "checkout_sha256": "62aa3f2792e9c1653d8bdcfeff8383a57f1e3371ba3e2f23f04615a9f4dfaf33"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "019343223e76c7ff954ed1bc2a0521f9669adad7435133628aa931e2996c2a77",
+          "git_blob": "afb36b9d69f427388498b0cc78c30c971d58778f",
+          "checkout_sha256": "59f1b5301b11df004e2842137afd54cf914aa0e5e84924a1a29b60d7b21be73b"
+        },
+        "summary.csv": {
+          "original_sha256": "bcbba6442b3a66a9398fd53bed7f3b1e174db44c157714db8871a9829725def0",
+          "git_blob": "9889f78fdabe1c021659e792bbf2a3db5b8b11e3",
+          "checkout_sha256": "d0bac39e1c864e28b264674f87effd41bbffd47801c4ab707b472b167faba5cb"
+        },
+        "summary.json": {
+          "original_sha256": "b7c4a932d75f6b3a5270a80bd9ca1c7b65961966d92ee0c76a7257268d573add",
+          "git_blob": "82812453a7d4243d73ce957c923aed68ea95a507",
+          "checkout_sha256": "bf7452b80bc7042fd1cc730506f38cdf9d684d1d6495dd41e1bdc03cb00cf2a6"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261110T083434Z-6ad3fdfe-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "832272975621d357e8d9ff601321bc30360f1f8b",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "9f0a99168fccdec8617fd22892703cf8996b7465b3813d4e87d94a826be9f564",
+          "git_blob": "e4184a7ad89bdb972d165ccd9115ecc87087b61d",
+          "checkout_sha256": "07d0e4785ac130b38bcf17bda3ca9c9a3036a63122261b0f4caba2ecafe44582"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "43dd0824721dde115df3c68c2d4ac1dab7219b41d6b655afe0d42d9a7f7be715",
+          "git_blob": "37d0837d748cb41cb09e1df4e4f4c20e34dbec20",
+          "checkout_sha256": "4a1c876c812d640ec35ab81bcc504283443d28e95df6f059fc05cddb42c4f987"
+        },
+        "summary.csv": {
+          "original_sha256": "3b4e5dd7259e5022ca1031923ebe780e18343368f2977b416f091e84dcd4ed07",
+          "git_blob": "7b05bba7c8b3538e1091287a4a555cde0c07dd8e",
+          "checkout_sha256": "bcb387a2b69e1ea4d22f81646852067c003160b0b5b6bb76fa0c9bbe2a434cc2"
+        },
+        "summary.json": {
+          "original_sha256": "447f2e4d134108b43a0df31086df0f04ed83ef14da502529f0792104d3b4aa28",
+          "git_blob": "5a8a8998e6c93feea2a0c70e71bde421c95d56ff",
+          "checkout_sha256": "02b3592f859f9e51cfe1aff4d24679ad3f85f86fdee6cb952bc662bb52fbdbb0"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261110T094556Z-ba2a02ce-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "d8a8860d703635e9b329916072ba97c1180c0943",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "4f4a8db2571e3b73aa36ab040d06e0f98e52e1e87477d0ee8d3c2998fe99b489",
+          "git_blob": "3f4adca41c9b2d5060c01ca12fc883b43411e8b7",
+          "checkout_sha256": "a9c07a7df24ea22996b3916bf8aa9ec2b1fa08e90d9f09fd15f55b3692563ce4"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "466627b4082e7c8ef7859fc2dfe86277904d8e402a9ac2d30770944e517e279c",
+          "git_blob": "6b3c4a3217ba1ff285f2a45bea838e2c7075be1c",
+          "checkout_sha256": "eea1d359e9bcde30b03961e1ef36b8234aaed36bdd97dec361e53e09baf97139"
+        },
+        "summary.csv": {
+          "original_sha256": "02e08a9e6365873c0afc5b0ac0afab10f962f161d30591dcdf2d5b5b539ade0d",
+          "git_blob": "e196f0c98e70c287816ed73eedb3fda21e54e486",
+          "checkout_sha256": "c476ff524dbb24955be8caa64df63862b19b119cdae0acf3539d55aac63bde6b"
+        },
+        "summary.json": {
+          "original_sha256": "016910e8073a9011265486e3e6c737745e669c717b14f36f5dca38d2258a8378",
+          "git_blob": "f22780dbbca02dad6e7dab4da157508ee3c136b1",
+          "checkout_sha256": "5a65f23cfb34af0a9168b7fe19e0ddb3d75a95dbea4b1d56e09b298053b53b08"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261110T102703Z-ee68ff15-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "265874499c69be2305833f99851a14975a815b4f",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "def703d783645d061d06d832c9d286d453fc4c0bfbec338ba58bf75189b1e288",
+          "git_blob": "97d5c476762d92cc1206431d698be3389e7457f0",
+          "checkout_sha256": "653a2df7d4125cc4bd5fe75d7dd0c43cb5d41327bcd5435795cd71e4e00fac99"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "79d368c3a81beae4e2fafab12ffa0603dee588e3aa115a1c270e5bd147b18892",
+          "git_blob": "9842bac8a2a4f49f0582736c7b9bef347e2a1d9b",
+          "checkout_sha256": "338c97b81f0a784896f31d42297610eb050a652b0aa044d85156bca52a8e1c40"
+        },
+        "summary.csv": {
+          "original_sha256": "ae3268357d761eee57e5f63190d786f0a28ad76254e69f453146bcfe4d6fb697",
+          "git_blob": "dd2f02d880cbb55ca0f1f0a5fcc880d882ebbaf4",
+          "checkout_sha256": "d3714105f166f9b4c29830785a21068f58dbda7fac1b8e0e96ab288b910c9413"
+        },
+        "summary.json": {
+          "original_sha256": "1eaffae8be3a60c9d6e4c50d844d3af55348fe66a91851a62fade413448d695d",
+          "git_blob": "f6b5760e3450ad00d0b0abb6057388e7a7b4aebd",
+          "checkout_sha256": "cce7813941414aef23cadaaaf01a3e7f095ffa8aafcba73dc44bacad96d44e37"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261110T111300Z-172c453b-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "088cf2390fd53aa61f39ed3521a27615f6fdee38",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "32402cbfa8f8b5def662befa44b2e8b3926f9adc8d829e25f374c81b95608590",
+          "git_blob": "9c1b74083852cc83c2fe20ba8f9eea77f19a46c8",
+          "checkout_sha256": "c6516363843599e90831c881e46e564f612b6b92e4d63087d11afe63ae74d1a5"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "7504f4f7ec19661db41612d71546dceee541175fc55425841298b392a218f335",
+          "git_blob": "47748b49eda83b99f5dcdf1a1f7e40ea1408a05f",
+          "checkout_sha256": "0a5327d7f7534e589e2a15eab79cc032ddec65ff75f55301a63c659dac583c21"
+        },
+        "summary.csv": {
+          "original_sha256": "218089d8d63c82c8d15a0a4eb53c32a24c09ce298812d8b5fcdef54191a5f077",
+          "git_blob": "5ca986e942f7df1f9e8c98ae0eff181b4a0bb853",
+          "checkout_sha256": "93bb93aca700618bb133a90d818f040fe6ae7148f494a99f2d2ee871879476e9"
+        },
+        "summary.json": {
+          "original_sha256": "8ec754e9531763da16a6b4969c713acd0188a1ac9fbc63c03ac208ff84434cfe",
+          "git_blob": "0473a29e1c27cf50dd4fb8890d563760b0c2c527",
+          "checkout_sha256": "fc58d724d8d9bd0d4683cd85b2cf88658d3622f0afd50087602e06f6a4837e99"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261110T113659Z-f9bb2ca8-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "8b0193069def526a331068aa5ac9bd24ae542615",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "3acef345cce3fa86a88535ef5a2ea953cf1bae38f3c1d4ecb3f69706067ad7a8",
+          "git_blob": "51b381e1af79cb200e7f255b0a1ac267dfe06014",
+          "checkout_sha256": "c636a7d1da861f3a51ae61554e60d291a9eaffa1c0d43c7e59ff40fdaae3129a"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "631aeff5b31f3bcd2956b8851a60b14ef9402cfcff6031e641c3b6a8145acccf",
+          "git_blob": "5b0cd963db93e70c9f70917a6cd528391f5e5024",
+          "checkout_sha256": "7c28fc63a3ae1b0b9e6483c000d4a3f4c8ef44b3076a3739fd7546848fb6a556"
+        },
+        "summary.csv": {
+          "original_sha256": "cf7877cb0798f70eb539e0d9b20e3d39afe0251a09b8ea219ea5894c4b0fbbe9",
+          "git_blob": "23d06912ae4a2893bc693d1f830e9ab6f4b04797",
+          "checkout_sha256": "3925d021bcfc4e82e93a3184d22c6ca7ae6e2e8346c43c559b4df81abd767d7e"
+        },
+        "summary.json": {
+          "original_sha256": "3dec8bc9e46d8cb151894aeabc88bca7f04b69655f6ea8ec72dff0a01cff50b6",
+          "git_blob": "7dc437faba4c26fba524eca8a668b9ab3dc47415",
+          "checkout_sha256": "bb840b46bfc7e582897d7bee746909d9beb6620e011a70fae8e5cb8b2f080b79"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261110T122314Z-d7f8e7e5-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "723532a36c106fef718fc7968fafbad70ca47e52",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "69eaaaac86a9550fb1c0b324a23c0d9c1c9e8ca4886aa0de1402916da5d6a158",
+          "git_blob": "8a14f31240c46b96c8c8fa3ebec24a71e111f4db",
+          "checkout_sha256": "10dd44bd96f91a75e18222a67213891fc9cac5273405a19647a943e89c34cbaf"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "3811ca828cfc3ddf0cc2c9f2ac8942c17c82813ca37b1270c7ca6beb24248c25",
+          "git_blob": "83e195f2c9f236676bee456547917f090b42cc16",
+          "checkout_sha256": "0ce881ef31fba9d39bf96421eab62d7ede26315b3da21203759fba4888e35f4b"
+        },
+        "summary.csv": {
+          "original_sha256": "ddf6a7189b46fab4192bbdbb0eae3ff95a2737d10bf15b91bebb168a4714eea0",
+          "git_blob": "9294d072ef95c4c09e41a3d775ece75fc5044640",
+          "checkout_sha256": "2643a8246dcd777cc1c995d46f63277a0e469fcc35d712fad6ae2f936c345cce"
+        },
+        "summary.json": {
+          "original_sha256": "21acf13e6ed881b8c428b460379d0687ab05679f95a6c0278318c8308e079ccb",
+          "git_blob": "3a451a7eb6b337848dd244ec2bd11c6a77451187",
+          "checkout_sha256": "f4c00fa235f411264d06c84d231814d948bd6d056bbecd6d71a5e4cb3c324f4b"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261110T130729Z-161fd0ce-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "56e9d8c8c5751e058e85e681e96ae2cb063c2db8",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "d57d616b038695e7c16c0a0536b7f1016df8ea47467aebfc78acacb0ac6fa8a6",
+          "git_blob": "5459c77cc83de776f5151cb3cc4e58e40bd17452",
+          "checkout_sha256": "ca2501a8bf97fff67c3a4add17c3bb179447830f82a09f106b2ec58ecd5084f8"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "f781a4bad07ad4dac8da6f3f1c8fa0d4c4ca41435ce52b16311e024d1b3f1ad7",
+          "git_blob": "20c30a53e0bf8f4c98e9c9464e20166b74fd244f",
+          "checkout_sha256": "aeabb6453091b4c35c9fe3e1777ba4deddb6ff5706c0b7cdf921b634e2ae7d13"
+        },
+        "summary.csv": {
+          "original_sha256": "826ccc274b05ca7ca3b03f00793ecf32ebbb786a7a881fcb809e50ea454bc645",
+          "git_blob": "04c35bfb1484e9cbcf46834b8b1e1ea8979afe45",
+          "checkout_sha256": "5de30e2a315e84e22aa7fceb4c1944d35c4c1bc5ff7d45c84fa8e3faa5cc8833"
+        },
+        "summary.json": {
+          "original_sha256": "0ddc6855470d389ea90d4e67ff05f7664fd7f5ad8a873575aa52fdf6dec10c5f",
+          "git_blob": "d202d92b52d1a83b37eeb34b490ddfe020cc8af4",
+          "checkout_sha256": "8e111d3fdeb358a5568e536203d757baafa9efc5f4b7e2b3bc93d4440897fb7f"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261110T142645Z-46f987f0-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "49fe41e1f20f7fa318842d105d56e1667141769d",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "462a26943209725d200a59b054fae9bc0055fab1ee219c76f95ee40be59b3411",
+          "git_blob": "8145fff739eea42faf918e732cd914a84f978cdc",
+          "checkout_sha256": "7af09f8b3c6d35f33065c0693b6b9ff572db2ad06809366fd3591a603733ec9f"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "a6887c829eb197edeaa00f57e63488430faa773d857e5bde86af4c5768b1b5f1",
+          "git_blob": "9312a14a920202d88abf789db6548dc0334adace",
+          "checkout_sha256": "9f5de13d450e061d215fa79df2aa567dc96282368fe6120a752e05c6713b2dc3"
+        },
+        "summary.csv": {
+          "original_sha256": "0d93b1c65207b5bcb9d0774e875b1076c4e3f264818516accfaa113152810031",
+          "git_blob": "7589d69934a4332239a48e4a0fde1ae109821f83",
+          "checkout_sha256": "f1e9edafd8e327d80124b22246cce2affdca3b2fc355639644f13893ad07b8bf"
+        },
+        "summary.json": {
+          "original_sha256": "719461071cd1d109a1b5b17cfe0684fb22eeab2b0c801b8710d3b01462849fd9",
+          "git_blob": "d6a2118f70d0f03ec79f0846618b6f06251ae0df",
+          "checkout_sha256": "cb64b366960f4cd1be2eae9830925483433d485d5bf0b692ec7cd86a5035a374"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261110T194147Z-d3ca2090-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "1a98c82848a4612ea7d6c62f6e46f0ea700955f2",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "ac0c3f2c1a76cdf3600438a3d646c3a14fbc2c7cfc042be3983b4cf69e188356",
+          "git_blob": "10c856ff83c5c51148dfc35ce4d31780aa6f1efc",
+          "checkout_sha256": "fea5b748a0771367a81ca478a377204a2e70570fe2ec932ba5dfbde42753f5f1"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "dae77f2e0047fe94835364c93184e05fb576fa4ae8ade8e7a87a27f58fe961cd",
+          "git_blob": "372693c06d73b2abcc40caffeb07a736832eac5a",
+          "checkout_sha256": "a96c3c3f3e3c2b839189500ae2d48201ea7573fb758b33b5ecfbf64647bec349"
+        },
+        "summary.csv": {
+          "original_sha256": "ead2b45db3ce49dde3dee7415500b6fce0e4939df6c65fb6d2a5a625468f61a4",
+          "git_blob": "c480c1379d857e0469befc6977110f633532798c",
+          "checkout_sha256": "48dcd595ac8c2f844c6839f8f1f8a089a207e1584079bcb949335a3a2f73b871"
+        },
+        "summary.json": {
+          "original_sha256": "9f40fa259b85aa45845b3559f6bf27b20ddfdb7fda417d2c67bdd0e65fb7fe86",
+          "git_blob": "dac4eb84ff7aea17fb352f3993d6aa6f0b7dc3f7",
+          "checkout_sha256": "b6667d234da1642d6adfee12c907b1af5aa23a509fb519b968827dc44c70e957"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261111T110234Z-68c0f219-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "02f180c044ec325a24c5953378396d58f2ef8690",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "ffe62ecb0769b52080271643f1b661e7d57440cc5b3b62dc1c26c64e5924b5d6",
+          "git_blob": "600cd1731abea90b572df8ca456236c57ec6cc7e",
+          "checkout_sha256": "190cda50674c78cc3a1f2c0bcb7676f1b8fb5c14717c7e5d63dce15fdb79c5e7"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "b52992c684d6c345b71cdd8a7a62144c6c74b5401e2ca91c7aa419bdbdc5f2da",
+          "git_blob": "8c57b331275a07c1398ab5f7fd50dada5f4d0fd3",
+          "checkout_sha256": "1e52ef61d71afec984245129cfbd0b00bdf8468a8cee2f8f8f0232ff8834cbae"
+        },
+        "summary.csv": {
+          "original_sha256": "9302b630cf6da07aa71f8323bbfdf434feaf013dedaee69bc45f018b553016f1",
+          "git_blob": "85a4d20aec6255cb2fb4e33debc5f6f46f33b7eb",
+          "checkout_sha256": "6c84c8738dd51178032017a1ec29cc68645d3ae3911e42fef7f48b8197a23eb4"
+        },
+        "summary.json": {
+          "original_sha256": "e07c19029cf157d9bc0acc0559d0c0835a2abde13c7601ddaadd374acd48866a",
+          "git_blob": "431a62f1a7b59c8ca2346111b8d4c279815d1960",
+          "checkout_sha256": "0b89c4c6e7b8598390a99b837f89331b6ed9bb9a81a6fda52f96f0bd54b19c79"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261115T140213Z-85f189ba-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "cb5db31a37d941e87132cce6cd1ac9fd08347bff",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "1d85647547fff68d5b44bdf4c457018d31a086a94f42917d63db6504b8a9196f",
+          "git_blob": "8c90d805e98d7396b8c19df1989b234f36fb7fc6",
+          "checkout_sha256": "8ed66486903cd192d3ebebbad85e4210636b2699d952dc13e9b66aafcb7f5491"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "dde6511bb7edded49f9484d34aa5d83b62a08838ecc8a00168d005cc734fd589",
+          "git_blob": "9c1ab48cf8a959a352776bbb3f9947b29bdb5d52",
+          "checkout_sha256": "1ece670aa22a23dbb69b5506780721ee3fe585f3e6517320386271651df93248"
+        },
+        "summary.csv": {
+          "original_sha256": "e220616f5299ea31547361944df9694b57c2a62fce27d61aa108880e08c5651f",
+          "git_blob": "67a1d4c719afca5c61c97c5b4e47bb96273562f8",
+          "checkout_sha256": "630367d1bbd969622c606664fa4fc1d8e6de8b5430ed92a549e5900adc5ba762"
+        },
+        "summary.json": {
+          "original_sha256": "8ba32d36918f9bb2d714144c9a239dd1f3be7d39a630f6c6591d9ee71014ab71",
+          "git_blob": "d0233315e383a76df9e56ad4db46994e9fe3b0f2",
+          "checkout_sha256": "0f7b3a030c790d0bbd65092610ccc0ff2603ab513ecc179342a621631821ad6d"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261115T143606Z-03f6333f-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "89287fd387bb911872c33e4c4edc5ab1b1597689",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "e0c4760179749155a957fb3f7d6b06ebd16c144a08c44ca1a25f3ebb90f05e4e",
+          "git_blob": "dc5412abc8a24faa41aee1732f09a34ac48ea3ce",
+          "checkout_sha256": "6b9972d1fe1a1cfb81df3c08ad0d9b2b32cdf68d14b02c1bd16e3334155e5d3f"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "f46d3d6e33d18111ae904b9d0afe8f9685f85f6baa8394bc7d562ba11e718eca",
+          "git_blob": "1e88eb33f872111e6074a1c3c12829da3c8ac223",
+          "checkout_sha256": "f20978d0fa41c1ca07ffacdd97181ed8fd0ebdf592e502401eb760b7effb7dba"
+        },
+        "summary.csv": {
+          "original_sha256": "d65bee007c6a3424a5eb89e713cef45917a033a9d02b3611a8e2d085adf68219",
+          "git_blob": "574461e2939cc88969761c242dfe20381a8645b5",
+          "checkout_sha256": "eaf02de90024665dbdbc7949887acf947a517b60cdd04da0ffbd200a2b455fa7"
+        },
+        "summary.json": {
+          "original_sha256": "28349de8400ec77d629b062deb0ec4198c684af433363a0503a4ae0caf482306",
+          "git_blob": "a3d5d47bf89db3fb47bc083671c94dabc0d441bc",
+          "checkout_sha256": "7c30a91366a708adf731f63bf982ae344437d0f641855c50854d1053ef11907e"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261115T161112Z-fff50610-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "9e4aec9b509dfe7c53c38563bddcc6f6887ad535",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "3d335bb1661de3e4cff54ee393d7ec8738212c3f6dc3bad754fcba032c69058d",
+          "git_blob": "e8721aa85409c74f1066bd7863e53297654c1628",
+          "checkout_sha256": "7df0c6a2f99cfbfab3aa086e35bf8ee5919c3690927bcf94ff9dd7157104bbc8"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "8dcfaf7047e9d2d1780b9bb72f1d0bf0c3bbf5185fd074dfd9a59b7c4455060f",
+          "git_blob": "98cb53564b7a7535fbbc21c39661b07421d8375b",
+          "checkout_sha256": "1ef2ae5f11e7cc67218e1d6ac0b904b8beda3c756319f70f79a61945c92f7e10"
+        },
+        "summary.csv": {
+          "original_sha256": "0dd4bf581bd064806aab12b208682e2a064695e0308f0874507e691913a2d34f",
+          "git_blob": "0ede00b08192c7ff9bc83ef897d3bb19f71b0756",
+          "checkout_sha256": "a920dfee52ef06b57c77d5a88f36625c232e9b3aaf7d339e735d9ffc131ddaf7"
+        },
+        "summary.json": {
+          "original_sha256": "0da9d1ca4f24324c4aa32eb0753e08848a312fcccbcba0745c2e3a2b11085b11",
+          "git_blob": "ebafaefd54b7b7547f0fc4a78bf682bc53203a3d",
+          "checkout_sha256": "a35c422a54844ef2dffbf410e15a14e84e9fcb91d2f041b1118c04eba383b30d"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261115T164043Z-6fc5883d-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "e2658bd46185f7dbd37f6c08a65e3f23409b3828",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "99978e5e63a6ce74ad2ce971ef21d05a9b2319faf152cc85a16b1d3ce7b127f7",
+          "git_blob": "99a47938abc3f94d739a46b47fbfd3aa9b03ebd5",
+          "checkout_sha256": "2551a9d84f05857508e1e97f508060830a519ad03a1825512eacbe96797d472b"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "451de54aee64068d068c75a8023af7cc7ce0f9caf50fad03ae5e6fe97f002acc",
+          "git_blob": "d60f179a4a716e5cfb0d5450c720a7cbf9b8181b",
+          "checkout_sha256": "06cb312abd421a5e98aef7fa560f0bdd6db510a8d247b838197b6ba059adb457"
+        },
+        "summary.csv": {
+          "original_sha256": "f11d9bacceb43d6696bc23ce70827d5a9f71d346e0c9f610c1050a8f6c3e94e8",
+          "git_blob": "0efaa45a7a745f7bd1e97d9c7d5e289a662be8f2",
+          "checkout_sha256": "26eb312de01fb9e64d780939a8b6e4a514d6e6ab1ff6570650d7fcc19b3a3aab"
+        },
+        "summary.json": {
+          "original_sha256": "7796134a1c264376f1112f9e6fc37b5bc74da2f9d31a370b97da3a225bdea419",
+          "git_blob": "6aa3e29ca37c996d50e1460ad4ef46c7fd37d5fe",
+          "checkout_sha256": "52d2c1791794f99620265d68c2fb067e0993a021f750c7b44de3da81aa4c7951"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261115T172956Z-1be0350b-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "c594149148cd9e115321f1ae27cf08616859c6a0",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "0c1f4cb2c77cf1d6bc239650b0d9c284ef335d13282963b80f5108a0b6b34024",
+          "git_blob": "b96318a5d0f6741aee75ab3649b0e5c1ceeb5369",
+          "checkout_sha256": "18dbc325ff5ae97ee2a2b2865296490674f77f0f68183e1700c80c0ccac8990d"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "60f0531410c27bc0124cd438b0d5b8c85db6a01fcdb2b523b03e4ef7ec72fdd4",
+          "git_blob": "72f2a3c50dbe671e8b4240b66d5a91a5801e379b",
+          "checkout_sha256": "2aae68dacf528df45635770aaa9ac94d197358a665d29fb09056fab0617f7fdd"
+        },
+        "summary.csv": {
+          "original_sha256": "d4e91771ed473a2d198702ea982c6f3c321225cab732a3c590e26679fc1b2ba9",
+          "git_blob": "4f7897bc8f87bb50f6f4ab02cc3337ce4065752c",
+          "checkout_sha256": "1955ab26fab9d8de4afa0cade44125dfc18c1d202ab25570e7d0f9e6e71fa8b4"
+        },
+        "summary.json": {
+          "original_sha256": "0539a18d0c5a4f6fc63cf01c70d1cce9682429029317b86c5e7f190293f454a8",
+          "git_blob": "d5f65462789e851cc1e56d3369457df29168f73d",
+          "checkout_sha256": "153be9bd98c9f4393210281e3160f7219249ff08b17ee5cca3143d986460258c"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261115T180032Z-22d1b837-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "c4e8a8935cfe73cff5fefe1e884748ca9913c09e",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "7cd65586c01f0053fc408f2199f2d6ebf926a084c7fa4d5b9afe00f721232d48",
+          "git_blob": "4048150dc96e9c84d7136efe216c7b5df1d76a16",
+          "checkout_sha256": "472308ead29307658b4d57620fa44187023f16bb2b8118330fa8ed5a36a7d68f"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "a6271c4048ce22becdc05c73378ecd955dd49b772414bf98d3cef1ef2182d868",
+          "git_blob": "de981c72fa2fa0635fbad565ee6cc070043e3d02",
+          "checkout_sha256": "78536e0ca28d64a3920d3f43fbfe8891074fa924c2ce004ef7f9a49453731655"
+        },
+        "summary.csv": {
+          "original_sha256": "f91801741cbbf03455e9d4cbc939d767591cbc87a022ebd8d11a18961151b268",
+          "git_blob": "832049bfd0503c163dcd3e1e33a5090c0a25a6f4",
+          "checkout_sha256": "23a401bbe62c9378ea8bbdcede0b7e9893536aa26efab581be8283887c28f334"
+        },
+        "summary.json": {
+          "original_sha256": "36b2e6f296d990af0a173c7438b2137c77dfb3c032605a105b05b7c0c4092b45",
+          "git_blob": "6b6f11c16da4ce60bce1a9c0b1a309524e790127",
+          "checkout_sha256": "cfbe42ce8e17d10d4c7907817d21d75c53a9f526319ba66c4f72b48639cfdc1b"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261115T184931Z-b2407d9b-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "0ebdce0f18e0d950a102b41fccf5ebb2c6487b82",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "dc38c1cdc187f3d55a0b1923321b570746d9a7189ea4aaa983d124b94e8f9bfb",
+          "git_blob": "90d98bcc7f036deddb9f7399ee9f32d540ca4866",
+          "checkout_sha256": "63059e1ed7265344dac375b8d1cf0f484ddd98f2c95800fd1d5239839512d128"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "b2e3670c349465ffc8ef1cc1f2b055e37b63e488ea428a54f76cec37d390d249",
+          "git_blob": "0f3003d3c0b447924850c86f391a6468ca20080c",
+          "checkout_sha256": "4a007f6003dc78748cec75a6a6054d14ce317bf3c77a1c792f62f617f5d047a3"
+        },
+        "summary.csv": {
+          "original_sha256": "de7fae618500afab0a85ad184f101d00ec3befec53a0fe84d5c8fb5277f91665",
+          "git_blob": "6ccefda142094ab617aa43f2cd0bd72bd8c22d08",
+          "checkout_sha256": "0e81d2aa3b985aa96708325d8c7f4d911e61fc721c649c6b1b845c69793c8654"
+        },
+        "summary.json": {
+          "original_sha256": "d5233f77f99247084f7d8d90766571994bb2704d8910faa2387e1ec1d9163a4c",
+          "git_blob": "09a2665850556196a978394bc45608b600dd5430",
+          "checkout_sha256": "fb187fe382b0f761263b2af0e33a38b0eba80bc6fe832f174b9e117ffd7cd3d8"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261115T193835Z-720b0164-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "99bdb9568fd4dd16cf76d844ca997ac26724c93a",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "2d8591f53054068f34eb1396c96b5f5a12a851c049a9e8fe3de5910d6a893ad5",
+          "git_blob": "b325d1043080e530fbfef626a35df2cbf42984dc",
+          "checkout_sha256": "95e486a3e3ea67eac064f42f10a2f29f8f0147a2a2dc25c04802f5cd24c60166"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "a22269ac91afd48ca93966ec479849fedc5d8f847cb43db132107c24dde1a28e",
+          "git_blob": "cd4d451cce37d315291f3d9b0ee7881890d3f636",
+          "checkout_sha256": "50b7729b1400de4238065ab5c58e3ef9eeb418fc7596f9a3c3a5996f2f65f536"
+        },
+        "summary.csv": {
+          "original_sha256": "3e520a25cd557622aa8acd16aa0a565277e5deb6b58970753b4d10d369f1fd15",
+          "git_blob": "5b16ccb9d1d648574db45bd92d33411c5b6ee0bd",
+          "checkout_sha256": "a3e816272351474b807337603bf47a9ae8198acfc2b2040e0d035073a5630bfc"
+        },
+        "summary.json": {
+          "original_sha256": "6dc7d956e30f939706c70fb9bd6cf67e6ca941f42c80a578c5d4d317e1d7a9eb",
+          "git_blob": "c9348f8fe698514369743e6d11b43751891507a1",
+          "checkout_sha256": "16df3b421445162bc5f7c1b9c45d6aa54f9fdb39d7ceb0623c92fef81bec2826"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261115T201525Z-d393f04a-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "9528f220c7866c34284eddd939d80f4b4c808847",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "81ae36d21a0c02d9f5596b3cca054d74f022970cc2a0fe0dbda43bee904e19f1",
+          "git_blob": "ceb65c6772d3af7a1857274800eef683bb840a15",
+          "checkout_sha256": "06183d6631ae61ad6ad13e98bec1436d9e4296aed879958e18f4ccfea7d7d0b4"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "4251e624b6eec51914b57deaf4a956504dc134e84047843ea0b776ac52e98177",
+          "git_blob": "efb72cb6ec547715c5793d0f939fa7273419588e",
+          "checkout_sha256": "410006d52d7d53736c83a5649bf9508c01c75c8a133c3a2890aaf49b3f3e6c0e"
+        },
+        "summary.csv": {
+          "original_sha256": "ac21bd9a2dce62b74aa1bc51f1daa232d591e2736639d745aefc51fdda5dc74b",
+          "git_blob": "d085c8880d913493e7c7f1dc8e5819edaf0d306e",
+          "checkout_sha256": "363222b1bcfdae7ad35bd6bb534c570b2dda149084ef376c33890397709040bb"
+        },
+        "summary.json": {
+          "original_sha256": "31c740e14f5fbf30e7a41d0f7ef7262ca6a2b47265e728e63146d44d8ecfd7f5",
+          "git_blob": "b6fea244f9dd8724838beef5c27f9629510f748e",
+          "checkout_sha256": "c1fa5c7f299b46d22db974d17477454de5b2e03934c8be1e96ff1e724ac4c966"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261115T210503Z-4b066e90-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "9189b76f8be10edddf5c3018ffe4aeb631e1e736",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "8c1c113c05417e865fec44ee2e83f532da0259b4b5c26d0f749e9b68b6020fe1",
+          "git_blob": "6e7995a9cae4e5fa94f3a0bbd63bb7d84c0f2bb1",
+          "checkout_sha256": "00e13393ea202e7ec95ef89e12dff79b301bb678ee00f2d5c1f45e9d1e243edb"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "2421b32715aac432e58533d77852c7280d8853429ebb7d477ece9d18a9ab2e67",
+          "git_blob": "393587334b19041fa920f719523b4d6589413738",
+          "checkout_sha256": "91ca8118a4d3f20870c4dce27cbbd60ff19bd03ac533f43c17a0b27b51676bc0"
+        },
+        "summary.csv": {
+          "original_sha256": "ed36e22858b9623d7d6d368ddfcf50204b61be645a4073b7b5118f2c4a1f04ac",
+          "git_blob": "a0a2a30c6bfd3236b6004bd9b3998e08f1a56567",
+          "checkout_sha256": "020c27817a236d7df3a6d74fc73c6eb98c266e9f240024f8111f7e95facf8637"
+        },
+        "summary.json": {
+          "original_sha256": "c913bb3ee30914b5083f0fbb9e2162bdc6e09210ea0e0e6b36faf63d955de6c7",
+          "git_blob": "175a8122c3ac5d62ba09d163696e000d843147b2",
+          "checkout_sha256": "37a0e5c2434b647e78f4380d560d1ff57cd58a680ce8d3689f2052e529abfa11"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261115T215231Z-b6016170-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "c2dc979083620d47190b87236854f9618ea3022b",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "be3cc12328f10cbeda850f30c4c8d704b0d30b8d8c72c261b7b8e0c97a58450f",
+          "git_blob": "205979c15cddf4dc9f045e589e83ac1510600410",
+          "checkout_sha256": "c8199496ca8b9955dae5e13c39b01872c7432e774dd4f443bc85887ef8f5a80f"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "55f897f0063ae48e1052e3c59ed1c08e2fffc67773636ca32654ca23edd858ef",
+          "git_blob": "bb0f8ae3756184a454a0f437c37529270c5f8c15",
+          "checkout_sha256": "297627488ee9d316513980be3c1467d445abfee1328cf6c64ea1b4d8161204e0"
+        },
+        "summary.csv": {
+          "original_sha256": "8c9ef65c3db4b14650fa2e685e5f028a5442c39cf907d0abdc110a2d88f0cd66",
+          "git_blob": "7dc4f3e1a69f7206e9abbad16eec71ec10100835",
+          "checkout_sha256": "41680dc0f2e20269c3363b56f8eb216bf8e962ee77ecdd689d77cc0e12485f61"
+        },
+        "summary.json": {
+          "original_sha256": "413ab3bd728477fbee7e23c209e869509b0744cd83af406cff6a59e3da41da14",
+          "git_blob": "74049b77c9647d290bd1e55351226f61722b8381",
+          "checkout_sha256": "c22f21e661cda71539d72b217a5ff6e9ce63abedf1b3184ad8af6abbbb52c609"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261115T222422Z-7671e746-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "a5a4d973f835344aeb44cf0a38d5f320f9561591",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "5c1ef36b2e9695156c2a4598bc82ce1bed0bb6b42f661b3ae063d3227d84475d",
+          "git_blob": "f8f2d33d2d966706defb2a7a78acf62709ef31db",
+          "checkout_sha256": "e7b840cf8c71168d27b988e236cbaa348f7e4aca8b5b4f6515cd678fba742bf4"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "768280628776290bf45de1d8a7e92cd7cf534c828f37e4f11b65e890e4130d23",
+          "git_blob": "152880c569cf408cd79e53c930dafcc9301e30e8",
+          "checkout_sha256": "d88a34a33b50c66cc9c16302b033f577e11c879641f4eaf2312901f69a64e11e"
+        },
+        "summary.csv": {
+          "original_sha256": "7a06a31bd7145f7c91acbcbf0bc0bf63b571ef49b8d9b7da98e569d6b93522ba",
+          "git_blob": "9e6c7352a7a77c3ec95c6ac46ea25fec78a1805b",
+          "checkout_sha256": "2f18aedb91fac5be2e77d69fcc86ba16b477f5acd329255d8c68e7819eeeaa79"
+        },
+        "summary.json": {
+          "original_sha256": "86ff4520cc1a443b9fb582d47c2f771fda1432afb5c2eb29bb9eec63d6e1eaf1",
+          "git_blob": "01e4a33a7ccdd8b1d0e1d1dbaf6943dfa7b7d3e2",
+          "checkout_sha256": "3e57e3b9e8a79c706a12464609cf44ed075eea2c3e45a7ae582daf5c88d208b3"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261115T230200Z-261eec44-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "15f7a659be1e0635909fe8786154396858f018ce",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "ac3f78349fb7bf45abdd66f301ebff4e4476ec503c64e259c32d1c1bd84c4627",
+          "git_blob": "7004391c9cfb04d31856f455e0910c43e490da3b",
+          "checkout_sha256": "9d41398ef267b31fcaeda768187fa9975f822e7f02f97dd40c50289f8ebd859a"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "75959e6d1a7ad75baa1fd2fa24694a899224a2cc805ed353d640697b09c62afd",
+          "git_blob": "d985f1eecf17649a180086e7b04fd1afb7cec305",
+          "checkout_sha256": "4867ea8e6c01ddcbb8c4d37cc21d66f44b9e42d4a9773479fde57d29f793e45c"
+        },
+        "summary.csv": {
+          "original_sha256": "18bdedcb70d3d30a36d94ea9569461102be53d1a065c6c078d30e48d10048445",
+          "git_blob": "c130ba4614c34555536c3718d6dfff8abef9d2b8",
+          "checkout_sha256": "267884aab5a40c2f041ecb6f7670dd9447eb80b7f0b6101ec2b1fa845829fe4d"
+        },
+        "summary.json": {
+          "original_sha256": "c54804ed6b83e31cec1d86ca372e18d90029b9c9fd2dd90f19a56b76b1c6d900",
+          "git_blob": "64a09845d05f08d0e45f1c8bc438a8da6742a11c",
+          "checkout_sha256": "3ba27d85dd354ecd74d39bf2d0911acabd18281260497b55182c6f1fc96f016d"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261116T025021Z-920ba116-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "7c01ec551bb426f1482069da081ac495511565a7",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "392ebdc5e368c6c14d730859bb01bd8dda47a583ba9c67e3200d6d87c1ef148a",
+          "git_blob": "492ff919454e8be470363cb66a4a119bc0b79e45",
+          "checkout_sha256": "e3f54c6ad0aa073851411b4f77c7eb48a2b308be622a60bb91c5011034f943a0"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "594ec12a031b288523331978fb921576aec25be20eb7c29fa617a5699c3f08d8",
+          "git_blob": "044191672f5adea609b09854a0bbd74f7e78aa9a",
+          "checkout_sha256": "4f86928a5ee0bfed67611bcb3da6de76da624229d48d2a763e30e2b48336db6a"
+        },
+        "summary.csv": {
+          "original_sha256": "95e215b98f0c7dc80460615071e92f65cc1b1321960df1281d0efa961b7f3b57",
+          "git_blob": "ea626e6fdede1ee1a9f6a69fe9698d399949648f",
+          "checkout_sha256": "078f029b2ada07d9baa0d525107dd223ddfaa46a4adc323da6c0555931b60b2e"
+        },
+        "summary.json": {
+          "original_sha256": "2f0d08b1de4b0fd1d0bdd017bf3c8c7a4fa030405216eecfd4c2cd2760730cd4",
+          "git_blob": "9a196b9d78e2b6374b151f06d626a18bf5a999d4",
+          "checkout_sha256": "305bd778195e41d7b9a3e11284183132d29f16cf95398cc1c7288a62bc63975a"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261116T080605Z-9fa41c54-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "922cbc8eacd929e4c7351281974addaced685fbc",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "9d2c77cd0877760fac651858a9764993a905abcdf88b7da26de01a34ba5c0048",
+          "git_blob": "39920faebe8bcda0e0892fee990b5ae158421a58",
+          "checkout_sha256": "7286616fbf679b1072ab539634779ab43ec6fc7618ab50e2d537f8d232a73ed9"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "506b79b74ced393047511ba162a71119f2e57961da9d5d61b9dd649a4bc6162e",
+          "git_blob": "22b590a149f09e41d394f428688f41d627f82008",
+          "checkout_sha256": "74f482e34b5b699c710db5c5f712f1774fac42f2cd04475509c1b819b2a01cae"
+        },
+        "summary.csv": {
+          "original_sha256": "5180c464f7b451a73a5a00e4b4780cde4e859192f1595cfa9dcb9acfcb6b6677",
+          "git_blob": "c97d85f4cca74357ed1e5a5fb144c114aa992702",
+          "checkout_sha256": "939057939d38a20777e9bfeaeb4d017c6f945d6bcb05832933b93ee3a641feb4"
+        },
+        "summary.json": {
+          "original_sha256": "585bb0a7c0db199550d034594a0b28fc8a1c67b687ce17435a769c3433591e91",
+          "git_blob": "392aab6478f3a83653d2cab26e68cdb5df2f6b02",
+          "checkout_sha256": "2aeabe2f39f8c61fb7ccc39249e323a51296e40b916fdd9dc226ab0bdb33357e"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261116T133213Z-8dbe93fd-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "6afa008259d9f1518c4a477c4b63db94c193f5bb",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "3a479e891d9d6059329ee5ae9ff422b8ac977d3d2fd399c138553211eeb25321",
+          "git_blob": "e7644f6d7ee810859d9806fe9b1b137275c636b6",
+          "checkout_sha256": "7b70885d3230c198a9945dfcb0c31feb6bc58cd85643b7555da5e5f7b8c2db78"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "0ad269239a624cb737e3f2cc808b692e018145a80fab9771868231925f842294",
+          "git_blob": "0890b27a3e467e88d962209e6e018a69c39d6dde",
+          "checkout_sha256": "d0df75a1b167cc46ef456049e4b9a77ddca7295769ae19c3f819f9851bd969c0"
+        },
+        "summary.csv": {
+          "original_sha256": "890a031325f353828e972b61a7d7ba1d5d37d8d8053279bda7438ecf459d4ba5",
+          "git_blob": "5008e4536e2b5fd1cd64a20d09c48dac577a6fd5",
+          "checkout_sha256": "ea66e8fef7c29fa848e8ef9c387adb1b781df33f2be16732c1d1ec80897d4b8f"
+        },
+        "summary.json": {
+          "original_sha256": "2162b424864f40fb358046b972168bec1c6c5464110c294f1557ee7d0b36e0a5",
+          "git_blob": "f69179b6655bb783a917721a4eb36bef72f789d8",
+          "checkout_sha256": "accd8eed992bd326e008ca9ffdaf9edf0e1a83d8684428381f875d4aefc689de"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261116T201001Z-56cd5073-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "376cc553acaf56db30897a4065bb1918b049f920",
+      "crlf_exceptions": {
+        "README.md": {
+          "original_sha256": "97950f0d80326d06e1b77a553cc92dd8bae82ea029ad60880ad6d30c7f98add0",
+          "git_blob": "45a9f97036d97f88db8171d7992e28555e85669e",
+          "checkout_sha256": "3269a031ddd89ed22f2ce70f15eb7a7753d9898f2747083be6d4992f7767c89b"
+        },
+        "benchmark-summary.json": {
+          "original_sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+          "git_blob": "fe51488c7066f6687ef680d6bfaa4f7768ef205c",
+          "checkout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "resolved-config.json": {
+          "original_sha256": "7b9deb7beed88d356aecac8c0e7d34e34398e32b904f89f93ae34fa00d5b7886",
+          "git_blob": "1e0808c4a55783873e442e81622f6d5100030331",
+          "checkout_sha256": "2d5303a90d3d37503b473f7203897386948857edd3d58d22aeb4acc37f696dda"
+        },
+        "summary.csv": {
+          "original_sha256": "f99b1262f65f43b7a9b776c83a05b72f63cbd6814c7cb7cdfc2fe77bcdfb1fe3",
+          "git_blob": "67fd575c2619adce6eaa9f4f67ac9e4f5a71ae53",
+          "checkout_sha256": "0456be0c1b0d223c013863df5debf55a5095fea2ca2905de729f832f79de7a52"
+        },
+        "summary.json": {
+          "original_sha256": "bc9f4ff581aa2df092de01575a1cbbe76c3bde811f3d238caa154d8f3531a011",
+          "git_blob": "d21b3f631cb36f559b34bf8c2bbb3f02fed36580",
+          "checkout_sha256": "ff3e9bf7302fff53b0c458e69f6334fb992fa0c9e11df139146bb8cf63ae6a69"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261117T043857Z-d2cbbd81-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "fc8016ac7f086b4a8af5b8f93abc58fd56b7d916",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "8f0edf1bde9a66ab9b0a26535d9af468ae23cd7a2d184401020db77a05571556",
+          "git_blob": "c5bc85ed9135b271c242d1bbad577e296419c342",
+          "checkout_sha256": "d08c00c46723207098d0cf18bffa39f336600473e2f513560e1a4f3aeab11d21"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261117T044726Z-01d2a5a1-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "fff0e2387dbf9ffba30343a6c838622566ad2fd8",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "9267382225ff90ddd4860a27c992f0bce96e9509e81d0b8c460e4f63edb7eae0",
+          "git_blob": "7bd15e7200526ca27cc06381086849019ee9bf1f",
+          "checkout_sha256": "71d58fd7391ca0021835ab5071685dc49d8ee06233baac3f20240f274935c51a"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261117T052908Z-16a250ab-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "3fb3341e3d71ceb8684de4e560ff2ccea42fd1e2",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "b5c67886d6ab56f04700a4d51325e17379c722fffc7e8dfdafa3ce457c8fed81",
+          "git_blob": "1d44ca355085e3304203cb8b97edcbc848b3328b",
+          "checkout_sha256": "d7dbc601fee6d5b7de6311c9ac7059f250052ce042f65ab46c2473af07d0f666"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261117T061720Z-22ef705a-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "46f1f38905c03214e094761d81f9a99fd3d66e6b",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "2ad04dd0ae9337cb53d64a7f0b4ec38f5df3e96581578d871f57b56301875cd1",
+          "git_blob": "bf5cafb02a8ae0cfda919c8e0f30238d30aebd87",
+          "checkout_sha256": "eb70d63750d77834ccbf1456b400b82454ec787f3252a7ef4803c144b8fa1c42"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261117T064606Z-ca04bbea-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "85fd7ab218735096538be41d00d02b6a3c057bc8",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "0405c69f94e0beb80b0edc7a0b80b76654101eae669ba886f2884b914a50c712",
+          "git_blob": "0cb53002bc7cce3a66a76e941fd45307c66dca87",
+          "checkout_sha256": "0fe645944c7591b4094e3ee1d4ec48400c79a6b30fdc9d393fa11aed768d7301"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261117T070552Z-eb1d47f8-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "bfb86c92a0042a0c18aa3233f4aa457f4dc482af",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "84e6f082af949511f602f56ccebab4173a97f96a5ee7074df6f9a331bf2e8a64",
+          "git_blob": "099972138a7f1ac6e44c4c0a1b90819c1e9d25d5",
+          "checkout_sha256": "2836b286295cc9c4020d298c7be0185d1063cceed88eb91c99282c68d0bbafb3"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261117T073753Z-bee9d8ce-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "b53a44494c48ccb4a2e52dc25da8d5b58cfa712b",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "f1b7f008058b4bcfb0b6ca09f7992b140d17b57a7559d5fc93c04ff8fc8b1708",
+          "git_blob": "f79c0984a3ea0ee5e4dcf36c5daeeb0a752994ff",
+          "checkout_sha256": "50ba9c10a9e2ab70265a270f8228e54c5d8f05c15a4a9b7e90921703ab44eda1"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261117T080318Z-29021cec-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "1e68865f45c782d08419e42bfc7be2233856ab28",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "29805a43c5544d380263d0da62bdbb613e04d93c402446cd784488b4ab3e4c7c",
+          "git_blob": "a8b390cd48fa6200c63ce172f973b55a1d2a2a45",
+          "checkout_sha256": "c88d8544fe452b88bbd6b0be6fbdc61933c004ada961163601b82f9ce7068dcf"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261117T101636Z-6ef57688-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "97e91283c4295c00b5b1b04892358f93c42d7314",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "72f777618befdfc79aa7786c3049352300c6662e79cb99515367555c4f275040",
+          "git_blob": "442e8e481006181f41b4cd7d6f31a3ee50fed50d",
+          "checkout_sha256": "fae12cb490cfa7a99daa2d4107575574c7c7e11a0ea678226a50f2cb3f3cfb12"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261117T152529Z-a4c8f742-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "8f50be0ffce7353e1cfc6e38aea582ed69c1af8f",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "c17341f50fd9ad2b2e2c22e0d5a9ef338795f897969d5d43058a388b712b6ec3",
+          "git_blob": "3167fe9db8fc8e576b1cfead263cf906506c0e30",
+          "checkout_sha256": "74297e22627b26d6a8a651e77b050d2d8043d59ea13097c19f91515843072e7d"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261117T195001Z-d94a644a-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "992a923c11c9ccf66fbe59d529332611613fe877",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "924487efb63869e913edc764540688c35359794479e43deacd3f8aedb44292d7",
+          "git_blob": "dcf43348fb18353ced16de3de4ca03d12f842e9e",
+          "checkout_sha256": "078beac3234368530bb659be5541591d17a6312287b087c46b7d1b223efad557"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261117T202720Z-89dcd579-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "884558b4e990d3f6718b59f999dd68dfbe867492",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "e1ecc16f3c67d4723fb0313c21078d2dd779e73bcd52f200242c3dbba520d670",
+          "git_blob": "d424767ef7e93ff1709a55edb5ec9da66e2f72cb",
+          "checkout_sha256": "e8d37a9a09f34f409d896e95d68e86659647d6a582f70340cfb9d8373ebab573"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261117T210308Z-f839a69f-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "332a8e79d65d0346cef3c53740ea9446e12706ee",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "91a24b57efdec0a53560883af5deb9b58567448cbad9902dabbe5976aaf61f34",
+          "git_blob": "d3252f74f762c9c0716ab90ec6b24b46695a7dcb",
+          "checkout_sha256": "5b1b73d2a3fc21afd06ee0b45cde4c94d95f7197ef00fb20350415008460cf87"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261117T213717Z-0797f5e5-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "a49d8d9c1b5385bc596730f6006bb626b2697cb9",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "7ac30933f5f9ecb7c27e1b22afd2ddc3b344e63f40c4aa9be503b1ec22f1af82",
+          "git_blob": "3c42ae82c5fb18d4f9f2b8fffa18aa5f3a660ce2",
+          "checkout_sha256": "33180b2c73fb9fbb8ddcf2350674e99f2a81a36b18f63d80edf20f8d4b5ede17"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261117T220944Z-fb65881a-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "15c081bcde6c9dad41fdfd08c9ea0ec1c6200461",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "a6b806d5c6051c1380bc723b172d861b3f23ffece6180c8560b87eab7593d000",
+          "git_blob": "eeaf3181d5fcbcf3e49641540a4325f543f4458e",
+          "checkout_sha256": "595a2b0852dc057ce440ec2ee6c62684150aa2a5d48b04bcd3ba8158c960d104"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261118T014808Z-cc8eec8c-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "a886490ac926b5d622c0091969dafc8b07c764f3",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "ee543fc6d2813445e3ec9bba4891a9f8d5434b004fa68f372dce94899ddea50c",
+          "git_blob": "7719a4e18b08c9f80a996c86cb673f16111f50d9",
+          "checkout_sha256": "38698978f59263fb14072c97d8401c9051e82b0fa217d32e7cfc2ef55fd712b4"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261118T050451Z-60d1fe39-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "04141ef97858595f79f0d4672d80b814229f7a08",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "0a2b3bb3c358a327a89c100325850eb90380aa3fb31a4282491bb09b1343241c",
+          "git_blob": "81439862d57f757d25a50d98dbd8806828fc6194",
+          "checkout_sha256": "277ba15bc58ae5be024ee8eb9b655bc875acf9af142fdfd10a6819ceb386854c"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261118T091847Z-e5ed63b4-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "c99cfd1bcc799a3a170a3e0ff61ad7e1c094031b",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "ab16ac745da8d0ffbd43fbfd176f6db2218adf47e2b4ee0dc3b2db318145304f",
+          "git_blob": "2699ed67337a6c7fba89229b4089cdb026189296",
+          "checkout_sha256": "b8a56924c4bc271a83e2bfc4b56b5acd5c6f047bba3dea7189cbc3a665625a68"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261118T120658Z-2f4fa5af-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "4847f9550ecb38fa84e2d858d01816fbdb640dab",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "5ec9607b47c0a23d2c084530ff5e34359ab1da8a793a73f173394c947a9a92fd",
+          "git_blob": "1072ee0a3d967a90d8a956912c9a967c7a464b57",
+          "checkout_sha256": "af0605ce278435af2a0d1aa916b0a65214b636a1e3194a4b82af7c2b3dcab3a3"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T001756Z-e1adff6b-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "597a5060135a14a11dc88ee2f3b50ba9d0930806",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "29b38a882eade9bc6c2205ed7f3d568da8085a68b2eaabdeabdb61ee54aad169",
+          "git_blob": "eb95c8462498668b63577409868f0411666fe982",
+          "checkout_sha256": "608f8ae0ad53fd5e50cf2ccbe8b2d21723dbb09025e5ce6671e99db84b06cb66"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T003348Z-8d8d894b-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "bd9168f1840250a45d82179e6b2dbb4223372f43",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "03f9d9b190f354770393a5e947c3858212456264bb9f82d70bf9f1b64d380458",
+          "git_blob": "11063c0d018050e776f49d9d04d712a5958177b2",
+          "checkout_sha256": "8bca9440d0135505c57440657fb8fcbfd77df92e90bcb6622d1c34e30247f7fd"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T004854Z-df06d9cb-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "15d6686d9b2feda713afde3e0bed1c048b1b81f6",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "36b033da75c23583b00df88a4811e6aef3cbad3cabf7d82f53c9a880daa8eefc",
+          "git_blob": "4b3d01086f20490b3d147a526650da1126b7ca53",
+          "checkout_sha256": "2531609cabf71892ec0bc0308015ad502cab8c66c312d1c2f7a881f0accaeaa4"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T010725Z-569a049b-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "364101f4d819877db97893b0c5f31c9ced629254",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "ff6d1cb24e9c6e61bda411c1c09df064f2a5a3073ba90bf2d399e8129e010383",
+          "git_blob": "4b3f6d45f0a9196cdf5ace4c0db021a18fca3e37",
+          "checkout_sha256": "b1d29eafed3c92e83b26e0f851dd98ec439e03ec2f43ce6b376705b444ce7db6"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T012251Z-02ce34e6-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "fb4eb0360b7b55f279153b32620668ce862fd4ae",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "b6bc43441b693a946752090778722bbe6265b9cdf89b8709de7e7af1d7fa22d0",
+          "git_blob": "59a8fd9de22d28b5540001fffaaa8498831dc9d4",
+          "checkout_sha256": "6fea8d3fa7b424e11729aa95ae32efddf0b3b062156aea5744e6bcdd2fbbfb76"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T030132Z-4cfa054c-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "ce97ba0a3ebed0d3ebc444f4e3580d48cb723e0b",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "0fab30a56665ae57cc0048e8ba4bbfb54e65018edf2499e1641b1237ebfc8bed",
+          "git_blob": "2568a7613e9286757d2fe513649af4bc07674dd2",
+          "checkout_sha256": "86120c5efe9f34ca1c733ecc3ad4a4fab2741575208ef096d0dc0527a506123c"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T035237Z-c1de26ec-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "015f489e68d77692a299d430a269df544f7d349c",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "cd5c594a06c512c6f37ecf42d79f9e922f60930d51f281ba599ada91b1a95c92",
+          "git_blob": "6a16c678e93fa1e899e7bb8b43322bada0e8ddae",
+          "checkout_sha256": "4d897922dfe892dfd79fbabd00416e4ec2124e1908f2f5f86e64c7912d60b028"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T051919Z-18802dd7-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "fb43523f474d0bac9e798fa877a84e109cbf6e46",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "c31f56ceef9c05c7814998531397cb167e078d3035af24d5047b139046bdbe01",
+          "git_blob": "c44a4af43b3740590d0ceb18cb9d11c9c020c6ab",
+          "checkout_sha256": "d6e6d55f52f082dc49af219be58695033ead0a3d3fab3e3feefdbf49d85b8ee6"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T080915Z-a8f825b0-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "6dd49c3e0f26b265ab013ccf7dac9e2dda492281",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "65fbc910831e7bdd0132ccbffa59844d368f4797480a37c2f3db6794d1f4b198",
+          "git_blob": "b725b192b2c5ac034f35bb5ee5df9ad363423f02",
+          "checkout_sha256": "1e51674633f1f47b5f926d3571a12faf77600a530a908f4df2148d5ec40bfa6d"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T083921Z-1f20982a-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "273fff28b75680a1cf1955ead2c03a197b3236e5",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "78656e9b485f0121dd8764b4885aeb968ffad02977984ba1b1e39204113f9b04",
+          "git_blob": "2289555b50e8debac05df68ec28fdf6538c366df",
+          "checkout_sha256": "8f9f4cadaca11935415626d401006bb95c90ebdd2a5d9241f3aa0b431f8c194e"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T090027Z-2fbb4fe0-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "f12439300016d6583298f9cbfe6e04f41823ea12",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "0c335a55e6e0185b1e6d4f8d14010039621894d952d0cd558b9e8e0cc61b385e",
+          "git_blob": "45fe020839e6182e5fe9b6e635571adcd92d16cb",
+          "checkout_sha256": "dc3a8f861b0266004a7b62c3e9e140c8fecc0a02e7c10db54a97eda19cbe48f5"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T092400Z-30894afc-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "259b65821032ca0c668b1dae6ae8fae35b1eaa50",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "5fb9f8a5bf79c83cd89290c5a9adc4e24863b6b9b60e07fe92034df2eb34c0ae",
+          "git_blob": "5cadb2de3ec0561e9ccd174c20985065cae284dd",
+          "checkout_sha256": "7dfd6f124383d000316a7e65f246217e573ca4aacc7dd88bd6df5075c3eab5f3"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T094709Z-cbbdfa68-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "32ce6812ca0e5bdbb0441b0c11a200c24c263ccc",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "f88cc24448b5e8ad80c0ff2afaa56ee6f3892278b1e49eb3d8cc404f30ce9938",
+          "git_blob": "7bf5ce6cf8ee94278727157265c6fe12d990ab08",
+          "checkout_sha256": "1fe81279a9bea4dbc113395e155fdce1e0fab334ac5358d3d1609714e16bf9ac"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T101018Z-e2ea6a6f-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "acc4ff08296896760b1b5d201d7016dbf7115bbb",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "c61b1b7dcc13fca375c44815c14cfba14cdc8198bce10ef3befcfa87920acc12",
+          "git_blob": "4e5f1a5d4568292cf923cefdc9037fde653f63dc",
+          "checkout_sha256": "7e01d31af918a62caeaa541946ca0f6b1f4c1b8ce8a17cbe638433a820f8f670"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T122121Z-ad75034c-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "1fa34eb6cc69288986f4382229e91de6e728e1f4",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "587734dedf7882256d52c1e73cffeef00c2f82d4a0becc239cbcf8c968c22d90",
+          "git_blob": "6d649a4523e8c71fe76420bb58d641353d2326e1",
+          "checkout_sha256": "ab219573bbb673add9067931bd532152c8553159f3989c111e15e59f6e6f84c4"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T124804Z-80069b0a-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "dad9f9c2a8002e2918dd9d3b0c019ac9ccb48a55",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "ff07b073cc13f8a108bc05607f06d8019b94a668d35efd622fa36613ff9356be",
+          "git_blob": "2ee1e9016f0775e2dbae9650c0ce569a2b194900",
+          "checkout_sha256": "51bd39e3e337848671faa16244d5704d46d219e28e2ae752946ecc9b219bbd88"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261122T143702Z-f61498fb-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "7626eca17c0140604ece299194c9adde592749a6",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "6b2bfc12062d1eddf6e562ab41ae0a745d874e2dd80c3952e3d551b3e25e5132",
+          "git_blob": "96f286ff91bbd5b2704045a6627688f831b77902",
+          "checkout_sha256": "ac1bd4e8b335d35370107552fd24641e59dc9d489607fb590304ab65b7cce398"
+        }
+      }
+    },
+    "docs/results/model-offloading/campaign-20261123T104721Z-e2a3aa26-offload-model-offloading-1/manifest.json": {
+      "manifest_blob": "52f75ad1f5709fe1d02d3b89c3150748a90a9792",
+      "crlf_exceptions": {
+        "summary.csv": {
+          "original_sha256": "8b15e9646792b4801840361906519e613b77ef8de138c724a3bca9d5cfdf7fe4",
+          "git_blob": "0d6ab643a104196cd708b64170ea99f9a44fbafd",
+          "checkout_sha256": "03822c4c895470bda63f1ec4e1d4ac52bc7ee32ba4b80189d06293716828e42d"
+        }
+      }
+    }
+  }
+}

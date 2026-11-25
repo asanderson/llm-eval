@@ -45,7 +45,7 @@ def git(root,*args,env=None,check=True):
     return p.stdout.strip() if check else p
 
 
-def validate_bundle(report):
+def _inspect_bundle(report):
     report=Path(report);spec=read_json(report/'publication.json');bundle=report/'bundle'
     rel=Path(spec['report_path']);charts=Path(spec['chart_path'])
     if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._/-]*',spec['base_branch']) or '..' in spec['base_branch']:
@@ -53,7 +53,8 @@ def validate_bundle(report):
     if rel.is_absolute() or '..' in rel.parts or charts.is_absolute() or '..' in charts.parts:
         raise ValueError('Unsafe publication destination')
     if rel.parts[:2]!=('docs','results') or charts.parts[:2]!=('diagrams','results'):raise ValueError('Publication is restricted to result documentation')
-    manifest=read_json(bundle/rel/'manifest.json')
+    manifest_data=(bundle/rel/'manifest.json').read_bytes()
+    manifest=json.loads(manifest_data)
     if manifest['report_fingerprint']!=spec['report_fingerprint']:raise ValueError('Report fingerprint mismatch')
     from llm_eval.common import digest
     if digest({k:v for k,v in manifest.items() if k!='report_fingerprint'})!=manifest['report_fingerprint']:raise ValueError('Manifest integrity failure')
@@ -66,7 +67,11 @@ def validate_bundle(report):
         if name in manifest['files'] and sha256_file(path)!=manifest['files'][name]:raise ValueError('Report file integrity failure')
     if actual!=expected:raise ValueError('Report file inventory changed')
     if size>spec['max_artifact_bytes']:raise ValueError('Report exceeds artifact-size limit; complete local bundle retained')
-    return spec,manifest,size
+    return spec,manifest,size,hashlib.sha256(manifest_data).hexdigest()
+
+
+def validate_bundle(report):
+    return _inspect_bundle(report)[:3]
 
 
 def _blob(root,ref):
@@ -77,14 +82,27 @@ def _blob(root,ref):
 
 
 def _check_blobs(worktree,spec,manifest,manifest_sha,prefix,env):
-    """Every staged (prefix ':') or committed (prefix 'HEAD:') blob of a canonical bundle equals the manifest that was
-    validated (its own digest taken from the bytes read once, not re-read from disk); the staged inventory under the report
-    path is exactly the manifest's. Nothing is rewritten to make bytes match."""
+    """Verify inventory and exact bytes in the index and the commit, including any per-run chart."""
     expected={**manifest['files'],(Path(spec['report_path'])/'manifest.json').as_posix():manifest_sha}
-    if prefix==':' and set(git(worktree,'ls-files','--',spec['report_path'],env=env).splitlines())!=set(expected):
-        raise ValueError('Staged files differ from the manifest')
+    roots=(spec['report_path'],spec['chart_path'])
+    if prefix == ':':
+        listed=git(worktree,'ls-files','--stage','--',*roots,env=env)
+        inventory_error='Staged files differ from the manifest'
+    else:
+        listed=git(worktree,'ls-tree','-r',prefix[:-1],'--',*roots,env=env)
+        inventory_error='Committed files differ from the manifest'
+    inventory={}
+    for line in listed.splitlines():
+        metadata,name=line.split('\t',1)
+        inventory[name]=metadata.split()[0]
+    if set(inventory)!=set(expected) or any(mode!='100644' for mode in inventory.values()):
+        raise ValueError(inventory_error)
     for name,sha in sorted(expected.items()):
-        if hashlib.sha256(_blob(worktree,prefix+name)).hexdigest()!=sha:raise ValueError('Committed bytes differ from the manifest: '+name)
+        data=_blob(worktree,prefix+name)
+        if hashlib.sha256(data).hexdigest()!=sha:
+            raise ValueError('Committed bytes differ from the manifest: '+name)
+        if name.endswith(('.md','.csv','.json')) and b'\r' in data:
+            raise ValueError('Report text must use LF line endings: '+name)
 
 
 def write_index(worktree):
@@ -137,9 +155,77 @@ def _private_ref(root,name):
     finally:git(root,'update-ref','-d',name,check=False)
 
 
-def publish_report(report,root,dry_run=False,api=None):
+def _check_remote(root, remote, repository, push=False):
+    if not re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+',repository):
+        raise ValueError('Invalid publication repository')
+    args=('remote','get-url',*(['--push','--all'] if push else []),remote)
+    url=git(root,*args)
+    allowed={'https://github.com/'+repository+'.git','https://github.com/'+repository,
+             'git@github.com:'+repository+'.git','ssh://git@github.com/'+repository+'.git'}
+    if url not in allowed:
+        raise ValueError(remote+' does not match the publication repository '+repository)
+
+
+def _commit_bundle(report,worktree,spec,manifest,manifest_sha,env):
+    paths=[spec['report_path']]
+    if (report/'bundle'/spec['chart_path']).exists():
+        paths.append(spec['chart_path'])
+    for relative in paths:
+        shutil.copytree(report/'bundle'/relative,worktree/relative,dirs_exist_ok=True)
+    write_index(worktree)
+    generated=[path for path in ('docs/results/index','diagrams/results/summary')
+               if (worktree/path).exists() or git(worktree,'ls-files','--',path,env=env)]
+    git(worktree,'add','-f','-A','--',*paths,'docs/results/README.md','README.md',*generated,env=env)
+    _check_blobs(worktree,spec,manifest,manifest_sha,':',env)
+    changed=git(worktree,'diff','--cached','--quiet',env=env,check=False).returncode!=0
+    merging=git(worktree,'rev-parse','--verify','MERGE_HEAD',env=env,check=False).returncode==0
+    if changed or merging:
+        git(worktree,'-c','user.name=llm-eval results','-c','user.email=llm-eval@users.noreply.github.com',
+            'commit','-m','results: '+spec['publication_id'],env=env)
+    head=git(worktree,'rev-parse','HEAD',env=env)
+    _check_blobs(worktree,spec,manifest,manifest_sha,head+':',env)
+    return head
+
+
+def _prepare_fork(report,root,spec,manifest,manifest_sha,branch,fork):
+    """Prepare a verified local branch from upstream for a contributor who can push only to their fork."""
+    if fork.casefold()==spec['repository'].casefold():
+        raise ValueError('Specify your own GitHub fork for --prepare-fork')
+    _check_remote(root,'upstream',spec['repository'])
+    _check_remote(root,'origin',fork,push=True)
+    env={**os.environ,'GIT_TERMINAL_PROMPT':'0'}
+    # A private ref per invocation also works in shallow clones and nonstandard fetch configurations.
+    with tempfile.TemporaryDirectory(prefix='llm-eval-fork-') as tmp:
+        worktree=Path(tmp)/'checkout'
+        with _private_ref(root,'refs/llm-eval/'+Path(tmp).name) as base:
+            git(root,'fetch','--no-tags','upstream','+refs/heads/'+spec['base_branch']+':'+base,env=env)
+            if git(root,'ls-tree',base,'--',spec['report_path'],spec['chart_path'],env=env):
+                raise ValueError('The publication ID already exists upstream. Submit a new run as a separate bundle.')
+            git(root,'worktree','add','--detach',worktree,base,env=env)
+            try:
+                commit=_commit_bundle(report,worktree,spec,manifest,manifest_sha,env)
+                ref='refs/heads/'+branch
+                old=git(root,'rev-parse','--verify',ref,env=env,check=False)
+                if old.returncode==0:
+                    old=old.stdout.strip()
+                    if (git(root,'rev-parse',old+'^{tree}',env=env)!=git(root,'rev-parse',commit+'^{tree}',env=env)
+                        or git(root,'show','-s','--format=%P',old,env=env)!=git(root,'rev-parse',base,env=env)):
+                        raise ValueError('A different local branch already uses this publication ID: '+branch)
+                    commit=old
+                else:
+                    git(root,'update-ref',ref,commit,'',env=env)
+            finally:
+                git(root,'worktree','remove','--force',worktree,env=env,check=False)
+    owner=fork.split('/')[0]
+    return {'status':'prepared','branch':branch,'commit':commit,'base':spec['base_branch'],
+            'push':'git push origin '+commit+':refs/heads/'+branch,
+            'compare_url':'https://github.com/'+spec['repository']+'/compare/'+spec['base_branch']+'...'+owner+':'+branch+'?expand=1',
+            'draft':spec['draft'],'report_path':spec['report_path'],'fingerprint':spec['report_fingerprint']}
+
+
+def publish_report(report,root,dry_run=False,api=None,prepare_fork=None):
     report=Path(report).resolve();root=Path(root).resolve()
-    spec,manifest,size=validate_bundle(report)
+    spec,manifest,size,manifest_sha=_inspect_bundle(report)
     # Decided from every experiment identity the bundle carries, not from one label a caller could edit.
     from llm_eval.experiments import REGISTRY, canonical, get_experiment, plugin_hook, reporting_policy
     dest=report/'bundle'/spec['report_path'];raw=dest/'raw/measurements.jsonl.gz'
@@ -191,10 +277,17 @@ def publish_report(report,root,dry_run=False,api=None):
         if found:      # the class of the matched mark, never text from the bundle
             raise ValueError('Publication identity mismatch: the bundle carries content of '+name+' ('+(found if isinstance(found,str) else 'content')+')')
     branch='results/'+spec['experiment_id']+'/'+spec['publication_id']
+    if prepare_fork and any(plugin_hook(name,'verify_publication') for name in names):
+        raise ValueError('Fork preparation is unavailable for a restricted projection. Use its authorized upstream publication workflow.')
     if dry_run:return {'branch':branch,'bytes':size,'files':list(manifest['files']),'dry_run':True}
-    if manifest.get('canonical_bytes'):      # the digest of the manifest bytes that were validated, read once
-        data=(dest/'manifest.json').read_bytes();manifest_sha=hashlib.sha256(data).hexdigest()
-        if json.loads(data)!=manifest:raise ValueError('Report file integrity failure')
+    expected_path=Path('docs/results')/spec['experiment_id']/spec['publication_id']
+    expected_chart=Path('diagrams/results')/spec['experiment_id']/spec['publication_id']
+    if (len(expected_path.parts)!=4 or expected_path.as_posix()!=spec['report_path']
+        or expected_chart.as_posix()!=spec['chart_path'] or manifest['publication_id']!=spec['publication_id']):
+        raise ValueError('Publication paths must identify one experiment run')
+    git(root,'check-ref-format','--branch',branch)
+    if prepare_fork:
+        return _prepare_fork(report,root,spec,manifest,manifest_sha,branch,prepare_fork)
     lock=ProcessLock(report/'.publish.lock');lock.acquire()
     try:
         token=os.environ.get('GH_TOKEN') or os.environ.get('GITHUB_TOKEN')
@@ -205,10 +298,7 @@ def publish_report(report,root,dry_run=False,api=None):
                 receipt={'url':existing['html_url'],'branch':branch,'fingerprint':fingerprint,'status':'merged'}
                 atomic_json(report/'publication-state.json',receipt);return receipt
             branch+='-'+fingerprint[:12];existing=api.find(branch)
-        remote=git(root,'remote','get-url','origin')
-        allowed={'https://github.com/'+spec['repository']+'.git','https://github.com/'+spec['repository'],
-                 'git@github.com:'+spec['repository']+'.git'}
-        if remote not in allowed:raise ValueError('origin does not match the publication repository')
+        _check_remote(root,'origin',spec['repository'])
         with tempfile.TemporaryDirectory(prefix='llm-eval-publish-') as tmp,_private_ref(root,'refs/llm-eval/publish-base') as private:
             temp=Path(tmp);worktree=temp/'checkout';env=os.environ.copy();env['GIT_TERMINAL_PROMPT']='0'
             if token:
@@ -246,28 +336,16 @@ def publish_report(report,root,dry_run=False,api=None):
                                 # A results branch only ever changes the generated blocks, so the base copy carries the
                                 # hand-written text; the blocks are regenerated below.
                                 git(worktree,'checkout','--theirs','--',name,env=env)
-                charts=[spec['chart_path']] if (report/'bundle'/spec['chart_path']).exists() else []      # a projected bundle has none
-                for relative in [spec['report_path'],*charts]:
-                    shutil.copytree(report/'bundle'/relative,worktree/relative,dirs_exist_ok=True)
-                write_index(worktree)
-                generated=[p for p in ('docs/results/index','diagrams/results/summary') if (worktree/p).exists()]
-                git(worktree,'add','-f','-A','--',spec['report_path'],*charts,'docs/results/README.md','README.md',*generated,env=env)
-                if manifest.get('canonical_bytes'):_check_blobs(worktree,spec,manifest,manifest_sha,':',env)
-                changed=git(worktree,'diff','--cached','--quiet',env=env,check=False).returncode!=0
-                merging=git(worktree,'rev-parse','--verify','MERGE_HEAD',env=env,check=False).returncode==0
-                if changed or merging:
-                    git(worktree,'-c','user.name=llm-eval results','-c','user.email=llm-eval@users.noreply.github.com','commit','-m','results: '+spec['publication_id'],env=env)
-                head=git(worktree,'rev-parse','HEAD',env=env)
-                if manifest.get('canonical_bytes'):_check_blobs(worktree,spec,manifest,manifest_sha,'HEAD:',env)
-                if protected and git(worktree,'diff','--name-only',private,'HEAD','--',*protected,env=env):
+                head=_commit_bundle(report,worktree,spec,manifest,manifest_sha,env)
+                if protected and git(worktree,'diff','--name-only',private,head,'--',*protected,env=env):
                     raise ValueError('Publication branch changes a protected file')
-                git(worktree,'push','origin','HEAD:refs/heads/'+branch,env=env)
+                git(worktree,'push','origin',head+':refs/heads/'+branch,env=env)
             finally:
                 git(root,'worktree','remove','--force',worktree,env=env,check=False)
             body=(f"This experiment report adds raw measurements, JSON/CSV summaries, configuration coverage and PNG charts to the results documentation.\n\n"
                   f"Experiment: {manifest['experiment_id']}\nCampaign: {manifest['campaign_id']}\nStatus: {manifest['status']}\nSynthetic: {manifest['synthetic']}\n"
                   f"Measured code: {spec['code_revision']}\nReport: {spec['report_path']}/README.md\nRaw data: {spec['report_path']}/raw/measurements.jsonl.gz\n"
-                  f"Validation: bundle checksums, file inventory and size checked before push.\nReproduction: use the measured revision and resolved-config.json to bind local artifacts, then run llm-eval plan/run --campaign YOUR_CAMPAIGN.json.\n\nReport fingerprint: {fingerprint}")
+                  f"Validation: bundle size, staged and committed file inventories and SHA-256 digests checked before push.\nReproduction: use the measured revision and resolved-config.json to bind local artifacts, then run llm-eval plan/run --campaign YOUR_CAMPAIGN.json.\n\nReport fingerprint: {fingerprint}")
             if manifest.get('canonical_bytes'):      # a projected bundle: fixed sentences and projected values only
                 body=(f"This experiment report adds a validated projection to the results documentation: cohort metrics with counts and intervals, JSON/CSV summaries, configuration coverage and a canonical raw archive.\n\n"
                       f"Experiment: {manifest['experiment_id']}\nCampaign: {manifest['campaign_id']}\nStatus: {manifest['status']}\n"

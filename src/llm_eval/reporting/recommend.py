@@ -1,174 +1,368 @@
-"""Recommended setup, harness and model per hardware configuration and experiment, derived from the published results.
-
-`llm-eval index-results` writes one page per (hardware configuration, experiment) pair under
-docs/results/index/recommended/HARDWARE/EXPERIMENT.md and an overview beside them. A recommendation is the best-ranked
-harness and model combination of the pair, by the ranking of `index.ranked`, together with the configuration of that run
-as its bundle's resolved configuration records it. A pair without a ranked run gets a page that says why. Nothing is typed
-by hand and every value of a bundle is rendered through `index._cell`, so a hostile value stays inert text.
-"""
+"""Reader-facing evidence cards, setup pages and machine-readable matched comparisons."""
 from __future__ import annotations
 
 import json
+import os
+import re
+import shutil
+from collections import Counter, defaultdict
 from pathlib import Path
+from statistics import median
 
-from .index import RANKING_RULE, TOP_LIMIT, _cell, _link, _read, identity, ranked, slug, table
+from .index import CHARTS, PLATFORMS, _cell, _link, matched, slug, table, us_model
 
-DIRECTORY = 'recommended'      # below docs/results/index, so a publication stages these pages with the index
-NOTE = 'Generated from the published bundles by `llm-eval index-results`; do not edit by hand.'
-SCOPE = ('It is a statement about the published runs on this hardware configuration, not about the model or the harness in '
-         'general. The checks are small deterministic checks, the runs can differ in more than the harness and the model '
-         '(each report states its conditions), and the recommendation changes when a newer run of a combination is published.')
-# (label, key) of the run configuration, in the order they are shown. A key the run does not carry gives no row.
-CONFIG = (('Lane', 'lane'), ('Context tokens', 'context_tokens'), ('Output cap (tokens)', 'max_output_tokens'),
-          ('Temperature', 'temperature'), ('Seed', 'seed'), ('Warm-ups per task', 'warmups'),
-          ('Measured repetitions per task', 'repeats'), ('Request deadline (s)', 'timeout_s'),
-          ('RAM budget (GiB)', 'ram_budget_gib'), ('GPU budget (GiB)', 'gpu_budget_gib'),
-          ('Model artifact and tokenizer revision', 'tokenizer_revision'), ('Chat template SHA-256', 'chat_template_sha256'),
-          ('Reasoning mode', 'reasoning_mode'), ('Request options', 'request_options'), ('Placement notes', 'placement_notes'))
-LAUNCH = (('Model file', 'model_file'), ('GPU layers requested', 'gpu_layers'), ('GPU share requested (ratio)', 'gpu_offload'),
-          ('CPU threads', 'threads'), ('Import mode', 'import_mode'))
-ATTESTED = (('NVIDIA driver', 'nvidia_driver'), ('OS build', 'os_build'), ('WSL version', 'wsl_version'), ('WSL guest memory', 'wsl_memory_cap'))
+UNKNOWN = 'not recorded'
+FIT = 'hardware-fit'
 
 
-def _job(root, record):
-    """The planned job behind an index record, from the resolved configuration of its bundle; None when it is not found."""
-    bundle = Path(root) / 'docs/results' / Path(record['report']).parent
-    for job in _read(bundle / 'resolved-config.json').get('jobs', []):
-        if (job.get('case_id') == record['case'] and job.get('hardware_config_id', 'unknown') == record['hardware']
-                and identity(job) == (record['harness'], record['model'])):
-            return job
-    return None
+def value(v):
+    if isinstance(v, float):
+        v = int(v) if v.is_integer() else f'{v:.3g}'
+    return UNKNOWN if v is None else _cell(v)
 
 
-def _value(value):
-    """One setting as text: objects as compact JSON, None and empty values as no value."""
-    if value is None or value == '' or value == {} or value == []:
-        return None
-    return json.dumps(value, sort_keys=True, ensure_ascii=False) if isinstance(value, (dict, list)) else str(value)
+def span(values):
+    if not values:
+        return UNKNOWN
+    return value(min(values)) if min(values) == max(values) else f'{value(min(values))}–{value(max(values))}'
 
 
-def settings(job):
-    """[(label, text)] of the configuration a run recorded: the run configuration with its launch and attested settings, or
-    the router of a routing job. Empty for a job that carries neither."""
-    parameters = (job or {}).get('parameters') or {}
-    config, router = parameters.get('config'), parameters.get('router')
-    rows = []
-    if isinstance(config, dict):
-        launch = config.get('launch') if isinstance(config.get('launch'), dict) else {}
-        attested = config.get('hardware_attestation') if isinstance(config.get('hardware_attestation'), dict) else {}
-        rows += [('Harness version', config.get('backend_version'))]
-        rows += [(label, launch.get(key)) for label, key in LAUNCH]
-        rows += [(label, config.get(key)) for label, key in CONFIG]
-        rows += [(label, attested.get(key)) for label, key in ATTESTED]
-    elif isinstance(router, dict):
-        rows += [('Router ' + str(key), value) for key, value in sorted(router.items(), key=lambda item: str(item[0]))
-                 if not isinstance(value, (dict, list))]
-    return [(label, text) for label, text in ((label, _value(value)) for label, value in rows) if text is not None]
+def sources(r, prefix, names=('Report', 'Config', 'CSV', 'Raw')):
+    files = {'Report': 'README.md', 'Config': 'resolved-config.json', 'CSV': 'summary.csv', 'Raw': 'raw/measurements.jsonl.gz',
+             'Manifest': 'manifest.json', 'Cohorts': 'legal-summary.json'}
+    base = prefix + r['report'].rsplit('/', 1)[0] + '/'
+    return ' · '.join(f'[{name}]({base}{files[name]})' for name in names
+                      if name == 'Report' or files[name] in r['downloads'])
 
 
-def _number(value):
-    return _cell(None if value is None else format(value, '.3g'))
+def detail(r, index):
+    return f"{index}recommended/{slug(r['hardware'])}/{slug(r['experiment'])}.md"
 
 
-def _rows(chosen, first, index_prefix, report_prefix, start=1):
-    """Ranking rows; `first` is the leading column, 'harness' or 'model'."""
-    second = 'model' if first == 'harness' else 'harness'
-    return [f"| {rank} | {_link(first, r[first], index_prefix)} | {_link(second, r[second], index_prefix)} | "
-            f"{r['score'][0]}/{r['score'][1]} | {_number(r['wall_mid'])} | {_number(r['tokens_mid'])} | "
-            f"[{r['date']}]({report_prefix}{r['report']}) |" for rank, r in enumerate(chosen, start)]
+def placement(r):
+    f = r['observation']['fit']
+    if r['mode'] == 'projection':
+        return 'capacity estimate'
+    if f.get('fit_class') in ('capacity_failure', 'loader_failure'):
+        return _cell(f['fit_class']).replace('_', ' ') + ' (' + _cell(f.get('reason')).replace('_', ' ') + ')'
+    if r['status'] == 'failed' and r['observation']['completed'] == 0:
+        return 'failed before any request completed'
+    count, total = f.get('layers_offloaded'), f.get('layers_total')
+    if count is not None and total is not None:
+        return f'{value(count)} of {value(total)} layers reported on GPU'
+    if f.get('placement') not in (None, 'unobserved'):
+        return 'backend reported ' + _cell(f['placement']).replace('_', ' ')
+    if f.get('verdict') == 'in_vram' and 'gpu_telemetry' in (f.get('evidence_basis') or []):
+        return 'fit inferred from device memory, layer count unknown'
+    return 'layer placement unknown'
 
 
-def _why_unranked(chosen):
-    """One sentence: why no run of the pair is ranked."""
-    if all(not r.get('ranked', True) for r in chosen):
-        return 'The results of this experiment are published by class and cohort and are not ranked.'
-    if all(r['synthetic'] for r in chosen):
-        return 'Every published run of this pair is a synthetic fixture, which measures no model.'
-    return 'No run of this pair has succeeded with scored checks.'
+def completion(r):
+    obs = r['observation']
+    if r['mode'] == 'projection':
+        return 'no model call'
+    return f"{obs['completed']}/{obs['observations']}" if obs['completed'] is not None else UNKNOWN
 
 
-def page(root, experiment, hardware, records, order):
-    """The page of one pair: `records` are its published results, newest first; `order` its ranked combinations, best first."""
-    index_prefix, report_prefix = '../../', '../../../'
-    lines = [f'# Recommended setup, harness and model: {_cell(experiment)} on {_cell(hardware)}', '',
-             '[Recommended setups](../README.md) · [Results index](../../README.md) · [Executive summary](../../../README.md)', '',
-             f'{NOTE} {len(records)} published result(s) for this experiment and hardware configuration; '
-             f'{len(order)} harness and model combination(s) are ranked.']
-    if not order:
-        lines += ['', '## No recommendation', '', _why_unranked(records) + ' Its published results are listed below.']
-    else:
-        best = order[0]
-        job = _job(root, best)
-        tied = sum(1 for r in order if r['score'][0] * best['score'][1] == best['score'][0] * r['score'][1])
-        lines += ['', '## Recommendation', '', '| | |', '|---|---|',
-                  f"| Harness | {_link('harness', best['harness'], index_prefix)} |",
-                  f"| Model | {_link('model', best['model'], index_prefix)} |",
-                  f"| Operating system | {_cell(best['os'])} |",
-                  f"| Checks passed | {best['score'][0]}/{best['score'][1]} |",
-                  f"| Median wall time per request (s) | {_number(best['wall_mid'])} |",
-                  f"| Output tokens per second | {_number(best['tokens_mid'])} |",
-                  f"| Measured | [{best['date']}]({report_prefix}{best['report']}) |",
-                  '', 'This is the best-ranked combination of the results index for this pair. ' + RANKING_RULE]
-        if tied > 1:
-            lines += ['', f'{tied} combinations pass the same share of checks as the recommended one; the order among them is by '
-                          'median wall time, then by output rate.']
-        lines += ['', SCOPE]
-        rows = settings(job)
-        if rows:
-            lines += ['', '## Setup of the recommended run', '',
-                      "Read from the resolved configuration of the run's report. To reproduce it, use the measured code revision "
-                      'named in that report.', '', '| Setting | Value |', '|---|---|']
-            lines += [f'| {label} | {_cell(text)} |' for label, text in rows]
-        per_harness = {}
-        for r in order:      # best first, so each harness keeps its best combination
-            per_harness.setdefault(r['harness'], r)
-        if len(per_harness) > 1:
-            lines += ['', '## Best combination on each harness', '',
-                      'The rank is the position in the ranking of this pair.', '',
-                      '| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |', '|---:|---|---|---:|---:|---:|---|']
-            for r in per_harness.values():
-                lines += _rows([r], 'harness', index_prefix, report_prefix, start=order.index(r) + 1)
-        if len(order) > 1:
-            lines += ['', f'## Best {min(TOP_LIMIT, len(order))} combinations', '',
-                      '| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |', '|---:|---|---|---:|---:|---:|---|']
-            lines += _rows(order[:TOP_LIMIT], 'harness', index_prefix, report_prefix)
-    lines += ['', '## Published results of this pair', '', table(records, index_prefix, report_prefix)]
+def checks(r):
+    return _cell(r['decisions'] or r['quality'] or 'unscored')
+
+
+def workload(r):
+    obs = r['observation']
+    if r['mode'] == 'projection':
+        return 'capacity estimates'
+    if r.get('legal') and r['legal'].get('matters') is not None:
+        return f"{value(r['legal']['matters'])} fictional matters"
+    if obs['tasks'] is None:
+        return UNKNOWN
+    return f"{obs['tasks']} tasks × {span(obs['repeat_range'])} measured attempts"
+
+
+def fit_rows(records, prefix):
+    lines = ['| Model and runtime | Job status | Completed | Checks passed | Prompt tokens observed | Time until text appears (median s) | Placement evidence | Source |',
+             '|---|---|---:|---:|---:|---:|---|---|']
+    for r in records:
+        obs = r['observation']
+        name = _cell(r['model']) + ' · ' + _cell(PLATFORMS.get(r['harness'], r['harness']))
+        lines.append(f"| {name} | {_cell(r['status'])} | {completion(r)} | {checks(r)} | {span(obs['prompt_range'])} | "
+                     f"{value(obs['visible_s'])} | {placement(r)} | {sources(r, prefix, ('Report',))} |")
+    return lines
+
+
+def featured_fit(records):
+    """Choose a recently tested artifact with multiple evidence types. Include failures on its other runtimes."""
+    groups = defaultdict(dict)
+    for r in records:  # newest job first, including failed attempts
+        if r['experiment'] == FIT and r['mode'] == 'measured' and not r['synthetic'] and r['class'] is None:
+            groups[(r['hardware'], r['model'])].setdefault(r['harness'], r)
+    if not groups:
+        return []
+    def coverage(group):
+        return (max(r['date'] for r in group), len({placement(r) for r in group}), len(group), max(r['created'] for r in group))
+    chosen = max((list(g.values()) for g in groups.values()), key=coverage)
+    return sorted(chosen, key=lambda r: r['harness'])
+
+
+def highlights(records, index, report_prefix):
+    lines = ['### What ran on this hardware?', '']
+    fit = featured_fit(records)
+    if fit:
+        r = fit[0]
+        gpu = r['gpu']
+        lines += [f"**{_cell(r['model'])}** on {_cell(r['hardware'])} ({_cell(r['os'])}). "
+                  f"{value(gpu.get('name'))}, {value(gpu.get('vram_gib'))} GiB of GPU memory. "
+                  'Each row is the latest published test of this artifact name on that runtime.', '']
+        lines += fit_rows(fit, report_prefix)
+        sizes = {workload(r) for r in fit}
+        contexts = {r['context'] for r in fit}
+        detail_line = ('Each run recorded ' + sizes.pop() + '. ') if len(sizes) == 1 and UNKNOWN not in sizes else ''
+        if len(contexts) == 1 and None not in contexts:
+            n = contexts.pop()
+            detail_line += f'The configured context window was {value(n)} tokens. '
+            prompts = [r['observation']['prompt_range'][-1] for r in fit if r['observation']['prompt_range']]
+            if prompts and max(prompts) < n:
+                detail_line += f'The longest prompt with a recorded token count used {value(max(prompts))} tokens. '
+        lines += ['', detail_line + 'Checks refer to the published workload. Repeated attempts on one question count as one distinct task.',
+                  '', f'[Inspect the run settings, device memory and raw records]({detail(r, index)}).', '']
+    lines += ['| Experiment and hardware | Evidence available | Read the runs |', '|---|---|---|']
+    for (experiment, hardware), group in pairs(records).items():
+        mode_labels = {'measured': 'model run', 'category-smoke': 'model run', 'decision': 'model run',
+                       'livebench': 'LiveBench job', 'live': 'live routing job', 'matched-performance': 'performance job',
+                       'replay': 'replay job', 'projection': 'projection'}
+        counts = Counter(r['class'] or ('fixture' if r['synthetic'] else mode_labels.get(r['mode'], 'job')) for r in group)
+        names = {'measured': 'measured model run', 'score-only': 'rescore'}
+        state = ', '.join(f'{n} {_cell(names.get(k, k))}' + ('s' if n != 1 else '') for k, n in sorted(counts.items()))
+        failed = sum(r['status'] == 'failed' for r in group)
+        state += f' ({failed} failed)' if failed else ''
+        lines.append(f"| {_cell(experiment)} · {_cell(hardware)} | {state} | [Evidence and reproduction]({detail(group[0], index)}) |")
+    pending = [r for r in records if any('all_pass_reviewed' in (row.get('metrics') or {}) for row in r['legal_rows'])
+               and r['legal'].get('review_required') and not r['legal'].get('reviewer_fingerprint')]
+    if pending:
+        lines += ['', f"**Human review is pending** in {len(pending)} published legal jobs on fictional matters. "
+                  f"See the [review denominators]({detail(pending[0], index)}#legal-evaluation)."]
+    if any(r['hardware'] == 'raider-ubuntu' and r['synthetic'] for r in records) and all(
+            r['synthetic'] or r['mode'] == 'projection' for r in records if r['hardware'] == 'raider-ubuntu'):
+        lines += ['', 'Native Ubuntu on the Raider has fixture coverage only. A measured result there is still open.']
+    lines += ['', f'[Browse by model, date or runtime]({index}README.md) · [US model results]({index}origin/us.md).']
+    return '\n'.join(lines)
+
+
+def pairs(records):
+    groups = defaultdict(list)
+    for r in records:
+        groups[(r['experiment'], r['hardware'])].append(r)
+    return groups
+
+
+def matched_section(records):
+    groups = matched(records)
+    lines = ['## Matched model comparisons', '',
+             'A group changes the model package within one publication on one hardware configuration and runtime. '
+             'The suite hashes, exact prompts, measured repetitions, scorer code and recorded request settings must match. '
+             'The package includes its tokenizer and template. Failed jobs and runs with incomplete controls remain in the run history.', '']
+    if not groups:
+        return lines + ['No two successful model packages have complete matching controls in these bundles.']
+    lines += ['Times are descriptive. Host paging, model-specific defaults, cache reuse and independent sessions can be unobserved. '
+              'Each row shows this run’s observed median among completed requests. Repeated prompts on one host do not establish '
+              'uncertainty across machines or general model quality. The downloadable manifest contains each full comparison key and its inputs.']
+    for key, group in groups.items():
+        r = group[0]
+        lines += ['', f"### {_cell(r['harness'])} · {_cell(r['date'])} · {key[:12]}", '',
+                  f"Fixed workload and settings include {workload(r)}, protocol {value(r['protocol'])}, "
+                  f"mode {value(r['mode'])} and hardware {value(r['hardware'])}. Backend version: {value(r['backend_version'])}. "
+                  f"Comparison question: {_cell(r['controls']['question'])}.",
+                  '', '| Model package | Completed | Checks passed | Wall time (median s) | Time until text appears (median s) | Backend decode (median tok/s) |',
+                  '|---|---:|---:|---:|---:|---:|']
+        for r in group:
+            o = r['observation']
+            lines.append(f"| {_cell(r['model'])} | {completion(r)} | {checks(r)} | {value(o['wall_s'])} | "
+                         f"{value(o['visible_s'])} | {value(o['decode_tps'])} |")
+        baseline = group[0]
+        base_times = baseline['observation']['task_wall_medians']
+        if base_times:
+            lines += ['', f"Paired wall-time differences use {_cell(baseline['model'])} as the alphabetically first reference. "
+                      'For each identical prompt, subtract the reference median from the other model’s median. '
+                      'The range spans the observed prompts. Negative values mean a shorter wait.', '',
+                      '| Model package | Paired prompts | Median difference (s) | Observed range (s) |',
+                      '|---|---:|---:|---:|']
+            for other in group[1:]:
+                times = other['observation']['task_wall_medians']
+                delta = [other_t - base_times[task] for task, other_t in times.items() if task in base_times]
+                lines.append(f"| {_cell(other['model'])} | {len(delta)} | {value(median(delta) if delta else None)} | {span(delta)} |")
+    return lines
+
+
+def legal_section(records):
+    lines = ['## Legal evaluation', '', 'The unit is a fictional matter within one arm. Rates and denominators come from the public '
+             'cohort summaries. Each stage has its own eligible matters. A missing review has no reviewed score.', '',
+             '| Run / class | Arm | Exact-version recall (mean, n) | Citations resolve (rate, n) | All deterministic checks (rate, n) | Human-reviewed all-pass (rate, n) |',
+             '|---|---|---|---|---|---|']
+    for r in records:
+        for cohort in r['legal_rows']:
+            metrics = cohort.get('metrics') or {}
+            def measure(key):
+                v = metrics.get(key) or {}
+                if not v.get('n'):
+                    return ('pending, n=0' if key == 'all_pass_reviewed' and key in metrics and r['legal'].get('review_required')
+                            and not r['legal'].get('reviewer_fingerprint') else 'unavailable')
+                return f"{value(v.get('value'))}, n={value(v['n'])}"
+            cells = [measure(k) for k in ('retrieval.exact_version_recall', 'criterion.citations_resolve',
+                                          'all_pass_deterministic', 'all_pass_reviewed')]
+            lines.append(f"| {_cell(r['date'])} {_cell(r['mode'])} ({_cell(r['class'])}) | {_cell(cohort.get('arm'))} | " + ' | '.join(cells) + ' |')
+    return lines
+
+
+def fit_memory(records):
+    lines = ['## Memory at the tested prompts', '', 'Device-wide memory includes other processes. The reserve is the minimum '
+             'free memory the experiment requests. Each peak covers the whole job, across prompt lengths.', '',
+             '| Date / model / runtime | Prompt tokens observed | Context window requested (tokens) | Peak used / total (MiB) | Reserve (MiB) | Fit verdict |',
+             '|---|---:|---:|---:|---:|---|']
+    for r in records:
+        f = r['observation']['fit']
+        if r['mode'] == 'projection':
+            continue
+        lines.append(f"| {_cell(r['date'])} · {_cell(r['model'])} · {_cell(r['harness'])} | {span(r['observation']['prompt_range'])} | "
+                     f"{value(r['context'])} | {value(f.get('peak_used_mib'))} / {value(f.get('total_mib'))} | "
+                     f"{value(f.get('reserve_mib'))} | {value(f.get('verdict'))} |")
+    return lines
+
+
+def fit_chart(records, path):
+    """A job-level peak cannot be assigned to a particular prompt. Plot the observed range against job headroom."""
+    points = []
+    for r in records:
+        f, prompt = r['observation']['fit'], r['observation']['prompt_range']
+        if (r['status'] == 'succeeded' and not r['synthetic'] and prompt and
+                all(isinstance(f.get(k), (int, float)) for k in ('total_mib', 'reserve_mib', 'peak_used_mib'))):
+            points.append((prompt, (f['total_mib'] - f['peak_used_mib']) / 1024, f['reserve_mib'] / 1024,
+                           bool(f.get('layers_total') and f.get('layers_offloaded') is not None)))
+    if not points:
+        return False
+    from . import charts
+    if not charts.available():
+        return False
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(figsize=(7.5, 3.8), layout='constrained')
+    for known, marker, color, label in ((True, 'o', '#23537d', 'Layer count recorded'), (False, '^', '#9b5817', 'Layer count unknown')):
+        values = [p for p in points if p[3] == known]
+        if values:
+            for (lo, hi), left, _, _ in values:
+                ax.plot([lo, hi], [left, left], color=color, alpha=.65)
+            ax.scatter([p[0][1] for p in values], [p[1] for p in values], marker=marker, color=color, label=label)
+    for reserve in sorted({p[2] for p in points}):
+        ax.axhline(reserve, color='#444', linestyle='--', label=f'Reserve {reserve:g} GiB')
+    ax.set(xlabel='Observed prompt length range (tokens)', ylabel='GPU memory free at job peak (GiB)',
+           title=f'Memory headroom across {len(points)} measured jobs')
+    ax.legend(fontsize=8)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(path, dpi=150, metadata={'Software': 'llm-eval'})
+    plt.close(fig)
+    return True
+
+
+def example(records, prefix):
+    measured = next((r for r in records if not r['synthetic'] and r['class'] is None and r['mode'] != 'projection' and
+                     r['status'] == 'succeeded' and r['observation']['tasks']), None)
+    if not measured:
+        if all(r['synthetic'] for r in records):
+            return ['These runs exercised a synthetic fixture. A measured model run on this configuration is still open.']
+        return []
+    r, o = measured, measured['observation']
+    lines = [f"**One recent run** · {_cell(r['date'])} · {_cell(r['model'])} on {_cell(r['harness'])}. "
+             f"{workload(r)}. {completion(r)} requests completed and {checks(r)} checks passed."]
+    if r['mode'] == 'decision':
+        lines += ['', 'Each check asks whether the router selected the expected label. The timing covers the decision. '
+                  'Downstream answer quality and end-to-end generation cost require a different experiment.']
+    elif r['mode'] == 'category-smoke':
+        lines += ['', f"The median time until text appeared was {value(o['visible_s'])} s. The observed prompts used "
+                  f"{span(o['prompt_range'])} tokens and the outputs used {span(o['output_range'])} tokens. "
+                  'The deterministic checks cover the short answers in this workload.']
+    if r['mode'] == 'category-smoke':
+        lines += ['', f"Requested context {value(r['context'])} tokens, output cap {value(r['output_cap'])} tokens. "
+                  f"Requested GPU layers {value(r['launch'].get('gpu_layers'))}, GPU share {value(r['launch'].get('gpu_offload'))}. "
+                  f"Observed placement: {placement(r)}."]
+    return lines + ['', sources(r, prefix)]
+
+
+def page(records, chart):
+    r = records[0]
+    base = '../../../'
+    docs = '../../../../'
+    lines = [f"# {_cell(r['experiment'])} on {_cell(r['hardware'])}", '',
+             '[Setup evidence](../README.md) · [Results index](../../README.md)']
+    if r['experiment'] == FIT:
+        lines += ['', '## Can the model run here?', ''] + fit_rows([v for v in records if v['mode'] != 'projection'], base)
+        lines += ['', *fit_memory(records)]
+        if chart:
+            lines += ['', f'![Free GPU memory at the sampled job peak across the short prompt ranges listed above.]({chart})']
+    elif r['experiment'] != 'legal-models':
+        lines += ['', *example(records, base)]
+    if any(v['legal_rows'] for v in records):
+        lines += ['', *legal_section(records)]
+    if any(v['ranked'] and not v['synthetic'] for v in records):
+        lines += ['', *matched_section(records)]
+    lines += ['', '## Reproduce a run', '',
+              'Choose a dated report in the table. The manifest pins the code revision. Config records the planned job, '
+              'input hashes and launch settings. CSV contains category summaries. Raw contains the published measurements. '
+              'Some older bundles omit artifacts or runtime details. Local paths have been removed.',
+              '', f"[Read the reproduction recipe]({docs}REPRODUCE.md) · [Download the comparison manifest]({slug(r['experiment'])}.json).",
+              ]
+    bundle = 'docs/results/' + r['report'].rsplit('/', 1)[0]
+    if re.fullmatch(r'[\w./-]+', bundle) and re.fullmatch(r'[\w.-]+', r['job_id']):
+        lines += ['', f"For the newest listed job ({_cell(r['case'])}) run this from the repository root.", '',
+                  '```sh', f"llm-eval result-inputs --input {bundle} --job {r['job_id']}", '```']
+    lines += ['', '## Run history', '', 'One row per published job, newest first. A completed request can still fail its check. '
+              'Output-cap and reload conditions can differ between rows. Use a matched group for a controlled comparison. '
+              'Projection rows count candidate settings. Legal jobs expose aggregate evidence by cohort.', '',
+              '| Date | Model / runtime | Mode and status | Actual workload | Completed | Checks passed | Median wall s | First visible text s | Backend decode tok/s | Evidence |',
+              '|---|---|---|---|---:|---:|---:|---:|---:|---|']
+    for v in records:
+        o = v['observation']
+        kind = v['class'] or ('fixture' if v['synthetic'] else v['mode'])
+        lines.append(f"| {_cell(v['date'])} | {_cell(v['model'])} · {_cell(v['harness'])} | {_cell(kind)} · {_cell(v['status'])} | "
+                     f"{workload(v)} | {completion(v)} | {checks(v)} | {value(o['wall_s'])} | {value(o['visible_s'])} | "
+                     f"{value(o['decode_tps'])} | {sources(v, base, ('Report', 'Config', 'Manifest', 'CSV', 'Raw', 'Cohorts'))} |")
     return '\n'.join(lines) + '\n'
 
 
-def overview(records, order):
-    """The overview of every pair, one section per experiment (newest result first) and one row per hardware configuration."""
-    lines = ['# Recommended setups', '', '[Results index](../README.md) · [Executive summary](../../README.md)', '',
-             f'{NOTE} One page per hardware configuration and experiment: the best-ranked harness and model combination of the '
-             'results index and the configuration of that run. ' + RANKING_RULE]
-    for experiment in dict.fromkeys(r['experiment'] for r in records):      # records arrive newest first
-        lines += ['', f'## {_cell(experiment)}', '',
-                  '| Hardware configuration | Harness | Model | Checks passed | Median wall s | Output tok/s | Page |',
-                  '|---|---|---|---:|---:|---:|---|']
-        for hardware in sorted({r['hardware'] for r in records if r['experiment'] == experiment}):
-            link = f"[recommended setup]({slug(hardware)}/{slug(experiment)}.md)"
-            chosen = order.get((experiment, hardware))
-            if not chosen:
-                lines.append(f"| {_link('hardware', hardware, '../')} | – | – | – | – | – | {link} (no recommendation) |")
-                continue
-            best = chosen[0]
-            lines.append(f"| {_link('hardware', hardware, '../')} | {_link('harness', best['harness'], '../')} | "
-                         f"{_link('model', best['model'], '../')} | {best['score'][0]}/{best['score'][1]} | "
-                         f"{_number(best['wall_mid'])} | {_number(best['tokens_mid'])} | {link} |")
-    return '\n'.join(lines) + '\n'
+def manifest(records):
+    return {'schema_version': 1, 'comparison_unit': 'model package within a single publication, workload and named runtime',
+            'matched_groups': {key: {'controls': group[0]['controls'], 'job_ids': [r['job_id'] for r in group]}
+                               for key, group in matched(records).items()},
+            'jobs': [{'job_id': r['job_id'], 'report': r['report'], 'case': r['case'], 'model': r['model'], 'runtime': r['harness'],
+                      'status': r['status'], 'code_revision': r['revision'], 'config_sha256': r['config_sha256'],
+                      'artifact_sha256': r['observation']['artifacts'], 'router_revision': r['model_revision'],
+                      'suite_sha256': r['observation']['suites'], 'observed_prompt_tokens': r['observation']['prompt_range'],
+                      'observed_output_tokens': r['observation']['output_range'], 'cohort_digests': r['cohorts'],
+                      'candidate_comparison_sha256': r['comparison']} for r in records]}
 
 
-def write_recommendations(root, records, index):
-    """Write the overview and one page per pair below `index`/recommended; returns the number of pair pages."""
-    directory, order = Path(index) / DIRECTORY, ranked(records)
-    pairs = sorted({(r['experiment'], r['hardware']) for r in records})
-
-    def save(path, text):
+def write_evidence(root, records, index):
+    directory = index / 'recommended'
+    directory.mkdir(exist_ok=True)
+    chart_dir = root / CHARTS
+    if chart_dir.exists():
+        shutil.rmtree(chart_dir)
+    lines = ['# Setup evidence by hardware and experiment', '', '[Results index](../README.md)', '',
+             '| Experiment | Hardware | Published jobs | Matched groups | Evidence |', '|---|---|---:|---:|---|']
+    for (experiment, hardware), group in pairs(records).items():
+        path = directory / slug(hardware) / (slug(experiment) + '.md')
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding='utf-8', newline='\n')
-
-    save(directory / 'README.md', overview(records, order))
-    for experiment, hardware in pairs:
-        chosen = [r for r in records if r['experiment'] == experiment and r['hardware'] == hardware]
-        save(directory / slug(hardware) / (slug(experiment) + '.md'), page(root, experiment, hardware, chosen, order.get((experiment, hardware), [])))
-    return len(pairs)
+        chart = None
+        if experiment == FIT:
+            image = chart_dir / f'{slug(experiment)}-{slug(hardware)}.png'
+            if fit_chart(group, image):
+                chart = Path(os.path.relpath(image, path.parent)).as_posix()
+        path.write_text(page(group, chart), encoding='utf-8', newline='\n')
+        path.with_suffix('.json').write_text(json.dumps(manifest(group), indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+        lines.append(f"| {_link('experiment', experiment, '../')} | {_link('hardware', hardware, '../')} | {len(group)} | "
+                     f"{len(matched(group))} | [Results and reproduction]({path.relative_to(directory).as_posix()}) |")
+    (directory / 'README.md').write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
+    origin = index / 'origin'
+    origin.mkdir()
+    (origin / 'us.md').write_text('# US model results\n\n[Results index](../README.md)\n\n'
+        'Includes models with a recorded US developer and US developers for all base models. Runs are ordered by date.\n\n'
+        + table([r for r in records if us_model(r)], '../', '../../') + '\n', encoding='utf-8', newline='\n')

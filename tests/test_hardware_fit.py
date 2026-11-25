@@ -31,7 +31,7 @@ from llm_eval.orchestration.planner import compile_campaign, revision
 from llm_eval.orchestration.scheduler import initialize, run_campaign
 from llm_eval.orchestration.setup import setup_campaign
 from llm_eval.reporting.experiment import build_report, sanitize
-from llm_eval.reporting.index import collect, top_combinations, write_results_index
+from llm_eval.reporting.index import collect, matched, write_results_index
 from llm_eval.reporting.publish import publish_report, validate_bundle
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1548,7 +1548,7 @@ class ResultsIndexTests(TempCase):
         write_json(dest / 'resolved-config.json', {'jobs': jobs})
         write_json(dest / 'summary.json', summary)
 
-    def test_published_bundles_are_collected_and_only_measured_runs_rank(self):
+    def test_published_projections_and_incomplete_measured_runs_remain_visible(self):
         def job(job_id, mode, harness, model, **parameters):
             return {'job_id': job_id, 'mode': mode, 'case_id': model, 'hardware_config_id': 'raider-windows', 'hardware': {'os_id': 'windows-11-native'},
                     'parameters': {'identity': {'harness': harness, 'model': model}, **parameters}}
@@ -1572,10 +1572,8 @@ class ResultsIndexTests(TempCase):
                          ('hardware-fit', 'projection', 'projection', 430, None, None))
         self.assertEqual((by_model['qwen38-27b-q4_k_m']['harness'], by_model['qwen38-27b-q4_k_m']['output_cap'], by_model['qwen38-27b-q4_k_m']['quality']),
                          ('ollama', 256, '7/9'))
-        # Quantizations of one model rank separately; the projection (no scored check) and the failed run do not rank.
-        top = top_combinations(records)
-        self.assertEqual(list(top), [('hardware-fit', 'raider-windows')])
-        self.assertEqual([r['model'] for r in top[('hardware-fit', 'raider-windows')]], ['qwen38-27b-q5_k_m', 'qwen38-27b-q4_k_m'])
+        # Without pinned suites and observed task identities the measured packages cannot be compared.
+        self.assertEqual(matched(records), {})
         self.assertEqual(write_results_index(self.path), 4)
         index = self.path / 'docs/results/index'
         for page in ('experiment/hardware-fit.md', 'harness/projection.md', 'harness/ollama.md', 'model/measured-models-gguf.md',
@@ -1583,7 +1581,8 @@ class ResultsIndexTests(TempCase):
             self.assertTrue((index / page).is_file(), page)
         summary = (self.path / 'docs/results/README.md').read_text(encoding='utf-8')
         self.assertIn('### hardware-fit: models by harness', summary)
-        self.assertIn('| 1 | [ollama](index/harness/ollama.md) | [qwen38-27b-q5_k_m](index/model/qwen38-27b-q5_k_m.md) | 8/9 |', summary)
+        self.assertIn('[Evidence and reproduction](index/recommended/raider-windows/hardware-fit.md)', summary)
+        self.assertNotIn('| Rank |', summary)
 
 
 if __name__ == '__main__':

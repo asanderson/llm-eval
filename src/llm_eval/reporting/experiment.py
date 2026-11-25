@@ -100,11 +100,20 @@ def canonical_json(value):
     return (json.dumps(value,indent=2,sort_keys=True,ensure_ascii=False,allow_nan=False)+'\n').encode('utf-8')
 
 
+def _bundle_json(path, value):
+    # Keep the generic report's established key order. Byte writes also fix record separators on Windows.
+    path.write_bytes((json.dumps(value, indent=2, ensure_ascii=False, allow_nan=False) + '\n').encode('utf-8'))
+
+
 def canonical_csv(rows,fieldnames):
     """CSV with LF line ends, UTF-8; empty bytes without fields."""
     buffer=io.StringIO()
     if fieldnames:
-        writer=csv.DictWriter(buffer,fieldnames=fieldnames,lineterminator='\n');writer.writeheader();writer.writerows(rows)
+        writer=csv.DictWriter(buffer,fieldnames=fieldnames,lineterminator='\n')
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({k: v.replace('\r\n', '\n').replace('\r', '\n') if isinstance(v, str) else v
+                             for k, v in row.items()})
     return buffer.getvalue().encode('utf-8')
 
 
@@ -214,21 +223,18 @@ def build_report(experiment_dir):
     try:
         raw=('\n'.join(json.dumps(r,sort_keys=True,ensure_ascii=False,allow_nan=False) for r in records)+'\n').encode()
         (dest/'raw').mkdir();(dest/'raw/measurements.jsonl.gz').write_bytes(gzip.compress(raw,mtime=0))
-        atomic_json(dest/'summary.json',summary)
+        _bundle_json(dest/'summary.json',summary)
         benchmark_rows=[{'job_id':r['job_id'],'source_file':r['source_file'],'data':r['data']} for r in records
                         if r['record_type']=='benchmark_summary' and r['latest_attempt']]
-        atomic_json(dest/'benchmark-summary.json',benchmark_rows)
+        _bundle_json(dest/'benchmark-summary.json',benchmark_rows)
         flattened=[{'job_id':r['job_id'],'source_file':r['source_file'],**r['data']} for r in benchmark_rows]
-        with (dest/'benchmark-summary.csv').open('w',encoding='utf-8',newline='') as f:
-            if flattened:
-                writer=csv.DictWriter(f,fieldnames=sorted({k for r in flattened for k in r}));writer.writeheader()
-                writer.writerows({k:safe_cell(v) for k,v in r.items()} for r in flattened)
-        with (dest/'summary.csv').open('w',encoding='utf-8',newline='') as f:
-            if summary:
-                writer=csv.DictWriter(f,fieldnames=list(summary[0]));writer.writeheader()
-                writer.writerows({k:safe_cell(json.dumps(v) if isinstance(v,(dict,list)) else v) for k,v in r.items()} for r in summary)
+        benchmark_fields=sorted({k for row in flattened for k in row})
+        benchmark_cells=({k:safe_cell(v) for k,v in row.items()} for row in flattened)
+        (dest/'benchmark-summary.csv').write_bytes(canonical_csv(benchmark_cells,benchmark_fields))
+        summary_cells=({k:safe_cell(json.dumps(v) if isinstance(v,(dict,list)) else v) for k,v in row.items()} for row in summary)
+        (dest/'summary.csv').write_bytes(canonical_csv(summary_cells,list(summary[0]) if summary else []))
         jobs=[j for j in plan['jobs'] if j['job_id'] in exp['job_ids']]
-        atomic_json(dest/'resolved-config.json',sanitize({'experiment':exp,'jobs':jobs,'input_hashes':list(plan['inputs'].values())},removed,False))
+        _bundle_json(dest/'resolved-config.json',sanitize({'experiment':exp,'jobs':jobs,'input_hashes':list(plan['inputs'].values())},removed,False))
         chart(summary,bundle/chart_rel,{j['job_id']:' / '.join(identity(j)) for j in jobs})
         complete=all(x['status'] in {'succeeded','skipped'} for x in coverage)
         synthetic=any(j['parameters'].get('synthetic') for j in jobs)
@@ -262,15 +268,15 @@ def build_report(experiment_dir):
         text+='\n## Measurements by harness and model\n\n'+'\n'.join(metrics)+f'\n\n![Request latency]({image})\n\n'
         text+='## Interpretation and reproduction\n\nWarmups and superseded attempts remain in raw data and are excluded from summaries. Each job/category is a separate cohort. Missing values remain unknown. Replay cost and generation latency are estimates; an offline oracle is an upper bound. LiveBench upstream grades are exported separately as judgment and benchmark summary records, not relabeled as local smoke scores.\n\n'
         text+='Use the measured code revision and resolved configuration to reconstruct the campaign with your local artifact paths and credential references. Verify the recorded input hashes. Run `llm-eval plan --campaign YOUR_CAMPAIGN.json` before `llm-eval run --campaign YOUR_CAMPAIGN.json`. Synthetic results do not establish model quality or hardware performance.\n'
-        (dest/'README.md').write_text(text,encoding='utf-8')
+        (dest/'README.md').write_bytes(text.replace('\r\n','\n').replace('\r','\n').encode('utf-8'))
         manifest={'schema_version':2,'experiment_id':exp['experiment_id'],'experiment_run_id':exp['experiment_run_id'],
                   'publication_id':publication_id,'campaign_id':plan['campaign_id'],'created_utc':state['created_utc'],
                   'code_revision':plan['code_revision'],'status':status,'synthetic':synthetic,'coverage':coverage,
                   'raw_records':len(records),'removed_fields':sorted(removed),
                   'files':{p.relative_to(bundle).as_posix():sha256_file(p) for p in sorted(bundle.rglob('*')) if p.is_file()}}
         manifest['report_fingerprint']=digest(manifest)
-        atomic_json(dest/'manifest.json',manifest)
-        atomic_json(temporary/'publication.json',{'repository':config.get('publish',{}).get('repository','asanderson/llm-eval'),
+        _bundle_json(dest/'manifest.json',manifest)
+        _bundle_json(temporary/'publication.json',{'repository':config.get('publish',{}).get('repository','asanderson/llm-eval'),
                     'base_branch':config.get('publish',{}).get('base_branch','main'),'report_path':rel.as_posix(),'chart_path':chart_rel.parent.as_posix(),
                     'report_fingerprint':manifest['report_fingerprint'],'experiment_id':exp['experiment_id'],'publication_id':publication_id,
                     'draft':not complete,'max_artifact_bytes':config.get('max_artifact_bytes',40*1024*1024),'code_revision':plan['code_revision']})

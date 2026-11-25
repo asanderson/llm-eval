@@ -11,6 +11,8 @@ llm-eval publish-results --input results/campaign-ID/experiments/RUN_ID/report
 
 Install the `reporting` extra for PNG chart rendering. Legacy `llm-eval report --input DIR` still reads v1 measurement directories. Campaign reports use a separate versioned envelope; historical results are not rewritten.
 
+First-time contributors can prepare a local results branch, review it, and open a pull request from a personal fork. See [Contributing a measurement or reporting a failure](../CONTRIBUTING.md).
+
 ## Outputs
 
 The local `report/bundle/` mirrors the eventual repository layout:
@@ -28,9 +30,21 @@ Each report lists its configuration coverage and measurements **by harness and m
 
 ## Navigating published results
 
-[`docs/results/README.md`](results/README.md) is the entry point. It opens with the executive summary (the five best harness and model combinations per experiment for each hardware configuration, the five best models where a model repeats among them, the same rankings restricted to US models (see [model origins](MODELS.md#model-origins)), a comparison chart for each, and the conclusions per hardware configuration), followed by the navigation index, the detailed results and the list of published reports.
+The [results overview](results/README.md) links findings to the measured workload, hardware, execution class and supporting jobs. The [setup evidence](results/index/recommended/README.md) pages distinguish direct comparisons within a matched protocol from evidence that can only support a single observation. Hardware-fit estimates, measured service timings, synthetic checks and legal cohorts each have their own interpretation. See the [reproduction guide](REPRODUCE.md) to inspect a bundle and check its recorded inputs.
 
-`llm-eval index-results` regenerates everything derived from the published bundles: `docs/results/index/` (one page per hardware configuration, experiment, harness, model and UTC date, and an overview), `docs/results/index/recommended/` (one page per hardware configuration and experiment: the best-ranked harness and model combination of that pair, the configuration its run recorded and the next-best combinations, or the reason why the pair has no ranked run), the summary charts in `diagrams/results/summary/` (one per experiment and hardware configuration with at least two ranked combinations; needs the `reporting` extra), and three marked blocks of the results README: `results-top` (ranking and charts), `results-index` (browse links and a models-by-harness matrix per experiment whose cells link to every published run) and `results-list` (every report, newest first; a report published under a renamed experiment's former id is listed under the current id). It also fills the `summary-recommended` block of the repository README: the best model and the best US model per platform, experiment and hardware configuration. Text outside the `<!-- results-*:start -->`, `<!-- results-*:end -->` and `<!-- summary-recommended:* -->` markers is hand-written and left untouched. The publisher runs the same step, so a results PR carries the updated indexes. Never edit the generated pages by hand.
+Run `llm-eval index-results` to regenerate `docs/results/index/`, including hardware, experiment, harness, model and date pages, the setup evidence and comparison manifests. The command also updates summary charts under `diagrams/results/summary/`, the three generated blocks of the results README, and the findings block of the repository README. The publisher stages these changes with the bundle.
+
+## Verify a fresh clone
+
+```bash
+python -m llm_eval verify-results
+```
+
+The command checks the file inventory of every committed bundle, including charts, and compares checkout bytes to the Git object IDs in HEAD. It validates each manifest fingerprint and every file SHA-256. A nonzero exit identifies the first unexpected change. This verifies the published bytes. It does not establish the accuracy of a measurement or recover an unavailable model or runtime.
+
+At archive revision `ee8c7b56f09adc9ef83007ecd27534e33175b928`, 95 manifests listed 744 files. **493 files matched their manifest directly.** Another **251 files in 87 bundles** had been hashed with CRLF before Git committed LF. Restoring CRLF reproduced all 251 original SHA-256 values. The [versioned compatibility map](result-integrity-v1.json) records each exact path, original SHA-256, committed blob ID, and checkout SHA-256, and pins the historical manifest objects. The verifier checks the map's own digest and accepts only these exact historical pairs. The other eight bundles had zero discrepancies. Historical manifests, raw records and charts retain their original bytes.
+
+New public reports serialize JSON, Markdown and CSV with UTF-8 and LF. Both contribution routes check the exact staged and committed files against the validated manifest before any push. Newly prepared reports receive no historical exception. If an unpublished report from an older harness fails the blob check, rebuild the local report from its experiment directory with `llm-eval report --input EXPERIMENT_DIR`, inspect the regenerated export, and retry.
 
 Raw records retain warmups and every attempt. Summaries use the latest attempt of each job and exclude warmups. Synthetic measurements remain explicitly labeled. Upstream LiveBench judgments and CSV reports are separate raw record types; their scores are not recomputed as smoke-test pass rates. Report fingerprints and compressed exports are deterministic for unchanged source artifacts.
 
@@ -60,7 +74,7 @@ Configure a campaign with:
 
 Set `GH_TOKEN` or `GITHUB_TOKEN` in the coordinator environment with repository contents/pull-request permissions. Tokens are never saved in campaign JSON. Git and the GitHub API use these credentials; publication has no `gh` dependency. `origin` must match the configured repository. Measurement workers do not need GitHub publication credentials.
 
-The publisher validates file inventory/checksums and a configurable size limit (40 MiB by default), creates an isolated Git worktree, commits only the result bundle, the generated index and charts, and the generated blocks of the results README and the repository README, pushes `results/EXPERIMENT/PUBLICATION`, and opens a PR. Incomplete runs open draft PRs. It never merges the PR or overwrites the user's working tree.
+The publisher validates staged and committed bundle files against the manifest, checks a configurable size limit (40 MiB by default), creates an isolated Git worktree, commits only the result bundle, the generated index and charts, and the generated blocks of the results README and the repository README, pushes `results/EXPERIMENT/PUBLICATION`, and opens a PR. Incomplete runs open draft PRs. It never merges the PR or overwrites the user's working tree.
 
 A retry finds an already pushed branch/open PR. Changed results add a commit to the same open results branch; an amendment after merge gets a new fingerprint-suffixed branch. Index regeneration preserves other reports from the current base. Conflicts outside the generated index, charts and README blocks stop publication for review; a conflicting README is taken from the base and its blocks are regenerated. Pushes never force-update a shared branch.
 
@@ -84,7 +98,7 @@ Network/authentication failures retain the full local report, mark publication f
 
 > Differencing is not prevented: two reduced runs over overlapping subsets (five matters and the same five plus a sixth) can be subtracted to give the sixth matter's result.
 
-**Canonical bytes.** The byte format and the staged and committed blob checks, which apply to projected bundles only, are stated under "The projection" and "Publication" in the README; the historical bundles of the other experiments are not blob-checked.
+**Canonical bytes.** The legal plugin specifies the byte format of its projection under "The projection" in the experiment README. Both generic and projected publications verify staged and committed Git blobs. `verify-results` checks the published archive against the historical compatibility map described above.
 
 **Cohorts and the index.** `llm-eval index-results` classifies each job of a projected bundle as `fixture`, `measured` (execution kind `model-run`) or `score-only`; a bundle with more than one experiment identity is `invalid`, and a bundle of a projected experiment without the projection is `legacy`; neither is ranked. Legal results stay out of the generic top-combinations ranking (`GENERIC_RANKING = False`) and appear in their own "Results by class and cohort" section, one row per job: the row lists every cohort of the job, and its count is the job's total over all of them, because the summary rows of a job name no cohort. Per-cohort numbers are in the linked report. What a cohort covers is listed under "The projection" in the README.
 
