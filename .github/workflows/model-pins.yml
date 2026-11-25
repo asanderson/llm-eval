@@ -1,20 +1,23 @@
 name: Model pin check
 
 # Nightly: compare catalog/model-artifacts.json (the quantized artifact each
-# measured catalog model loads in the next run) with Hugging Face. A pin whose
-# repository has a newer commit that still publishes every pinned file with a
-# Git LFS sha256 is moved to that commit, and one pull request is opened (or
-# refreshed) with the result. What the check only reports lands in the PR
-# body and in a tracking issue: a pinned file that is gone or cannot be
-# verified, a repository Hugging Face does not serve, a model measured in the
-# published results without a pin, a publisher repository that moved past the
-# catalog's source revision, and new repositories of the pinned models'
-# publishers. A run refreshes the issue while something waits on a decision,
+# measured catalog model loads in the next run) and the publisher snapshots of
+# the pinned models in catalog/models.json with Hugging Face. An artifact pin
+# whose repository has a newer commit that still publishes every pinned file
+# with a Git LFS sha256 is moved to that commit; a pinned model's publisher
+# snapshot follows its repository's head commit with the metadata Hugging Face
+# reports for it. One pull request is opened (or refreshed) with the result.
+# What the check only reports lands in the PR body and in a tracking issue: a
+# pinned file that is gone or cannot be verified, a moved publisher repository
+# whose answer the catalog cannot record, a repository Hugging Face does not
+# serve, a model measured in the published results without a pin, a pin whose
+# base model is not the catalog's repository, and new repositories of the
+# pinned models' publishers. A run refreshes the issue while something waits on a decision,
 # and closes it once nothing does and no lookup failed. See docs/MODELS.md.
 #
-# Never touched: catalog/models.json (the publisher snapshots are reviewed by
-# hand) and the published results under docs/results/ (they keep the revision
-# they recorded). The check writes catalog/model-artifacts.json, nothing else.
+# Never touched: the published results under docs/results/ (they keep the
+# revision they recorded). The check writes catalog/model-artifacts.json,
+# catalog/models.json and the revision table of docs/MODELS.md, nothing else.
 #
 # The other nightly jobs: upstream-pins.yml (06:17 UTC) bumps the platform and
 # package pins of catalog/installers.json, Dependabot (.github/dependabot.yml,
@@ -47,7 +50,7 @@ concurrency:
 
 env:
   BRANCH: auto/model-pins
-  PR_TITLE: "Bump pinned model artifact revisions"
+  PR_TITLE: "Bump pinned model revisions"
   ISSUE_TITLE: "Model versions needing a manual decision"
   ISSUE_LABEL: model-pins
 
@@ -71,9 +74,17 @@ jobs:
           python3 scripts/model_pins.py --apply --summary /tmp/summary.md --issue-summary /tmp/issue.md --github-output
           cat /tmp/summary.md >> "$GITHUB_STEP_SUMMARY"
 
+      # A moved publisher snapshot rewrites the model catalog, which model
+      # discovery validates (its Hugging Face anchors among it): run its offline
+      # tests too, so a bump discovery would refuse never reaches a pull request.
+      # When they refuse it, the run fails here and says why; the issue steps
+      # below still run, and the issue is not closed that night.
       - name: Run the offline checks CI would
+        id: checks
         if: steps.resolve.outputs.changed == 'true'
-        run: python3 -m unittest discover -s tests -p 'test_model_pins.py' -v
+        run: |
+          python3 -m unittest discover -s tests -p 'test_model_pins.py' -v
+          python3 -m unittest discover -s tests -p 'test_model_discovery.py' -v
 
       - name: Open or refresh the bump pull request
         if: steps.resolve.outputs.changed == 'true'
@@ -104,6 +115,7 @@ jobs:
 
       - name: Read the tracking issue
         id: issue
+        if: ${{ !cancelled() }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -131,7 +143,7 @@ jobs:
       # issue never shows an older night's upstream values. A closed issue is
       # reopened, not duplicated.
       - name: Refresh the tracking issue with what needs a manual decision
-        if: steps.resolve.outputs.manual == 'true'
+        if: ${{ !cancelled() && steps.resolve.outputs.manual == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BASE: ${{ github.event.repository.default_branch }}
@@ -158,10 +170,11 @@ jobs:
             *)      gh issue create --title "$ISSUE_TITLE" --body-file /tmp/issue-body.md --label "$ISSUE_LABEL" ;;
           esac
 
-      # A failed lookup settles nothing: that night the issue is never closed,
-      # because the closing comment could be untrue.
+      # A failed lookup settles nothing, and neither does a bump the offline
+      # checks refused: that night the issue is never closed, because the
+      # closing comment could be untrue.
       - name: Close the tracking issue once nothing needs a manual decision
-        if: steps.resolve.outputs.manual == 'false' && steps.resolve.outputs.failed == 'false'
+        if: ${{ !cancelled() && steps.checks.outcome != 'failure' && steps.resolve.outputs.manual == 'false' && steps.resolve.outputs.failed == 'false' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUMBER: ${{ steps.issue.outputs.number }}
