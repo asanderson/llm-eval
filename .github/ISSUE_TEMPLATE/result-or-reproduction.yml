@@ -1,0 +1,36 @@
+name: Result or reproduction problem
+description: Report a failed measurement, an unreproducible result, or a blocked contribution
+title: "[Results] "
+body:
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Where did the run stop?
+      options:
+        - Choosing a comparable published result
+        - Verifying a bundle or artifact
+        - Checking hardware or preparing inputs
+        - Running or scoring the workload
+        - Preparing a fork branch or opening a pull request
+        - Interpreting an unexpected measurement
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Published report path, job ID, or attempted campaign
+      placeholder: docs/results/EXPERIMENT/PUBLICATION, job ID, or campaign file
+    validations:
+      required: true
+  - type: textarea
+    id: attempted
+    attributes:
+      label: Command, expected outcome, and observed outcome
+      description: Include the harness commit, the first actionable error and whether you could repeat it. Remove tokens, hostnames, local paths, endpoint URLs and prompt or output bodies. Keep private and restricted legal data local.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Public environment and relevant differences
+      description: Device model, OS and runtime versions, memory, public artifact revision and checksum, workload, settings and any unavailable fields. A partial report is welcome.

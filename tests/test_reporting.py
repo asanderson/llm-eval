@@ -1,5 +1,8 @@
+import contextlib
 import copy
 import gzip
+import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -133,7 +136,6 @@ def fixed_routing_report(root, experiment='llm-routing'):
 def text_digests(report):
     """{bundle file: sha256 of its text, LF line ends; of the decompressed bytes for the archive}; the PNG chart (rendering
     library) and the manifest and receipt (which hash the chart) are left out."""
-    import hashlib
     out={}
     for p in sorted((report/'bundle').rglob('*')):
         if p.is_file() and p.suffix!='.png' and p.name!='manifest.json':
@@ -184,24 +186,84 @@ class ProjectionTests(unittest.TestCase):
 
 class BytesTests(unittest.TestCase):
     setUp=ReportingTests.setUp
-    def test_published_history_is_not_rewritten(self):
-        status=real_git(ROOT,'status','--porcelain')
-        bare=self.root/'remote.git';repo=self.root/'repo'
-        def run(*args):subprocess.run(args,check=True,capture_output=True)
-        run('git','init','--bare',str(bare));run('git','init','-b','main',str(repo))
-        (repo/'README.md').write_text('# Test repository\n')
-        run('git','-C',str(repo),'add','README.md');run('git','-C',str(repo),'-c','user.name=Fixture','-c','user.email=fixture@example.com','commit','-m','initial')
-        run('git','-C',str(repo),'remote','add','origin',str(bare));run('git','-C',str(repo),'push','-u','origin','main')
-        def fixture_git(root,*args,**kwargs):
-            if args==('remote','get-url','origin'):return 'https://github.com/asanderson/llm-eval.git'
-            if args[:1]==('ls-files',):raise AssertionError('a bundle without the canonical marker is not blob-checked')
-            return real_git(root,*args,**kwargs)
-        manifest=validate_bundle(self.report)[1]
-        with patch('llm_eval.reporting.publish.git',side_effect=fixture_git),patch('llm_eval.reporting.publish._blob',side_effect=AssertionError('no blob check')),\
-                patch.dict(os.environ,{'GH_TOKEN':'','GITHUB_TOKEN':''}):
-            receipt=publish_report(self.report,repo,api=FakeGitHub())
-        self.assertEqual(receipt['status'],'open')
-        self.assertEqual(validate_bundle(self.report)[1],manifest)      # the receipt is new; the bundle and its manifest are not
-        self.assertEqual(real_git(ROOT,'status','--porcelain'),status)
+
+    def create_remotes(self):
+        # An upstream base, an outsider's fork, then an ordinary clone of the fork.
+        upstream=self.root/'upstream.git'
+        fork=self.root/'fork.git'
+        repo=self.root/'repo'
+        fixture=self.root/'base'
+        def run(*args):
+            subprocess.run(['git',*map(str,args)],check=True,capture_output=True)
+        run('init','-b','main',fixture)
+        (fixture/'README.md').write_bytes(b'# Test repository\n')
+        (fixture/'.gitattributes').write_bytes((ROOT/'.gitattributes').read_bytes())
+        run('-C',fixture,'add','.')
+        run('-C',fixture,'-c','user.name=Fixture','-c','user.email=f@example.com','commit','-m','fixture')
+        run('clone','--bare',fixture,upstream)
+        run('clone','--bare',upstream,fork)
+        run('clone',fork,repo)
+        real_git(repo,'config','core.autocrlf','true')
+        real_git(repo,'remote','add','upstream',upstream)
+        return upstream,fork,repo
+
+    @staticmethod
+    def fixture_git(root,*args,**kwargs):
+        if args==('remote','get-url','upstream'):
+            return 'https://github.com/asanderson/llm-eval.git'
+        if args==('remote','get-url','--push','--all','origin'):
+            return 'https://github.com/contributor/llm-eval.git'
+        if args==('remote','get-url','origin'):
+            return 'https://github.com/asanderson/llm-eval.git'
+        return real_git(root,*args,**kwargs)
+
+    def test_contributor_prepares_reviews_and_pushes_only_to_fork(self):
+        upstream,fork,repo=self.create_remotes()
+        (repo/'README.md').write_bytes(b'private uncommitted work\n')
+        branches=real_git(upstream,'show-ref','--heads')
+        spec,manifest,_=validate_bundle(self.report)
+        with patch('llm_eval.reporting.publish.git',side_effect=self.fixture_git), \
+                patch.dict(os.environ,{'GH_TOKEN':'','GITHUB_TOKEN':''}), \
+                patch('llm_eval.reporting.publish.GitHub',side_effect=AssertionError('fork preparation contacted GitHub')):
+            receipt=publish_report(self.report,repo,prepare_fork='contributor/llm-eval')
+            from llm_eval.reporting.cli import main
+            output=io.StringIO()
+            with contextlib.redirect_stdout(output):
+                self.assertEqual(main(['publish-results','--input',str(self.report),'--project-root',str(repo),
+                                       '--prepare-fork','contributor/llm-eval']),0)
+            again=json.loads(output.getvalue())
+        self.assertEqual(receipt,again)
+        self.assertEqual((repo/'README.md').read_bytes(),b'private uncommitted work\n')
+        self.assertEqual(real_git(repo,'branch','--show-current'),'main')
+        self.assertEqual(real_git(fork,'show-ref','--heads'),branches)
+        self.assertTrue(receipt['draft'])
+        self.assertIn('asanderson/llm-eval/compare/main...contributor:',receipt['compare_url'])
+        subprocess.run(receipt['push'].split(),cwd=repo,check=True,capture_output=True)
+        self.assertEqual(real_git(upstream,'show-ref','--heads'),branches)
+        clone=self.root/'viewer'
+        subprocess.run(['git','clone','--branch',receipt['branch'],str(fork),str(clone)],check=True,capture_output=True)
+        for name,sha in manifest['files'].items():
+            data=(clone/name).read_bytes()
+            self.assertEqual(hashlib.sha256(data).hexdigest(),sha,name)
+            if name.endswith(('.csv','.json','.md')):
+                self.assertNotIn(b'\r',data)
+        self.assertEqual((clone/spec['report_path']/'manifest.json').read_bytes(),
+                         (self.report/'bundle'/spec['report_path']/'manifest.json').read_bytes())
+
+    def test_generic_staged_and_committed_byte_checks_block_a_push(self):
+        _,bare,repo=self.create_remotes()
+        spec,_,_=validate_bundle(self.report)
+        for timing in ('stage','commit'):
+            def race(root,*args,**kwargs):
+                if ((timing=='stage' and args[:3]==('add','-f','-A'))
+                    or (timing=='commit' and args[0]=='-c' and 'commit' in args)):
+                    path=Path(root)/spec['report_path']/'summary.csv'
+                    path.write_bytes(path.read_bytes()+b'corrupt\n')
+                    real_git(root,'add','--',str(path))
+                return self.fixture_git(root,*args,**kwargs)
+            with self.subTest(timing=timing),patch('llm_eval.reporting.publish.git',side_effect=race), \
+                    self.assertRaisesRegex(ValueError,'bytes differ.*summary.csv'):
+                publish_report(self.report,repo,api=FakeGitHub())
+            self.assertEqual(real_git(bare,'for-each-ref','--format=%(refname:short)','refs/heads'),'main')
 
 if __name__=='__main__':unittest.main()

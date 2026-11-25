@@ -1,0 +1,89 @@
+{
+  "comparison_unit": "model package within a single publication, workload and named runtime",
+  "jobs": [
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": null,
+      "case": "legal-score",
+      "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce",
+      "cohort_digests": [
+        "1ebf89d17c04d4981e75113905ab4cf8aa66bb7c0bfd2fee384f6d394e78772c",
+        "79bcd479444de72976b160eb38b1c3d86cc9f9bd528abd9dce40b21acdd6f892"
+      ],
+      "config_sha256": null,
+      "job_id": "score-legal-benchmark-1-ff60ca399ae0",
+      "model": "llm-eval-kimi-linear-48b:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [],
+      "report": "legal-benchmark/campaign-20261118T071704Z-9ee36cc3-score-legal-benchmark-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {}
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": null,
+      "case": "legal-retrieval",
+      "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce",
+      "cohort_digests": [
+        "51bfc24c09cbfb208efceaadd663573dec25f32d54369c06bde31337c4b62e20",
+        "a703a0efa8ee10c47b1cdd68f0c7f3c47b25ddcebad8da90e99a37165de153c2",
+        "ec47becd2a64d7628085bf17666c6dd9b66bd35e0a975f9ec8d7a084bc41fd6a",
+        "f42b95936572b0381a9fc5f78a9b54aadf07e5fd6d8ce3127b70ac8c94f235ba"
+      ],
+      "config_sha256": null,
+      "job_id": "retrieval-legal-benchmark-1-5aef2f285d5d",
+      "model": "fixture",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [],
+      "report": "legal-benchmark/campaign-20261118T064854Z-6746b621-retrieval-legal-benchmark-1/README.md",
+      "router_revision": null,
+      "runtime": "fixture",
+      "status": "succeeded",
+      "suite_sha256": {}
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": null,
+      "case": "legal-generation",
+      "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce",
+      "cohort_digests": [
+        "a4c61fc0ea5cdd0850078f6bfdd87e3d3825f48dd2d1e2c45ed22cfed032a5f4",
+        "b128b835b565101c849869e75651628c3d86c5c701d9b22da215198d64ed3d96"
+      ],
+      "config_sha256": null,
+      "job_id": "generation-legal-benchmark-1-727308bd9fb4",
+      "model": "llm-eval-kimi-linear-48b:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [],
+      "report": "legal-benchmark/campaign-20261118T064854Z-6746b621-generation-legal-benchmark-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {}
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": null,
+      "case": "legal-workflow",
+      "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce",
+      "cohort_digests": [
+        "472486def2e90986929364dfe0945be5c9a025ca5ed1d94b64f8732ab3f9a1f4",
+        "6c4923f1df126aab7277b94df7036ff4b8befe167086baa5a9dd86c264e4d2e3"
+      ],
+      "config_sha256": null,
+      "job_id": "workflow-legal-benchmark-1-00efc50ea670",
+      "model": "llm-eval-kimi-linear-48b:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [],
+      "report": "legal-benchmark/campaign-20261118T064854Z-6746b621-workflow-legal-benchmark-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {}
+    }
+  ],
+  "matched_groups": {},
+  "schema_version": 1
+}

@@ -1,0 +1,834 @@
+{
+  "comparison_unit": "model package within a single publication, workload and named runtime",
+  "jobs": [
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "ef474d5f9f67e2dcd48b0c021f568ea901120f466dec31aa71153d1a42b8cf7e",
+      "case": "ollama-clef-flash",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "f9b663267022e679fd5de93ae6049c941bb49d7091353a49c117f41c83bcb31a",
+      "job_id": "routing-decision-models-1-0701e943af0c",
+      "model": "llm-eval-clef-flash:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        171,
+        176
+      ],
+      "report": "decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md",
+      "router_revision": "73e026ff389b28464bb26f8978f3164851a76832f0d339032747e2c56f98ea29",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "ef474d5f9f67e2dcd48b0c021f568ea901120f466dec31aa71153d1a42b8cf7e",
+      "case": "ollama-clef",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "6c74616217978e22d83d4ba55035f8ab17b3923a49fc789ca63f51e0c207809c",
+      "job_id": "routing-decision-models-1-cff82f501cf5",
+      "model": "llm-eval-clef:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        171,
+        176
+      ],
+      "report": "decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md",
+      "router_revision": "7885241a86db4803ff95b6a8fc60dc132a5f9612a76db786a304cfa8c760f84b",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "ef474d5f9f67e2dcd48b0c021f568ea901120f466dec31aa71153d1a42b8cf7e",
+      "case": "ollama-d1-omni",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "44e6437fdea208ab52c91814e86b1e08ee466ee4877f33bc6f3c11db750dcaf2",
+      "job_id": "routing-decision-models-1-473146c3e729",
+      "model": "llm-eval-d1-omni:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        64,
+        68
+      ],
+      "report": "decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md",
+      "router_revision": "1ba59f63e8363dbec439b18fd03eec16aadfecee48c445f1283dabd00c612ca3",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "ef474d5f9f67e2dcd48b0c021f568ea901120f466dec31aa71153d1a42b8cf7e",
+      "case": "ollama-d1",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "f2510db869f16228956ce6c4819ff9149567f0118ceff92468ce4934b1c98111",
+      "job_id": "routing-decision-models-1-b72471bb152f",
+      "model": "llm-eval-d1:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        78,
+        82
+      ],
+      "report": "decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md",
+      "router_revision": "8c2d9ddae4413c38b183644320b6f4bca4c5f629ae9e5104c3b13a150ed85e7e",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "ef474d5f9f67e2dcd48b0c021f568ea901120f466dec31aa71153d1a42b8cf7e",
+      "case": "ollama-laya",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "187f5e72ea221ccda4d402ae313e6ad36680550390352b43ca20685635b96839",
+      "job_id": "routing-decision-models-1-8f34219dcce9",
+      "model": "llm-eval-laya:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        59,
+        60
+      ],
+      "report": "decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md",
+      "router_revision": "1f196b378202837961e8856ceeb36af8b03c4b6158f6b02f15cc2b0a99b65e5a",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "ef474d5f9f67e2dcd48b0c021f568ea901120f466dec31aa71153d1a42b8cf7e",
+      "case": "ollama-nimble-v3",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "0f4ca84ea191a2bee23eb49c3dd8fbdd18b378c8200f9fd02517629cfdfea274",
+      "job_id": "routing-decision-models-1-2cfe79fef460",
+      "model": "llm-eval-nimble-v3:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        213,
+        218
+      ],
+      "report": "decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md",
+      "router_revision": "6f0e87f398007002ca6de5899f8e62c0826a4e8b723b4fc533526ef9c2b2c487",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "ef474d5f9f67e2dcd48b0c021f568ea901120f466dec31aa71153d1a42b8cf7e",
+      "case": "ollama-nimble",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "7d784c52ca1a03d2fc5077bece62bf8483219efa69e775442a51a809d2899ee6",
+      "job_id": "routing-decision-models-1-ac901abb4fcd",
+      "model": "llm-eval-nimble:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        213,
+        218
+      ],
+      "report": "decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md",
+      "router_revision": "6aa3fde96874d5d9f03306e795016e232610aaa5f19efcb107bf9311c712ccd9",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "ef474d5f9f67e2dcd48b0c021f568ea901120f466dec31aa71153d1a42b8cf7e",
+      "case": "ollama-pplx-decider",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "d032c7baf89cd2bc3573f6cea3c8281df1599d1771f6938f2e4cf623e61544e5",
+      "job_id": "routing-decision-models-1-efcc2160debc",
+      "model": "llm-eval-pplx-decider:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        124,
+        129
+      ],
+      "report": "decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md",
+      "router_revision": "733585a9ebb6205d2d5b64a13748f0b1c9f1285885dd267780cfdb1c4c8ef141",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "ef474d5f9f67e2dcd48b0c021f568ea901120f466dec31aa71153d1a42b8cf7e",
+      "case": "ollama-tev1-0.8b",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "cc82e2180d671a684ddcc6f354dc5778095b60762a0b8feb9c8f397e44fe96eb",
+      "job_id": "routing-decision-models-1-49a41a2986fd",
+      "model": "llm-eval-tev1-0.8b:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        155,
+        160
+      ],
+      "report": "decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md",
+      "router_revision": "abc31fdb0bf52506cc47091145ac19c4cfb509b73a6841789324f9e32200c099",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "ef474d5f9f67e2dcd48b0c021f568ea901120f466dec31aa71153d1a42b8cf7e",
+      "case": "ollama-tev1",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "ead9d69c25f549b222afe8113015668a77fee6941917f66cb142a83f783a41d3",
+      "job_id": "routing-decision-models-1-c6e41214da48",
+      "model": "llm-eval-tev1:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        155,
+        160
+      ],
+      "report": "decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md",
+      "router_revision": "7954dce22bc6c29c3b119656207681d12cb34434fed7caa086bfbc919bef0740",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "e08f398039c5d1ae8fd45b7082dcc8b04d53132e7958a61ac797b0821909c238",
+      "case": "ollama-clef-flash",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "f9b663267022e679fd5de93ae6049c941bb49d7091353a49c117f41c83bcb31a",
+      "job_id": "routing-decision-models-1-0701e943af0c",
+      "model": "llm-eval-clef-flash:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        171,
+        176
+      ],
+      "report": "decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md",
+      "router_revision": "73e026ff389b28464bb26f8978f3164851a76832f0d339032747e2c56f98ea29",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "e08f398039c5d1ae8fd45b7082dcc8b04d53132e7958a61ac797b0821909c238",
+      "case": "ollama-clef",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "6c74616217978e22d83d4ba55035f8ab17b3923a49fc789ca63f51e0c207809c",
+      "job_id": "routing-decision-models-1-cff82f501cf5",
+      "model": "llm-eval-clef:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        171,
+        176
+      ],
+      "report": "decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md",
+      "router_revision": "7885241a86db4803ff95b6a8fc60dc132a5f9612a76db786a304cfa8c760f84b",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "e08f398039c5d1ae8fd45b7082dcc8b04d53132e7958a61ac797b0821909c238",
+      "case": "ollama-d1-omni",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "44e6437fdea208ab52c91814e86b1e08ee466ee4877f33bc6f3c11db750dcaf2",
+      "job_id": "routing-decision-models-1-473146c3e729",
+      "model": "llm-eval-d1-omni:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        64,
+        68
+      ],
+      "report": "decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md",
+      "router_revision": "1ba59f63e8363dbec439b18fd03eec16aadfecee48c445f1283dabd00c612ca3",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "e08f398039c5d1ae8fd45b7082dcc8b04d53132e7958a61ac797b0821909c238",
+      "case": "ollama-d1",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "f2510db869f16228956ce6c4819ff9149567f0118ceff92468ce4934b1c98111",
+      "job_id": "routing-decision-models-1-b72471bb152f",
+      "model": "llm-eval-d1:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        78,
+        82
+      ],
+      "report": "decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md",
+      "router_revision": "8c2d9ddae4413c38b183644320b6f4bca4c5f629ae9e5104c3b13a150ed85e7e",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "e08f398039c5d1ae8fd45b7082dcc8b04d53132e7958a61ac797b0821909c238",
+      "case": "ollama-laya",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "187f5e72ea221ccda4d402ae313e6ad36680550390352b43ca20685635b96839",
+      "job_id": "routing-decision-models-1-8f34219dcce9",
+      "model": "llm-eval-laya:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        59,
+        60
+      ],
+      "report": "decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md",
+      "router_revision": "1f196b378202837961e8856ceeb36af8b03c4b6158f6b02f15cc2b0a99b65e5a",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "e08f398039c5d1ae8fd45b7082dcc8b04d53132e7958a61ac797b0821909c238",
+      "case": "ollama-nimble-v3",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "0f4ca84ea191a2bee23eb49c3dd8fbdd18b378c8200f9fd02517629cfdfea274",
+      "job_id": "routing-decision-models-1-2cfe79fef460",
+      "model": "llm-eval-nimble-v3:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        213,
+        218
+      ],
+      "report": "decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md",
+      "router_revision": "6f0e87f398007002ca6de5899f8e62c0826a4e8b723b4fc533526ef9c2b2c487",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "e08f398039c5d1ae8fd45b7082dcc8b04d53132e7958a61ac797b0821909c238",
+      "case": "ollama-nimble",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "7d784c52ca1a03d2fc5077bece62bf8483219efa69e775442a51a809d2899ee6",
+      "job_id": "routing-decision-models-1-ac901abb4fcd",
+      "model": "llm-eval-nimble:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        213,
+        218
+      ],
+      "report": "decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md",
+      "router_revision": "6aa3fde96874d5d9f03306e795016e232610aaa5f19efcb107bf9311c712ccd9",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "e08f398039c5d1ae8fd45b7082dcc8b04d53132e7958a61ac797b0821909c238",
+      "case": "ollama-pplx-decider",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "d032c7baf89cd2bc3573f6cea3c8281df1599d1771f6938f2e4cf623e61544e5",
+      "job_id": "routing-decision-models-1-efcc2160debc",
+      "model": "llm-eval-pplx-decider:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        124,
+        129
+      ],
+      "report": "decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md",
+      "router_revision": "733585a9ebb6205d2d5b64a13748f0b1c9f1285885dd267780cfdb1c4c8ef141",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "e08f398039c5d1ae8fd45b7082dcc8b04d53132e7958a61ac797b0821909c238",
+      "case": "ollama-tev1-0.8b",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "cc82e2180d671a684ddcc6f354dc5778095b60762a0b8feb9c8f397e44fe96eb",
+      "job_id": "routing-decision-models-1-49a41a2986fd",
+      "model": "llm-eval-tev1-0.8b:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        155,
+        160
+      ],
+      "report": "decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md",
+      "router_revision": "abc31fdb0bf52506cc47091145ac19c4cfb509b73a6841789324f9e32200c099",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "e08f398039c5d1ae8fd45b7082dcc8b04d53132e7958a61ac797b0821909c238",
+      "case": "ollama-tev1",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "ead9d69c25f549b222afe8113015668a77fee6941917f66cb142a83f783a41d3",
+      "job_id": "routing-decision-models-1-c6e41214da48",
+      "model": "llm-eval-tev1:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        155,
+        160
+      ],
+      "report": "decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md",
+      "router_revision": "7954dce22bc6c29c3b119656207681d12cb34434fed7caa086bfbc919bef0740",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "e282ec3a85bae7ca842939970df89d25c267e2eea7f54655b5060b57adae41ef",
+      "case": "ollama-nimble",
+      "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce",
+      "cohort_digests": [],
+      "config_sha256": "fb3093a38301513a6355c61cf03b34c98d83177f7536f48c348380ee450c2ec0",
+      "job_id": "routing-llm-routing-1-ac901abb4fcd",
+      "model": "llm-eval-nimble:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        213,
+        218
+      ],
+      "report": "llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md",
+      "router_revision": "6aa3fde96874d5d9f03306e795016e232610aaa5f19efcb107bf9311c712ccd9",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": "e282ec3a85bae7ca842939970df89d25c267e2eea7f54655b5060b57adae41ef",
+      "case": "ollama-tev1",
+      "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce",
+      "cohort_digests": [],
+      "config_sha256": "e7481d1140781d468eefa56d31853d7495eabd1c69135922bf61f5b5e0508980",
+      "job_id": "routing-llm-routing-1-c6e41214da48",
+      "model": "llm-eval-tev1:locked",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [
+        155,
+        160
+      ],
+      "report": "llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md",
+      "router_revision": "7954dce22bc6c29c3b119656207681d12cb34434fed7caa086bfbc919bef0740",
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    }
+  ],
+  "matched_groups": {
+    "e08f398039c5d1ae8fd45b7082dcc8b04d53132e7958a61ac797b0821909c238": {
+      "controls": {
+        "check": "decision_correct",
+        "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+        "experiment": "decision-models",
+        "experiment_version": 1,
+        "hardware": {
+          "hardware_profile": "msi-raider-18-hx-ai",
+          "os_id": "windows-11-wsl2-ubuntu-26.04",
+          "target": "raider"
+        },
+        "hardware_config_id": "raider-wsl",
+        "harness": "ollama",
+        "measured_schedule": [
+          [
+            "original-routing-smoke",
+            "coding",
+            "coding-1",
+            "9a102431f58d35edace6c01d4eb125f60e8f60c30eb6d6f60fdf82bbbf364631",
+            1
+          ],
+          [
+            "original-routing-smoke",
+            "coding",
+            "coding-1",
+            "9a102431f58d35edace6c01d4eb125f60e8f60c30eb6d6f60fdf82bbbf364631",
+            2
+          ],
+          [
+            "original-routing-smoke",
+            "coding",
+            "coding-1",
+            "9a102431f58d35edace6c01d4eb125f60e8f60c30eb6d6f60fdf82bbbf364631",
+            3
+          ],
+          [
+            "original-routing-smoke",
+            "math",
+            "math-1",
+            "2cd1a810ab0da24369f2dc76a1a8ae6e63d0923ffbf9288977a0df7965a1a398",
+            1
+          ],
+          [
+            "original-routing-smoke",
+            "math",
+            "math-1",
+            "2cd1a810ab0da24369f2dc76a1a8ae6e63d0923ffbf9288977a0df7965a1a398",
+            2
+          ],
+          [
+            "original-routing-smoke",
+            "math",
+            "math-1",
+            "2cd1a810ab0da24369f2dc76a1a8ae6e63d0923ffbf9288977a0df7965a1a398",
+            3
+          ]
+        ],
+        "mode": "decision",
+        "parameters": {
+          "repeats": 3,
+          "router": {
+            "criteria": {
+              "coding": "Writing or debugging software",
+              "general": "Other requests",
+              "math": "Mathematical reasoning"
+            },
+            "instructions": "Choose the category that best describes the user request.",
+            "kind": "systemone",
+            "platform": "ollama",
+            "timeout_s": 300
+          },
+          "save_outputs": false,
+          "suite": "[local path omitted]",
+          "warmups": 1
+        },
+        "publication": "campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1",
+        "question": "router label agreement on identical prompts",
+        "reported_paging_by_category": {},
+        "suites": {
+          "all": [
+            "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+          ]
+        },
+        "target": {
+          "physical_host_id": "raider",
+          "transport": "local"
+        },
+        "version": 1
+      },
+      "job_ids": [
+        "routing-decision-models-1-0701e943af0c",
+        "routing-decision-models-1-cff82f501cf5",
+        "routing-decision-models-1-473146c3e729",
+        "routing-decision-models-1-b72471bb152f",
+        "routing-decision-models-1-8f34219dcce9",
+        "routing-decision-models-1-2cfe79fef460",
+        "routing-decision-models-1-ac901abb4fcd",
+        "routing-decision-models-1-efcc2160debc",
+        "routing-decision-models-1-49a41a2986fd",
+        "routing-decision-models-1-c6e41214da48"
+      ]
+    },
+    "e282ec3a85bae7ca842939970df89d25c267e2eea7f54655b5060b57adae41ef": {
+      "controls": {
+        "check": "decision_correct",
+        "code_revision": "7e4606827cde8d9af4ccbb0c2ec8473d8d8049ce",
+        "experiment": "decision-models",
+        "experiment_version": 1,
+        "hardware": {
+          "hardware_profile": "msi-raider-18-hx-ai",
+          "os_id": "windows-11-wsl2-ubuntu-26.04",
+          "target": "raider"
+        },
+        "hardware_config_id": "raider-wsl",
+        "harness": "ollama",
+        "measured_schedule": [
+          [
+            "original-routing-smoke",
+            "coding",
+            "coding-1",
+            "9a102431f58d35edace6c01d4eb125f60e8f60c30eb6d6f60fdf82bbbf364631",
+            1
+          ],
+          [
+            "original-routing-smoke",
+            "coding",
+            "coding-1",
+            "9a102431f58d35edace6c01d4eb125f60e8f60c30eb6d6f60fdf82bbbf364631",
+            2
+          ],
+          [
+            "original-routing-smoke",
+            "coding",
+            "coding-1",
+            "9a102431f58d35edace6c01d4eb125f60e8f60c30eb6d6f60fdf82bbbf364631",
+            3
+          ],
+          [
+            "original-routing-smoke",
+            "math",
+            "math-1",
+            "2cd1a810ab0da24369f2dc76a1a8ae6e63d0923ffbf9288977a0df7965a1a398",
+            1
+          ],
+          [
+            "original-routing-smoke",
+            "math",
+            "math-1",
+            "2cd1a810ab0da24369f2dc76a1a8ae6e63d0923ffbf9288977a0df7965a1a398",
+            2
+          ],
+          [
+            "original-routing-smoke",
+            "math",
+            "math-1",
+            "2cd1a810ab0da24369f2dc76a1a8ae6e63d0923ffbf9288977a0df7965a1a398",
+            3
+          ]
+        ],
+        "mode": "decision",
+        "parameters": {
+          "repeats": 3,
+          "router": {
+            "criteria": {
+              "coding": "Writing or debugging software",
+              "general": "Other requests",
+              "math": "Mathematical reasoning"
+            },
+            "instructions": "Choose the category that best describes the user request.",
+            "kind": "systemone",
+            "platform": "ollama",
+            "timeout_s": 300
+          },
+          "save_outputs": false,
+          "suite": "[local path omitted]",
+          "warmups": 1
+        },
+        "publication": "campaign-20261118T051019Z-d72bad77-routing-llm-routing-1",
+        "question": "router label agreement on identical prompts",
+        "reported_paging_by_category": {},
+        "suites": {
+          "all": [
+            "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+          ]
+        },
+        "target": {
+          "physical_host_id": "raider",
+          "transport": "local"
+        },
+        "version": 1
+      },
+      "job_ids": [
+        "routing-llm-routing-1-ac901abb4fcd",
+        "routing-llm-routing-1-c6e41214da48"
+      ]
+    },
+    "ef474d5f9f67e2dcd48b0c021f568ea901120f466dec31aa71153d1a42b8cf7e": {
+      "controls": {
+        "check": "decision_correct",
+        "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+        "experiment": "decision-models",
+        "experiment_version": 1,
+        "hardware": {
+          "hardware_profile": "msi-raider-18-hx-ai",
+          "os_id": "windows-11-wsl2-ubuntu-26.04",
+          "target": "raider"
+        },
+        "hardware_config_id": "raider-wsl",
+        "harness": "ollama",
+        "measured_schedule": [
+          [
+            "original-routing-smoke",
+            "coding",
+            "coding-1",
+            "9a102431f58d35edace6c01d4eb125f60e8f60c30eb6d6f60fdf82bbbf364631",
+            1
+          ],
+          [
+            "original-routing-smoke",
+            "coding",
+            "coding-1",
+            "9a102431f58d35edace6c01d4eb125f60e8f60c30eb6d6f60fdf82bbbf364631",
+            2
+          ],
+          [
+            "original-routing-smoke",
+            "coding",
+            "coding-1",
+            "9a102431f58d35edace6c01d4eb125f60e8f60c30eb6d6f60fdf82bbbf364631",
+            3
+          ],
+          [
+            "original-routing-smoke",
+            "math",
+            "math-1",
+            "2cd1a810ab0da24369f2dc76a1a8ae6e63d0923ffbf9288977a0df7965a1a398",
+            1
+          ],
+          [
+            "original-routing-smoke",
+            "math",
+            "math-1",
+            "2cd1a810ab0da24369f2dc76a1a8ae6e63d0923ffbf9288977a0df7965a1a398",
+            2
+          ],
+          [
+            "original-routing-smoke",
+            "math",
+            "math-1",
+            "2cd1a810ab0da24369f2dc76a1a8ae6e63d0923ffbf9288977a0df7965a1a398",
+            3
+          ]
+        ],
+        "mode": "decision",
+        "parameters": {
+          "repeats": 3,
+          "router": {
+            "criteria": {
+              "coding": "Writing or debugging software",
+              "general": "Other requests",
+              "math": "Mathematical reasoning"
+            },
+            "instructions": "Choose the category that best describes the user request.",
+            "kind": "systemone",
+            "platform": "ollama",
+            "timeout_s": 300
+          },
+          "save_outputs": false,
+          "suite": "[local path omitted]",
+          "warmups": 1
+        },
+        "publication": "campaign-20261124T224634Z-f70bba1c-routing-decision-models-1",
+        "question": "router label agreement on identical prompts",
+        "reported_paging_by_category": {},
+        "suites": {
+          "all": [
+            "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+          ]
+        },
+        "target": {
+          "physical_host_id": "raider",
+          "transport": "local"
+        },
+        "version": 1
+      },
+      "job_ids": [
+        "routing-decision-models-1-0701e943af0c",
+        "routing-decision-models-1-cff82f501cf5",
+        "routing-decision-models-1-473146c3e729",
+        "routing-decision-models-1-b72471bb152f",
+        "routing-decision-models-1-8f34219dcce9",
+        "routing-decision-models-1-2cfe79fef460",
+        "routing-decision-models-1-ac901abb4fcd",
+        "routing-decision-models-1-efcc2160debc",
+        "routing-decision-models-1-49a41a2986fd",
+        "routing-decision-models-1-c6e41214da48"
+      ]
+    }
+  },
+  "schema_version": 1
+}

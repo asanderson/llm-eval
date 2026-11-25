@@ -1,22 +1,6 @@
-"""Navigable indexes and the generated parts of the results README over the published bundles in docs/results.
-
-Every bundle (docs/results/EXPERIMENT/PUBLICATION/) carries manifest.json, resolved-config.json, summary.json and its
-raw measurements. From those this writes:
-
-- docs/results/index/: one page per hardware configuration, experiment, harness, model and UTC date, plus an overview;
-- docs/results/index/recommended/: the recommended setup, harness and model per hardware configuration and experiment
-  (`recommend.py`);
-- diagrams/results/summary/: one comparison chart per experiment and hardware configuration;
-- the three marked blocks of docs/results/README.md: the top combinations with their charts (executive summary),
-  the navigation matrices, and the list of published reports. Text outside the markers is hand-written and kept;
-- the marked block of the repository README: the recommended model per platform, experiment and hardware configuration.
-
-A bundle published under the former id of a renamed experiment is indexed under the experiment's current id. A model's
-origin (catalog/model-origins.json) decides whether it is ranked among the US models.
-"""
+"""Regenerate navigation, evidence cards and within-publication comparisons from published bundles."""
 from __future__ import annotations
 
-import gzip
 import html
 import json
 import math
@@ -26,18 +10,15 @@ import statistics
 from collections import defaultdict
 from pathlib import Path
 
+from llm_eval.common import digest
 from llm_eval.experiments import canonical
+from . import evidence
 
 TOP_START, TOP_END = '<!-- results-top:start -->', '<!-- results-top:end -->'
 START, END = '<!-- results-index:start -->', '<!-- results-index:end -->'
 LIST_START, LIST_END = '<!-- results-list:start -->', '<!-- results-list:end -->'
 SUMMARY_START, SUMMARY_END = '<!-- summary-recommended:start -->', '<!-- summary-recommended:end -->'
 ORIGINS = 'catalog/model-origins.json'
-# (id, title, guide) of each experiment, in the order the repository README lists them.
-EXPERIMENTS = (('hardware-fit', 'Hardware fit', 'experiments/hardware-fit/README.md'),
-               ('model-offloading', 'Model offloading', 'experiments/model-offloading/README.md'),
-               ('decision-models', 'Decision models', 'experiments/decision-models/README.md'),
-               ('legal-models', 'Legal models', 'experiments/legal-models/README.md'))
 PLATFORMS = {'ollama': 'Ollama', 'lmstudio': 'LM Studio', 'koboldcpp': 'KoboldCpp', 'llama.cpp': 'llama.cpp',
              'ik_llama.cpp': 'ik_llama.cpp', 'ktransformers': 'KTransformers', 'vllm': 'vLLM', 'accelerate': 'Accelerate',
              'airllm': 'AirLLM', 'strata': 'Strata'}      # display names, in the order the summary columns take
@@ -62,7 +43,7 @@ Each report includes raw measurements, summaries and reproducibility metadata. S
 {LIST_END}
 """
 CHARTS = 'diagrams/results/summary'
-RECOMMENDED = 'Recommended setup, harness and model per hardware configuration and experiment: [recommended setups]({link}).'
+RECOMMENDED = 'Inspect workloads, placement and reproducibility details in the [setup evidence]({link}).'
 CATEGORIES = (('hardware', 'Hardware configuration'), ('experiment', 'Experiment'), ('harness', 'Harness'),
               ('model', 'Model'), ('date', 'Date (UTC)'))
 
@@ -141,24 +122,6 @@ def _middle(values):
     return statistics.median(values) if values else None
 
 
-def _peaks(bundle):
-    """{job_id: peak backend RSS and GPU memory in GiB} from the telemetry of each job's latest attempt."""
-    raw, peaks = bundle / 'raw/measurements.jsonl.gz', defaultdict(dict)
-    if not raw.exists():
-        return peaks
-    with gzip.open(raw, 'rt', encoding='utf-8') as lines:
-        for line in lines:
-            record = json.loads(line)
-            if record.get('record_type') != 'telemetry' or not record.get('latest_attempt'):
-                continue
-            data, peak = record.get('data') or {}, peaks[record.get('job_id')]
-            gpus = [g.get('used_mib') for g in data.get('gpus') or [] if g.get('used_mib') is not None]
-            for key, value in (('backend_rss_gib', data.get('backend_tree_rss_gib')), ('gpu_gib', sum(gpus) / 1024 if gpus else None)):
-                if value is not None:
-                    peak[key] = max(peak.get(key, 0), value)
-    return peaks
-
-
 KINDS = {'fixture': 'fixture', 'model-run': 'measured', 'score-only': 'score-only'}
 CLASSES = (('fixture', 'Fixture runs'), ('measured', 'Measured runs'), ('score-only', 'Score-only runs'), ('invalid', 'Invalid bundles'),
            ('legacy', 'Legacy bundles'))
@@ -194,7 +157,11 @@ def collect(root):
         manifest, resolved = _read(manifest_path), _read(bundle / 'resolved-config.json')
         summary = _read(bundle / 'summary.json') if (bundle / 'summary.json').exists() else []
         coverage = {c['job_id']: c for c in manifest.get('coverage', [])}
-        peaks = _peaks(bundle)
+        observations = evidence.read_bundle(bundle)
+        legal_path = bundle / 'legal-summary.json'
+        legal_rows = _read(legal_path).get('cohorts', []) if legal_path.is_file() else []
+        downloads = [name for name in ('resolved-config.json', 'manifest.json', 'summary.csv', 'raw/measurements.jsonl.gz',
+                                       'legal-summary.json') if (bundle / name).is_file()]
         names = _identities(manifest, resolved)
         for job in resolved.get('jobs', []):
             rows = [r for r in summary if r.get('job_id') == job['job_id']]
@@ -202,7 +169,8 @@ def collect(root):
             parameters = job.get('parameters') or {}
             config = parameters.get('config') or {}
             kind, rankable = _classified(names, manifest, job)
-            records.append({
+            raw = observations[job['job_id']]
+            record = {
                 'date': manifest['created_utc'][:10], 'created': manifest['created_utc'],
                 'experiment': canonical(manifest['experiment_id']), 'mode': job.get('mode'),
                 'campaign': manifest.get('campaign_id'), 'publication': manifest['publication_id'],
@@ -221,12 +189,23 @@ def collect(root):
                 'score': _counts(rows, 'decision_accuracy', 'decision_labelled_n') or _counts(rows, 'quality_pass_rate', 'quality_check_n'),
                 'wall_mid': _middle(r.get('elapsed_s_median') for r in rows),
                 'tokens_mid': _middle(r.get('output_tokens_per_wall_second_median') for r in rows),
-                'backend_rss_gib': peaks[job['job_id']].get('backend_rss_gib'), 'gpu_gib': peaks[job['job_id']].get('gpu_gib'),
+                'backend_rss_gib': raw.peaks.get('backend_rss_gib'), 'gpu_gib': raw.peaks.get('gpu_gib'),
                 'report': f"{bundle.parent.name}/{bundle.name}/README.md",
                 'execution_kind': parameters.get('execution_kind'), 'data_class': parameters.get('data_class'),
                 'cohorts': list(parameters['cohorts']) if isinstance(parameters.get('cohorts'), list) else [],
                 'class': kind, 'ranked': rankable, 'origin': origin.get(model),
-            })
+                'job_id': job['job_id'], 'downloads': downloads, 'revision': manifest.get('code_revision'),
+                'context': config.get('context_tokens'), 'protocol': config.get('protocol') or (parameters.get('router') or {}).get('kind'),
+                'backend_version': config.get('backend_version'), 'gpu': (job.get('hardware_profile') or {}).get('gpu') or {},
+                'reason': (coverage.get(job['job_id']) or {}).get('reason'), 'observation': raw.measured(),
+                'legal': raw.legal, 'legal_rows': [l for l in legal_rows if l.get('job_id') == job['job_id']],
+                'launch': config.get('launch') or {}, 'config_sha256': job.get('config_sha256'),
+                'model_revision': (parameters.get('router') or {}).get('model_revision'),
+            }
+            controls = evidence.comparison_controls(manifest, job, raw, record)
+            record['comparison'] = digest(controls) if controls else None
+            record['controls'] = controls
+            records.append(record)
     records.sort(key=lambda r: (r['experiment'], r['hardware'], r['harness'], r['model'], str(r['case'])))
     records.sort(key=lambda r: r['created'], reverse=True)
     return records
@@ -260,112 +239,18 @@ def table(records, index_prefix, report_prefix):
     return '\n'.join(lines)
 
 
-RANKING_RULE = ('Ranked by share of checks passed (correct decisions for decision models, quality checks otherwise), '
-                'then lower median wall time per request, then higher output tokens per second. Each harness and model '
-                'combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and '
-                'runs without scored checks are not ranked. Wall time and token rate are the median of the category medians. Where a model '
-                'repeats among the best combinations, a second table ranks the models, each by its best combination.')
-CHART_NOTE = ('Chart: every ranked combination, best-ranked model first, one color per harness. Each panel has its own '
-              'axis; wall time is on a log scale. Exact values are in the tables of this page and in the linked reports.')
-US_RULE = ('US models only, by the same ranking: models whose developer, and the developer of every base model they were '
-           'fine-tuned, distilled or pruned from, are headquartered in the United States ([model origins]({link})).')
-
-
 def us_model(record):
-    """Whether the record's model is a US model by catalog/model-origins.json; a model without an origin record is not."""
     return bool((record.get('origin') or {}).get('us'))
 
 
-def ranked(records, keep=None):
-    """{(experiment, hardware): every rankable harness and model combination, best first}; `keep(record)`, when given,
-    narrows the records first (for example to US models)."""
-    newest = {}
-    for r in records:      # records arrive newest first
-        if not r.get('ranked', True) or r['synthetic'] or r['status'] != 'succeeded' or not r['score']:
-            continue
-        if keep and not keep(r):
-            continue
-        newest.setdefault((r['experiment'], r['hardware'], r['harness'], r['model']), r)
+def matched(records):
+    """Comparable model packages with the same complete controls. Keep every run, ordered by model."""
     groups = defaultdict(list)
-    for (experiment, hardware, _, _), r in newest.items():
-        groups[(experiment, hardware)].append(r)
-
-    def order(r):
-        return (-r['score'][0] / r['score'][1], r['wall_mid'] if r['wall_mid'] is not None else float('inf'),
-                -(r['tokens_mid'] or 0), r['harness'], r['model'])
-    return {key: sorted(groups[key], key=order) for key in sorted(groups)}
-
-
-TOP_LIMIT = 5      # rows of the ranking per experiment and hardware configuration
-
-
-def top_combinations(records, limit=TOP_LIMIT, keep=None):
-    """{(experiment, hardware): best `limit` records}, one record per harness and model combination."""
-    return {key: chosen[:limit] for key, chosen in ranked(records, keep).items()}
-
-
-def top_models(records, limit=TOP_LIMIT, keep=None):
-    """{(experiment, hardware): best `limit` records}, one per model: the model's best harness and model combination."""
-    out = {}
-    for key, chosen in ranked(records, keep).items():
-        best = {}
-        for r in chosen:      # best combination first, so a model keeps its best harness
-            best.setdefault(r['model'], r)
-        out[key] = list(best.values())[:limit]
-    return out
-
-
-def ranking(records, index_prefix, report_prefix, limit=TOP_LIMIT, charts=None):
-    """Top combinations per experiment and hardware configuration, and the top models where a model repeats among them;
-    `charts` maps such a pair to an image link."""
-    lines = [f'### Top {limit} harness and model combinations per experiment and hardware configuration', '', RANKING_RULE,
-             'Each pair then ranks US models alone. ' + US_RULE.format(link=report_prefix + '../MODELS.md#model-origins')]
-    pairs = list(dict.fromkeys((r['experiment'], r['hardware']) for r in records if r.get('ranked', True)))      # newest result first
-    best, models = top_combinations(records, limit), top_models(records, limit)
-    us_best, us_models, every = top_combinations(records, limit, us_model), top_models(records, limit, us_model), ranked(records)
-
-    def row(rank, r, first, second, *more):
-        return (f"| {rank} | {first} | {second} | " + ''.join(f'{cell} | ' for cell in more) + f"{r['score'][0]}/{r['score'][1]} | "
-                f"{_cell(None if r['wall_mid'] is None else format(r['wall_mid'], '.3g'))} | "
-                f"{_cell(None if r['tokens_mid'] is None else format(r['tokens_mid'], '.3g'))} | "
-                f"[{r['date']}{' cap ' + str(r['output_cap']) if r['output_cap'] else ''}]({report_prefix}{r['report']}) |")
-    for experiment, hardware in pairs:
-        lines += ['', f"**{_link('experiment', experiment, index_prefix)} on {_link('hardware', hardware, index_prefix)}**", '']
-        chosen = best.get((experiment, hardware))
-        if not chosen:
-            lines.append('No measured run with scored checks has been published yet.')
-            continue
-        lines += ['| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |', '|---:|---|---|---:|---:|---:|---|']
-        lines += [row(rank, r, _link('harness', r['harness'], index_prefix), _link('model', r['model'], index_prefix))
-                  for rank, r in enumerate(chosen, 1)]
-        if models[(experiment, hardware)] != chosen:      # a model repeats among the best combinations: rank the models too
-            lines += ['', f'Top {limit} models, each on its best-ranked harness:', '',
-                      '| Rank | Model | Harness | Checks passed | Median wall s | Output tok/s | Run |', '|---:|---|---|---:|---:|---:|---|']
-            lines += [row(rank, r, _link('model', r['model'], index_prefix), _link('harness', r['harness'], index_prefix))
-                      for rank, r in enumerate(models[(experiment, hardware)], 1)]
-        lines += ['', f'Top {limit} harness and model combinations of US models:', '']
-        us = us_best.get((experiment, hardware))
-        if us:
-            lines += ['| Rank | Harness | Model | Developer | Checks passed | Median wall s | Output tok/s | Run |',
-                      '|---:|---|---|---|---:|---:|---:|---|']
-            lines += [row(rank, r, _link('harness', r['harness'], index_prefix), _link('model', r['model'], index_prefix),
-                          _cell(lineage(r['origin']))) for rank, r in enumerate(us, 1)]
-            if us_models[(experiment, hardware)] != us:      # a US model repeats: rank the US models too
-                lines += ['', f'Top {limit} US models, each on its best-ranked harness:', '',
-                          '| Rank | Model | Harness | Developer | Checks passed | Median wall s | Output tok/s | Run |',
-                          '|---:|---|---|---|---:|---:|---:|---|']
-                lines += [row(rank, r, _link('model', r['model'], index_prefix), _link('harness', r['harness'], index_prefix),
-                              _cell(lineage(r['origin']))) for rank, r in enumerate(us_models[(experiment, hardware)], 1)]
-        else:
-            lines.append('No measured run of a US model with scored checks has been published for this pair.')
-        shown = list(dict.fromkeys(r['model'] for r in chosen if not r.get('origin')))      # of the combinations in the first table
-        others = len({r['model'] for r in every[(experiment, hardware)] if not r.get('origin')} - set(shown))
-        if shown or others:
-            lines += ['', 'Origin not recorded, so not ranked among US models: ' + ', '.join(f'`{_cell(m)}`' for m in shown) +
-                      (('; and ' if shown else '') + f'{others} more model(s) ranked below the top {limit}' if others else '') + '.']
-        if (charts or {}).get((experiment, hardware)):
-            lines += ['', f"![{experiment} on {hardware}: harness and model combinations compared]({charts[(experiment, hardware)]})", '', CHART_NOTE]
-    return '\n'.join(lines)
+    for r in records:
+        if r.get('comparison'):
+            groups[r['comparison']].append(r)
+    return {key: sorted(group, key=lambda r: (r['model'], r['job_id'])) for key, group in sorted(groups.items())
+            if len({r['model'] for r in group}) > 1}
 
 
 def navigation(records, index_prefix, report_prefix):
@@ -424,65 +309,9 @@ def cohort_results(records, index_prefix, report_prefix):
     return '\n'.join(lines)
 
 
-def summary(records):
-    """The recommended model per platform, experiment and hardware configuration, for the repository README: one table per
-    hardware configuration (newest result first), one row per experiment, one column per platform with a ranked run. A cell
-    names the best-ranked model on that platform and, on a second line, the best-ranked US model."""
-    every, us = ranked(records), ranked(records, us_model)
-    index, results = 'docs/results/index/', 'docs/results/'
-    known = [e for e, _, _ in EXPERIMENTS]
-    titles = {e: (title, guide) for e, title, guide in EXPERIMENTS}
-    order = list(PLATFORMS)
-
-    def best(chosen, harness):
-        return next((r for r in chosen if r['harness'] == harness), None)
-
-    def text(r):
-        wall = '' if r['wall_mid'] is None else f", {format(r['wall_mid'], '.3g')} s"
-        return f"{_link('model', r['model'], index)} [{r['score'][0]}/{r['score'][1]}{wall}]({results}{r['report']})"
-    lines = ['Generated by `llm-eval index-results` from the published bundles; do not edit between the markers. Each cell is '
-             'the best-ranked model on that platform: checks passed and median wall time per request, linked to the report of '
-             'its run, which records the run configuration. The second line is the best-ranked US model (developer and base '
-             'models from the United States). "–" means no measured run with scored checks on that platform. The ranking is '
-             f'the one of the [results]({results}README.md); the [recommended setups]({index}recommended/README.md) pages give '
-             'the configuration of the best-ranked run of each experiment and hardware configuration.']
-    for hardware in dict.fromkeys(r['hardware'] for r in records):      # records arrive newest first
-        here = [r for r in records if r['hardware'] == hardware]
-        harnesses = sorted({r['harness'] for (_, h), chosen in every.items() if h == hardware for r in chosen},
-                           key=lambda h: (order.index(h) if h in order else len(order), h))
-        lines += ['', f"**{_link('hardware', hardware, index)}**", '']
-        if not harnesses:
-            lines.append('No measured run with scored checks has been published for this hardware configuration yet.')
-            continue
-        lines += ['| Experiment | ' + ' | '.join(_cell(PLATFORMS.get(h, h)) for h in harnesses) + ' |', '|---|' + '---|' * len(harnesses)]
-        experiments = known + sorted({r['experiment'] for r in here} - set(known))
-        unranked = []
-        for experiment in experiments:
-            title, guide = titles.get(experiment, (experiment, None))
-            name = f'[{_cell(title)}]({guide})' if guide else _cell(title)
-            chosen, chosen_us = every.get((experiment, hardware), []), us.get((experiment, hardware), [])
-            if not chosen and any(r['experiment'] == experiment for r in here):
-                unranked.append(name)
-            cells = []
-            for harness in harnesses:
-                top = best(chosen, harness)
-                if top is None:
-                    cells.append('–')
-                    continue
-                top_us = best(chosen_us, harness)
-                cells.append(text(top) + '<br>US: ' + (text(top_us) if top_us else 'none measured'))
-            lines.append(f'| {name} | ' + ' | '.join(cells) + ' |')
-        if unranked:
-            lines += ['', 'Published here but not ranked (fixture runs only, or results published by class and cohort): '
-                      + ', '.join(unranked) + '.']
-    return '\n'.join(lines)
-
-
 def overview(records, index_prefix, report_prefix):
-    """Top combinations, then the navigation, then the results by class and cohort (when there are any)."""
     cohorts = cohort_results(records, index_prefix, report_prefix)
-    return ranking(records, index_prefix, report_prefix) + '\n\n' + navigation(records, index_prefix, report_prefix) + \
-        ('\n\n' + cohorts if cohorts else '')
+    return navigation(records, index_prefix, report_prefix) + ('\n\n' + cohorts if cohorts else '')
 
 
 def listing(root):
@@ -493,24 +322,7 @@ def listing(root):
         m, link = _read(path), (path.parent / 'README.md').relative_to(results).as_posix()
         synthetic = ', '.join(sorted(m.get('execution_kinds') or [])) if 'projection' in m else m['synthetic']
         rows.append((m['created_utc'], f"| {_cell(canonical(m['experiment_id']))} | {_cell(m['created_utc'])} | {_cell(m['status'])} | {_cell(synthetic)} | [Report]({link}) |"))
-    return '\n'.join([LEGACY_LIST_HEADER, '|---|---|---|---|---|'] + [row for _, row in sorted(rows, reverse=True)])
-
-
-def write_charts(root, records):
-    """Redraw the summary charts; {(experiment, hardware): link relative to docs/results}. Needs the reporting extra."""
-    from . import charts
-    directory, links = Path(root) / CHARTS, {}
-    if directory.exists():
-        shutil.rmtree(directory)
-    if not charts.available():
-        return links
-    for (experiment, hardware), chosen in ranked(records).items():
-        if len(chosen) < 2:      # a single combination is a number, not a comparison
-            continue
-        name = f"{slug(experiment)}-{slug(hardware)}.png"
-        charts.summary_chart(chosen, directory / name, f"{experiment} on {hardware}: newest succeeded run of each harness and model")
-        links[(experiment, hardware)] = f"../../{CHARTS}/{name}"
-    return links
+    return '\n'.join(['| Experiment | Publication time UTC | Status | Synthetic flag or execution kinds | Results |', '|---|---|---|---|---|'] + [row for _, row in sorted(rows, reverse=True)])
 
 
 def _fill(text, start, end, body):
@@ -543,14 +355,14 @@ def write_results_index(root):
             save(index / category / (slug(value) + '.md'),
                  f"# {title}: {_cell(value)}\n\n[Results index](../README.md) · [Executive summary](../../README.md)\n\n"
                  f"{len(chosen)} published result(s). {note}\n\n" + table(chosen, '../', '../../') + '\n')
-    from .recommend import write_recommendations      # imported here: that module imports this one
-    write_recommendations(root, records, index)
+    from .recommend import highlights, write_evidence
+    write_evidence(root, records, index)
     readme = results / 'README.md'
     text = readme.read_text(encoding='utf-8') if readme.exists() else ''
     if not text or (LEGACY_LIST_HEADER in text and LIST_START not in text):      # absent, or the fully generated list of earlier versions
         text = SKELETON
     if TOP_START in text and TOP_END in text:
-        text = _fill(text, TOP_START, TOP_END, ranking(records, 'index/', '', charts=write_charts(root, records)))
+        text = _fill(text, TOP_START, TOP_END, highlights(records, 'index/', ''))
     cohorts = cohort_results(records, 'index/', '')
     text = _fill(text, START, END, navigation(records, 'index/', '') + ('\n\n' + cohorts if cohorts else '') +
                  '\n\nFull table and per-category pages: [results index](index/README.md). ' + RECOMMENDED.format(link='index/recommended/README.md'))
@@ -560,5 +372,5 @@ def write_results_index(root):
     if top.is_file():
         text = top.read_text(encoding='utf-8')
         if SUMMARY_START in text and SUMMARY_END in text:
-            save(top, _fill(text, SUMMARY_START, SUMMARY_END, summary(records)))
+            save(top, _fill(text, SUMMARY_START, SUMMARY_END, highlights(records, 'docs/results/index/', 'docs/results/')))
     return len(records)

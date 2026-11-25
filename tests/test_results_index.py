@@ -6,13 +6,13 @@ import unittest
 from pathlib import Path
 
 from llm_eval.reporting.index import (END, LIST_END, LIST_START, START, SUMMARY_END, SUMMARY_START, TOP_END, TOP_START, collect,
-                                      identity, lineage, origins, ranking, slug, us_model,
-                                      top_combinations, top_models, write_results_index)
+                                      identity, lineage, matched, origins, slug, us_model, write_results_index)
 
 
 def bundle(root, experiment, publication, created, jobs, summary, synthetic=False):
     dest = root / 'docs/results' / experiment / publication
     dest.mkdir(parents=True)
+    (root / 'docs/REPRODUCE.md').touch()
     (dest / 'README.md').write_text('# report\n', encoding='utf-8')
     (dest / 'manifest.json').write_text(json.dumps({
         'experiment_id': experiment, 'publication_id': publication, 'campaign_id': 'fixture', 'created_utc': created,
@@ -83,7 +83,7 @@ class ResultsIndexTests(unittest.TestCase):
         self.assertEqual(pages, ['README.md', 'date/2026-11-08.md', 'date/2026-11-09.md', 'experiment/decision-models.md',
                                  'experiment/model-offloading.md', 'hardware/raider-ubuntu.md', 'hardware/raider-windows.md',
                                  'harness/koboldcpp.md', 'harness/ollama.md', 'model/deepseek-r1-32b.md',
-                                 'model/llm-eval-nimble-locked.md', 'recommended/README.md',
+                                 'model/llm-eval-nimble-locked.md', 'origin/us.md', 'recommended/README.md',
                                  'recommended/raider-ubuntu/decision-models.md', 'recommended/raider-windows/model-offloading.md'])
         for page in [*index.rglob('*.md'), self.summary]:
             for target in re.findall(r'\]\(([^)#]+)\)', page.read_text(encoding='utf-8')):
@@ -103,15 +103,13 @@ class ResultsIndexTests(unittest.TestCase):
         self.assertTrue(text.endswith(LIST_END + '\n'))
         # each block holds its own part: ranking on top, navigation in the middle, the report list last
         top, rest = text.split(TOP_END)
-        self.assertIn('### Top 5 harness and model combinations', top)
+        self.assertIn('### What ran on this hardware?', top)
         self.assertNotIn('models by harness', top)
         self.assertIn('[Report](model-offloading/campaign-b-offload/README.md)', rest.split(LIST_START)[1])
         self.assertNotIn('stale', text)
         self.assertIn('### model-offloading: models by harness', text)
         # experiments are ordered by their newest result: offloading ran on 2026-11-09, routing on 2026-11-08
         self.assertLess(text.index('### model-offloading: models by harness'), text.index('### decision-models: models by harness'))
-        self.assertLess(text.index('**[model-offloading](index/experiment/model-offloading.md) on'),
-                        text.index('**[decision-models](index/experiment/decision-models.md) on'))
         # newest run first inside a matrix cell; category pages are linked relative to docs/results
         line = next(line for line in text.splitlines() if line.startswith('| [deepseek-r1-32b](index/model/deepseek-r1-32b.md)'))
         koboldcpp, cell = [c.strip() for c in line.strip('|').split(' | ')[1:]]      # harness columns are alphabetical
@@ -124,67 +122,15 @@ class ResultsIndexTests(unittest.TestCase):
         write_results_index(self.root)
         self.assertEqual(self.summary.read_text(encoding='utf-8'), before)
 
-    def test_top_combinations_rank_by_checks_then_latency_per_experiment_and_hardware(self):
-        bundle(self.root, 'model-offloading', 'campaign-c-offload', '2026-11-09T14:52:55+00:00',
-               [offload_job('c1', 'ollama', 'qwen38-27b'), offload_job('c2', 'lmstudio', 'qwen38-27b'),
-                offload_job('c3', 'koboldcpp', 'gemma4-31b'), offload_job('c4', 'koboldcpp', 'qwen38-27b'),
-                offload_job('c5', 'lmstudio', 'unscored')],
-               [row('c1', 'coding', 18.7, 3.58, quality=1.0), row('c1', 'math', 16.0, 3.55, quality=1.0),
-                row('c2', 'coding', 7.7, 5.93, quality=1.0), row('c2', 'math', 7.2, 6.8, quality=1.0),
-                row('c3', 'coding', 1.1, 2.68, quality=8 / 9), row('c4', 'coding', 25.9, 3.54, quality=7 / 9),
-                row('c5', 'coding', 0.5, 9.0)])
-        best = top_combinations(collect(self.root))
-        self.assertEqual(sorted(best), [('model-offloading', 'raider-windows')])      # the only routing run is synthetic
-        self.assertEqual([(r['harness'], r['model'], r['score']) for r in best[('model-offloading', 'raider-windows')]][:3],
-                         [('lmstudio', 'qwen38-27b', (18, 18)), ('ollama', 'qwen38-27b', (18, 18)), ('koboldcpp', 'gemma4-31b', (8, 9))])
-        # A combination is judged on its newest succeeded run: ollama/deepseek is the 0/9 rerun, not the older 3/18.
-        every = top_combinations(collect(self.root), limit=10)[('model-offloading', 'raider-windows')]
-        self.assertEqual([(r['harness'], r['model'], r['publication']) for r in every][3:],
-                         [('koboldcpp', 'qwen38-27b', 'campaign-c-offload'), ('ollama', 'deepseek-r1-32b', 'campaign-b-offload')])
-        self.assertEqual(best[('model-offloading', 'raider-windows')], every)      # five combinations fill the default five rows
-        # the models, each on its best harness: qwen38-27b ran on three harnesses and appears once, on lmstudio
-        by_model = top_models(collect(self.root))[('model-offloading', 'raider-windows')]
-        self.assertEqual([(r['model'], r['harness']) for r in by_model],
-                         [('qwen38-27b', 'lmstudio'), ('gemma4-31b', 'koboldcpp'), ('deepseek-r1-32b', 'ollama')])
-        self.assertEqual(len(top_models(collect(self.root), limit=2)[('model-offloading', 'raider-windows')]), 2)
-        self.assertEqual(len(top_combinations(collect(self.root), limit=3)[('model-offloading', 'raider-windows')]), 3)
+    def test_incomplete_historical_metadata_is_displayed_as_an_observation(self):
+        records = collect(self.root)
+        self.assertEqual(matched(records), {})
         write_results_index(self.root)
-        text = self.summary.read_text(encoding='utf-8')
-        heading = '### Top 5 harness and model combinations per experiment and hardware configuration'
-        self.assertLess(text.index(heading), text.index('### Browse by category'))
-        self.assertIn('| 1 | [lmstudio](index/harness/lmstudio.md) | [qwen38-27b](index/model/qwen38-27b.md) | 18/18 | 7.45 | 6.37 | '
-                      '[2026-11-09 cap 2048](model-offloading/campaign-c-offload/README.md) |', text)
-        self.assertIn('**[decision-models](index/experiment/decision-models.md) on [raider-ubuntu](index/hardware/raider-ubuntu.md)**'
-                      '\n\n'
-                      'No measured run with scored checks has been published yet.', text)
-        # qwen38-27b ran on three harnesses, so the models are ranked too, each once on its best harness
-        models = text.split('Top 5 models, each on its best-ranked harness:')[1].split('![')[0]
-        self.assertEqual(re.findall(r'^\| (\d) \| \[([^\]]+)\]\(index/model/[^)]+\) \| \[([^\]]+)\]', models, flags=re.M),
-                         [('1', 'qwen38-27b', 'lmstudio'), ('2', 'gemma4-31b', 'koboldcpp'), ('3', 'deepseek-r1-32b', 'ollama')])
-        overview = (self.root / 'docs/results/index/README.md').read_text(encoding='utf-8')
-        self.assertIn(heading, overview)
-        # four ranked combinations are a comparison: the summary gets a chart, the index page does not repeat it
-        chart = self.root / 'diagrams/results/summary/model-offloading-raider-windows.png'
-        self.assertTrue(chart.read_bytes().startswith(b'\x89PNG'))
-        self.assertIn('](../../diagrams/results/summary/model-offloading-raider-windows.png)', text)
-        self.assertNotIn('.png', overview)
-        self.assertEqual([p.name for p in chart.parent.iterdir()], [chart.name])      # routing has nothing to compare
-
-    def test_the_ranking_shows_five_rows_and_keeps_the_rest_in_the_index(self):
-        models = [f'model-{n}' for n in range(7)]      # seven combinations whose checks fall from 9/9 to 3/9
-        bundle(self.root, 'model-offloading', 'campaign-d-offload', '2026-11-10T09:00:00+00:00',
-               [offload_job(f'd{n}', 'ollama', m) for n, m in enumerate(models)],
-               [row(f'd{n}', 'coding', 1.0 + n, 5.0, quality=(9 - n) / 9) for n in range(7)])
-        write_results_index(self.root)
-        text = self.summary.read_text(encoding='utf-8')
-        top = text.split(TOP_END)[0].split('**[model-offloading]')[1]
-        ranks = re.findall(r'^\| (\d+) \| \[ollama\]', top, flags=re.M)
-        self.assertEqual(ranks, ['1', '2', '3', '4', '5'])
-        self.assertIn('[model-4](index/model/model-4.md)', top)
-        self.assertNotIn('model-5', top)
-        self.assertNotIn('Top 5 models', text)      # the five best combinations are five different models: nothing more to rank
-        self.assertTrue((self.root / 'docs/results/index/model/model-5.md').is_file())      # ranked sixth, still indexed
-        self.assertIn('model-5', (self.root / 'docs/results/index/harness/ollama.md').read_text(encoding='utf-8'))
+        page = (self.root / 'docs/results/index/recommended/raider-windows/model-offloading.md').read_text()
+        self.assertIn('No two successful model packages have complete matching controls', page)
+        self.assertIn('deepseek-r1-32b · koboldcpp | category-smoke · failed', page)
+        self.assertIn('not recorded | not recorded | 0/9', page)
+        self.assertNotIn('| Rank |', page)
 
     def test_results_readme_lists_newest_first(self):
         from llm_eval.reporting.publish import write_index
@@ -220,7 +166,7 @@ class ResultsIndexTests(unittest.TestCase):
                     self.summary.write_text(before, encoding='utf-8')
                 write_results_index(self.root)
                 text = self.summary.read_text(encoding='utf-8')
-                self.assertLess(text.index('## Executive summary'), text.index('### Top 5 harness and model combinations'))
+                self.assertLess(text.index('## Executive summary'), text.index('### What ran on this hardware?'))
                 self.assertLess(text.index('## Results index'), text.index('### Browse by category'))
                 self.assertLess(text.index('## All published reports'), text.index('campaign-a-routing/README.md)', text.index(LIST_START)))
 
@@ -238,6 +184,7 @@ def legal_bundle(root, publication, created, jobs, summary, projection=True, exp
     is the id it was published under (`legal-benchmark` before the rename of 2026-11-24)."""
     dest = root / 'docs/results' / experiment / publication
     dest.mkdir(parents=True)
+    (root / 'docs/REPRODUCE.md').touch()
     (dest / 'README.md').write_text('# report\n', encoding='utf-8')
     manifest = {'experiment_id': experiment, 'publication_id': publication, 'campaign_id': 'fixture', 'created_utc': created,
                 'status': 'complete', 'synthetic': any(j['parameters'].get('synthetic') for j in jobs),
@@ -249,24 +196,6 @@ def legal_bundle(root, publication, created, jobs, summary, projection=True, exp
     (dest / 'resolved-config.json').write_text(json.dumps({'experiment': {'experiment_id': experiment}, 'jobs': jobs}), encoding='utf-8')
     (dest / 'summary.json').write_text(json.dumps(summary), encoding='utf-8')
     return dest
-
-
-def without_legal(text):
-    """A generated page without what the legal records add: their rows, sections and cohort table, the browse-by counts and
-    the per-page result count (both count every record)."""
-    kept, skipping, browse = [], False, False
-    for line in text.split('\n'):
-        if line.startswith('#'):
-            skipping = 'legal-models' in line or 'Results by class and cohort' in line
-            browse = line == '### Browse by category'
-        if line.startswith(('<!--', 'Full table and per-category pages')):      # the end of a generated section
-            skipping = False
-        if browse and line.startswith('|'):
-            continue
-        if skipping or 'campaign-l-legal' in line or 'published result(s)' in line:
-            continue
-        kept.append(line)
-    return kept
 
 
 class LegalIndexTests(unittest.TestCase):
@@ -296,10 +225,7 @@ class LegalIndexTests(unittest.TestCase):
         offload = next(r for r in records if r['experiment'] == 'model-offloading')
         self.assertEqual({k: offload[k] for k in ('execution_kind', 'data_class', 'cohorts', 'class', 'ranked')},
                          {'execution_kind': None, 'data_class': None, 'cohorts': [], 'class': None, 'ranked': True})
-        self.assertEqual(list(offload), ['date', 'created', 'experiment', 'mode', 'campaign', 'publication', 'hardware', 'os', 'harness', 'model',
-                                         'case', 'status', 'synthetic', 'output_cap', 'requests', 'errors', 'wall_s', 'tokens_per_s', 'quality',
-                                         'decisions', 'score', 'wall_mid', 'tokens_mid', 'backend_rss_gib', 'gpu_gib', 'report',
-                                         'execution_kind', 'data_class', 'cohorts', 'class', 'ranked', 'origin'])
+        self.assertIsNone(offload['comparison'])
 
     def test_a_job_with_several_cohorts_gets_one_row_with_the_job_total(self):
         # The summary rows are per arm and name no cohort, so the count beside a cohort digest would not be that cohort's.
@@ -335,41 +261,20 @@ class LegalIndexTests(unittest.TestCase):
         self.assertIn(cohort_results(collect(self.root), 'index/', ''), readme.split(START)[1].split(END)[0])
         for page in [*index.rglob('*.md'), self.summary]:
             for line in page.read_text(encoding='utf-8').splitlines():
-                if 'campaign-l-legal' in line:
+                if 'campaign-l-legal' in line and line.startswith('|'):
                     self.assertTrue(any(word in line for word in ('fixture', 'measured', 'score-only')), (page.name, line))
                     self.assertNotIn('(synthetic)', line)
         listing = next(line for line in readme.splitlines() if 'campaign-l-legal' in line and '[Report]' in line)
         self.assertIn('| fixture, model-run, score-only |', listing)
         self.assertTrue((index / 'experiment/legal-models.md').is_file())
 
-    def test_legal_records_never_enter_top_combinations(self):
+    def test_legal_runs_are_visible_and_never_enter_generic_comparisons(self):
         self.add_legal()
-        records = collect(self.root)
-        self.assertTrue(any(r['experiment'] == 'legal-models' and not r['synthetic'] and r['status'] == 'succeeded' and r['score'] for r in records))
-        self.assertFalse(any(r['experiment'] == 'legal-models' for chosen in top_combinations(records, 10).values() for r in chosen))
+        self.assertTrue(all(r['comparison'] is None for r in collect(self.root) if r['class']))
         write_results_index(self.root)
-        top = self.summary.read_text(encoding='utf-8').split(TOP_START)[1].split(TOP_END)[0]
-        self.assertNotIn('legal-models', top)
-        self.assertNotIn('campaign-l-legal', top)
-        self.assertNotIn('legal-host', top)
-        charts = self.root / 'diagrams/results/summary'
-        self.assertFalse(charts.exists() and any('legal' in p.name for p in charts.iterdir()))
-
-    def test_fixture_or_incomparable_rubric_cannot_displace_a_ranked_result(self):
-        bundle(self.root, 'model-offloading', 'campaign-c-offload', '2026-11-09T14:52:55+00:00',
-               [offload_job('c1', 'ollama', 'qwen38-27b'), offload_job('c2', 'lmstudio', 'qwen38-27b')],
-               [row('c1', 'coding', 18.7, 3.58, quality=0.5), row('c2', 'coding', 7.7, 5.93, quality=1.0)])
-
-        def best():
-            return [(r['harness'], r['model'], r['publication']) for r in top_combinations(collect(self.root), 10)[('model-offloading', 'raider-windows')]]
-        before = best()
-        # Newer legal records on the same hardware, harness and model, with perfect checks: a fixture and an incomparable rubric.
-        legal_bundle(self.root, 'campaign-m-legal', '2026-11-11T09:00:00+00:00',
-                     [legal_job('m1', 'fixture', 'ollama', 'qwen38-27b', hardware='raider-windows'),
-                      legal_job('m2', 'model-run', 'ollama', 'qwen38-27b', mode='generation', hardware='raider-windows')],
-                     [row('m1', 'all', 0.001, 99.0, quality=1.0), row('m2', 'lexical-eligible', 0.001, 99.0, quality=1.0)])
-        self.assertEqual(best(), before)
-        self.assertEqual(sorted(top_combinations(collect(self.root), 10)), [('model-offloading', 'raider-windows')])
+        page = (self.root / 'docs/results/index/recommended/legal-host/legal-models.md').read_text()
+        self.assertNotIn('Matched model comparisons', page)
+        self.assertIn('score-only', page)
 
     def test_relabelled_or_legacy_legal_bundles_are_not_ranked(self):
         bundle(self.root, 'decision-models', 'campaign-r-routing', '2026-11-09T03:57:38+00:00',
@@ -377,7 +282,6 @@ class LegalIndexTests(unittest.TestCase):
                  'hardware': {'os_id': 'ubuntu-26.04-native'},
                  'parameters': {'router': {'kind': 'systemone', 'platform': 'ollama', 'model': 'llm-eval-nimble:locked'}}}],
                [row('r2', 'coding', 0.05, None, decisions=0.5)])
-        self.assertEqual([r['publication'] for r in top_combinations(collect(self.root))[('decision-models', 'raider-ubuntu')]], ['campaign-r-routing'])
         # Newer and perfect, but the manifest says decision-models while the resolved jobs say legal-models.
         relabelled = legal_bundle(self.root, 'campaign-x-legal', '2026-11-12T03:57:38+00:00',
                                   [{**legal_job('x1', 'model-run', hardware='raider-ubuntu'),
@@ -392,34 +296,8 @@ class LegalIndexTests(unittest.TestCase):
         by_case = {r['case']: r for r in records}
         self.assertEqual((by_case['x1']['class'], by_case['x1']['ranked'], by_case['x1']['experiment']), ('invalid', False, 'decision-models'))
         self.assertEqual((by_case['y1']['class'], by_case['y1']['ranked']), ('legacy', False))
-        self.assertEqual([r['publication'] for r in top_combinations(records)[('decision-models', 'raider-ubuntu')]], ['campaign-r-routing'])
-
-    def test_offload_and_routing_output_is_identical_with_and_without_a_legal_bundle(self):
-        def outputs():
-            write_results_index(self.root)
-            return {p.relative_to(self.root).as_posix(): p.read_bytes() for p in sorted(self.root.rglob('*'))
-                    if p.is_file() and ('docs/results/index/' in p.as_posix() or '/diagrams/' in p.as_posix() or p == self.summary)}
-        bundle(self.root, 'model-offloading', 'campaign-c-offload', '2026-11-09T14:52:55+00:00',
-               [offload_job('c1', 'ollama', 'qwen38-27b'), offload_job('c2', 'lmstudio', 'qwen38-27b'), offload_job('c3', 'koboldcpp', 'gemma4-31b')],
-               [row('c1', 'coding', 18.7, 3.58, quality=1.0), row('c2', 'coding', 7.7, 5.93, quality=1.0), row('c3', 'coding', 1.1, 2.68, quality=8 / 9)])
-        before, records_before = outputs(), collect(self.root)
-        self.add_legal()
-        after, records_after = outputs(), collect(self.root)
-        self.assertEqual([r for r in records_after if r['experiment'] != 'legal-models'], records_before)
-        readme = 'docs/results/README.md'
-        self.assertEqual(after[readme].decode().split(TOP_START)[1].split(TOP_END)[0], before[readme].decode().split(TOP_START)[1].split(TOP_END)[0])
-        charts = {k for k in before if k.endswith('.png')}
-        self.assertTrue(charts)
-        self.assertEqual({k: after[k] for k in after if k.endswith('.png')}, {k: before[k] for k in charts})
-        for name, data in before.items():
-            if not name.endswith('.png'):
-                with self.subTest(page=name):
-                    self.assertEqual(without_legal(after[name].decode()), without_legal(data.decode()))
-        self.assertEqual(sorted(set(after) - set(before)),
-                         ['docs/results/index/date/2026-11-10.md', 'docs/results/index/experiment/legal-models.md',
-                          'docs/results/index/hardware/legal-host.md', 'docs/results/index/harness/fixture.md', 'docs/results/index/model/fixture.md',
-                          'docs/results/index/recommended/legal-host/legal-models.md',
-                          'docs/results/index/recommended/raider-windows/legal-models.md'])
+        self.assertIsNone(by_case['x1']['comparison'])
+        self.assertIsNone(by_case['y1']['comparison'])
 
     def test_hostile_values_of_a_projected_bundle_are_rendered_inert(self):
         hostile = legal_job('h1', 'model-run', 'h](javascript:alert(1))', 'm\n| x |', mode='generation\n## INJECTED\n<script>x</script>',
@@ -438,121 +316,98 @@ class LegalIndexTests(unittest.TestCase):
                 self.assertNotIn(raw, text, page.name)
 
 
-class RecommendationTests(unittest.TestCase):
-    """One generated page per hardware configuration and experiment: the best-ranked combination and its recorded setup."""
+class EvidencePageTests(unittest.TestCase):
     setUp = ResultsIndexTests.setUp
 
-    def page(self, hardware, experiment):
-        return (self.root / 'docs/results/index/recommended' / hardware / (experiment + '.md')).read_text(encoding='utf-8')
-
-    def add_ranked(self):
-        config = {'backend_version': '0.4.28+2', 'lane': 'offload', 'context_tokens': 4096, 'temperature': 0.0, 'seed': 7,
-                  'tokenizer_revision': 'owner/Repo-GGUF@' + 'a' * 40 + ' (tokenizer embedded in locked GGUF)',
-                  'launch': {'model_file': 'model-Q8_0.gguf', 'gpu_offload': '0.476', 'import_mode': 'hard-link'},
-                  'request_options': {}, 'hardware_attestation': {'nvidia_driver': '610.74', 'bios': 'not shown'}}
-        fast = offload_job('c2', 'lmstudio', 'qwen38-27b')
-        fast['parameters']['config'].update(config)
-        bundle(self.root, 'model-offloading', 'campaign-c-offload', '2026-11-09T14:52:55+00:00',
-               [offload_job('c1', 'ollama', 'qwen38-27b'), fast, offload_job('c3', 'koboldcpp', 'gemma4-31b')],
-               [row('c1', 'coding', 18.7, 3.58, quality=1.0), row('c2', 'coding', 7.7, 5.93, quality=1.0), row('c3', 'coding', 1.1, 2.68, quality=8 / 9)])
-
-    def test_a_ranked_pair_recommends_its_best_combination_with_the_recorded_setup(self):
-        self.add_ranked()
-        write_results_index(self.root)
-        text = self.page('raider-windows', 'model-offloading')
-        self.assertTrue(text.startswith('# Recommended setup, harness and model: model-offloading on raider-windows\n'))
-        recommendation = text.split('## Recommendation')[1].split('## Setup of the recommended run')[0]
-        # both qwen38-27b runs pass every check; the faster one, on lmstudio, is recommended
-        self.assertIn('| Harness | [lmstudio](../../harness/lmstudio.md) |', recommendation)
-        self.assertIn('| Model | [qwen38-27b](../../model/qwen38-27b.md) |', recommendation)
-        self.assertIn('| Operating system | windows-11-native |', recommendation)
-        self.assertIn('| Checks passed | 9/9 |', recommendation)
-        self.assertIn('| Measured | [2026-11-09](../../../model-offloading/campaign-c-offload/README.md) |', recommendation)
-        self.assertIn('2 combinations pass the same share of checks as the recommended one', recommendation)
-        setup = text.split('## Setup of the recommended run')[1].split('## Best combination on each harness')[0]
-        for line in ('| Harness version | 0.4.28+2 |', '| Model file | model-Q8_0.gguf |', '| GPU share requested (ratio) | 0.476 |',
-                     '| Import mode | hard-link |', '| Lane | offload |', '| Context tokens | 4096 |', '| Output cap (tokens) | 2048 |',
-                     '| Temperature | 0.0 |', '| Seed | 7 |', '| NVIDIA driver | 610.74 |',
-                     '| Model artifact and tokenizer revision | owner/Repo-GGUF@' + 'a' * 40 + ' (tokenizer embedded in locked GGUF) |'):
-            self.assertIn(line, setup)
-        for absent in ('GPU layers requested', 'CPU threads', 'Request options', 'not shown'):      # not recorded, empty, or not a listed setting
-            self.assertNotIn(absent, setup)
-        per_harness = text.split('## Best combination on each harness')[1].split('## Best ')[0]
-        ranks = [line.split(' | ')[0:2] for line in per_harness.splitlines() if line.startswith('| ') and line[2].isdigit()]
-        self.assertEqual(ranks, [['| 1', '[lmstudio](../../harness/lmstudio.md)'], ['| 2', '[ollama](../../harness/ollama.md)'],
-                                 ['| 3', '[koboldcpp](../../harness/koboldcpp.md)']])
-        self.assertIn('## Best 4 combinations', text)      # deepseek-r1-32b's newest ollama run passes no check and ranks fourth
-        overview = (self.root / 'docs/results/index/recommended/README.md').read_text(encoding='utf-8')
-        self.assertIn('| [raider-windows](../hardware/raider-windows.md) | [lmstudio](../harness/lmstudio.md) | [qwen38-27b](../model/qwen38-27b.md) | '
-                      '9/9 | 7.7 | 5.93 | [recommended setup](raider-windows/model-offloading.md) |', overview)
-        self.assertLess(overview.index('## model-offloading'), overview.index('## decision-models'))      # newest result first
-
-    def test_pairs_without_a_ranked_run_say_why_and_list_their_results(self):
-        legal_bundle(self.root, 'campaign-l-legal', '2026-11-10T09:00:00+00:00', [legal_job('l1', 'model-run', 'ollama', 'deepseek-r1-32b')],
-                     [row('l1', 'lexical-eligible', 5.0, 30.0, quality=1.0)])
-        bundle(self.root, 'model-offloading', 'campaign-u-offload', '2026-11-10T10:00:00+00:00',
-               [{**offload_job('u1', 'ollama', 'gemma4-31b'), 'hardware_config_id': 'other-host'}], [row('u1', 'coding', 2.0, 9.0)])
-        write_results_index(self.root)
-        for hardware, experiment, reason in (
-                ('raider-ubuntu', 'decision-models', 'Every published run of this pair is a synthetic fixture, which measures no model.'),
-                ('legal-host', 'legal-models', 'The results of this experiment are published by class and cohort and are not ranked.'),
-                ('other-host', 'model-offloading', 'No run of this pair has succeeded with scored checks.')):
-            text = self.page(hardware, experiment)
-            self.assertIn('## No recommendation\n\n' + reason, text)
-            self.assertNotIn('## Recommendation', text)
-            self.assertNotIn('## Setup of the recommended run', text)
-            self.assertIn('## Published results of this pair\n\n| Date | Experiment |', text)
-        overview = (self.root / 'docs/results/index/recommended/README.md').read_text(encoding='utf-8')
-        self.assertIn('| [legal-host](../hardware/legal-host.md) | – | – | – | – | – | [recommended setup](legal-host/legal-models.md) (no recommendation) |', overview)
-
-    def test_a_routing_pair_shows_the_router_settings(self):
-        bundle(self.root, 'decision-models', 'campaign-m-routing', '2026-11-10T03:00:00+00:00',
-               [{'job_id': 'm1', 'mode': 'decision', 'case_id': 'ollama-tev1', 'hardware_config_id': 'raider-windows',
-                 'hardware': {'os_id': 'windows-11-native'},
-                 'parameters': {'router': {'kind': 'systemone', 'platform': 'ollama', 'model': 'llm-eval-tev1:locked',
-                                           'model_revision': 'f' * 64, 'labels': ['coding', 'math']}}}],
-               [row('m1', 'coding', 0.03, None, decisions=1.0)])
-        write_results_index(self.root)
-        text = self.page('raider-windows', 'decision-models')
-        self.assertIn('| Model | [llm-eval-tev1:locked](../../model/llm-eval-tev1-locked.md) |', text)
-        self.assertIn('| Router model_revision | ' + 'f' * 64 + ' |', text)
-        self.assertIn('| Router platform | ollama |', text)
-        self.assertNotIn('Router labels', text)      # only scalar router settings are listed
-        self.assertNotIn('## Best combination on each harness', text)      # one combination: nothing to compare
-
-    def test_the_pages_are_regenerated_with_the_index_and_linked_from_it(self):
-        self.add_ranked()
-        stale = self.root / 'docs/results/index/recommended/removed-host/model-offloading.md'
+    def test_generated_setup_pages_are_deterministic_and_discard_stale_pages(self):
+        directory = self.root / 'docs/results/index/recommended'
+        stale = directory / 'removed-host/stale.md'
         stale.parent.mkdir(parents=True)
-        stale.write_text('stale', encoding='utf-8')
+        stale.touch()
         write_results_index(self.root)
         self.assertFalse(stale.exists())
-        directory = self.root / 'docs/results/index/recommended'
-        before = {p.relative_to(directory).as_posix(): p.read_bytes() for p in sorted(directory.rglob('*.md'))}
-        self.assertEqual(sorted(before), ['README.md', 'raider-ubuntu/decision-models.md', 'raider-windows/model-offloading.md'])
-        self.assertTrue(all(b'\r' not in data for data in before.values()))
+        before = {p: p.read_bytes() for p in directory.rglob('*') if p.is_file()}
         write_results_index(self.root)
-        self.assertEqual({p.relative_to(directory).as_posix(): p.read_bytes() for p in sorted(directory.rglob('*.md'))}, before)
-        self.assertIn('[recommended setups](index/recommended/README.md)', self.summary.read_text(encoding='utf-8').split(START)[1].split(END)[0])
-        self.assertIn('[recommended setups](recommended/README.md)', (self.root / 'docs/results/index/README.md').read_text(encoding='utf-8'))
-        for page in directory.rglob('*.md'):
-            for target in re.findall(r'\]\(([^)#]+)\)', page.read_text(encoding='utf-8')):
-                self.assertTrue((page.parent / target).resolve().is_file(), f'{page.name}: {target}')
+        self.assertEqual({p: p.read_bytes() for p in directory.rglob('*') if p.is_file()}, before)
+        self.assertIn('[setup evidence](index/recommended/README.md)', self.summary.read_text())
 
-    def test_hostile_values_of_the_recommended_run_are_rendered_inert(self):
-        hostile = offload_job('h1', 'ollama', 'm](javascript:alert(1))')
-        hostile['hardware_config_id'] = 'raider-windows'
-        hostile['hardware'] = {'os_id': '<img src=x onerror=alert(1)>'}
-        hostile['parameters']['config'].update({'backend_version': '1 |\n| injected | row', 'placement_notes': 'notes\n## INJECTED\n<script>x</script>',
-                                                'launch': {'model_file': '[click](javascript:alert(2))'}, 'request_options': {'x': '<b>bold</b>'}})
-        bundle(self.root, 'model-offloading', 'campaign-h-offload', '2026-11-10T11:00:00+00:00', [hostile], [row('h1', 'coding', 0.5, 50.0, quality=1.0)])
-        write_results_index(self.root)
-        text = self.page('raider-windows', 'model-offloading')
-        self.assertIn('| Model | [m\\](javascript:alert(1))](../../model/m-javascript-alert-1.md) |', text)      # recommended: the only full score
-        for raw in ('<script>', '<img', '<b>', '\n## INJECTED', '\n| injected | row', '[click](javascript'):
-            self.assertNotIn(raw, text)
-        self.assertEqual([line for line in text.splitlines() if line.startswith('#')][:3],
-                         ['# Recommended setup, harness and model: model-offloading on raider-windows', '## Recommendation', '## Setup of the recommended run'])
+    def test_latest_attempt_with_warmups_and_failed_requests(self):
+        bundle_path = self.root / 'docs/results/model-offloading/campaign-b-offload'
+        (bundle_path / 'raw').mkdir()
+        data = {'status': 'ok', 'task_id': 'a', 'category': 'math', 'warmup': False, 'prompt_tokens': 7,
+                'first_visible_s': 0.7, 'elapsed_s': 1.2, 'completion_tokens': 2}
+        with gzip.open(bundle_path / 'raw/measurements.jsonl.gz', 'wt') as out:
+            for latest, edits in [(True, {}), (True, {'status': 'error', 'task_id': 'b', 'prompt_tokens': 400}),
+                                  (True, {'warmup': True, 'task_id': 'warmup'}), (False, {'prompt_tokens': 999})]:
+                out.write(json.dumps({'job_id': 'b1', 'record_type': 'request', 'latest_attempt': latest, 'data': {**data, **edits}}) + '\n')
+        record = collect(self.root)[0]
+        obs = record['observation']
+        self.assertEqual((obs['tasks'], obs['repeat_range'], obs['completed'], obs['observations']), (2, [1], 1, 2))
+        self.assertEqual((obs['prompt_range'], obs['output_range'], obs['visible_s']), ([7, 7], [2, 2], 0.7))
+
+
+class ComparisonTests(unittest.TestCase):
+    def setUp(self):
+        from llm_eval.reporting.evidence import Evidence
+        self.manifest = {'synthetic': False, 'publication_id': 'publication', 'code_revision': '1' * 40}
+        self.config = {'platform': 'ollama', 'protocol': 'ollama', 'backend_version': '1.0',
+                       'context_tokens': 4096, 'max_output_tokens': 128, 'temperature': 0, 'seed': 7, 'concurrency': 1,
+                       'lane': 'offload', 'reasoning_mode': 'default', 'cache_condition': 'warm', 'speculative_decoding': 'disabled',
+                       'ram_budget_gib': 46, 'gpu_budget_gib': 22, 'request_options': {}, 'launch': {'gpu_layers': 20, 'model_file': 'a.gguf'}, 'tokenizer_revision': 'locked',
+                       'chat_template_sha256': '2' * 64, 'repeats': 2, 'warmups': 1}
+        self.job = {'experiment_version': 1, 'hardware': {'os_id': 'ubuntu'}, 'parameters': {'config': self.config}}
+        self.row = {'ranked': True, 'synthetic': False, 'status': 'succeeded', 'score': (2, 2), 'requests': 2,
+                    'os': 'ubuntu', 'hardware': 'h1', 'harness': 'ollama', 'experiment': 'model-offloading',
+                    'mode': 'category-smoke', 'publication': 'publication', 'model': 'a', 'job_id': 'a'}
+        self.raw = Evidence(requests=[{'status': 'ok', 'synthetic': False, 'task_id': 't', 'category': 'math',
+                            'benchmark': 'category-smoke', 'prompt_sha256': '3' * 64, 'repetition': i, 'quality_pass': True}
+                            for i in (1, 2)], suites={'math': {'4' * 64}}, artifacts={'5' * 64}, paging={'math': False})
+
+    def key(self):
+        from llm_eval.common import digest
+        from llm_eval.reporting.evidence import comparison_controls
+        controls = comparison_controls(self.manifest, self.job, self.raw, self.row)
+        return digest(controls) if controls is not None else None
+
+    def test_controls_fix_workload_protocol_settings_paging_and_publication(self):
+        expected = self.key()
+        self.assertIsNotNone(expected)
+        for mapping, field, updated in (
+                (self.config, 'max_output_tokens', 256), (self.config, 'context_tokens', 8192),
+                (self.config, 'cache_condition', 'cold'), (self.config, 'protocol', 'openai'),
+                (self.config['launch'], 'gpu_layers', 12), (self.config, 'seed', 8),
+                (self.raw.paging, 'math', True), (self.raw.suites, 'math', {'7' * 64}),
+                (self.raw.requests[0], 'prompt_sha256', '7' * 64), (self.raw.requests[1], 'task_id', 'other'),
+                (self.raw.requests[1], 'repetition', 1), (self.manifest, 'code_revision', '6' * 40),
+                (self.row, 'publication', 'another bundle'), (self.row, 'mode', 'decision'),
+                (self.row, 'harness', 'other'), (self.row, 'status', 'failed'), (self.row, 'synthetic', True)):
+            with self.subTest(field=field, updated=updated):
+                original = mapping[field]
+                mapping[field] = updated
+                self.assertNotEqual(self.key(), expected)
+                mapping[field] = original
+
+    def test_incomplete_vintage_runs_are_never_cohorted(self):
+        for mapping, field in ((self.config, 'protocol'), (self.config, 'request_options'), (self.config, 'temperature'),
+                               (self.config, 'repeats'), (self.manifest, 'code_revision'), (self.raw.requests[0], 'task_id'),
+                               (self.raw.requests[0], 'prompt_sha256'), (self.raw.requests[0], 'synthetic')):
+            with self.subTest(field=field):
+                original = mapping.pop(field)
+                self.assertIsNone(self.key())
+                mapping[field] = original
+        self.raw.artifacts.clear()
+        self.assertIsNone(self.key())
+
+    def test_only_the_model_package_may_change_and_a_singleton_has_no_comparator(self):
+        a = {**self.row, 'comparison': self.key()}
+        self.assertEqual(matched([a]), {})
+        self.config.update(model_id='b', tokenizer_revision='b tokenizer', chat_template_sha256='b' * 64)
+        self.config['launch']['model_file'] = 'b.gguf'
+        self.raw.artifacts = {'b' * 64}
+        b = {**self.row, 'comparison': self.key(), 'job_id': 'b', 'model': 'b'}
+        self.assertEqual(a['comparison'], b['comparison'])
+        self.assertEqual(list(matched([b, a]).values()), [[a, b]])
+        self.assertEqual(matched([a, {**a, 'job_id': 'rerun'}]), {})
 
 
 ORIGINS = {
@@ -596,58 +451,33 @@ class RenamedExperimentAndUsModelTests(unittest.TestCase):
         self.assertFalse((index / 'experiment/llm-routing.md').exists())
         self.assertTrue((index / 'recommended/raider-windows/decision-models.md').is_file())
         text = (self.root / 'docs/results/README.md').read_text(encoding='utf-8')
-        self.assertIn('**[decision-models](index/experiment/decision-models.md) on', text)
+        self.assertIn('[Evidence and reproduction](index/recommended/raider-windows/decision-models.md)', text)
         listed = next(line for line in text.splitlines() if '[Report](llm-routing/campaign-l-routing/README.md)' in line)
         self.assertTrue(listed.startswith('| decision-models | 2026-11-19T00:00:00+00:00 |'), listed)      # the link keeps its path
 
-    def test_us_models_are_ranked_alone_with_their_lineage(self):
+    def test_us_model_filter_preserves_lineage_and_all_runs(self):
         records = collect(self.root)
-        self.assertEqual([(r['harness'], r['model']) for r in top_combinations(records)[('model-offloading', 'raider-windows')]],
-                         [('lmstudio', 'nowhere-model'), ('koboldcpp', 'unchecked-model'), ('ollama', 'us-on-foreign-base'),
-                          ('ollama', 'foreign-model'), ('lmstudio', 'us-model-q4')])
-        # A base model from abroad, an organization without a country and a model without an entry all leave the US ranking.
-        self.assertEqual([(r['harness'], r['model']) for r in top_combinations(records, keep=us_model)[('model-offloading', 'raider-windows')]],
-                         [('lmstudio', 'us-model-q4'), ('ollama', 'us-model')])
-        self.assertEqual([lineage(next(r for r in records if r['model'] == m)['origin']) for m in ('us-model-q4', 'us-on-foreign-base', 'nowhere-model')],
-                         ['US Lab', 'US Lab on Elsewhere base', 'not recorded'])
-        text = ranking(records, 'index/', '')
-        block = text.split('**[model-offloading](index/experiment/model-offloading.md) on', 1)[1].split('**[', 1)[0]
-        self.assertIn('Top 5 harness and model combinations of US models:\n\n'
-                      '| Rank | Harness | Model | Developer | Checks passed | Median wall s | Output tok/s | Run |', block)
-        self.assertIn('| 1 | [lmstudio](index/harness/lmstudio.md) | [us-model-q4](index/model/us-model-q4.md) | US Lab | 6/9 | 2 | 10 |', block)
-        self.assertIn('Origin not recorded, so not ranked among US models: `nowhere-model`.', block)
-        decisions = text.split('**[decision-models](index/experiment/decision-models.md) on', 1)[1]
-        self.assertIn('No measured run of a US model with scored checks has been published for this pair.', decisions)
-        self.assertIn('[model origins](../MODELS.md#model-origins)', text)
+        self.assertEqual({r['model'] for r in records if us_model(r)}, {'us-model-q4', 'us-model'})
+        self.assertEqual([lineage(next(r for r in records if r['model'] == m)['origin']) for m in
+                          ('us-model-q4', 'us-on-foreign-base', 'nowhere-model')], ['US Lab', 'US Lab on Elsewhere base', 'not recorded'])
+        write_results_index(self.root)
+        page = (self.root / 'docs/results/index/origin/us.md').read_text()
+        self.assertIn('[us-model-q4]', page)
+        self.assertNotIn('[unknown-model]', page)
+        self.assertNotIn('[foreign-model]', page)
+        self.assertNotIn('| Rank |', page)
 
-    def test_the_repository_readme_names_the_best_model_and_the_best_us_model_per_platform(self):
-        readme = self.root / 'README.md'
-        readme.write_text(f'# Project\n\nkept\n\n{SUMMARY_START}\nstale\n{SUMMARY_END}\n\nalso kept\n', encoding='utf-8')
+    def test_readme_markers_preserve_outside_text(self):
+        path = self.root / 'README.md'
+        path.write_text(f'# Project\n\n{SUMMARY_START}\nold\n{SUMMARY_END}\n\nkept\n')
         write_results_index(self.root)
-        text = readme.read_text(encoding='utf-8')
-        self.assertTrue(text.startswith('# Project\n\nkept\n\n' + SUMMARY_START + '\n'))
-        self.assertTrue(text.endswith('\n' + SUMMARY_END + '\n\nalso kept\n'))
-        self.assertNotIn('stale', text)
-        table = [line for line in text.splitlines() if line.startswith('| ')]
-        self.assertEqual(table[0], '| Experiment | Ollama | LM Studio | KoboldCpp |')
-        self.assertEqual([line.split(' | ')[0] for line in table[1:]],
-                         ['| [Hardware fit](experiments/hardware-fit/README.md)', '| [Model offloading](experiments/model-offloading/README.md)',
-                          '| [Decision models](experiments/decision-models/README.md)', '| [Legal models](experiments/legal-models/README.md)'])
-        ollama, lmstudio, koboldcpp = table[2].split(' | ')[1:4]
-        self.assertEqual(ollama, '[us-on-foreign-base](docs/results/index/model/us-on-foreign-base.md) '
-                                 '[9/9, 1 s](docs/results/model-offloading/campaign-o-offload/README.md)<br>US: '
-                                 '[us-model](docs/results/index/model/us-model.md) [6/9, 3 s](docs/results/model-offloading/campaign-o-offload/README.md)')
-        self.assertIn('[nowhere-model]', lmstudio)
-        self.assertIn('<br>US: [us-model-q4]', lmstudio)
-        self.assertEqual(koboldcpp.split('<br>')[1], 'US: none measured |')      # the last cell of the row
-        self.assertIn('[llm-eval-tev1:locked]', table[3].split(' | ')[1])
-        self.assertEqual(table[3].split(' | ')[2:], ['–', '– |'])
-        self.assertEqual(table[1], '| [Hardware fit](experiments/hardware-fit/README.md) | – | – | – |')
-        plain = self.root / 'other-README.md'
-        readme.write_text('# Project without markers\n', encoding='utf-8')
+        after = path.read_text()
+        self.assertTrue(after.endswith(f'{SUMMARY_END}\n\nkept\n'))
+        self.assertIn('Evidence and reproduction', after)
+        self.assertNotIn('\nold\n', after)
+        path.write_text('# Project without markers\n')
         write_results_index(self.root)
-        self.assertEqual(readme.read_text(encoding='utf-8'), '# Project without markers\n')
-        self.assertFalse(plain.exists())
+        self.assertEqual(path.read_text(), '# Project without markers\n')
 
 
 class LegalRenameIndexTests(unittest.TestCase):

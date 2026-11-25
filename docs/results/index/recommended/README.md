@@ -1,33 +1,14 @@
-# Recommended setups
+# Setup evidence by hardware and experiment
 
-[Results index](../README.md) · [Executive summary](../../README.md)
+[Results index](../README.md)
 
-Generated from the published bundles by `llm-eval index-results`; do not edit by hand. One page per hardware configuration and experiment: the best-ranked harness and model combination of the results index and the configuration of that run. Ranked by share of checks passed (correct decisions for decision models, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians. Where a model repeats among the best combinations, a second table ranks the models, each by its best combination.
-
-## hardware-fit
-
-| Hardware configuration | Harness | Model | Checks passed | Median wall s | Output tok/s | Page |
-|---|---|---|---:|---:|---:|---|
-| [raider-wsl](../hardware/raider-wsl.md) | [lmstudio](../harness/lmstudio.md) | [inkling2-mini-26b-iq4_nl](../model/inkling2-mini-26b-iq4_nl.md) | 27/27 | 1.75 | 54.3 | [recommended setup](raider-wsl/hardware-fit.md) |
-
-## decision-models
-
-| Hardware configuration | Harness | Model | Checks passed | Median wall s | Output tok/s | Page |
-|---|---|---|---:|---:|---:|---|
-| [raider-ubuntu](../hardware/raider-ubuntu.md) | – | – | – | – | – | [recommended setup](raider-ubuntu/decision-models.md) (no recommendation) |
-| [raider-windows](../hardware/raider-windows.md) | [ollama](../harness/ollama.md) | [llm-eval-tev1:locked](../model/llm-eval-tev1-locked.md) | 6/6 | 0.0367 | – | [recommended setup](raider-windows/decision-models.md) |
-| [raider-wsl](../hardware/raider-wsl.md) | [ollama](../harness/ollama.md) | [llm-eval-d1:locked](../model/llm-eval-d1-locked.md) | 6/6 | 0.0119 | – | [recommended setup](raider-wsl/decision-models.md) |
-
-## model-offloading
-
-| Hardware configuration | Harness | Model | Checks passed | Median wall s | Output tok/s | Page |
-|---|---|---|---:|---:|---:|---|
-| [raider-windows](../hardware/raider-windows.md) | [ollama](../harness/ollama.md) | [kimi-linear-48b](../model/kimi-linear-48b.md) | 24/27 | 0.141 | 16.8 | [recommended setup](raider-windows/model-offloading.md) |
-| [raider-wsl](../hardware/raider-wsl.md) | [lmstudio](../harness/lmstudio.md) | [qwen35-35b-moe](../model/qwen35-35b-moe.md) | 27/27 | 8.32 | 42.4 | [recommended setup](raider-wsl/model-offloading.md) |
-
-## legal-models
-
-| Hardware configuration | Harness | Model | Checks passed | Median wall s | Output tok/s | Page |
-|---|---|---|---:|---:|---:|---|
-| [raider-windows](../hardware/raider-windows.md) | – | – | – | – | – | [recommended setup](raider-windows/legal-models.md) (no recommendation) |
-| [raider-wsl](../hardware/raider-wsl.md) | – | – | – | – | – | [recommended setup](raider-wsl/legal-models.md) (no recommendation) |
+| Experiment | Hardware | Published jobs | Matched groups | Evidence |
+|---|---|---:|---:|---|
+| [hardware-fit](../experiment/hardware-fit.md) | [raider-wsl](../hardware/raider-wsl.md) | 13 | 2 | [Results and reproduction](raider-wsl/hardware-fit.md) |
+| [decision-models](../experiment/decision-models.md) | [raider-wsl](../hardware/raider-wsl.md) | 22 | 3 | [Results and reproduction](raider-wsl/decision-models.md) |
+| [model-offloading](../experiment/model-offloading.md) | [raider-wsl](../hardware/raider-wsl.md) | 54 | 0 | [Results and reproduction](raider-wsl/model-offloading.md) |
+| [legal-models](../experiment/legal-models.md) | [raider-wsl](../hardware/raider-wsl.md) | 4 | 0 | [Results and reproduction](raider-wsl/legal-models.md) |
+| [model-offloading](../experiment/model-offloading.md) | [raider-windows](../hardware/raider-windows.md) | 106 | 0 | [Results and reproduction](raider-windows/model-offloading.md) |
+| [legal-models](../experiment/legal-models.md) | [raider-windows](../hardware/raider-windows.md) | 4 | 0 | [Results and reproduction](raider-windows/legal-models.md) |
+| [decision-models](../experiment/decision-models.md) | [raider-windows](../hardware/raider-windows.md) | 4 | 2 | [Results and reproduction](raider-windows/decision-models.md) |
+| [decision-models](../experiment/decision-models.md) | [raider-ubuntu](../hardware/raider-ubuntu.md) | 1 | 0 | [Results and reproduction](raider-ubuntu/decision-models.md) |

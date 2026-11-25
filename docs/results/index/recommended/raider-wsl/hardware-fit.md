@@ -1,90 +1,107 @@
-# Recommended setup, harness and model: hardware-fit on raider-wsl
+# hardware-fit on raider-wsl
 
-[Recommended setups](../README.md) · [Results index](../../README.md) · [Executive summary](../../../README.md)
+[Setup evidence](../README.md) · [Results index](../../README.md)
 
-Generated from the published bundles by `llm-eval index-results`; do not edit by hand. 13 published result(s) for this experiment and hardware configuration; 8 harness and model combination(s) are ranked.
+## Can the model run here?
 
-## Recommendation
+| Model and runtime | Job status | Completed | Checks passed | Prompt tokens observed | Time until text appears (median s) | Placement evidence | Source |
+|---|---|---:|---:|---:|---:|---|---|
+| inkling2-mini-26b-iq4_nl · LM Studio | succeeded | 27/27 | 27/27 | 27–56 | 1.72 | fit inferred from device memory, layer count unknown | [Report](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
+| muse-glimmer-30b-kquant-17gb-q4_k_m · LM Studio | succeeded | 27/27 | 24/27 | 68–91 | 4.13 | fit inferred from device memory, layer count unknown | [Report](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
+| inkling2-mini-26b-iq4_nl · Ollama | failed | 0/27 | 0/27 | not recorded | not recorded | failed before any request completed | [Report](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
+| muse-glimmer-30b-kquant-17gb-q4_k_m · Ollama | succeeded | 27/27 | 24/27 | 68–91 | 4.05 | 53 of 53 layers reported on GPU | [Report](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
+| qwen38-27b-ud-q4_k_xl · Ollama | succeeded | 27/27 | 24/27 | 66–88 | 1.87 | 66 of 66 layers reported on GPU | [Report](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
+| inkling2-mini-26b-iq4_nl · KoboldCpp | succeeded | 27/27 | 27/27 | 15–44 | 6.48 | 49 of 49 layers reported on GPU | [Report](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
+| muse-glimmer-30b-kquant-17gb-q4_k_m · KoboldCpp | succeeded | 27/27 | 18/27 | 22–45 | 0.524 | 53 of 53 layers reported on GPU | [Report](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
+| qwen38-27b-ud-q4_k_xl · KoboldCpp | succeeded | 27/27 | 24/27 | 23–45 | 2.96 | 66 of 66 layers reported on GPU | [Report](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
+| qwen38-27b-ud-q4_k_xl · LM Studio | succeeded | 27/27 | 24/27 | 66–88 | 0.886 | fit inferred from device memory, layer count unknown | [Report](../../../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
+| qwen38-27b-ud-q4_k_xl · Ollama | succeeded | 27/27 | 24/27 | 66–88 | 1.88 | 66 of 66 layers reported on GPU | [Report](../../../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
+| qwen38-27b-ud-q4_k_xl · KoboldCpp | succeeded | 27/27 | 24/27 | 23–45 | 2.78 | 66 of 66 layers reported on GPU | [Report](../../../hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) |
 
-| | |
-|---|---|
-| Harness | [lmstudio](../../harness/lmstudio.md) |
-| Model | [inkling2-mini-26b-iq4_nl](../../model/inkling2-mini-26b-iq4_nl.md) |
-| Operating system | windows-11-wsl2-ubuntu-26.04 |
-| Checks passed | 27/27 |
-| Median wall time per request (s) | 1.75 |
-| Output tokens per second | 54.3 |
-| Measured | [2026-11-24](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
+## Memory at the tested prompts
 
-This is the best-ranked combination of the results index for this pair. Ranked by share of checks passed (correct decisions for decision models, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians. Where a model repeats among the best combinations, a second table ranks the models, each by its best combination.
+Device-wide memory includes other processes. The reserve is the minimum free memory the experiment requests. Each peak covers the whole job, across prompt lengths.
 
-2 combinations pass the same share of checks as the recommended one; the order among them is by median wall time, then by output rate.
+| Date / model / runtime | Prompt tokens observed | Context window requested (tokens) | Peak used / total (MiB) | Reserve (MiB) | Fit verdict |
+|---|---:|---:|---:|---:|---|
+| 2026-11-24 · inkling2-mini-26b-iq4_nl · lmstudio | 27–56 | 8192 | 20020 / 24463 | 2048 | in_vram |
+| 2026-11-24 · muse-glimmer-30b-kquant-17gb-q4_k_m · lmstudio | 68–91 | 8192 | 17532 / 24463 | 2048 | in_vram |
+| 2026-11-24 · inkling2-mini-26b-iq4_nl · ollama | not recorded | 8192 | 2126 / 24463 | 2048 | not_in_vram |
+| 2026-11-24 · muse-glimmer-30b-kquant-17gb-q4_k_m · ollama | 68–91 | 8192 | 17745 / 24463 | 2048 | in_vram |
+| 2026-11-24 · qwen38-27b-ud-q4_k_xl · ollama | 66–88 | 8192 | 18446 / 24463 | 2048 | in_vram |
+| 2026-11-24 · inkling2-mini-26b-iq4_nl · koboldcpp | 15–44 | 8192 | 19894 / 24463 | 2048 | in_vram |
+| 2026-11-24 · muse-glimmer-30b-kquant-17gb-q4_k_m · koboldcpp | 22–45 | 8192 | 17620 / 24463 | 2048 | in_vram |
+| 2026-11-24 · qwen38-27b-ud-q4_k_xl · koboldcpp | 23–45 | 8192 | 18849 / 24463 | 2048 | in_vram |
+| 2026-11-23 · qwen38-27b-ud-q4_k_xl · lmstudio | 66–88 | 8192 | 19390 / 24463 | 2048 | in_vram |
+| 2026-11-23 · qwen38-27b-ud-q4_k_xl · ollama | 66–88 | 8192 | 18390 / 24463 | 2048 | in_vram |
+| 2026-11-23 · qwen38-27b-ud-q4_k_xl · koboldcpp | 23–45 | 8192 | 19071 / 24463 | 2048 | in_vram |
 
-It is a statement about the published runs on this hardware configuration, not about the model or the harness in general. The checks are small deterministic checks, the runs can differ in more than the harness and the model (each report states its conditions), and the recommendation changes when a newer run of a combination is published.
+![Free GPU memory at the sampled job peak across the short prompt ranges listed above.](../../../../../diagrams/results/summary/hardware-fit-raider-wsl.png)
 
-## Setup of the recommended run
+## Matched model comparisons
 
-Read from the resolved configuration of the run's report. To reproduce it, use the measured code revision named in that report.
+A group changes the model package within one publication on one hardware configuration and runtime. The suite hashes, exact prompts, measured repetitions, scorer code and recorded request settings must match. The package includes its tokenizer and template. Failed jobs and runs with incomplete controls remain in the run history.
 
-| Setting | Value |
-|---|---|
-| Harness version | 0.4.28+2 |
-| Model file | Inkling-2-Mini-IQ4_NL.gguf |
-| GPU share requested (ratio) | max |
-| Import mode | symbolic-link |
-| Lane | control |
-| Context tokens | 8192 |
-| Output cap (tokens) | 2048 |
-| Temperature | 0.0 |
-| Seed | 20261005 |
-| Warm-ups per task | 1 |
-| Measured repetitions per task | 3 |
-| Request deadline (s) | 900 |
-| RAM budget (GiB) | 46 |
-| GPU budget (GiB) | 22 |
-| Model artifact and tokenizer revision | ggml-org/Inkling-2-Mini-GGUF@e8a2cecf0e78914f07cc27b9be711a9b2c7561d9 (tokenizer embedded in locked GGUF) |
-| Chat template SHA-256 | 53a9035f3255945704b5857657cfb00c1165090c0641c4f782a0cbf268cc16dc |
-| Reasoning mode | model default; OpenAI-protocol harnesses may return reasoning inline in content |
-| Placement notes | Requested every layer on the GPU (launch.gpu_offload max; the thread count is the app default), context 8192. LM Studio 0.4.28+2 ran as the desktop app from LM-Studio-0.4.28-2-x64.AppImage under WSLg; observed AppImage SHA-256 a3e6cf8233697be0a8ad6871197b424242af3c5a346671aeed59959ed7eebf11 (the vendor publishes none). The managed launch keeps no placement lines in its log; the evidence is the VRAM telemetry in fit/metadata.json of the attempt. |
-| NVIDIA driver | 610.74 |
-| OS build | 10.0.26300 (Windows host; guest kernel 6.18.33.2-microsoft-standard-WSL2) |
-| WSL version | 2.7.12.0, kernel 6.18.33.2-microsoft-standard-WSL2 |
-| WSL guest memory | guest MemTotal 51.0 GiB at the start of this run; swap 0 MiB (see wsl_config) |
+Times are descriptive. Host paging, model-specific defaults, cache reuse and independent sessions can be unobserved. Each row shows this run’s observed median among completed requests. Repeated prompts on one host do not establish uncertainty across machines or general model quality. The downloadable manifest contains each full comparison key and its inputs.
 
-## Best combination on each harness
+### koboldcpp · 2026-11-24 · 2ab74f59c1bb
 
-The rank is the position in the ranking of this pair.
+Fixed workload and settings include 9 tasks × 3 measured attempts, protocol openai, mode measured and hardware raider-wsl. Backend version: 1.125.1. Comparison question: smoke checks for model packages under the same recorded resource budget.
 
-| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---:|---:|---:|---|
-| 1 | [lmstudio](../../harness/lmstudio.md) | [inkling2-mini-26b-iq4_nl](../../model/inkling2-mini-26b-iq4_nl.md) | 27/27 | 1.75 | 54.3 | [2026-11-24](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
-| 2 | [koboldcpp](../../harness/koboldcpp.md) | [inkling2-mini-26b-iq4_nl](../../model/inkling2-mini-26b-iq4_nl.md) | 27/27 | 6.66 | 12.8 | [2026-11-24](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
-| 4 | [ollama](../../harness/ollama.md) | [qwen38-27b-ud-q4_k_xl](../../model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 1.97 | 33.7 | [2026-11-24](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
+| Model package | Completed | Checks passed | Wall time (median s) | Time until text appears (median s) | Backend decode (median tok/s) |
+|---|---:|---:|---:|---:|---:|
+| inkling2-mini-26b-iq4_nl | 27/27 | 27/27 | 6.64 | 6.48 | not recorded |
+| muse-glimmer-30b-kquant-17gb-q4_k_m | 27/27 | 18/27 | 0.524 | 0.524 | not recorded |
 
-## Best 5 combinations
+Paired wall-time differences use inkling2-mini-26b-iq4_nl as the alphabetically first reference. For each identical prompt, subtract the reference median from the other model’s median. The range spans the observed prompts. Negative values mean a shorter wait.
 
-| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---:|---:|---:|---|
-| 1 | [lmstudio](../../harness/lmstudio.md) | [inkling2-mini-26b-iq4_nl](../../model/inkling2-mini-26b-iq4_nl.md) | 27/27 | 1.75 | 54.3 | [2026-11-24](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
-| 2 | [koboldcpp](../../harness/koboldcpp.md) | [inkling2-mini-26b-iq4_nl](../../model/inkling2-mini-26b-iq4_nl.md) | 27/27 | 6.66 | 12.8 | [2026-11-24](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
-| 3 | [lmstudio](../../harness/lmstudio.md) | [qwen38-27b-ud-q4_k_xl](../../model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 0.886 | 68.6 | [2026-11-23](../../../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
-| 4 | [ollama](../../harness/ollama.md) | [qwen38-27b-ud-q4_k_xl](../../model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 1.97 | 33.7 | [2026-11-24](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
-| 5 | [koboldcpp](../../harness/koboldcpp.md) | [qwen38-27b-ud-q4_k_xl](../../model/qwen38-27b-ud-q4_k_xl.md) | 24/27 | 3.04 | 27 | [2026-11-24](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
+| Model package | Paired prompts | Median difference (s) | Observed range (s) |
+|---|---:|---:|---:|
+| muse-glimmer-30b-kquant-17gb-q4_k_m | 9 | -6.14 | -12–-3.61 |
 
-## Published results of this pair
+### lmstudio · 2026-11-24 · ffa32eb897ed
 
-| Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
-|---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
-| [2026-11-24](../../date/2026-11-24.md) | [hardware-fit](../../experiment/hardware-fit.md) | [raider-wsl](../../hardware/raider-wsl.md) | [lmstudio](../../harness/lmstudio.md) | [inkling2-mini-26b-iq4_nl](../../model/inkling2-mini-26b-iq4_nl.md) | inkling2-mini-26b-iq4_nl-lmstudio | 2048 | succeeded | 27 | 0 | 1.46–2.04 | 53.5–55.3 | 27/27 | – | [report](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [hardware-fit](../../experiment/hardware-fit.md) | [raider-wsl](../../hardware/raider-wsl.md) | [lmstudio](../../harness/lmstudio.md) | [muse-glimmer-30b-kquant-17gb-q4_k_m](../../model/muse-glimmer-30b-kquant-17gb-q4_k_m.md) | muse-glimmer-30b-kquant-17gb-q4_k_m-lmstudio | 2048 | succeeded | 27 | 0 | 2.96–6.84 | 35.4–35.7 | 24/27 | – | [report](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [hardware-fit](../../experiment/hardware-fit.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [inkling2-mini-26b-iq4_nl](../../model/inkling2-mini-26b-iq4_nl.md) | inkling2-mini-26b-iq4_nl-ollama | 2048 | failed | 27 | 27 | – | – | 0/27 | – | [report](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [hardware-fit](../../experiment/hardware-fit.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [muse-glimmer-30b-kquant-17gb-q4_k_m](../../model/muse-glimmer-30b-kquant-17gb-q4_k_m.md) | muse-glimmer-30b-kquant-17gb-q4_k_m-ollama | 2048 | succeeded | 27 | 0 | 2.78–5.19 | 36.6–37.1 | 24/27 | – | [report](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [hardware-fit](../../experiment/hardware-fit.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [qwen38-27b-ud-q4_k_xl](../../model/qwen38-27b-ud-q4_k_xl.md) | qwen38-27b-ud-q4_k_xl-ollama | 2048 | succeeded | 27 | 0 | 1.41–1.98 | 33.1–33.7 | 24/27 | – | [report](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [hardware-fit](../../experiment/hardware-fit.md) | [raider-wsl](../../hardware/raider-wsl.md) | [koboldcpp](../../harness/koboldcpp.md) | [inkling2-mini-26b-iq4_nl](../../model/inkling2-mini-26b-iq4_nl.md) | inkling2-mini-26b-iq4_nl-koboldcpp | 2048 | succeeded | 27 | 0 | 5.22–11.7 | 12.8–13 | 27/27 | – | [report](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [hardware-fit](../../experiment/hardware-fit.md) | [raider-wsl](../../hardware/raider-wsl.md) | [koboldcpp](../../harness/koboldcpp.md) | [muse-glimmer-30b-kquant-17gb-q4_k_m](../../model/muse-glimmer-30b-kquant-17gb-q4_k_m.md) | muse-glimmer-30b-kquant-17gb-q4_k_m-koboldcpp | 2048 | succeeded | 27 | 0 | 0.524–0.525 | 3.81–3.82 | 18/27 | – | [report](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [hardware-fit](../../experiment/hardware-fit.md) | [raider-wsl](../../hardware/raider-wsl.md) | [koboldcpp](../../harness/koboldcpp.md) | [qwen38-27b-ud-q4_k_xl](../../model/qwen38-27b-ud-q4_k_xl.md) | qwen38-27b-ud-q4_k_xl-koboldcpp | 2048 | succeeded | 27 | 0 | 2.76–3.72 | 27–27.7 | 24/27 | – | [report](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) |
-| [2026-11-23](../../date/2026-11-23.md) | [hardware-fit](../../experiment/hardware-fit.md) | [raider-wsl](../../hardware/raider-wsl.md) | [lmstudio](../../harness/lmstudio.md) | [qwen38-27b-ud-q4_k_xl](../../model/qwen38-27b-ud-q4_k_xl.md) | qwen38-27b-ud-q4_k_xl-lmstudio | 2048 | succeeded | 27 | 0 | 0.753–0.968 | 61.6–69.1 | 24/27 | – | [report](../../../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
-| [2026-11-23](../../date/2026-11-23.md) | [hardware-fit](../../experiment/hardware-fit.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [qwen38-27b-ud-q4_k_xl](../../model/qwen38-27b-ud-q4_k_xl.md) | qwen38-27b-ud-q4_k_xl-ollama | 2048 | succeeded | 27 | 0 | 1.43–1.99 | 32.9–33.7 | 24/27 | – | [report](../../../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) |
-| [2026-11-23](../../date/2026-11-23.md) | [hardware-fit](../../experiment/hardware-fit.md) | [raider-wsl](../../hardware/raider-wsl.md) | [koboldcpp](../../harness/koboldcpp.md) | [qwen38-27b-ud-q4_k_xl](../../model/qwen38-27b-ud-q4_k_xl.md) | qwen38-27b-ud-q4_k_xl-koboldcpp | 2048 | succeeded | 27 | 0 | 2.58–3.07 | 26.9–27.4 | 24/27 | – | [report](../../../hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) |
-| [2026-11-23](../../date/2026-11-23.md) | [hardware-fit](../../experiment/hardware-fit.md) | [raider-wsl](../../hardware/raider-wsl.md) | [projection](../../harness/projection.md) | [measured-models-gguf](../../model/measured-models-gguf.md) | projection-measured-models | – | succeeded | 430 | 0 | – | – | – | – | [report](../../../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
-| [2026-11-23](../../date/2026-11-23.md) | [hardware-fit](../../experiment/hardware-fit.md) | [raider-wsl](../../hardware/raider-wsl.md) | [projection](../../harness/projection.md) | [measured-models-gguf-as-found](../../model/measured-models-gguf-as-found.md) | projection-measured-models-as-found | – | succeeded | 430 | 0 | – | – | – | – | [report](../../../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) |
+Fixed workload and settings include 9 tasks × 3 measured attempts, protocol openai, mode measured and hardware raider-wsl. Backend version: 0.4.28+2. Comparison question: smoke checks for model packages under the same recorded resource budget.
+
+| Model package | Completed | Checks passed | Wall time (median s) | Time until text appears (median s) | Backend decode (median tok/s) |
+|---|---:|---:|---:|---:|---:|
+| inkling2-mini-26b-iq4_nl | 27/27 | 27/27 | 1.75 | 1.72 | not recorded |
+| muse-glimmer-30b-kquant-17gb-q4_k_m | 27/27 | 24/27 | 4.16 | 4.13 | not recorded |
+
+Paired wall-time differences use inkling2-mini-26b-iq4_nl as the alphabetically first reference. For each identical prompt, subtract the reference median from the other model’s median. The range spans the observed prompts. Negative values mean a shorter wait.
+
+| Model package | Paired prompts | Median difference (s) | Observed range (s) |
+|---|---:|---:|---:|
+| muse-glimmer-30b-kquant-17gb-q4_k_m | 9 | 2.17 | -0.514–4.8 |
+
+## Reproduce a run
+
+Choose a dated report in the table. The manifest pins the code revision. Config records the planned job, input hashes and launch settings. CSV contains category summaries. Raw contains the published measurements. Some older bundles omit artifacts or runtime details. Local paths have been removed.
+
+[Read the reproduction recipe](../../../../REPRODUCE.md) · [Download the comparison manifest](hardware-fit.json).
+
+For the newest listed job (inkling2-mini-26b-iq4_nl-lmstudio) run this from the repository root.
+
+```sh
+llm-eval result-inputs --input docs/results/hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1 --job fit-hardware-fit-1-971aedbccee6
+```
+
+## Run history
+
+One row per published job, newest first. A completed request can still fail its check. Output-cap and reload conditions can differ between rows. Use a matched group for a controlled comparison. Projection rows count candidate settings. Legal jobs expose aggregate evidence by cohort.
+
+| Date | Model / runtime | Mode and status | Actual workload | Completed | Checks passed | Median wall s | First visible text s | Backend decode tok/s | Evidence |
+|---|---|---|---|---:|---:|---:|---:|---:|---|
+| 2026-11-24 | inkling2-mini-26b-iq4_nl · lmstudio | measured · succeeded | 9 tasks × 3 measured attempts | 27/27 | 27/27 | 1.75 | 1.72 | not recorded | [Report](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) · [Config](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/resolved-config.json) · [Manifest](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/manifest.json) · [CSV](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/summary.csv) · [Raw](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | muse-glimmer-30b-kquant-17gb-q4_k_m · lmstudio | measured · succeeded | 9 tasks × 3 measured attempts | 27/27 | 24/27 | 4.16 | 4.13 | not recorded | [Report](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md) · [Config](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/resolved-config.json) · [Manifest](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/manifest.json) · [CSV](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/summary.csv) · [Raw](../../../hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | inkling2-mini-26b-iq4_nl · ollama | measured · failed | 9 tasks × 3 measured attempts | 0/27 | 0/27 | not recorded | not recorded | not recorded | [Report](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) · [Config](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/resolved-config.json) · [Manifest](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/manifest.json) · [CSV](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/summary.csv) · [Raw](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | muse-glimmer-30b-kquant-17gb-q4_k_m · ollama | measured · succeeded | 9 tasks × 3 measured attempts | 27/27 | 24/27 | 4.07 | 4.05 | 37.9 | [Report](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) · [Config](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/resolved-config.json) · [Manifest](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/manifest.json) · [CSV](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/summary.csv) · [Raw](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | qwen38-27b-ud-q4_k_xl · ollama | measured · succeeded | 9 tasks × 3 measured attempts | 27/27 | 24/27 | 1.97 | 1.87 | 35.8 | [Report](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md) · [Config](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/resolved-config.json) · [Manifest](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/manifest.json) · [CSV](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/summary.csv) · [Raw](../../../hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | inkling2-mini-26b-iq4_nl · koboldcpp | measured · succeeded | 9 tasks × 3 measured attempts | 27/27 | 27/27 | 6.64 | 6.48 | not recorded | [Report](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) · [Config](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/resolved-config.json) · [Manifest](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/manifest.json) · [CSV](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/summary.csv) · [Raw](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | muse-glimmer-30b-kquant-17gb-q4_k_m · koboldcpp | measured · succeeded | 9 tasks × 3 measured attempts | 27/27 | 18/27 | 0.524 | 0.524 | not recorded | [Report](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) · [Config](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/resolved-config.json) · [Manifest](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/manifest.json) · [CSV](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/summary.csv) · [Raw](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | qwen38-27b-ud-q4_k_xl · koboldcpp | measured · succeeded | 9 tasks × 3 measured attempts | 27/27 | 24/27 | 3.04 | 2.96 | not recorded | [Report](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md) · [Config](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/resolved-config.json) · [Manifest](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/manifest.json) · [CSV](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/summary.csv) · [Raw](../../../hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/raw/measurements.jsonl.gz) |
+| 2026-11-23 | qwen38-27b-ud-q4_k_xl · lmstudio | measured · succeeded | 9 tasks × 3 measured attempts | 27/27 | 24/27 | 0.886 | 0.886 | not recorded | [Report](../../../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) · [Config](../../../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/resolved-config.json) · [Manifest](../../../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/manifest.json) · [CSV](../../../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/summary.csv) · [Raw](../../../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/raw/measurements.jsonl.gz) |
+| 2026-11-23 | qwen38-27b-ud-q4_k_xl · ollama | measured · succeeded | 9 tasks × 3 measured attempts | 27/27 | 24/27 | 1.97 | 1.88 | 35.5 | [Report](../../../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md) · [Config](../../../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/resolved-config.json) · [Manifest](../../../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/manifest.json) · [CSV](../../../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/summary.csv) · [Raw](../../../hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/raw/measurements.jsonl.gz) |
+| 2026-11-23 | qwen38-27b-ud-q4_k_xl · koboldcpp | measured · succeeded | 9 tasks × 3 measured attempts | 27/27 | 24/27 | 2.83 | 2.78 | not recorded | [Report](../../../hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md) · [Config](../../../hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/resolved-config.json) · [Manifest](../../../hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/manifest.json) · [CSV](../../../hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/summary.csv) · [Raw](../../../hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/raw/measurements.jsonl.gz) |
+| 2026-11-23 | measured-models-gguf · projection | projection · succeeded | capacity estimates | no model call | unscored | not recorded | not recorded | not recorded | [Report](../../../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) · [Config](../../../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/resolved-config.json) · [Manifest](../../../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/manifest.json) · [CSV](../../../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/summary.csv) · [Raw](../../../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/raw/measurements.jsonl.gz) |
+| 2026-11-23 | measured-models-gguf-as-found · projection | projection · succeeded | capacity estimates | no model call | unscored | not recorded | not recorded | not recorded | [Report](../../../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md) · [Config](../../../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/resolved-config.json) · [Manifest](../../../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/manifest.json) · [CSV](../../../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/summary.csv) · [Raw](../../../hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/raw/measurements.jsonl.gz) |

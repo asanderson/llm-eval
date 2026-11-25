@@ -1503,7 +1503,7 @@ class ReplayTests(ReplayCase):
         (record,) = records
         self.assertEqual((record['experiment'], record['synthetic'], record['status']), ('decision-models', False, 'succeeded'))
         self.assertFalse(record['score'])
-        self.assertEqual(index.ranked(records), {})
+        self.assertEqual(index.matched(records), {})
         for name in ('routing-replay-campaign.json', 'score-campaign.json'):
             self.assertEqual(read_json(EXAMPLES / name)['reporting']['publish']['mode'], 'none')
 

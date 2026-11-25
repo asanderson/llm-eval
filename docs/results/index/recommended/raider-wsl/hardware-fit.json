@@ -1,0 +1,1011 @@
+{
+  "comparison_unit": "model package within a single publication, workload and named runtime",
+  "jobs": [
+    {
+      "artifact_sha256": [
+        "0d9aa44ea2528cc6f242fb9bc39d92adad26c3b4d4f37983f26f670db068b59f"
+      ],
+      "candidate_comparison_sha256": "ffa32eb897edfe6ddd81ef3791291402917f1222264b183a4aed34943a43239d",
+      "case": "inkling2-mini-26b-iq4_nl-lmstudio",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "f708812c45057304b08499fdd763168adfab38a777150aadac393cf14a25cee9",
+      "job_id": "fit-hardware-fit-1-971aedbccee6",
+      "model": "inkling2-mini-26b-iq4_nl",
+      "observed_output_tokens": [
+        62,
+        232
+      ],
+      "observed_prompt_tokens": [
+        27,
+        56
+      ],
+      "report": "hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "6123ca6e89b288a099f677fb761126a7917d88e881b147f67823bb3d50847ca7"
+      ],
+      "candidate_comparison_sha256": "ffa32eb897edfe6ddd81ef3791291402917f1222264b183a4aed34943a43239d",
+      "case": "muse-glimmer-30b-kquant-17gb-q4_k_m-lmstudio",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "6ce4f71a5cf588fd046a93244c79a49fcdf480ba0f486e4e3d31b4560d4d4e5d",
+      "job_id": "fit-hardware-fit-1-54cda96c277e",
+      "model": "muse-glimmer-30b-kquant-17gb-q4_k_m",
+      "observed_output_tokens": [
+        78,
+        248
+      ],
+      "observed_prompt_tokens": [
+        68,
+        91
+      ],
+      "report": "hardware-fit/campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "0d9aa44ea2528cc6f242fb9bc39d92adad26c3b4d4f37983f26f670db068b59f"
+      ],
+      "candidate_comparison_sha256": null,
+      "case": "inkling2-mini-26b-iq4_nl-ollama",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "b002021313921eed4c344e554b93886e3fd643dc3c419f96497f65cd505ff9e4",
+      "job_id": "fit-hardware-fit-1-9aa57a544a52",
+      "model": "inkling2-mini-26b-iq4_nl",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [],
+      "report": "hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "failed",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "6123ca6e89b288a099f677fb761126a7917d88e881b147f67823bb3d50847ca7"
+      ],
+      "candidate_comparison_sha256": "faf0dcc06ea8e64e92f23477d45610fe1cccf14adf0458803cfe89a939eb8c87",
+      "case": "muse-glimmer-30b-kquant-17gb-q4_k_m-ollama",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "98dbb075908e6d3ae7962359f5f160f3955c64c41a7150e3a8e068bc167100cb",
+      "job_id": "fit-hardware-fit-1-82d35f1d737c",
+      "model": "muse-glimmer-30b-kquant-17gb-q4_k_m",
+      "observed_output_tokens": [
+        80,
+        254
+      ],
+      "observed_prompt_tokens": [
+        68,
+        91
+      ],
+      "report": "hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "963f92d6d13480f7ba26138bed111d5fc7b0a118b96d894c98f2fe13b41475ca"
+      ],
+      "candidate_comparison_sha256": "35db76aefc05f1110b3a47e9f0b616950576ea6b1454f134b315abf7607e17b0",
+      "case": "qwen38-27b-ud-q4_k_xl-ollama",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "faa864f7afae2ae9228bad95985a05cfc0c47cccb31a3ea862b2c90ca447d58e",
+      "job_id": "fit-hardware-fit-1-aca7cd52ca80",
+      "model": "qwen38-27b-ud-q4_k_xl",
+      "observed_output_tokens": [
+        42,
+        136
+      ],
+      "observed_prompt_tokens": [
+        66,
+        88
+      ],
+      "report": "hardware-fit/campaign-20261124T230811Z-0fa376ca-fit-hardware-fit-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "0d9aa44ea2528cc6f242fb9bc39d92adad26c3b4d4f37983f26f670db068b59f"
+      ],
+      "candidate_comparison_sha256": "2ab74f59c1bbe3599a7c5dd7e74fffe2f858114de5f8b034af89568e0160e349",
+      "case": "inkling2-mini-26b-iq4_nl-koboldcpp",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "55c465019c9d86c1b237b6a05d58c019592b62b3986eaf0900309a450f380761",
+      "job_id": "fit-hardware-fit-1-681665f3272a",
+      "model": "inkling2-mini-26b-iq4_nl",
+      "observed_output_tokens": [
+        52,
+        162
+      ],
+      "observed_prompt_tokens": [
+        15,
+        44
+      ],
+      "report": "hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "6123ca6e89b288a099f677fb761126a7917d88e881b147f67823bb3d50847ca7"
+      ],
+      "candidate_comparison_sha256": "2ab74f59c1bbe3599a7c5dd7e74fffe2f858114de5f8b034af89568e0160e349",
+      "case": "muse-glimmer-30b-kquant-17gb-q4_k_m-koboldcpp",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "9134ec7e839cbb94feb76d69a2b974b554a483ceb4ead1c948251f9f7c509e46",
+      "job_id": "fit-hardware-fit-1-2672aee4239f",
+      "model": "muse-glimmer-30b-kquant-17gb-q4_k_m",
+      "observed_output_tokens": [
+        2,
+        21
+      ],
+      "observed_prompt_tokens": [
+        22,
+        45
+      ],
+      "report": "hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "963f92d6d13480f7ba26138bed111d5fc7b0a118b96d894c98f2fe13b41475ca"
+      ],
+      "candidate_comparison_sha256": "b39f8f863b344fa7b2cd2fa0e4c58bfc1bf174e4b73782d266aa2dc27186ea4a",
+      "case": "qwen38-27b-ud-q4_k_xl-koboldcpp",
+      "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+      "cohort_digests": [],
+      "config_sha256": "afd1968f8398f572d8c91b5e1c4c05c3fa4f5afc409c0a4ec0ea0e6be21a91fc",
+      "job_id": "fit-hardware-fit-1-1479e5e031a5",
+      "model": "qwen38-27b-ud-q4_k_xl",
+      "observed_output_tokens": [
+        57,
+        112
+      ],
+      "observed_prompt_tokens": [
+        23,
+        45
+      ],
+      "report": "hardware-fit/campaign-20261124T225210Z-e801df32-fit-hardware-fit-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "963f92d6d13480f7ba26138bed111d5fc7b0a118b96d894c98f2fe13b41475ca"
+      ],
+      "candidate_comparison_sha256": "0584f57f539c977b0164c27c6c5d848a3d210883660e118c171ae3956ec28f92",
+      "case": "qwen38-27b-ud-q4_k_xl-lmstudio",
+      "code_revision": "2695cba457664b269921edfcf5afa430e2222330",
+      "cohort_digests": [],
+      "config_sha256": "e77d82686d0b942a95da059cfae496a244cabc4ad0d41ced5caad0be1cd737f9",
+      "job_id": "fit-hardware-fit-1-4b1c74ff0cbf",
+      "model": "qwen38-27b-ud-q4_k_xl",
+      "observed_output_tokens": [
+        36,
+        113
+      ],
+      "observed_prompt_tokens": [
+        66,
+        88
+      ],
+      "report": "hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md",
+      "router_revision": null,
+      "runtime": "lmstudio",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "963f92d6d13480f7ba26138bed111d5fc7b0a118b96d894c98f2fe13b41475ca"
+      ],
+      "candidate_comparison_sha256": "53324d72638ca7cb64aa876967383d6184b9a2d1ae2dc631541c310f0639c32d",
+      "case": "qwen38-27b-ud-q4_k_xl-ollama",
+      "code_revision": "2695cba457664b269921edfcf5afa430e2222330",
+      "cohort_digests": [],
+      "config_sha256": "37c493c2969402d125a8a9ab93ffc27101a7212b4867810ba7d1f67087618149",
+      "job_id": "fit-hardware-fit-1-aca7cd52ca80",
+      "model": "qwen38-27b-ud-q4_k_xl",
+      "observed_output_tokens": [
+        42,
+        136
+      ],
+      "observed_prompt_tokens": [
+        66,
+        88
+      ],
+      "report": "hardware-fit/campaign-20261123T120632Z-53d7833d-fit-hardware-fit-1/README.md",
+      "router_revision": null,
+      "runtime": "ollama",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [
+        "963f92d6d13480f7ba26138bed111d5fc7b0a118b96d894c98f2fe13b41475ca"
+      ],
+      "candidate_comparison_sha256": "cff08ba6bb720044c2ca428b894308d8af7ee3fc9357a38a58fa45db811563ec",
+      "case": "qwen38-27b-ud-q4_k_xl-koboldcpp",
+      "code_revision": "2695cba457664b269921edfcf5afa430e2222330",
+      "cohort_digests": [],
+      "config_sha256": "da0f6f37076b0fa00379c0cb9b5e331b0f3371539aa6e70daf68da21ad52e8c2",
+      "job_id": "fit-hardware-fit-1-1479e5e031a5",
+      "model": "qwen38-27b-ud-q4_k_xl",
+      "observed_output_tokens": [
+        6,
+        126
+      ],
+      "observed_prompt_tokens": [
+        23,
+        45
+      ],
+      "report": "hardware-fit/campaign-20261123T060454Z-d3e0de27-fit-hardware-fit-1/README.md",
+      "router_revision": null,
+      "runtime": "koboldcpp",
+      "status": "succeeded",
+      "suite_sha256": {
+        "coding": [
+          "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+        ],
+        "math": [
+          "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+        ],
+        "reasoning": [
+          "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+        ]
+      }
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": null,
+      "case": "projection-measured-models",
+      "code_revision": "2695cba457664b269921edfcf5afa430e2222330",
+      "cohort_digests": [],
+      "config_sha256": "6de23e518010bd5db6c3fe20ead452284e9dcc476173a88f23fe51145d2bce18",
+      "job_id": "fit-hardware-fit-1-350a43aad20a",
+      "model": "measured-models-gguf",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [],
+      "report": "hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md",
+      "router_revision": null,
+      "runtime": "projection",
+      "status": "succeeded",
+      "suite_sha256": {}
+    },
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": null,
+      "case": "projection-measured-models-as-found",
+      "code_revision": "2695cba457664b269921edfcf5afa430e2222330",
+      "cohort_digests": [],
+      "config_sha256": "281fe19f42593f9ff00bdefed0ee4920324cee078a0a285ea2a46cdb1dd5899a",
+      "job_id": "fit-hardware-fit-1-f008c633e429",
+      "model": "measured-models-gguf-as-found",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [],
+      "report": "hardware-fit/campaign-20261123T060120Z-252fece8-fit-hardware-fit-1/README.md",
+      "router_revision": null,
+      "runtime": "projection",
+      "status": "succeeded",
+      "suite_sha256": {}
+    }
+  ],
+  "matched_groups": {
+    "2ab74f59c1bbe3599a7c5dd7e74fffe2f858114de5f8b034af89568e0160e349": {
+      "controls": {
+        "check": "quality_pass",
+        "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+        "experiment": "hardware-fit",
+        "experiment_version": 1,
+        "hardware": {
+          "hardware_profile": "msi-raider-18-hx-ai",
+          "os_id": "windows-11-wsl2-ubuntu-26.04",
+          "target": "raider"
+        },
+        "hardware_config_id": "raider-wsl",
+        "harness": "koboldcpp",
+        "measured_schedule": [
+          [
+            "category-smoke",
+            "coding",
+            "coding-boundary",
+            "1590b584fc82558e9da7e624c45681ec2fedc4da0040568ffdc180e55cf37323",
+            1
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-boundary",
+            "1590b584fc82558e9da7e624c45681ec2fedc4da0040568ffdc180e55cf37323",
+            2
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-boundary",
+            "1590b584fc82558e9da7e624c45681ec2fedc4da0040568ffdc180e55cf37323",
+            3
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-json-read",
+            "88c0705df8153e507f2e586cb3855d18a3d1af9b0dea6ad9d00b347793db15a6",
+            1
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-json-read",
+            "88c0705df8153e507f2e586cb3855d18a3d1af9b0dea6ad9d00b347793db15a6",
+            2
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-json-read",
+            "88c0705df8153e507f2e586cb3855d18a3d1af9b0dea6ad9d00b347793db15a6",
+            3
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-trace",
+            "bf3826b0c9828958baa730962800f8589050d87f7bd19aa32f9fefcd4eac333e",
+            1
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-trace",
+            "bf3826b0c9828958baa730962800f8589050d87f7bd19aa32f9fefcd4eac333e",
+            2
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-trace",
+            "bf3826b0c9828958baa730962800f8589050d87f7bd19aa32f9fefcd4eac333e",
+            3
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-algebra",
+            "82a349ec3fdd3fa943275bde3a212fecd059e82fc061dc34317e81eaa818d95e",
+            1
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-algebra",
+            "82a349ec3fdd3fa943275bde3a212fecd059e82fc061dc34317e81eaa818d95e",
+            2
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-algebra",
+            "82a349ec3fdd3fa943275bde3a212fecd059e82fc061dc34317e81eaa818d95e",
+            3
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-arithmetic",
+            "0439274a961d418345f1046ebea1faa3b92a908098d38ec3b40a484589611e66",
+            1
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-arithmetic",
+            "0439274a961d418345f1046ebea1faa3b92a908098d38ec3b40a484589611e66",
+            2
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-arithmetic",
+            "0439274a961d418345f1046ebea1faa3b92a908098d38ec3b40a484589611e66",
+            3
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-probability",
+            "df5a8ed67de29e30032c9441c81f4186a44bf86cbf672c45977b93f3dbfd83c2",
+            1
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-probability",
+            "df5a8ed67de29e30032c9441c81f4186a44bf86cbf672c45977b93f3dbfd83c2",
+            2
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-probability",
+            "df5a8ed67de29e30032c9441c81f4186a44bf86cbf672c45977b93f3dbfd83c2",
+            3
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-logic",
+            "b4449ebe5c6f28a299a8f1e51e30fa034dbd96f3e6802deec5f828d148b9da64",
+            1
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-logic",
+            "b4449ebe5c6f28a299a8f1e51e30fa034dbd96f3e6802deec5f828d148b9da64",
+            2
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-logic",
+            "b4449ebe5c6f28a299a8f1e51e30fa034dbd96f3e6802deec5f828d148b9da64",
+            3
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-navigation",
+            "028577e5fe3fe50e699db7c034bc762b662f670bbeea0bbb240c2f9de7ae5b1d",
+            1
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-navigation",
+            "028577e5fe3fe50e699db7c034bc762b662f670bbeea0bbb240c2f9de7ae5b1d",
+            2
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-navigation",
+            "028577e5fe3fe50e699db7c034bc762b662f670bbeea0bbb240c2f9de7ae5b1d",
+            3
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-order",
+            "296ad9c2c1ab1819b23fc22a195c9a2028f3faf52ceb4b03c81d0491687aa3b9",
+            1
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-order",
+            "296ad9c2c1ab1819b23fc22a195c9a2028f3faf52ceb4b03c81d0491687aa3b9",
+            2
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-order",
+            "296ad9c2c1ab1819b23fc22a195c9a2028f3faf52ceb4b03c81d0491687aa3b9",
+            3
+          ]
+        ],
+        "mode": "measured",
+        "parameters": {
+          "categories": [
+            "reasoning",
+            "coding",
+            "math"
+          ],
+          "config": {
+            "backend_version": "1.125.1",
+            "cache_condition": "warm_process_repeated_prompt; prefix-cache policy must be recorded",
+            "concurrency": 1,
+            "context_tokens": 8192,
+            "gpu_budget_gib": 22,
+            "hardware_attestation": {
+              "ac_connected": true,
+              "bios": "E1824IMS.317",
+              "carried_from_windows_attestation": "bios, ram_configured_mhz, msi_power_fan_profile, mux_hybrid_setting and gpu_tgp_power_limit are the operator attestations of the native Windows runs of 2026-11-08 on the same machine; they were not read again for the WSL runs",
+              "gpu_tgp_power_limit": "nvidia-smi power.limit N/A; default 95 W, max 175 W",
+              "model_path": "[local path omitted]",
+              "model_ssd_filesystem": "ext4 on the WSL virtual disk of the guest, on the Windows C: NVMe volume (Phison 2TB NVMe ESR02TBTLCA3-E1J-2MS).",
+              "msi_power_fan_profile": "Best Performance (user-reported, MSI Center)",
+              "mux_hybrid_setting": "MSHybrid (observed: Intel Graphics and NVIDIA both active display adapters, Intel drives internal 3840px panel; MSI Center GPU Switch not read directly)",
+              "nvidia_driver": "610.74",
+              "os_build": "10.0.26300 (Windows host; guest kernel 6.18.33.2-microsoft-standard-WSL2)",
+              "other_workloads": "Hardware-fit measured runs on WSL2 Ubuntu 26.04 (guest of this Windows host), one campaign with the jobs of one harness in turn: KoboldCpp 1.125.1 loads each model file by path. The files of Muse Glimmer 30B and Inkling 2 Mini are on the guest disk; the Qwen 3.8 27B file is on the Windows volume and is read through /mnt/c. The LM Studio desktop app (Linux AppImage) is open in the guest under WSLg with no model loaded. Notable Windows programs running at the start: consumer Ollama tray app, a Windows Ollama server, Microsoft Teams, VMware tray, VMware authorization service, ProtonVPN client, ChatGPT desktop app, Claude desktop app.",
+              "ram_configured_mhz": [
+                6400,
+                6400
+              ],
+              "wsl_config": "[local path omitted]",
+              "wsl_memory_cap": "guest MemTotal 51.0 GiB at the start of this run; swap 0 MiB (see wsl_config)",
+              "wsl_version": "2.7.12.0, kernel 6.18.33.2-microsoft-standard-WSL2"
+            },
+            "hardware_profile": "msi-raider-18-hx-ai",
+            "lane": "control",
+            "launch": {
+              "gpu_layers": 999,
+              "threads": 16
+            },
+            "load_timeout_s": 1800,
+            "max_output_tokens": 2048,
+            "os_id": "windows-11-wsl2-ubuntu-26.04",
+            "placement_notes": "Requested every layer on the GPU (launch.gpu_layers 999), 16 CPU threads, context 8192. Observed placement is in the backend log and in fit/metadata.json of the attempt.",
+            "platform": "koboldcpp",
+            "protocol": "openai",
+            "ram_budget_gib": 46,
+            "reasoning_mode": "model default; OpenAI-protocol harnesses may return reasoning inline in content",
+            "repeats": 3,
+            "request_options": {},
+            "request_usage": true,
+            "save_outputs": false,
+            "schema_version": 1,
+            "seed": 20261005,
+            "speculative_decoding": "disabled",
+            "suite": "[local path omitted]",
+            "telemetry_interval_s": 1.0,
+            "temperature": 0.0,
+            "timeout_s": 900,
+            "warmups": 1
+          },
+          "server_mode": "managed"
+        },
+        "publication": "campaign-20261124T225210Z-e801df32-fit-hardware-fit-1",
+        "question": "smoke checks for model packages under the same recorded resource budget",
+        "reported_paging_by_category": {
+          "coding": false,
+          "math": false,
+          "reasoning": false
+        },
+        "suites": {
+          "coding": [
+            "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+          ],
+          "math": [
+            "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+          ],
+          "reasoning": [
+            "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+          ]
+        },
+        "target": {
+          "physical_host_id": "raider",
+          "transport": "local"
+        },
+        "version": 1
+      },
+      "job_ids": [
+        "fit-hardware-fit-1-681665f3272a",
+        "fit-hardware-fit-1-2672aee4239f"
+      ]
+    },
+    "ffa32eb897edfe6ddd81ef3791291402917f1222264b183a4aed34943a43239d": {
+      "controls": {
+        "check": "quality_pass",
+        "code_revision": "ce08c168fac5bbd7eff09b8356c036c35e7ce106",
+        "experiment": "hardware-fit",
+        "experiment_version": 1,
+        "hardware": {
+          "hardware_profile": "msi-raider-18-hx-ai",
+          "os_id": "windows-11-wsl2-ubuntu-26.04",
+          "target": "raider"
+        },
+        "hardware_config_id": "raider-wsl",
+        "harness": "lmstudio",
+        "measured_schedule": [
+          [
+            "category-smoke",
+            "coding",
+            "coding-boundary",
+            "1590b584fc82558e9da7e624c45681ec2fedc4da0040568ffdc180e55cf37323",
+            1
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-boundary",
+            "1590b584fc82558e9da7e624c45681ec2fedc4da0040568ffdc180e55cf37323",
+            2
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-boundary",
+            "1590b584fc82558e9da7e624c45681ec2fedc4da0040568ffdc180e55cf37323",
+            3
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-json-read",
+            "88c0705df8153e507f2e586cb3855d18a3d1af9b0dea6ad9d00b347793db15a6",
+            1
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-json-read",
+            "88c0705df8153e507f2e586cb3855d18a3d1af9b0dea6ad9d00b347793db15a6",
+            2
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-json-read",
+            "88c0705df8153e507f2e586cb3855d18a3d1af9b0dea6ad9d00b347793db15a6",
+            3
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-trace",
+            "bf3826b0c9828958baa730962800f8589050d87f7bd19aa32f9fefcd4eac333e",
+            1
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-trace",
+            "bf3826b0c9828958baa730962800f8589050d87f7bd19aa32f9fefcd4eac333e",
+            2
+          ],
+          [
+            "category-smoke",
+            "coding",
+            "coding-trace",
+            "bf3826b0c9828958baa730962800f8589050d87f7bd19aa32f9fefcd4eac333e",
+            3
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-algebra",
+            "82a349ec3fdd3fa943275bde3a212fecd059e82fc061dc34317e81eaa818d95e",
+            1
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-algebra",
+            "82a349ec3fdd3fa943275bde3a212fecd059e82fc061dc34317e81eaa818d95e",
+            2
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-algebra",
+            "82a349ec3fdd3fa943275bde3a212fecd059e82fc061dc34317e81eaa818d95e",
+            3
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-arithmetic",
+            "0439274a961d418345f1046ebea1faa3b92a908098d38ec3b40a484589611e66",
+            1
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-arithmetic",
+            "0439274a961d418345f1046ebea1faa3b92a908098d38ec3b40a484589611e66",
+            2
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-arithmetic",
+            "0439274a961d418345f1046ebea1faa3b92a908098d38ec3b40a484589611e66",
+            3
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-probability",
+            "df5a8ed67de29e30032c9441c81f4186a44bf86cbf672c45977b93f3dbfd83c2",
+            1
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-probability",
+            "df5a8ed67de29e30032c9441c81f4186a44bf86cbf672c45977b93f3dbfd83c2",
+            2
+          ],
+          [
+            "category-smoke",
+            "math",
+            "math-probability",
+            "df5a8ed67de29e30032c9441c81f4186a44bf86cbf672c45977b93f3dbfd83c2",
+            3
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-logic",
+            "b4449ebe5c6f28a299a8f1e51e30fa034dbd96f3e6802deec5f828d148b9da64",
+            1
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-logic",
+            "b4449ebe5c6f28a299a8f1e51e30fa034dbd96f3e6802deec5f828d148b9da64",
+            2
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-logic",
+            "b4449ebe5c6f28a299a8f1e51e30fa034dbd96f3e6802deec5f828d148b9da64",
+            3
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-navigation",
+            "028577e5fe3fe50e699db7c034bc762b662f670bbeea0bbb240c2f9de7ae5b1d",
+            1
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-navigation",
+            "028577e5fe3fe50e699db7c034bc762b662f670bbeea0bbb240c2f9de7ae5b1d",
+            2
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-navigation",
+            "028577e5fe3fe50e699db7c034bc762b662f670bbeea0bbb240c2f9de7ae5b1d",
+            3
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-order",
+            "296ad9c2c1ab1819b23fc22a195c9a2028f3faf52ceb4b03c81d0491687aa3b9",
+            1
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-order",
+            "296ad9c2c1ab1819b23fc22a195c9a2028f3faf52ceb4b03c81d0491687aa3b9",
+            2
+          ],
+          [
+            "category-smoke",
+            "reasoning",
+            "reasoning-order",
+            "296ad9c2c1ab1819b23fc22a195c9a2028f3faf52ceb4b03c81d0491687aa3b9",
+            3
+          ]
+        ],
+        "mode": "measured",
+        "parameters": {
+          "categories": [
+            "reasoning",
+            "coding",
+            "math"
+          ],
+          "config": {
+            "backend_version": "0.4.28+2",
+            "cache_condition": "warm_process_repeated_prompt; prefix-cache policy must be recorded",
+            "concurrency": 1,
+            "context_tokens": 8192,
+            "gpu_budget_gib": 22,
+            "hardware_attestation": {
+              "ac_connected": true,
+              "bios": "E1824IMS.317",
+              "carried_from_windows_attestation": "bios, ram_configured_mhz, msi_power_fan_profile, mux_hybrid_setting and gpu_tgp_power_limit are the operator attestations of the native Windows runs of 2026-11-08 on the same machine; they were not read again for the WSL runs",
+              "gpu_tgp_power_limit": "nvidia-smi power.limit N/A; default 95 W, max 175 W",
+              "model_path": "[local path omitted]",
+              "model_ssd_filesystem": "ext4 on the WSL virtual disk of the guest, on the Windows C: NVMe volume (Phison 2TB NVMe ESR02TBTLCA3-E1J-2MS).",
+              "msi_power_fan_profile": "Best Performance (user-reported, MSI Center)",
+              "mux_hybrid_setting": "MSHybrid (observed: Intel Graphics and NVIDIA both active display adapters, Intel drives internal 3840px panel; MSI Center GPU Switch not read directly)",
+              "nvidia_driver": "610.74",
+              "os_build": "10.0.26300 (Windows host; guest kernel 6.18.33.2-microsoft-standard-WSL2)",
+              "other_workloads": "Hardware-fit measured runs on WSL2 Ubuntu 26.04 (guest of this Windows host), one campaign with the jobs of one harness in turn: LM Studio 0.4.28+2 imports a symbolic link to each model file. The files of Muse Glimmer 30B and Inkling 2 Mini are on the guest disk. The LM Studio desktop app (Linux AppImage) is open in the guest under WSLg, as its managed runs require. Notable Windows programs running at the start: consumer Ollama tray app, a Windows Ollama server, Microsoft Teams, VMware tray, VMware authorization service, ProtonVPN client, ChatGPT desktop app, Claude desktop app.",
+              "ram_configured_mhz": [
+                6400,
+                6400
+              ],
+              "wsl_config": "[local path omitted]",
+              "wsl_memory_cap": "guest MemTotal 51.0 GiB at the start of this run; swap 0 MiB (see wsl_config)",
+              "wsl_version": "2.7.12.0, kernel 6.18.33.2-microsoft-standard-WSL2"
+            },
+            "hardware_profile": "msi-raider-18-hx-ai",
+            "lane": "control",
+            "launch": {
+              "gpu_offload": "max",
+              "import_mode": "symbolic-link"
+            },
+            "load_timeout_s": 1800,
+            "max_output_tokens": 2048,
+            "os_id": "windows-11-wsl2-ubuntu-26.04",
+            "placement_notes": "Requested every layer on the GPU (launch.gpu_offload max; the thread count is the app default), context 8192. LM Studio 0.4.28+2 ran as the desktop app from LM-Studio-0.4.28-2-x64.AppImage under WSLg; observed AppImage SHA-256 a3e6cf8233697be0a8ad6871197b424242af3c5a346671aeed59959ed7eebf11 (the vendor publishes none). The managed launch keeps no placement lines in its log; the evidence is the VRAM telemetry in fit/metadata.json of the attempt.",
+            "platform": "lmstudio",
+            "protocol": "openai",
+            "ram_budget_gib": 46,
+            "reasoning_mode": "model default; OpenAI-protocol harnesses may return reasoning inline in content",
+            "repeats": 3,
+            "request_options": {},
+            "request_usage": true,
+            "save_outputs": false,
+            "schema_version": 1,
+            "seed": 20261005,
+            "speculative_decoding": "disabled",
+            "suite": "[local path omitted]",
+            "telemetry_interval_s": 1.0,
+            "temperature": 0.0,
+            "timeout_s": 900,
+            "warmups": 1
+          },
+          "server_mode": "managed"
+        },
+        "publication": "campaign-20261124T232244Z-86c68e03-fit-hardware-fit-1",
+        "question": "smoke checks for model packages under the same recorded resource budget",
+        "reported_paging_by_category": {
+          "coding": false,
+          "math": false,
+          "reasoning": false
+        },
+        "suites": {
+          "coding": [
+            "b94a33490cc9881efe62183fc327489710301d04639f7250aa5a7234f51159a5"
+          ],
+          "math": [
+            "426c67059e9a46b2ef0ddf6f7c501b2b25ef1173fcf84dbeddd6214ce168921f"
+          ],
+          "reasoning": [
+            "1b5303c44fe3b0b2287e20aaedeec30c7c2b95c5e347d57e957d65bb4be5acc7"
+          ]
+        },
+        "target": {
+          "physical_host_id": "raider",
+          "transport": "local"
+        },
+        "version": 1
+      },
+      "job_ids": [
+        "fit-hardware-fit-1-971aedbccee6",
+        "fit-hardware-fit-1-54cda96c277e"
+      ]
+    }
+  },
+  "schema_version": 1
+}

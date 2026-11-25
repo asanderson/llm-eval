@@ -1,0 +1,28 @@
+{
+  "comparison_unit": "model package within a single publication, workload and named runtime",
+  "jobs": [
+    {
+      "artifact_sha256": [],
+      "candidate_comparison_sha256": null,
+      "case": "category-smoke",
+      "code_revision": "3fc8f649b2d5756dc3db2dcaa6142f40e719512b",
+      "cohort_digests": [],
+      "config_sha256": "e53447f6b2c8a1f8e3ff00eeaa1dfbb704d03a5c56eb8b92650c9e3878bffa99",
+      "job_id": "routing-llm-routing-1-290257f5d5ab",
+      "model": "category",
+      "observed_output_tokens": [],
+      "observed_prompt_tokens": [],
+      "report": "llm-routing/campaign-20261108T013814Z-7ff2610d-routing-llm-routing-1/README.md",
+      "router_revision": null,
+      "runtime": "category",
+      "status": "succeeded",
+      "suite_sha256": {
+        "all": [
+          "3302251a6bb9d7184acb0627a9131fab50abad76bf67ab276e981b1912b17cf8"
+        ]
+      }
+    }
+  ],
+  "matched_groups": {},
+  "schema_version": 1
+}

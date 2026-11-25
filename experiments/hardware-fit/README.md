@@ -9,7 +9,7 @@ It is the counterpart of [model offloading](../model-offloading/README.md). That
 | `projection` (default) | No GPU and no model files | For every candidate artifact: the VRAM, RAM and disk it needs, the limits it exceeds, and a shortlist. A projection, never a measurement. |
 | `measured` | The GPU of the hardware profile, a locked artifact, an installed harness | One artifact served with every layer requested on the GPU, the category suites of model offloading, and the evidence that the run stayed inside VRAM. |
 
-A succeeded `measured` job is ranked by the results index like any other measured run. The best-ranked combination of `hardware-fit` on a hardware configuration is the measured best fit, and the recommended setup page of that pair shows it. Projection rows carry no scored check, so a projection never enters that ranking.
+Read each measured run alongside its placement evidence, the input lengths the runtime served, and the checks its answers passed. Projection rows estimate capacity without running a model. [Browse hardware-fit results](../../docs/results/index/experiment/hardware-fit.md).
 
 ## The hardware configuration
 

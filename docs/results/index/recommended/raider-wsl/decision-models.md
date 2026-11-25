@@ -1,73 +1,133 @@
-# Recommended setup, harness and model: decision-models on raider-wsl
+# decision-models on raider-wsl
 
-[Recommended setups](../README.md) · [Results index](../../README.md) · [Executive summary](../../../README.md)
+[Setup evidence](../README.md) · [Results index](../../README.md)
 
-Generated from the published bundles by `llm-eval index-results`; do not edit by hand. 22 published result(s) for this experiment and hardware configuration; 10 harness and model combination(s) are ranked.
+**One recent run** · 2026-11-24 · llm-eval-clef-flash:locked on ollama. 2 tasks × 3 measured attempts. 6/6 requests completed and 6/6 checks passed.
 
-## Recommendation
+Each check asks whether the router selected the expected label. The timing covers the decision. Downstream answer quality and end-to-end generation cost require a different experiment.
 
-| | |
-|---|---|
-| Harness | [ollama](../../harness/ollama.md) |
-| Model | [llm-eval-d1:locked](../../model/llm-eval-d1-locked.md) |
-| Operating system | windows-11-wsl2-ubuntu-26.04 |
-| Checks passed | 6/6 |
-| Median wall time per request (s) | 0.0119 |
-| Output tokens per second | – |
-| Measured | [2026-11-24](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
+[Report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/resolved-config.json) · [CSV](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/raw/measurements.jsonl.gz)
 
-This is the best-ranked combination of the results index for this pair. Ranked by share of checks passed (correct decisions for decision models, quality checks otherwise), then lower median wall time per request, then higher output tokens per second. Each harness and model combination is represented by its newest measured run that succeeded; synthetic fixtures, failed runs and runs without scored checks are not ranked. Wall time and token rate are the median of the category medians. Where a model repeats among the best combinations, a second table ranks the models, each by its best combination.
+## Matched model comparisons
 
-10 combinations pass the same share of checks as the recommended one; the order among them is by median wall time, then by output rate.
+A group changes the model package within one publication on one hardware configuration and runtime. The suite hashes, exact prompts, measured repetitions, scorer code and recorded request settings must match. The package includes its tokenizer and template. Failed jobs and runs with incomplete controls remain in the run history.
 
-It is a statement about the published runs on this hardware configuration, not about the model or the harness in general. The checks are small deterministic checks, the runs can differ in more than the harness and the model (each report states its conditions), and the recommendation changes when a newer run of a combination is published.
+Times are descriptive. Host paging, model-specific defaults, cache reuse and independent sessions can be unobserved. Each row shows this run’s observed median among completed requests. Repeated prompts on one host do not establish uncertainty across machines or general model quality. The downloadable manifest contains each full comparison key and its inputs.
 
-## Setup of the recommended run
+### ollama · 2026-11-24 · e08f398039c5
 
-Read from the resolved configuration of the run's report. To reproduce it, use the measured code revision named in that report.
+Fixed workload and settings include 2 tasks × 3 measured attempts, protocol systemone, mode decision and hardware raider-wsl. Backend version: not recorded. Comparison question: router label agreement on identical prompts.
 
-| Setting | Value |
-|---|---|
-| Router instructions | Choose the category that best describes the user request. |
-| Router kind | systemone |
-| Router model | llm-eval-d1:locked |
-| Router model_revision | 8c2d9ddae4413c38b183644320b6f4bca4c5f629ae9e5104c3b13a150ed85e7e |
-| Router platform | ollama |
-| Router timeout_s | 300 |
+| Model package | Completed | Checks passed | Wall time (median s) | Time until text appears (median s) | Backend decode (median tok/s) |
+|---|---:|---:|---:|---:|---:|
+| llm-eval-clef-flash:locked | 6/6 | 6/6 | 0.0554 | not recorded | not recorded |
+| llm-eval-clef:locked | 6/6 | 6/6 | 0.534 | not recorded | not recorded |
+| llm-eval-d1-omni:locked | 6/6 | 6/6 | 0.0379 | not recorded | not recorded |
+| llm-eval-d1:locked | 6/6 | 6/6 | 0.0177 | not recorded | not recorded |
+| llm-eval-laya:locked | 6/6 | 6/6 | 0.0141 | not recorded | not recorded |
+| llm-eval-nimble-v3:locked | 6/6 | 6/6 | 0.055 | not recorded | not recorded |
+| llm-eval-nimble:locked | 6/6 | 6/6 | 0.0519 | not recorded | not recorded |
+| llm-eval-pplx-decider:locked | 6/6 | 6/6 | 0.103 | not recorded | not recorded |
+| llm-eval-tev1-0.8b:locked | 6/6 | 6/6 | 0.0147 | not recorded | not recorded |
+| llm-eval-tev1:locked | 6/6 | 6/6 | 0.0265 | not recorded | not recorded |
 
-## Best 5 combinations
+Paired wall-time differences use llm-eval-clef-flash:locked as the alphabetically first reference. For each identical prompt, subtract the reference median from the other model’s median. The range spans the observed prompts. Negative values mean a shorter wait.
 
-| Rank | Harness | Model | Checks passed | Median wall s | Output tok/s | Run |
-|---:|---|---|---:|---:|---:|---|
-| 1 | [ollama](../../harness/ollama.md) | [llm-eval-d1:locked](../../model/llm-eval-d1-locked.md) | 6/6 | 0.0119 | – | [2026-11-24](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| 2 | [ollama](../../harness/ollama.md) | [llm-eval-laya:locked](../../model/llm-eval-laya-locked.md) | 6/6 | 0.0136 | – | [2026-11-24](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| 3 | [ollama](../../harness/ollama.md) | [llm-eval-d1-omni:locked](../../model/llm-eval-d1-omni-locked.md) | 6/6 | 0.0146 | – | [2026-11-24](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| 4 | [ollama](../../harness/ollama.md) | [llm-eval-tev1-0.8b:locked](../../model/llm-eval-tev1-0.8b-locked.md) | 6/6 | 0.017 | – | [2026-11-24](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| 5 | [ollama](../../harness/ollama.md) | [llm-eval-tev1:locked](../../model/llm-eval-tev1-locked.md) | 6/6 | 0.0311 | – | [2026-11-24](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
+| Model package | Paired prompts | Median difference (s) | Observed range (s) |
+|---|---:|---:|---:|
+| llm-eval-clef:locked | 2 | 0.48 | 0.448–0.512 |
+| llm-eval-d1-omni:locked | 2 | -0.0178 | -0.0197–-0.0159 |
+| llm-eval-d1:locked | 2 | -0.0383 | -0.0402–-0.0365 |
+| llm-eval-laya:locked | 2 | -0.0408 | -0.0412–-0.0403 |
+| llm-eval-nimble-v3:locked | 2 | 0.000132 | -0.000725–0.000989 |
+| llm-eval-nimble:locked | 2 | -0.00638 | -0.00976–-0.00299 |
+| llm-eval-pplx-decider:locked | 2 | 0.0432 | 0.0339–0.0525 |
+| llm-eval-tev1-0.8b:locked | 2 | -0.0368 | -0.0412–-0.0323 |
+| llm-eval-tev1:locked | 2 | -0.0276 | -0.0277–-0.0276 |
 
-## Published results of this pair
+### ollama · 2026-11-18 · e282ec3a85ba
 
-| Date | Experiment | Hardware | Harness | Model | Case | Output cap | Status | Requests | Errors | Median wall s | Output tok/s | Quality | Decisions | Report |
-|---|---|---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-clef-flash:locked](../../model/llm-eval-clef-flash-locked.md) | ollama-clef-flash | – | succeeded | 6 | 0 | 0.042–0.0454 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-clef:locked](../../model/llm-eval-clef-locked.md) | ollama-clef | – | succeeded | 6 | 0 | 0.314–0.483 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-d1-omni:locked](../../model/llm-eval-d1-omni-locked.md) | ollama-d1-omni | – | succeeded | 6 | 0 | 0.0121–0.0171 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-d1:locked](../../model/llm-eval-d1-locked.md) | ollama-d1 | – | succeeded | 6 | 0 | 0.0117–0.0121 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-laya:locked](../../model/llm-eval-laya-locked.md) | ollama-laya | – | succeeded | 6 | 0 | 0.00842–0.0188 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-nimble-v3:locked](../../model/llm-eval-nimble-v3-locked.md) | ollama-nimble-v3 | – | succeeded | 6 | 0 | 0.0432–0.0446 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-nimble:locked](../../model/llm-eval-nimble-locked.md) | ollama-nimble | – | succeeded | 6 | 0 | 0.0505–0.0523 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-pplx-decider:locked](../../model/llm-eval-pplx-decider-locked.md) | ollama-pplx-decider | – | succeeded | 6 | 0 | 0.094–0.104 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-tev1-0.8b:locked](../../model/llm-eval-tev1-0.8b-locked.md) | ollama-tev1-0.8b | – | succeeded | 6 | 0 | 0.0168–0.0173 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-tev1:locked](../../model/llm-eval-tev1-locked.md) | ollama-tev1 | – | succeeded | 6 | 0 | 0.0308–0.0315 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-clef-flash:locked](../../model/llm-eval-clef-flash-locked.md) | ollama-clef-flash | – | succeeded | 6 | 0 | 0.0542–0.0557 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-clef:locked](../../model/llm-eval-clef-locked.md) | ollama-clef | – | succeeded | 6 | 0 | 0.504–0.566 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-d1-omni:locked](../../model/llm-eval-d1-omni-locked.md) | ollama-d1-omni | – | succeeded | 6 | 0 | 0.0345–0.0398 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-d1:locked](../../model/llm-eval-d1-locked.md) | ollama-d1 | – | succeeded | 6 | 0 | 0.014–0.0192 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-laya:locked](../../model/llm-eval-laya-locked.md) | ollama-laya | – | succeeded | 6 | 0 | 0.0138–0.0145 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-nimble-v3:locked](../../model/llm-eval-nimble-v3-locked.md) | ollama-nimble-v3 | – | succeeded | 6 | 0 | 0.055–0.0552 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-nimble:locked](../../model/llm-eval-nimble-locked.md) | ollama-nimble | – | succeeded | 6 | 0 | 0.0444–0.0527 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-pplx-decider:locked](../../model/llm-eval-pplx-decider-locked.md) | ollama-pplx-decider | – | succeeded | 6 | 0 | 0.0896–0.107 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-tev1-0.8b:locked](../../model/llm-eval-tev1-0.8b-locked.md) | ollama-tev1-0.8b | – | succeeded | 6 | 0 | 0.013–0.0234 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
-| [2026-11-24](../../date/2026-11-24.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-tev1:locked](../../model/llm-eval-tev1-locked.md) | ollama-tev1 | – | succeeded | 6 | 0 | 0.0265–0.0281 | – | – | 6/6 | [report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) |
-| [2026-11-18](../../date/2026-11-18.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-nimble:locked](../../model/llm-eval-nimble-locked.md) | ollama-nimble | – | succeeded | 6 | 0 | 0.0507–0.0554 | – | – | 6/6 | [report](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
-| [2026-11-18](../../date/2026-11-18.md) | [decision-models](../../experiment/decision-models.md) | [raider-wsl](../../hardware/raider-wsl.md) | [ollama](../../harness/ollama.md) | [llm-eval-tev1:locked](../../model/llm-eval-tev1-locked.md) | ollama-tev1 | – | succeeded | 6 | 0 | 0.0245–0.0261 | – | – | 6/6 | [report](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) |
+Fixed workload and settings include 2 tasks × 3 measured attempts, protocol systemone, mode decision and hardware raider-wsl. Backend version: not recorded. Comparison question: router label agreement on identical prompts.
+
+| Model package | Completed | Checks passed | Wall time (median s) | Time until text appears (median s) | Backend decode (median tok/s) |
+|---|---:|---:|---:|---:|---:|
+| llm-eval-nimble:locked | 6/6 | 6/6 | 0.0526 | not recorded | not recorded |
+| llm-eval-tev1:locked | 6/6 | 6/6 | 0.0249 | not recorded | not recorded |
+
+Paired wall-time differences use llm-eval-nimble:locked as the alphabetically first reference. For each identical prompt, subtract the reference median from the other model’s median. The range spans the observed prompts. Negative values mean a shorter wait.
+
+| Model package | Paired prompts | Median difference (s) | Observed range (s) |
+|---|---:|---:|---:|
+| llm-eval-tev1:locked | 2 | -0.0278 | -0.0293–-0.0262 |
+
+### ollama · 2026-11-24 · ef474d5f9f67
+
+Fixed workload and settings include 2 tasks × 3 measured attempts, protocol systemone, mode decision and hardware raider-wsl. Backend version: not recorded. Comparison question: router label agreement on identical prompts.
+
+| Model package | Completed | Checks passed | Wall time (median s) | Time until text appears (median s) | Backend decode (median tok/s) |
+|---|---:|---:|---:|---:|---:|
+| llm-eval-clef-flash:locked | 6/6 | 6/6 | 0.0453 | not recorded | not recorded |
+| llm-eval-clef:locked | 6/6 | 6/6 | 0.441 | not recorded | not recorded |
+| llm-eval-d1-omni:locked | 6/6 | 6/6 | 0.0131 | not recorded | not recorded |
+| llm-eval-d1:locked | 6/6 | 6/6 | 0.0119 | not recorded | not recorded |
+| llm-eval-laya:locked | 6/6 | 6/6 | 0.0179 | not recorded | not recorded |
+| llm-eval-nimble-v3:locked | 6/6 | 6/6 | 0.0442 | not recorded | not recorded |
+| llm-eval-nimble:locked | 6/6 | 6/6 | 0.0514 | not recorded | not recorded |
+| llm-eval-pplx-decider:locked | 6/6 | 6/6 | 0.104 | not recorded | not recorded |
+| llm-eval-tev1-0.8b:locked | 6/6 | 6/6 | 0.017 | not recorded | not recorded |
+| llm-eval-tev1:locked | 6/6 | 6/6 | 0.0311 | not recorded | not recorded |
+
+Paired wall-time differences use llm-eval-clef-flash:locked as the alphabetically first reference. For each identical prompt, subtract the reference median from the other model’s median. The range spans the observed prompts. Negative values mean a shorter wait.
+
+| Model package | Paired prompts | Median difference (s) | Observed range (s) |
+|---|---:|---:|---:|
+| llm-eval-clef:locked | 2 | 0.355 | 0.269–0.441 |
+| llm-eval-d1-omni:locked | 2 | -0.0291 | -0.0333–-0.0249 |
+| llm-eval-d1:locked | 2 | -0.0318 | -0.0338–-0.0299 |
+| llm-eval-laya:locked | 2 | -0.0301 | -0.037–-0.0232 |
+| llm-eval-nimble-v3:locked | 2 | 0.000193 | -0.000834–0.00122 |
+| llm-eval-nimble:locked | 2 | 0.00767 | 0.00502–0.0103 |
+| llm-eval-pplx-decider:locked | 2 | 0.0555 | 0.052–0.059 |
+| llm-eval-tev1-0.8b:locked | 2 | -0.0267 | -0.0287–-0.0247 |
+| llm-eval-tev1:locked | 2 | -0.0126 | -0.014–-0.0112 |
+
+## Reproduce a run
+
+Choose a dated report in the table. The manifest pins the code revision. Config records the planned job, input hashes and launch settings. CSV contains category summaries. Raw contains the published measurements. Some older bundles omit artifacts or runtime details. Local paths have been removed.
+
+[Read the reproduction recipe](../../../../REPRODUCE.md) · [Download the comparison manifest](decision-models.json).
+
+For the newest listed job (ollama-clef-flash) run this from the repository root.
+
+```sh
+llm-eval result-inputs --input docs/results/decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1 --job routing-decision-models-1-0701e943af0c
+```
+
+## Run history
+
+One row per published job, newest first. A completed request can still fail its check. Output-cap and reload conditions can differ between rows. Use a matched group for a controlled comparison. Projection rows count candidate settings. Legal jobs expose aggregate evidence by cohort.
+
+| Date | Model / runtime | Mode and status | Actual workload | Completed | Checks passed | Median wall s | First visible text s | Backend decode tok/s | Evidence |
+|---|---|---|---|---:|---:|---:|---:|---:|---|
+| 2026-11-24 | llm-eval-clef-flash:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0453 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-clef:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.441 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-d1-omni:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0131 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-d1:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0119 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-laya:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0179 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-nimble-v3:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0442 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-nimble:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0514 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-pplx-decider:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.104 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-tev1-0.8b:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.017 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-tev1:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0311 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224634Z-f70bba1c-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-clef-flash:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0554 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-clef:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.534 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-d1-omni:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0379 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-d1:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0177 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-laya:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0141 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-nimble-v3:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.055 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-nimble:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0519 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-pplx-decider:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.103 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-tev1-0.8b:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0147 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-24 | llm-eval-tev1:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0265 | not recorded | not recorded | [Report](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/README.md) · [Config](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/resolved-config.json) · [Manifest](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/manifest.json) · [CSV](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/summary.csv) · [Raw](../../../decision-models/campaign-20261124T224117Z-ce08f5a6-routing-decision-models-1/raw/measurements.jsonl.gz) |
+| 2026-11-18 | llm-eval-nimble:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0526 | not recorded | not recorded | [Report](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) · [Config](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/resolved-config.json) · [Manifest](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/manifest.json) · [CSV](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/summary.csv) · [Raw](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/raw/measurements.jsonl.gz) |
+| 2026-11-18 | llm-eval-tev1:locked · ollama | decision · succeeded | 2 tasks × 3 measured attempts | 6/6 | 6/6 | 0.0249 | not recorded | not recorded | [Report](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/README.md) · [Config](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/resolved-config.json) · [Manifest](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/manifest.json) · [CSV](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/summary.csv) · [Raw](../../../llm-routing/campaign-20261118T051019Z-d72bad77-routing-llm-routing-1/raw/measurements.jsonl.gz) |
