@@ -159,7 +159,10 @@ def slug(heading):
 
 
 def anchors(path):
-    return {slug(re.sub(r'^#+ ', '', l)) for l in prose(text(path)) if re.match(r'#{1,6} ', l)}
+    lines = prose(text(path))
+    headings = {slug(re.sub(r'^#+ ', '', line)) for line in lines if re.match(r'#{1,6} ', line)}
+    named = re.findall(r'<a (?:id|name)="([\w.-]+)"></a>', '\n'.join(lines))
+    return headings.union(named)
 
 
 def commands(body):

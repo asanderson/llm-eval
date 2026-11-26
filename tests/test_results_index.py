@@ -143,6 +143,8 @@ class ResultsIndexTests(unittest.TestCase):
         ]
         for path, start, end in ((root_readme, SUMMARY_START, SUMMARY_END), (self.summary, TOP_START, TOP_END)):
             block = path.read_text(encoding='utf-8').split(start)[1].split(end)[0]
+            links = re.findall(r'\]\(#(runs-[^)]+)\)', block)
+            self.assertCountEqual(links, re.findall(r'<a id="([^"]+)"></a>', block))
             actual = []
             hardware = experiment = None
             for line in block.splitlines():
