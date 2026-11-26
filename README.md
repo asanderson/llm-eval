@@ -1,10 +1,30 @@
 # llm-eval
 
+## Contents
+
+| Topic | Documents |
+|---|---|
+| [Experiments](#experiments) | [Hardware fit](experiments/hardware-fit/README.md) · [Model offloading](experiments/model-offloading/README.md) · [Decision models](experiments/decision-models/README.md) · [Legal models](experiments/legal-models/README.md) ([walkthrough](docs/LEGAL_MODELS_WALKTHROUGH.md)) · [Add a new experiment](docs/NEW_EXPERIMENT.md) |
+| Summary | [Measured results](#measured-results) by hardware, workload and runtime |
+| Models | [Model catalog](docs/MODELS.md) · [Model origins and US models](docs/MODELS.md#model-origins) · [Candidate models from Ollama, Hugging Face and LM Studio](docs/MODEL_CANDIDATES.md) · [LiveBench integration](docs/LIVEBENCH.md) · [Nightly model discovery](docs/MODEL_DISCOVERY.md) · catalogs: [models](catalog/models.json), [artifact pins](catalog/model-artifacts.json), [origins](catalog/model-origins.json) |
+| Model platforms | [Setup and compatibility of every platform](docs/PLATFORMS.md): [Ollama](docs/PLATFORMS.md#ollama) · [LM Studio](docs/PLATFORMS.md#lm-studio) · [KoboldCpp](docs/PLATFORMS.md#koboldcpp) · [llama.cpp and ik_llama.cpp](docs/PLATFORMS.md#llamacpp-and-ik_llamacpp) · [KTransformers](docs/PLATFORMS.md#ktransformers) · [vLLM](docs/PLATFORMS.md#vllm) · [Hugging Face Accelerate](docs/PLATFORMS.md#hugging-face-accelerate) · [AirLLM](docs/PLATFORMS.md#airllm) · [Strata](docs/PLATFORMS.md#strata) |
+| Hardware configurations | [Hardware configurations](docs/HARDWARE.md): [raider-windows](docs/HARDWARE.md#raider-windows) · [raider-wsl](docs/HARDWARE.md#raider-wsl) · [raider-ubuntu](docs/HARDWARE.md#raider-ubuntu) |
+| [Running experiments](#start-here) | [Readiness checker](docs/READINESS.md) · [Campaigns, inventories, SSH and recovery](docs/CAMPAIGNS.md) · walkthroughs for [native Windows 11](docs/WINDOWS_RAIDER_WALKTHROUGH.md), [WSL2 / Ubuntu 26.04](docs/WSL_RAIDER_WALKTHROUGH.md) and [native Ubuntu 26.04](docs/UBUNTU_RAIDER_WALKTHROUGH.md) · [Original platform workflows](docs/WORKFLOWS.md) |
+| Results | [Experiment results](docs/results/README.md) · [Results index](docs/results/index/README.md) · [Setup evidence](docs/results/index/recommended/README.md) · [Report generation and results pull requests](docs/RESULTS.md) |
+| Reference | [Methodology](docs/METHODOLOGY.md) · [Validation record](docs/VALIDATION.md) · [Security](docs/SECURITY.md) |
+
+## Experiments
+
 Test which language models run on a given computer, how long they take to answer, and what their answers get right. The published results include real runs on an MSI Raider laptop and labeled fixtures for checking the software.
 
-- **Choosing a local model?** Start with the [measured results](#measured-results) and check which runtime, prompt length and hardware were tested.
-- **Running a test?** [Reproduce a published run](docs/REPRODUCE.md) or [contribute a result on another machine](docs/HARDWARE_PARTICIPATION.md).
-- **Comparing results?** Open the [matched settings and download links](docs/results/index/recommended/README.md), or browse [individual runs by model or date](docs/results/index/README.md).
+| Experiment | What it evaluates | Guide |
+|---|---|---|
+| Hardware fit | Projects whether an artifact can fit in GPU memory and measures placement evidence, device memory and completion under load | [Hardware fit guide](experiments/hardware-fit/README.md) |
+| Model offloading | Quality, latency, throughput, and CPU/GPU/disk placement for models exceeding GPU VRAM | [Original experiment and model catalog](experiments/model-offloading/README.md) |
+| Decision models | Accuracy and latency of decision models (one choice question per task over named criteria, through Ollama's SystemOne API), replay selection quality, and the live quality, latency and API cost of the generators they route to. Formerly `llm-routing` | [Decision models guide](experiments/decision-models/README.md) |
+| Legal models | Retrieval of applicable law and source-grounded draft screening memos for human review, over a fictional jurisdiction; fictional fixture suite only; four runs on the Windows host and four in WSL2 published (generation and workflow on a served model, score, fixture retrieval), human review pending. Formerly `legal-benchmark` | [Legal models guide](experiments/legal-models/README.md) |
+
+The original target is the MSI Raider 18 HX AI with RTX 5090 Laptop 24 GiB, 64 GiB RAM, and native Ubuntu, native Windows, or WSL. Additional machines use their own profiles and execution targets. **Fixture tests are not real hardware benchmarks.** See the [validation record](docs/VALIDATION.md) for hardware acceptance gates.
 
 <a id="executive-summary"></a>
 
@@ -335,31 +355,11 @@ Native Ubuntu on the Raider has fixture coverage only. A measured result there i
 
 <!-- summary-recommended:end -->
 
-## Contents
-
-| Topic | Documents |
-|---|---|
-| Summary | [Measured results](#measured-results) by hardware, workload and runtime |
-| Experiments | [Hardware fit](experiments/hardware-fit/README.md) · [Model offloading](experiments/model-offloading/README.md) · [Decision models](experiments/decision-models/README.md) · [Legal models](experiments/legal-models/README.md) ([walkthrough](docs/LEGAL_MODELS_WALKTHROUGH.md)) · [Add a new experiment](docs/NEW_EXPERIMENT.md) |
-| Models | [Model catalog](docs/MODELS.md) · [Model origins and US models](docs/MODELS.md#model-origins) · [Candidate models from Ollama, Hugging Face and LM Studio](docs/MODEL_CANDIDATES.md) · [LiveBench integration](docs/LIVEBENCH.md) · [Nightly model discovery](docs/MODEL_DISCOVERY.md) · catalogs: [models](catalog/models.json), [artifact pins](catalog/model-artifacts.json), [origins](catalog/model-origins.json) |
-| Model platforms | [Setup and compatibility of every platform](docs/PLATFORMS.md): [Ollama](docs/PLATFORMS.md#ollama) · [LM Studio](docs/PLATFORMS.md#lm-studio) · [KoboldCpp](docs/PLATFORMS.md#koboldcpp) · [llama.cpp and ik_llama.cpp](docs/PLATFORMS.md#llamacpp-and-ik_llamacpp) · [KTransformers](docs/PLATFORMS.md#ktransformers) · [vLLM](docs/PLATFORMS.md#vllm) · [Hugging Face Accelerate](docs/PLATFORMS.md#hugging-face-accelerate) · [AirLLM](docs/PLATFORMS.md#airllm) · [Strata](docs/PLATFORMS.md#strata) |
-| Hardware configurations | [Hardware configurations](docs/HARDWARE.md): [raider-windows](docs/HARDWARE.md#raider-windows) · [raider-wsl](docs/HARDWARE.md#raider-wsl) · [raider-ubuntu](docs/HARDWARE.md#raider-ubuntu) |
-| Running experiments | [Readiness checker](docs/READINESS.md) · [Campaigns, inventories, SSH and recovery](docs/CAMPAIGNS.md) · walkthroughs for [native Windows 11](docs/WINDOWS_RAIDER_WALKTHROUGH.md), [WSL2 / Ubuntu 26.04](docs/WSL_RAIDER_WALKTHROUGH.md) and [native Ubuntu 26.04](docs/UBUNTU_RAIDER_WALKTHROUGH.md) · [Original platform workflows](docs/WORKFLOWS.md) |
-| Results | [Experiment results](docs/results/README.md) · [Results index](docs/results/index/README.md) · [Setup evidence](docs/results/index/recommended/README.md) · [Report generation and results pull requests](docs/RESULTS.md) |
-| Reference | [Methodology](docs/METHODOLOGY.md) · [Validation record](docs/VALIDATION.md) · [Security](docs/SECURITY.md) |
-
-## Experiments
-
-| Experiment | What it evaluates | Guide |
-|---|---|---|
-| Hardware fit | Projects whether an artifact can fit in GPU memory and measures placement evidence, device memory and completion under load | [Hardware fit guide](experiments/hardware-fit/README.md) |
-| Model offloading | Quality, latency, throughput, and CPU/GPU/disk placement for models exceeding GPU VRAM | [Original experiment and model catalog](experiments/model-offloading/README.md) |
-| Decision models | Accuracy and latency of decision models (one choice question per task over named criteria, through Ollama's SystemOne API), replay selection quality, and the live quality, latency and API cost of the generators they route to. Formerly `llm-routing` | [Decision models guide](experiments/decision-models/README.md) |
-| Legal models | Retrieval of applicable law and source-grounded draft screening memos for human review, over a fictional jurisdiction; fictional fixture suite only; four runs on the Windows host and four in WSL2 published (generation and workflow on a served model, score, fixture retrieval), human review pending. Formerly `legal-benchmark` | [Legal models guide](experiments/legal-models/README.md) |
-
-The original target is the MSI Raider 18 HX AI with RTX 5090 Laptop 24 GiB, 64 GiB RAM, and native Ubuntu, native Windows, or WSL. Additional machines use their own profiles and execution targets. **Fixture tests are not real hardware benchmarks.** See the [validation record](docs/VALIDATION.md) for hardware acceptance gates.
-
 ## Start here
+
+- **Choosing a local model?** Start with the [measured results](#measured-results) and check which runtime, prompt length and hardware were tested.
+- **Running a test?** [Reproduce a published run](docs/REPRODUCE.md) or [contribute a result on another machine](docs/HARDWARE_PARTICIPATION.md).
+- **Comparing results?** Open the [matched settings and download links](docs/results/index/recommended/README.md), or browse [individual runs by model or date](docs/results/index/README.md).
 
 Run the [readiness checker](docs/READINESS.md) on the test host to find missing tools/libraries and install supported prerequisites after prompting: `powershell -NoProfile -File .\scripts\readiness.ps1` on native Windows, or `bash scripts/readiness.sh` on Ubuntu/WSL. Use `--check-only` for an audit or `--campaign FILE` to derive requirements from your experiments.
 
