@@ -32,7 +32,7 @@ Each report lists its configuration coverage and measurements **by harness and m
 
 The [results overview](results/README.md) links findings to the measured workload, hardware, execution class and supporting jobs. The [setup evidence](results/index/recommended/README.md) pages distinguish direct comparisons within a matched protocol from evidence that can only support a single observation. Hardware-fit estimates, measured service timings, synthetic checks and legal cohorts each have their own interpretation. See the [reproduction guide](REPRODUCE.md) to inspect a bundle and check its recorded inputs.
 
-Run `llm-eval index-results` to regenerate `docs/results/index/`, including hardware, experiment, harness, model and date pages, the setup evidence and comparison manifests. The command also updates summary charts under `diagrams/results/summary/`, the three generated blocks of the results README, and the findings block of the repository README. The publisher stages these changes with the bundle.
+Run `llm-eval index-results` to regenerate `docs/results/index/`, including hardware, experiment, harness, model and date pages, the setup evidence and comparison manifests. The command also updates summary charts under `diagrams/results/summary/`, the three generated blocks of the results README, and the findings block of the repository README. The publisher stages these changes with the bundle. Both README summaries list every published job by hardware configuration and experiment. A model and harness can appear more than once when the archive contains reruns. The status, evidence type, publication date and job ID identify each observation.
 
 ## Verify a fresh clone
 

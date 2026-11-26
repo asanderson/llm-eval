@@ -90,41 +90,43 @@ def fit_rows(records, prefix):
     return lines
 
 
-def featured_fit(records):
-    """Choose a recently tested artifact with multiple evidence types. Include failures on its other runtimes."""
-    groups = defaultdict(dict)
-    for r in records:  # newest job first, including failed attempts
-        if r['experiment'] == FIT and r['mode'] == 'measured' and not r['synthetic'] and r['class'] is None:
-            groups[(r['hardware'], r['model'])].setdefault(r['harness'], r)
-    if not groups:
-        return []
-    def coverage(group):
-        return (max(r['date'] for r in group), len({placement(r) for r in group}), len(group), max(r['created'] for r in group))
-    chosen = max((list(g.values()) for g in groups.values()), key=coverage)
-    return sorted(chosen, key=lambda r: r['harness'])
+def hardware_run_rows(records, report_prefix):
+    """List every published job in a hardware/experiment group, including reruns."""
+    experiment = records[0]['experiment']
+    fit = experiment == FIT
+    latency_label, latency_key = ('Wall time (median s)', 'wall_s') if experiment == 'decision-models' else ('First text (median s)', 'visible_s')
+    columns = ['Model', 'Harness', 'Mode', 'Status', 'Workload', 'Completed', 'Checks passed', latency_label]
+    if fit:
+        columns += ['Input / configured context (tokens)', 'Placement evidence']
+    columns.append('Publication / job')
+    lines = ['| ' + ' | '.join(columns) + ' |', '|' + '---|' * len(columns)]
+    # collect() already orders newest first. Keep that order within a model/harness pair.
+    for r in sorted(records, key=lambda job: (job['model'], job['harness'])):
+        kind = r['class'] or ('fixture' if r['synthetic'] else None)
+        mode = _cell(r['mode'])
+        if kind and kind != r['mode']:
+            mode += ' · ' + _cell(kind)
+        obs = r['observation']
+        cells = [_cell(r['model']), _cell(PLATFORMS.get(r['harness'], r['harness'])), mode, _cell(r['status']),
+                 workload(r), completion(r), checks(r), value(obs[latency_key])]
+        if fit:
+            cells += [f"{span(obs['prompt_range'])} / {value(r['context'])}", placement(r)]
+        cells.append(f"[{_cell(r['created'])} · {_cell(r['job_id'])}]({report_prefix}{r['report']})")
+        lines.append('| ' + ' | '.join(cells) + ' |')
+    return lines
 
 
 def highlights(records, index, report_prefix):
     lines = ['### What ran on this hardware?', '']
-    fit = featured_fit(records)
-    if fit:
-        r = fit[0]
-        gpu = r['gpu']
-        lines += [f"**{_cell(r['model'])}** on {_cell(r['hardware'])} ({_cell(r['os'])}). "
-                  f"{value(gpu.get('name'))}, {value(gpu.get('vram_gib'))} GiB of GPU memory. "
-                  'Each row is the latest published test of this artifact name on that runtime.', '']
-        lines += fit_rows(fit, report_prefix)
-        sizes = {workload(r) for r in fit}
-        contexts = {r['context'] for r in fit}
-        detail_line = ('Each run recorded ' + sizes.pop() + '. ') if len(sizes) == 1 and UNKNOWN not in sizes else ''
-        if len(contexts) == 1 and None not in contexts:
-            n = contexts.pop()
-            detail_line += f'The configured context window was {value(n)} tokens. '
-            prompts = [r['observation']['prompt_range'][-1] for r in fit if r['observation']['prompt_range']]
-            if prompts and max(prompts) < n:
-                detail_line += f'The longest prompt with a recorded token count used {value(max(prompts))} tokens. '
-        lines += ['', detail_line + 'Checks refer to the published workload. Repeated attempts on one question count as one distinct task.',
-                  '', f'[Inspect the run settings, device memory and raw records]({detail(r, index)}).', '']
+    if not records:
+        return '\n'.join(lines + ['No published jobs yet.'])
+    by_hardware = defaultdict(lambda: defaultdict(list))
+    for r in records:
+        by_hardware[r['hardware']][r['experiment']].append(r)
+    lines += ['Every published job appears once below, grouped by hardware configuration and experiment. '
+              'Within each experiment, find the model and harness alphabetically, then its runs newest first. '
+              'Each publication time and job ID links to its source report.', '',
+              'Jump to ' + ' · '.join(f'[{_cell(h)}](#runs-{slug(h)})' for h in by_hardware) + '.', '']
     lines += ['| Experiment and hardware | Evidence available | Read the runs |', '|---|---|---|']
     for (experiment, hardware), group in pairs(records).items():
         mode_labels = {'measured': 'model run', 'category-smoke': 'model run', 'decision': 'model run',
@@ -135,7 +137,8 @@ def highlights(records, index, report_prefix):
         state = ', '.join(f'{n} {_cell(names.get(k, k))}' + ('s' if n != 1 else '') for k, n in sorted(counts.items()))
         failed = sum(r['status'] == 'failed' for r in group)
         state += f' ({failed} failed)' if failed else ''
-        lines.append(f"| {_cell(experiment)} · {_cell(hardware)} | {state} | [Evidence and reproduction]({detail(group[0], index)}) |")
+        anchor = f"runs-{slug(hardware)}-{slug(experiment)}"
+        lines.append(f"| [{_cell(experiment)} · {_cell(hardware)}](#{anchor}) | {state} | [Evidence and reproduction]({detail(group[0], index)}) |")
     pending = [r for r in records if any('all_pass_reviewed' in (row.get('metrics') or {}) for row in r['legal_rows'])
                and r['legal'].get('review_required') and not r['legal'].get('reviewer_fingerprint')]
     if pending:
@@ -144,6 +147,18 @@ def highlights(records, index, report_prefix):
     if any(r['hardware'] == 'raider-ubuntu' and r['synthetic'] for r in records) and all(
             r['synthetic'] or r['mode'] == 'projection' for r in records if r['hardware'] == 'raider-ubuntu'):
         lines += ['', 'Native Ubuntu on the Raider has fixture coverage only. A measured result there is still open.']
+    for hardware, experiments in by_hardware.items():
+        jobs = [r for group in experiments.values() for r in group]
+        systems = sorted({r['os'] for r in jobs if r['os']})
+        gpus = sorted({value(r['gpu']['name']) + (f" ({value(r['gpu']['vram_gib'])} GiB)" if r['gpu'].get('vram_gib') is not None else '')
+                       for r in jobs if r['gpu'].get('name')})
+        lines += ['', f'<a id="runs-{slug(hardware)}"></a>', '', f'#### {_cell(hardware)}', '',
+                  ' · '.join([f"{len(jobs)} published job" + ('s' if len(jobs) != 1 else ''),
+                              *(_cell(os_id) for os_id in systems), *gpus])]
+        for experiment, group in sorted(experiments.items()):
+            lines += ['', f'<a id="runs-{slug(hardware)}-{slug(experiment)}"></a>', '', f'##### {_cell(experiment)}', '',
+                      *hardware_run_rows(group, report_prefix), '',
+                      f'[Run settings and experiment details]({detail(group[0], index)}).']
     lines += ['', f'[Browse by model, date or runtime]({index}README.md) · [US model results]({index}origin/us.md).']
     return '\n'.join(lines)
 
