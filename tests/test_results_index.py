@@ -101,7 +101,7 @@ class ResultsIndexTests(unittest.TestCase):
         self.assertIn(TOP_END + '\n\nconclusions stay\n\n' + START, text)
         self.assertIn(END + '\n\nnarrative stays\n\n' + LIST_START, text)
         self.assertTrue(text.endswith(LIST_END + '\n'))
-        # each block holds its own part: ranking on top, navigation in the middle, the report list last
+        # The top block covers hardware, followed by navigation and the publication list.
         top, rest = text.split(TOP_END)
         self.assertIn('### What ran on this hardware?', top)
         self.assertNotIn('models by harness', top)
@@ -121,6 +121,45 @@ class ResultsIndexTests(unittest.TestCase):
         before = text
         write_results_index(self.root)
         self.assertEqual(self.summary.read_text(encoding='utf-8'), before)
+
+    def test_both_hardware_summaries_list_every_job_with_its_source_and_status(self):
+        # The same job ID can be published again; two models can use the same harness on one host.
+        bundle(self.root, 'hardware-fit', 'fit-repeat', '2026-11-10T11:00:00+00:00',
+               [offload_job('b1', 'ollama', 'deepseek-r1-32b', mode='measured', _status='failed'),
+                offload_job('p1', 'projection', 'fit-candidates', mode='projection'),
+                offload_job('other', 'ollama', 'another-model', mode='measured')], [])
+        root_readme = self.root / 'README.md'
+        root_readme.write_text(f'{SUMMARY_START}\n{SUMMARY_END}\n', encoding='utf-8')
+        write_results_index(self.root)
+
+        expected = [
+            ('raider-ubuntu', 'decision-models', 'llm-eval-nimble:locked', 'Ollama', 'decision · fixture', 'succeeded', 'campaign-a-routing', 'r1'),
+            ('raider-windows', 'model-offloading', 'deepseek-r1-32b', 'Ollama', 'category-smoke', 'succeeded', 'campaign-b-offload', 'b1'),
+            ('raider-windows', 'model-offloading', 'deepseek-r1-32b', 'Ollama', 'category-smoke', 'succeeded', 'campaign-a-offload', 'a1'),
+            ('raider-windows', 'model-offloading', 'deepseek-r1-32b', 'KoboldCpp', 'category-smoke', 'failed', 'campaign-a-offload', 'a2'),
+            ('raider-windows', 'hardware-fit', 'deepseek-r1-32b', 'Ollama', 'measured', 'failed', 'fit-repeat', 'b1'),
+            ('raider-windows', 'hardware-fit', 'fit-candidates', 'projection', 'projection', 'succeeded', 'fit-repeat', 'p1'),
+            ('raider-windows', 'hardware-fit', 'another-model', 'Ollama', 'measured', 'succeeded', 'fit-repeat', 'other'),
+        ]
+        for path, start, end in ((root_readme, SUMMARY_START, SUMMARY_END), (self.summary, TOP_START, TOP_END)):
+            block = path.read_text(encoding='utf-8').split(start)[1].split(end)[0]
+            links = re.findall(r'\]\(#(runs-[^)]+)\)', block)
+            self.assertCountEqual(links, re.findall(r'<a id="([^"]+)"></a>', block))
+            actual = []
+            hardware = experiment = None
+            for line in block.splitlines():
+                if line.startswith('#### '):
+                    hardware = line[5:]
+                elif line.startswith('##### '):
+                    experiment = line[6:]
+                match = re.search(r'\| \[[^\]]+ · ([^\]]+)\]\(([^)]+/README\.md)\) \|$', line)
+                if match:
+                    job_id, report = match.groups()
+                    self.assertTrue((path.parent / report).is_file())
+                    model, harness, mode, status = line.split(' | ')[:4]
+                    actual.append((hardware, experiment, model.removeprefix('| '), harness, mode, status,
+                                   Path(report).parent.name, job_id))
+            self.assertCountEqual(actual, expected)
 
     def test_incomplete_historical_metadata_is_displayed_as_an_observation(self):
         records = collect(self.root)
